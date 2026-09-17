@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_extra_material_wizard_form" model="ir.ui.view">
+        <field name="name">mrp.extra.material.wizard.form</field>
+        <field name="model">mrp.extra.material.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Extra Material Request">
+                <group>
+                    <field name="production_id"/>
+                    <field name="product_id"/>
+                    <field name="product_uom_category_id" invisible="1"/>
+                    <field name="quantity"/>
+                    <field name="product_uom_id"/>
+                    <field name="reason" placeholder="Why is the standard recipe quantity insufficient?"/>
+                </group>
+                <footer>
+                    <button name="action_add_extra_material" string="Add to Manufacturing Order" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

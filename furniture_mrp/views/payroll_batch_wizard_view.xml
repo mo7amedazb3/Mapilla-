@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_payroll_batch_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.payroll.batch.wizard.form</field>
+        <field name="model">furniture.mrp.payroll.batch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إنشاء كشوف كل العمال">
+                <header>
+                    <button name="action_generate_and_open" type="object"
+                            string="إنشاء الكشوف وفتحها"
+                            icon="fa-list-alt" class="btn-secondary"/>
+                    <button name="action_generate_and_print" type="object"
+                            string="إنشاء وطباعة التقرير المجمع"
+                            icon="fa-file-pdf-o" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>كشوف أجور كل العمال</h1>
+                        <p class="text-muted">
+                            كشف واحد لكل عامل، وتقرير PDF موحد بصف مستقل لكل عامل.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        كل عمال الشركة النشطين مضافون ومحددون تلقائيًا. يمكنك إلغاء
+                        تحديد أي عامل قبل التنفيذ. الفترة الافتراضية آخر 7 أيام،
+                        والجمعة إجازة أسبوعية مدفوعة ولا تُحسب غيابًا.
+                    </div>
+
+                    <group col="4">
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="employee_count" readonly="1"/>
+                        <field name="selected_count" readonly="1"/>
+                        <field name="missing_contract_count" readonly="1"/>
+                        <field name="zero_wage_count" readonly="1"/>
+                        <field name="slip_count" readonly="1"
+                               invisible="slip_count == 0"/>
+                    </group>
+
+                    <div class="alert alert-danger" role="alert"
+                         invisible="missing_contract_count == 0">
+                        يوجد عمال محددون بلا عقد صالح خلال الفترة. لن يُنشأ أي كشف
+                        حتى استبعادهم أو استكمال عقودهم.
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="zero_wage_count == 0">
+                        بعض العقود أجرها صفر؛ ستُنشأ كشوفها بصورة طبيعية وتظهر
+                        بقيمة صفر إلى أن يتم إدخال الأجر في العقد.
+                    </div>
+
+                    <separator string="العمال المضافون للكشف المجمع"/>
+                    <field name="line_ids" nolabel="1">
+                        <list editable="bottom" create="0" delete="0"
+                              decoration-danger="selected and not contract_id"
+                              decoration-muted="not selected">
+                            <field name="sequence" column_invisible="True"/>
+                            <field name="selected"/>
+                            <field name="employee_id" readonly="1" force_save="1"/>
+                            <field name="department_id" readonly="1" optional="show"/>
+                            <field name="pay_basis" readonly="1" optional="show"/>
+                            <field name="contract_id" readonly="1" optional="show"/>
+                        </list>
+                    </field>
+
+                    <field name="slip_ids" invisible="1"/>
+                    <div class="alert alert-light border mt-3" role="status">
+                        التنفيذ آمن كدفعة واحدة: أي عقد مفقود أو فترة متداخلة يوقف
+                        العملية كلها. الكشف المطابق يُعاد استخدامه، والمسودة فقط
+                        هي التي يُعاد حسابها؛ المعتمد والمدفوع لا يتغيران.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_payroll_batch_wizard" model="ir.actions.act_window">
+        <field name="name">إنشاء كشوف كل العمال</field>
+        <field name="res_model">furniture.mrp.payroll.batch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_payroll_batch_wizard_form"/>
+        <field name="target">current</field>
+    </record>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- تسلسل أوامر الإنتاج الرئيسية -->
+        <record id="seq_furniture_mrp_production" model="ir.sequence">
+            <field name="name">أوامر إنتاج الأثاث</field>
+            <field name="code">furniture.mrp.production</field>
+            <field name="prefix">MRP/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <!-- تسلسل جدول الإنتاج الرئيسي MPS -->
+        <record id="seq_furniture_mrp_mps" model="ir.sequence">
+            <field name="name">جدول الإنتاج الرئيسي MPS</field>
+            <field name="code">furniture.mrp.mps</field>
+            <field name="prefix">MPS/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <!-- تسلسل تقارير التكاليف -->
+        <record id="seq_furniture_mrp_costing" model="ir.sequence">
+            <field name="name">تقارير تكاليف الإنتاج</field>
+            <field name="code">furniture.mrp.costing</field>
+            <field name="prefix">COST/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_furniture_mrp_lane_handoff" model="ir.sequence">
+            <field name="name">تحويلات مراحل الأثاث</field>
+            <field name="code">furniture.mrp.lane.handoff</field>
+            <field name="prefix">HND/%(year)s/</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_furniture_mrp_future_order" model="ir.sequence">
+            <field name="name">طلبات التسليم المستقبلية</field>
+            <field name="code">furniture.mrp.future.order</field>
+            <field name="prefix">DEL/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

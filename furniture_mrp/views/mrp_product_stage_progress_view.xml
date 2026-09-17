@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_product_stage_progress_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.product.stage.progress.list</field>
+        <field name="model">furniture.mrp.product.stage.progress</field>
+        <field name="arch" type="xml">
+            <list string="مراحل تصنيع المنتج" create="0" edit="0" delete="0"
+                  class="o_furniture_progress_wizard_list">
+                <field name="stage_sequence" optional="hide"/>
+                <field name="product_id"/>
+                <field name="buyer_partner_id" optional="show"/>
+                <field name="beneficiary_partner_id" optional="show"/>
+                <field name="dimension_label" string="المقاس" widget="badge"
+                       class="o_furniture_dimension_badge"
+                       decoration-info="dimension_label"/>
+                <field name="production_id"/>
+                <field name="source_origin"/>
+                <field name="stage_label"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'done'"
+                       decoration-warning="status == 'in_progress'"
+                       decoration-muted="status == 'pending'"/>
+                <field name="qty"/>
+                <field name="location_id"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_product_stage_progress_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.product.stage.progress.form</field>
+        <field name="model">furniture.mrp.product.stage.progress</field>
+        <field name="arch" type="xml">
+            <form string="تفاصيل مرحلة المنتج" create="0" edit="0" delete="0"
+                  class="o_furniture_stage_transfer_wizard o_furniture_progress_detail_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">متابعة رحلة المنتج</div>
+                        <h2>تفاصيل تقدم الصنف بين مراحل الإنتاج</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">↗</div>
+                </div>
+                <sheet class="o_furniture_wizard_sheet">
+                    <group class="o_furniture_progress_card o_furniture_progress_product_card">
+                        <field name="product_id"/>
+                        <field name="dimension_label" widget="badge" readonly="1"
+                               class="o_furniture_dimension_badge"
+                               invisible="not dimension_label"/>
+                        <field name="production_id"/>
+                        <field name="production_line_id"/>
+                        <field name="buyer_partner_id"/>
+                        <field name="beneficiary_partner_id"/>
+                        <field name="source_origin"/>
+                    </group>
+                    <group class="o_furniture_progress_card o_furniture_progress_stage_card">
+                        <field name="stage_label"/>
+                        <field name="status"/>
+                        <field name="qty"/>
+                        <field name="location_id"/>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

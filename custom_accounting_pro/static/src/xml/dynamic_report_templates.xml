@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_accounting_pro.DynamicReport" owl="1">
+        <div class="o_dynamic_report_container">
+            <div class="o_dynamic_report_header d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div class="btn-group">
+                    <button class="btn" t-att-class="state.reportType === 'gl' ? 'btn-primary' : 'btn-outline-primary'" t-on-click="() => this.switchReport('gl')">General Ledger</button>
+                    <button class="btn" t-att-class="state.reportType === 'partner_ledger' ? 'btn-primary' : 'btn-outline-primary'" t-on-click="() => this.switchReport('partner_ledger')">Partner Ledger</button>
+                    <button class="btn" t-att-class="state.reportType === 'trial_balance' ? 'btn-primary' : 'btn-outline-primary'" t-on-click="() => this.switchReport('trial_balance')">Trial Balance</button>
+                    <button class="btn" t-att-class="state.reportType === 'pl' ? 'btn-primary' : 'btn-outline-primary'" t-on-click="() => this.switchReport('pl')">Profit &amp; Loss</button>
+                </div>
+                
+                <div class="o_report_controls d-flex align-items-center gap-2">
+                    <input type="date" class="form-control w-auto" t-model="state.dateFrom" placeholder="Date From"/>
+                    <input type="date" class="form-control w-auto" t-model="state.dateTo" placeholder="Date To"/>
+                    
+                    <button class="btn btn-primary" t-on-click="loadData" t-att-disabled="state.loading">
+                        <i class="fa fa-refresh"/> Refresh
+                    </button>
+                    
+                    <button class="btn btn-success" t-on-click="() => this.exportExcel()" t-att-disabled="state.loading || !state.data.length">
+                        <i class="fa fa-file-excel-o"/> Excel
+                    </button>
+                    
+                    <button class="btn btn-danger" t-on-click="() => this.printPdf()" t-att-disabled="state.loading || !state.data.length">
+                        <i class="fa fa-file-pdf-o"/> PDF
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="state.loading" class="o_dynamic_report_loading">
+                <div class="spinner"></div>
+                <p>Loading your beautifully formatted report...</p>
+            </div>
+
+            <div t-else="" class="o_dynamic_report_content table-responsive">
+                <table class="table table-sm table-hover o_report_table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;" class="text-center">
+                                <input type="checkbox" t-on-change="toggleAll" t-att-checked="isAllSelected()"/>
+                            </th>
+                            <th t-if="state.reportType !== 'partner_ledger'">Account Code</th>
+                            <th t-if="state.reportType === 'partner_ledger'">Partner</th>
+                            <th t-if="state.reportType !== 'partner_ledger'">Account Name</th>
+                            <th class="text-end" t-if="state.reportType !== 'pl'">Debit</th>
+                            <th class="text-end" t-if="state.reportType !== 'pl'">Credit</th>
+                            <th class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="state.data" t-as="acc" t-key="acc.account_id || acc.partner_id">
+                            <tr class="o_report_account_row" t-on-click="() => this.toggleExpand(acc.account_id || acc.partner_id)">
+                                <td class="text-center" t-on-click.stop="">
+                                    <input type="checkbox" t-model="state.selected[acc.account_id || acc.partner_id]"/>
+                                </td>
+                                <td>
+                                    <i t-if="acc.lines and acc.lines.length" class="fa" t-att-class="state.expanded[acc.account_id || acc.partner_id] ? 'fa-caret-down' : 'fa-caret-right'"/>
+                                    <t t-if="state.reportType !== 'partner_ledger'"><t t-esc="acc.code"/></t>
+                                    <t t-if="state.reportType === 'partner_ledger'"><t t-esc="acc.name"/></t>
+                                </td>
+                                <td t-if="state.reportType !== 'partner_ledger'">
+                                    <t t-esc="acc.name"/>
+                                    <button t-if="acc.lines and acc.lines.length" class="btn btn-sm btn-link text-success p-0 ms-2" t-on-click.stop="() => this.exportExcel([acc])" title="Export this account (Excel)">
+                                        <i class="fa fa-file-excel-o"/>
+                                    </button>
+                                    <button t-if="acc.lines and acc.lines.length" class="btn btn-sm btn-link text-danger p-0 ms-1" t-on-click.stop="() => this.printPdf([acc])" title="Export this account (PDF)">
+                                        <i class="fa fa-file-pdf-o"/>
+                                    </button>
+                                </td>
+                                <td class="text-end" t-if="state.reportType !== 'pl'"><t t-if="acc.debit !== undefined" t-esc="formatCurrency(acc.debit)"/></td>
+                                <td class="text-end" t-if="state.reportType !== 'pl'"><t t-if="acc.credit !== undefined" t-esc="formatCurrency(acc.credit)"/></td>
+                                <td class="text-end fw-bold">
+                                    <t t-esc="formatCurrency(acc.balance)"/>
+                                    <button t-if="state.reportType === 'partner_ledger' and acc.lines and acc.lines.length" class="btn btn-sm btn-link text-success p-0 ms-2" t-on-click.stop="() => this.exportExcel([acc])" title="Export this partner (Excel)">
+                                        <i class="fa fa-file-excel-o"/>
+                                    </button>
+                                    <button t-if="state.reportType === 'partner_ledger' and acc.lines and acc.lines.length" class="btn btn-sm btn-link text-danger p-0 ms-1" t-on-click.stop="() => this.printPdf([acc])" title="Export this partner (PDF)">
+                                        <i class="fa fa-file-pdf-o"/>
+                                    </button>
+                                </td>
+                            </tr>
+                            <t t-if="state.expanded[acc.account_id || acc.partner_id] and acc.lines">
+                                <t t-foreach="acc.lines" t-as="line" t-key="line.id">
+                                    <tr class="o_report_line_row">
+                                        <td/>
+                                        <td class="text-muted ps-4"><t t-esc="line.date"/></td>
+                                        <td class="text-muted" t-att-colspan="state.reportType !== 'partner_ledger' ? 1 : 0">
+                                            <t t-esc="line.label || line.journal"/> 
+                                            <t t-if="line.partner and state.reportType !== 'partner_ledger'">- <t t-esc="line.partner"/></t>
+                                        </td>
+                                        <td class="text-end text-muted"><t t-esc="formatCurrency(line.debit)"/></td>
+                                        <td class="text-end text-muted"><t t-esc="formatCurrency(line.credit)"/></td>
+                                        <td class="text-end text-muted"><t t-esc="formatCurrency(line.balance)"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </t>
+                        <tr t-if="!state.data.length">
+                            <td colspan="7" class="text-center text-muted py-4">No data found for this report.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

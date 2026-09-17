@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_furniture_mrp_stage_cost_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="currency" t-value="o.company_id.currency_id"/>
+                    <t t-set="rows" t-value="stage_data['rows']"/>
+                    <t t-set="brand_company" t-value="o.company_id"/>
+                    <div class="page" dir="rtl" style="font-family:'DejaVu Sans',Arial,sans-serif; color:#18313b; font-size:10px;">
+                        <style>
+                            .stage-cover { background:#123f49; color:#fff; padding:18px 22px; border-radius:10px; margin-bottom:12px; }
+                            .stage-cover h1 { color:#fff !important; margin:0 0 4px 0; font-size:25px; font-weight:700; }
+                            .stage-cover .subtitle { color:#ccebed; font-size:11px; }
+                            .stage-meta { width:100%; table-layout:fixed; margin-top:12px; color:#fff; }
+                            .stage-meta td { width:25%; box-sizing:border-box; padding:3px 8px; border-left:1px solid rgba(255,255,255,.18); vertical-align:top; word-wrap:break-word; }
+                            .section-title { font-size:14px; font-weight:700; color:#123f49; border-right:5px solid #e79b25; padding:4px 9px; margin:14px 0 7px; }
+                            .summary-table { width:100%; border-collapse:separate; border-spacing:7px 0; margin:0 -7px 10px; }
+                            .summary-card { border:1px solid #cfe1e3; background:#f4faf9; padding:10px; border-radius:7px; width:20%; }
+                            .summary-card .label { color:#60767d; font-size:9px; margin-bottom:3px; }
+                            .summary-card .value { color:#123f49; font-size:17px; font-weight:700; }
+                            .summary-card.total { background:#e7f5ef; border-color:#8cc9b1; }
+                            .summary-card.unit { background:#fff5df; border-color:#e9c777; }
+                            table.report-grid { width:100%; border-collapse:collapse; margin-bottom:10px; }
+                            table.report-grid thead th { background:#195966; color:#fff; padding:7px 4px; border:1px solid #174d58; font-size:9px; text-align:center; }
+                            table.report-grid tbody td { padding:7px 4px; border:1px solid #d7e2e4; text-align:center; vertical-align:middle; }
+                            table.report-grid tbody tr:nth-child(even) { background:#f5f8f8; }
+                            .product-name { font-weight:700; color:#155563; }
+                            .money { direction:ltr; white-space:nowrap; font-weight:600; }
+                            .unit-cost { direction:ltr; white-space:nowrap; font-size:13px; font-weight:700; color:#14784d; }
+                            .tag { display:inline-block; background:#e7f1f3; color:#155563; border:1px solid #bdd4d8; border-radius:9px; padding:1px 7px; }
+                            .notice { background:#fff8e8; border:1px solid #efd597; border-right:5px solid #e79b25; padding:8px 10px; margin:8px 0 12px; line-height:1.7; }
+                            .empty-box { background:#f5f7f7; color:#64777d; border:1px dashed #aebfc2; padding:14px; text-align:center; }
+                            .signatures { width:100%; margin-top:25px; page-break-inside:avoid; }
+                            .signatures td { width:33.33%; text-align:center; padding:30px 20px 0; }
+                            .signature-line { border-top:1px solid #71858a; padding-top:5px; }
+                        </style>
+
+                        <div class="stage-cover">
+                            <table style="width:100%; table-layout:fixed; color:#fff;">
+                                <tr>
+                                    <td style="width:70%; vertical-align:top;">
+                                        <h1>تقرير تكلفة مرحلة <t t-esc="stage_data['stage_label']"/></h1>
+                                        <div class="subtitle">الخامات والعمالة المعتمدة لهذه المرحلة فقط</div>
+                                    </td>
+                                    <td style="width:30%; text-align:left; vertical-align:top;">
+                                        <t t-call="furniture_mrp.report_company_brand_logo_left"/>
+                                        <div style="font-size:18px; font-weight:700;"><t t-esc="stage_order.name"/></div>
+                                        <div class="subtitle"><t t-esc="o.company_id.name"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="stage-meta">
+                                <tr>
+                                    <td><strong>أمر التصنيع:</strong> <t t-esc="o.name"/></td>
+                                    <td><strong>حالة المرحلة:</strong> <t t-esc="stage_data['state_label']"/></td>
+                                    <td><strong>ساعات العمالة:</strong> <t t-esc="'{:,.2f}'.format(stage_data['labor_hours'])"/></td>
+                                    <td><strong>عملة التقرير:</strong> <t t-esc="currency.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>العمال:</strong> <t t-esc="stage_data['workers'] or '-'"/></td>
+                                    <td><strong>ساعات الانتظار:</strong> <t t-esc="'{:,.2f}'.format(stage_data['waiting_hours'])"/></td>
+                                    <td><strong>تكلفة الانتظار:</strong> <t t-esc="'{:,.2f}'.format(stage_data['waiting_cost'])"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section-title">ملخص تكلفة المرحلة</div>
+                        <table class="summary-table">
+                            <tr>
+                                <td class="summary-card"><div class="label">الكمية المعتمدة</div><div class="value"><t t-esc="'{:,.3f}'.format(stage_data['total_quantity'])"/></div></td>
+                                <td class="summary-card"><div class="label">خامات المرحلة</div><div class="value"><t t-esc="'{:,.2f}'.format(stage_data['total_material'])"/></div></td>
+                                <td class="summary-card"><div class="label">عمالة المرحلة</div><div class="value"><t t-esc="'{:,.2f}'.format(stage_data['total_labor'])"/></div></td>
+                                <td class="summary-card total"><div class="label">إجمالي تكلفة المرحلة</div><div class="value"><t t-esc="'{:,.2f}'.format(stage_data['total_cost'])"/></div></td>
+                                <td class="summary-card unit"><div class="label">متوسط تكلفة القطعة في المرحلة</div><div class="value"><t t-esc="'{:,.2f}'.format(stage_data['unit_cost'])"/></div></td>
+                            </tr>
+                        </table>
+                        <div class="notice">
+                            هذا التقرير يعرض تكاليف <strong><t t-esc="stage_data['stage_label']"/></strong> فقط، ولا يشمل تكاليف المراحل السابقة أو اللاحقة. الأرقام مبنية على الدفعات التي تم قبول جودتها.
+                        </div>
+
+                        <div class="section-title">تكلفة الدفعات المعتمدة بالمرحلة</div>
+                        <table class="report-grid" t-if="rows">
+                            <thead><tr><th>الصنف</th><th>الموديل</th><th>المقاس</th><th>الكمية</th><th>الوحدة</th><th>خامات المرحلة</th><th>عمالة المرحلة</th><th>إجمالي المرحلة</th><th>تكلفة القطعة</th><th>تاريخ الاعتماد</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="row">
+                                    <td class="product-name"><t t-esc="row['product'].display_name"/></td>
+                                    <td><span class="tag" t-if="row['model']"><t t-esc="row['model'].name"/></span><span t-else="">-</span></td>
+                                    <td><span class="tag" t-if="row['dimension']"><t t-esc="row['dimension']"/></span><span t-else="">-</span></td>
+                                    <td><t t-esc="'{:,.3f}'.format(row['quantity'])"/></td>
+                                    <td><t t-esc="row['uom'].name"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['material_cost'])"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['labor_cost'])"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['total_cost'])"/></td>
+                                    <td class="unit-cost"><t t-esc="'{:,.2f}'.format(row['unit_cost'])"/> جنيه</td>
+                                    <td><span t-if="row['accepted_at']" t-field="row['entry'].accepted_at" t-options="{'widget':'datetime'}"/><span t-else="">-</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="empty-box" t-else="">لا توجد دفعات تم اعتماد تكلفتها في هذه المرحلة حتى الآن.</div>
+
+                        <table class="signatures"><tr><td><div class="signature-line">مشرف المرحلة</div></td><td><div class="signature-line">مدير الإنتاج</div></td><td><div class="signature-line">الإدارة المالية</div></td></tr></table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

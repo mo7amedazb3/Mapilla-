@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_furniture_payroll_slip" model="report.paperformat">
+        <field name="name">كشف أجر العامل A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">9</field>
+        <field name="margin_bottom">9</field>
+        <field name="margin_left">9</field>
+        <field name="margin_right">9</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="simple_payroll_salary-2.action_report_simple_payroll_slip" model="ir.actions.report">
+        <field name="name">كشف أجر العامل</field>
+        <field name="print_report_name">'كشف أجر - %s - %s' % (object.employee_id.name, object.date_from)</field>
+        <field name="paperformat_id" ref="paperformat_furniture_payroll_slip"/>
+    </record>
+
+    <template id="furniture_payroll_bare_layout">
+        <div class="article"
+             t-att-data-oe-model="o and o._name"
+             t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-out="0"/>
+        </div>
+    </template>
+
+    <template id="report_simple_payroll_slip_furniture"
+              inherit_id="simple_payroll_salary-2.report_simple_payroll_slip">
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-call">furniture_mrp.furniture_payroll_bare_layout</attribute>
+        </xpath>
+        <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' page ')]"
+               position="replace">
+            <div class="page" dir="rtl"
+                 style="font-family: DejaVu Sans, Arial, sans-serif; color: #17324d;">
+                <div style="background:#123b57; color:#fff; padding:12px 18px; border-radius:8px; margin-bottom:10px;">
+                    <table style="width:100%; color:#fff; border:0; table-layout:fixed;">
+                        <tr>
+                            <td style="width:72%; border:0; text-align:right; vertical-align:middle;">
+                                <div style="font-size:9px; color:#bcd2df; margin-bottom:2px;">كشف الحساب الأسبوعي</div>
+                                <h1 style="margin:0; color:#fff; font-size:22px; font-weight:800;">كشف أجر العامل</h1>
+                                <div style="margin-top:5px;">
+                                    <span style="display:inline-block; color:#bcd2df; font-size:11px; margin-left:8px;">الفترة</span>
+                                    <span dir="ltr" style="display:inline-block; direction:ltr; color:#fff; font-size:13px; font-weight:700;">
+                                        <span t-field="o.date_from"/> — <span t-field="o.date_to"/>
+                                    </span>
+                                </div>
+                            </td>
+                            <td style="width:28%; border:0; text-align:left; vertical-align:middle;">
+                                <img t-if="o.company_id.logo"
+                                     t-att-src="image_data_uri(o.company_id.logo)"
+                                     style="max-height:44px; max-width:130px; background:#fff; padding:5px; border-radius:6px;"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <table class="o_furniture_payroll_identity"
+                       style="width:100%; margin-bottom:11px; border-collapse:collapse; table-layout:fixed; background:#fff; border:1px solid #dce5ea;">
+                    <tr>
+                        <td style="width:50%; padding:7px 10px; background:#fff; border:1px solid #dce5ea; vertical-align:top;">
+                            <div style="color:#6c7f8a; font-size:10px; margin-bottom:2px;">العامل</div>
+                            <div style="color:#17324d; font-size:13px; font-weight:700; white-space:normal; word-break:break-word;">
+                                <span t-field="o.employee_id.name"/>
+                            </div>
+                        </td>
+                        <td style="width:50%; padding:7px 10px; background:#fff; border:1px solid #dce5ea; vertical-align:top;">
+                            <div style="color:#6c7f8a; font-size:10px; margin-bottom:2px;">طريقة الأجر</div>
+                            <div style="color:#17324d; font-size:13px; font-weight:700;">
+                                <span t-field="o.furniture_pay_basis"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:7px 10px; border:1px solid #dce5ea; vertical-align:top;">
+                            <div style="color:#6c7f8a; font-size:10px; margin-bottom:2px;">العقد</div>
+                            <div style="color:#17324d; font-size:12px; white-space:normal; word-break:break-word;">
+                                <span t-field="o.contract_id.name"/>
+                            </div>
+                        </td>
+                        <td style="padding:7px 10px; border:1px solid #dce5ea; vertical-align:top;">
+                            <div style="color:#6c7f8a; font-size:10px; margin-bottom:2px;">المرجع</div>
+                            <div style="color:#17324d; font-size:12px; white-space:normal; word-break:break-word;">
+                                <span t-field="o.name"/>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="o_furniture_payroll_section_title"
+                     style="border-right:4px solid #1f8a82; padding:2px 9px 2px 0; margin:12px 0 7px;">
+                    <strong style="display:block; color:#123b57; font-size:15px;">ملخص الحضور</strong>
+                    <span style="display:block; color:#788b96; font-size:9px; margin-top:1px;">أرقام الدوام المسجلة خلال الفترة</span>
+                </div>
+                <table class="o_furniture_payroll_attendance_kpis"
+                       style="width:100%; border-collapse:separate; border-spacing:4px 0; margin:0 -4px 12px; text-align:center; table-layout:fixed;">
+                    <tr>
+                        <td style="padding:8px 4px; background:#f7f9fa; border:1px solid #e0e7eb; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#71838e; font-size:9px; margin-bottom:3px;">أيام العمل</div>
+                            <div style="color:#17324d; font-size:16px; font-weight:800;"><t t-out="'%.0f' % (o.expected_working_days or 0.0)"/></div>
+                        </td>
+                        <td style="padding:8px 4px; background:#f7f9fa; border:1px solid #e0e7eb; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#71838e; font-size:9px; margin-bottom:3px;">ساعات الحضور</div>
+                            <div style="color:#17324d; font-size:16px; font-weight:800;"><t t-out="'%.2f' % (o.attendance_hours or 0.0)"/></div>
+                        </td>
+                        <td style="padding:8px 4px; background:#f7f9fa; border:1px solid #e0e7eb; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#71838e; font-size:9px; margin-bottom:3px;">أيام الغياب</div>
+                            <div style="color:#17324d; font-size:16px; font-weight:800;"><t t-out="'%.0f' % (o.absence_days or 0.0)"/></div>
+                        </td>
+                        <td style="padding:8px 4px; background:#f7f9fa; border:1px solid #e0e7eb; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#71838e; font-size:9px; margin-bottom:3px;">التأخير الفعلي</div>
+                            <div style="color:#17324d; font-size:16px; font-weight:800;"><t t-out="'%.2f' % (o.furniture_actual_late_hours or 0.0)"/></div>
+                            <div style="color:#91a0a8; font-size:8px;">ساعة</div>
+                        </td>
+                        <td style="padding:8px 4px; background:#f7f9fa; border:1px solid #e0e7eb; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#71838e; font-size:9px; margin-bottom:3px;">التأخير المخصوم</div>
+                            <div style="color:#17324d; font-size:16px; font-weight:800;"><t t-out="'%.2f' % (o.delay_hours or 0.0)"/></div>
+                            <div style="color:#91a0a8; font-size:8px;">ساعة</div>
+                        </td>
+                        <td style="padding:8px 4px; background:#f0faf8; border:1px solid #cfe7e1; border-radius:5px; vertical-align:middle;">
+                            <div style="color:#5d837b; font-size:9px; margin-bottom:3px;">العمل الإضافي</div>
+                            <div style="color:#187668; font-size:16px; font-weight:800;"><t t-out="'%.2f' % (o.factory_overtime_hours or 0.0)"/></div>
+                            <div style="color:#79a098; font-size:8px;">ساعة</div>
+                        </td>
+                    </tr>
+                </table>
+                <t t-set="gross_earnings"
+                   t-value="(o.base_wage or 0.0) + (o.contract_allowances or 0.0) + (o.factory_bonus_amount or 0.0) + (o.furniture_overtime_amount or 0.0)"/>
+                <t t-set="total_deductions"
+                   t-value="(o.absence_deduction or 0.0) + (o.delay_deduction or 0.0) + (o.factory_other_deduction_amount or 0.0)"/>
+
+                <div class="o_furniture_payroll_section_title"
+                     style="border-right:4px solid #1f8a82; padding:2px 9px 2px 0; margin:11px 0 7px;">
+                    <strong style="display:block; color:#123b57; font-size:15px;">تفاصيل الأجر</strong>
+                    <span style="display:block; color:#788b96; font-size:9px; margin-top:1px;">الاستحقاقات والخصومات وصافي المبلغ</span>
+                </div>
+                <table class="o_furniture_payroll_statement"
+                       style="width:100%; border-collapse:collapse; margin-bottom:11px; table-layout:fixed; font-size:12px; border:1px solid #dce5ea; page-break-inside:avoid;">
+                    <thead>
+                        <tr style="background:#f2f5f7; color:#5e727e;">
+                            <th style="width:72%; padding:7px 11px; border-bottom:1px solid #dce5ea; text-align:right; font-weight:700;">البيان</th>
+                            <th style="width:28%; padding:7px 12px; border-right:1px solid #dce5ea; border-bottom:1px solid #dce5ea; text-align:right; font-weight:700;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="o_furniture_payroll_earnings_section" style="background:#f6fbf8; color:#176c42; page-break-inside:avoid;">
+                            <td colspan="2" style="padding:6px 10px; border-right:4px solid #39a46e; border-bottom:1px solid #dbeae1; font-weight:800;">
+                                <div style="font-size:12px; font-weight:800;">الاستحقاقات</div>
+                                <div style="color:#7e9789; font-size:9px; font-weight:400; margin-top:1px;">المبالغ المضافة للعامل</div>
+                            </td>
+                        </tr>
+                        <tr class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee; font-weight:600;">
+                                <t t-if="o.furniture_pay_basis == 'production'">
+                                    استحقاق الإنتاج — <span t-field="o.furniture_completed_piece_qty"/> قطعة
+                                </t>
+                                <t t-else="">الراتب الأساسي للفترة</t>
+                            </td>
+                            <td dir="ltr"
+                                t-att-style="'padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; font-size:13px; font-weight:800; white-space:nowrap; color:%s;' % ('#16834f' if o.base_wage else '#82929b')">
+                                &#43;&#160;<span t-field="o.base_wage" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.furniture_food_allowance_period" class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">بدل أكل</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#16834f; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#43;&#160;<span t-field="o.furniture_food_allowance_period" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.furniture_transport_allowance_period" class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">بدل مواصلات</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#16834f; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#43;&#160;<span t-field="o.furniture_transport_allowance_period" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.furniture_basic_allowance_period" class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">البدل الأساسي</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#16834f; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#43;&#160;<span t-field="o.furniture_basic_allowance_period" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.factory_bonus_amount" class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">حوافز</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#16834f; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#43;&#160;<span t-field="o.factory_bonus_amount" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.factory_overtime_hours" class="o_furniture_payroll_earning" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">
+                                عمل إضافي —
+                                <t t-out="'%.2f' % (o.factory_overtime_hours or 0.0)"/> ساعة
+                                × <t t-out="'%.2f' % (o.furniture_regular_hour_rate or 0.0)"/>
+                                × <t t-out="'%.2f' % (o.furniture_overtime_multiplier or 1.0)"/>
+                            </td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#16834f; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#43;&#160;<span t-field="o.furniture_overtime_amount" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr class="o_furniture_payroll_total_earnings" style="background:#eef8f2; color:#12653a; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #cce5d6; font-weight:800;">إجمالي الاستحقاقات</td>
+                            <td dir="ltr"
+                                t-att-style="'padding:8px 12px; border-right:1px solid #cce5d6; border-bottom:1px solid #cce5d6; text-align:right; direction:ltr; font-size:14px; font-weight:800; white-space:nowrap; color:%s;' % ('#12653a' if gross_earnings else '#82929b')">
+                                &#43;&#160;<span t-out="gross_earnings" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr class="o_furniture_payroll_deductions_section" style="background:#fff8f7; color:#a92b25; page-break-inside:avoid;">
+                            <td colspan="2" style="padding:6px 10px; border-right:4px solid #d85c54; border-bottom:1px solid #f0dedc; font-weight:800;">
+                                <div style="font-size:12px; font-weight:800;">الخصومات</div>
+                                <div style="color:#a98885; font-size:9px; font-weight:400; margin-top:1px;">المبالغ المخصومة من الاستحقاق</div>
+                            </td>
+                        </tr>
+                        <tr t-if="o.absence_deduction" class="o_furniture_payroll_deduction" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">خصم الغياب</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#c5342c; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#8722;&#160;<span t-field="o.absence_deduction" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.delay_deduction" class="o_furniture_payroll_deduction" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">خصم التأخير</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#c5342c; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#8722;&#160;<span t-field="o.delay_deduction" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="o.factory_other_deduction_amount" class="o_furniture_payroll_deduction" style="background:#fff; color:#17324d; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">خصومات أخرى</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#c5342c; font-size:13px; font-weight:800; white-space:nowrap;">
+                                &#8722;&#160;<span t-field="o.factory_other_deduction_amount" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="not total_deductions" class="o_furniture_payroll_no_deductions" style="background:#fff; color:#7b8c96; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #e4eaee;">لا توجد خصومات مالية خلال الفترة</td>
+                            <td dir="ltr" style="padding:8px 12px; border-right:1px solid #e4eaee; border-bottom:1px solid #e4eaee; text-align:right; direction:ltr; color:#9aa7ae; font-weight:700;">—</td>
+                        </tr>
+                        <tr class="o_furniture_payroll_total_deductions" style="background:#fff2f1; color:#a92b25; page-break-inside:avoid;">
+                            <td style="padding:8px 11px; border-bottom:1px solid #ebd1cf; font-weight:800;">إجمالي الخصومات</td>
+                            <td dir="ltr"
+                                t-att-style="'padding:8px 12px; border-right:1px solid #ebd1cf; border-bottom:1px solid #ebd1cf; text-align:right; direction:ltr; font-size:14px; font-weight:800; white-space:nowrap; color:%s;' % ('#a92b25' if total_deductions else '#82929b')">
+                                &#8722;&#160;<span t-out="total_deductions" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr class="o_furniture_payroll_net" style="background:#123b57; color:#fff; border-top:3px solid #2da978; page-break-inside:avoid;">
+                            <td style="padding:10px 11px; border-bottom:1px solid #123b57; font-size:15px; font-weight:800;">
+                                صافي المستحق
+                                <span style="display:block; color:#bfd1dc; font-size:9px; font-weight:400; margin-top:2px;">المبلغ النهائي المستحق للعامل</span>
+                            </td>
+                            <td dir="ltr" style="padding:10px 12px; border-right:1px solid #35586e; border-bottom:1px solid #123b57; text-align:right; direction:ltr; font-size:18px; font-weight:800; color:#fff; white-space:nowrap;">
+                                <span t-field="o.net_salary" t-options='{"widget":"monetary","display_currency":o.company_currency_id}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table style="width:100%; margin-top:28px; text-align:center; page-break-inside:avoid;">
+                    <tr>
+                        <td style="width:50%; padding:8px;">توقيع المسؤول<br/>____________________</td>
+                        <td style="width:50%; padding:8px;">توقيع العامل<br/>____________________</td>
+                    </tr>
+                </table>
+            </div>
+        </xpath>
+    </template>
+</odoo>

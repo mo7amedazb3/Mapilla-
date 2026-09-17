@@ -1,0 +1,257 @@
+.o_furniture_future_order_bell {
+    position: relative;
+    min-width: 46px;
+    height: 46px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 18px;
+}
+
+.o_furniture_future_order_bell.has-alerts {
+    color: #ffcf56;
+}
+
+.o_furniture_future_order_bell.has-alerts .o_furniture_future_order_bell_icon {
+    display: inline-block;
+    animation: o_furniture_future_bell_pulse 2.4s ease-in-out infinite;
+}
+
+.o_furniture_future_order_badge {
+    position: absolute;
+    top: 3px;
+    inset-inline-end: 0;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border: 2px solid var(--o-navbar-background, #12344d);
+    border-radius: 10px;
+    background: #d83a3a;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 15px;
+    text-align: center;
+}
+
+@keyframes o_furniture_future_bell_pulse {
+    0%, 84%, 100% { transform: rotate(0deg); }
+    88% { transform: rotate(9deg); }
+    92% { transform: rotate(-9deg); }
+    96% { transform: rotate(5deg); }
+}
+
+.o_furniture_future_order_menu {
+    width: min(410px, calc(100vw - 24px));
+    overflow: hidden;
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 18px 46px rgba(10, 35, 53, 0.28);
+}
+
+.o_furniture_future_order_dropdown > header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 17px;
+    color: #fff;
+    background: linear-gradient(135deg, #173c58, #1e6d70);
+}
+
+.o_furniture_future_order_dropdown > header span:first-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.o_furniture_future_order_dropdown > header small {
+    opacity: 0.78;
+}
+
+.o_furniture_future_order_dropdown_count {
+    display: grid;
+    place-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 18px;
+    background: #f5bd3f;
+    color: #17344c;
+    font-weight: 900;
+}
+
+.o_furniture_future_order_list {
+    max-height: 430px;
+    overflow: auto;
+    background: #f6f9fb;
+}
+
+.o_furniture_future_order_item {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 5px;
+    padding: 13px 16px;
+    border: 0;
+    border-bottom: 1px solid #dde7ec;
+    background: #fff;
+    color: #17344c;
+    text-align: start;
+}
+
+.o_furniture_future_order_item:hover {
+    background: #eef8f7;
+}
+
+.o_furniture_future_order_item_main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.o_furniture_future_order_item_main em {
+    border-radius: 999px;
+    padding: 3px 8px;
+    background: #fff0cf;
+    color: #a75d00;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 800;
+}
+
+.o_furniture_future_order_item_customer,
+.o_furniture_future_order_item > small {
+    color: #647b8b;
+    font-size: 12px;
+}
+
+.o_furniture_future_order_item_stock {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 3px 8px;
+    background: #f2e7e7;
+    color: #9a3737;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.o_furniture_future_order_item_stock.is-available {
+    background: #dff3e6;
+    color: #1f7441;
+}
+
+.o_furniture_future_order_item_stock.is-partial {
+    background: #fff1cf;
+    color: #986200;
+}
+
+.o_furniture_future_order_empty {
+    padding: 34px 18px;
+    color: #667f8f;
+    text-align: center;
+}
+
+.o_furniture_future_order_empty.is-success i { color: #2b9560; }
+.o_furniture_future_order_empty.is-error { color: #a83d3d; }
+
+.o_furniture_future_order_dropdown > footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: #fff;
+}
+
+.o_furniture_future_order_dropdown > footer .btn:first-child { flex: 1; }
+
+.o_furniture_future_order_sticky {
+    position: fixed;
+    z-index: 1040;
+    top: 58px;
+    right: 16px;
+    display: flex;
+    width: min(430px, calc(100vw - 32px));
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1px solid #f2c14d;
+    border-inline-end: 5px solid #d93d3d;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #fff8df, #fff);
+    box-shadow: 0 12px 34px rgba(20, 43, 57, 0.28);
+    color: #493711;
+    text-align: start;
+    animation: o_furniture_future_sticky_in 0.3s ease-out;
+}
+
+.o_furniture_future_order_sticky:hover {
+    transform: translateY(1px);
+    box-shadow: 0 9px 25px rgba(20, 43, 57, 0.24);
+}
+
+.o_furniture_future_order_sticky > span:nth-child(2) {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.o_furniture_future_order_sticky small {
+    margin-top: 2px;
+    color: #806b37;
+}
+
+.o_furniture_future_order_sticky_icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border-radius: 50%;
+    background: #d93d3d;
+    color: #fff;
+}
+
+@keyframes o_furniture_future_sticky_in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.o_furniture_future_order_form .o_furniture_future_order_form__summary {
+    display: grid;
+    grid-template-columns: auto minmax(220px, 1fr) minmax(260px, 1.4fr);
+    align-items: center;
+    gap: 14px;
+    margin: 12px 0 24px;
+    padding: 15px 18px;
+    border: 1px solid #d6e8e7;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f1fbfa, #fff);
+}
+
+.o_furniture_future_order_form__summary > div:not(:first-child) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.o_furniture_future_order_form__summary_icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border-radius: 13px;
+    background: #2b8984;
+    color: #fff;
+    font-size: 20px;
+}
+
+@media (max-width: 767px) {
+    .o_furniture_future_order_sticky { top: 52px; right: 8px; }
+    .o_furniture_future_order_form .o_furniture_future_order_form__summary {
+        grid-template-columns: auto 1fr;
+    }
+    .o_furniture_future_order_form__summary > div:last-child {
+        grid-column: 1 / -1;
+    }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mapilla.EmployeeSearchSuggestions" t-inherit="web.SearchBar.Items" t-inherit-mode="extension">
+        <xpath expr="//t[@t-elif='item.isChild']" position="attributes">
+            <attribute name="t-elif">item.isChild or item.employeeSuggestion</attribute>
+        </xpath>
+    </t>
+</templates>

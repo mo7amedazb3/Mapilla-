@@ -1,0 +1,21 @@
+<odoo>
+    <record id="production_demand_cycle_form" model="ir.ui.view">
+        <field name="name">furniture.production.demand.cycle</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_production_form"/>
+        <field name="priority">300</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='production_lane'][@widget='badge']" position="replace">
+                <field name="production_lane" invisible="1"/>
+                <field name="cycle_label" widget="badge" readonly="1" nolabel="1" class="o_furniture_lane_header_badge"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <field name="demand_order_count" invisible="1"/>
+                <button name="action_open_demand_orders" type="object" string="أوامر مراحل التصنيع" icon="fa-sitemap" class="btn-primary" invisible="not demand_order_count"/>
+            </xpath>
+            <xpath expr="//field[@name='production_line_ids']" position="attributes">
+                <attribute name="readonly">production_lane == 'demand' and state != 'draft'</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

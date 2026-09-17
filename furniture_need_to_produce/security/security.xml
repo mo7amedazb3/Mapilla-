@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Global rules remain restrictive if another group later grants access. -->
+    <record id="rule_need_to_produce_company" model="ir.rule">
+        <field name="name">Need to Produce: allowed companies</field>
+        <field name="model_id" ref="model_furniture_need_to_produce"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_need_to_produce_stage_company" model="ir.rule">
+        <field name="name">Piece stages: allowed companies</field>
+        <field name="model_id" ref="model_furniture_need_to_produce_stage"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_need_to_produce_material_company" model="ir.rule">
+        <field name="name">Piece materials: allowed companies</field>
+        <field name="model_id" ref="model_furniture_need_to_produce_material"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_need_to_produce_input_company" model="ir.rule">
+        <field name="name">Piece input allocations: allowed companies</field>
+        <field name="model_id" ref="model_furniture_need_to_produce_input"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

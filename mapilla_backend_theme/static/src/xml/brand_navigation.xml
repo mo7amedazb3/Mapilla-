@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mapilla_backend_theme.AppIcon">
+        <span class="o_mapilla_app_glyph" aria-hidden="true">
+            <svg t-if="brand.path" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path t-att-d="brand.path"/>
+            </svg>
+            <img t-else="" t-att-src="props.app.webIconData || '/base/static/description/icon.png'" alt=""/>
+        </span>
+    </t>
+
+    <t t-name="mapilla_backend_theme.WorkspaceMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <!-- Keep the native mobile section drawer AND mount the same workspace
+             dropdown on mobile. MuK normally mounts it only on desktop. -->
+        <xpath expr="//t[@t-else=''][div[hasclass('o_navbar_apps_menu')]]" position="attributes">
+            <attribute name="t-else"/>
+        </xpath>
+        <xpath expr="//AppsMenu" position="attributes">
+            <attribute name="state">this.mapillaAppsState</attribute>
+        </xpath>
+        <xpath expr="//AppsMenu/t[@t-set-slot='content']/DropdownItem" position="before">
+            <header class="o_mapilla_workspace_header" dir="rtl">
+                <div class="o_mapilla_workspace_topline">
+                    <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_dark.png" alt="MAPILLA"/>
+                    <div class="o_mapilla_workspace_tools">
+                        <span class="o_mapilla_company"><i class="fa fa-building-o" aria-hidden="true"/> <t t-esc="this.mapillaCompany.currentCompany.name"/></span>
+                        <button class="o_mapilla_launcher_close" t-on-click="() => this.mapillaAppsState.close()" title="العودة إلى العمل" aria-label="إغلاق قائمة التطبيقات"><i class="fa fa-times" aria-hidden="true"/></button>
+                    </div>
+                </div>
+                <div class="o_mapilla_workspace_section">
+                    <h2>تطبيقاتك</h2><span><t t-esc="this.appMenuService.getAppsMenuItems().length"/> تطبيق في مساحة عملك</span>
+                </div>
+            </header>
+        </xpath>
+        <xpath expr="//AppsMenu//DropdownItem/a" position="replace">
+            <div class="o_mapilla_app_card" dir="rtl">
+                <MapillaAppIcon app="app"/>
+                <span class="o_mapilla_app_text"><span class="mk_app_name" t-esc="app.label"/><small t-esc="this.mapillaAppBrand(app).caption"/></span>
+                <i class="fa fa-angle-left o_mapilla_app_arrow" aria-hidden="true"/>
+            </div>
+        </xpath>
+        <xpath expr="//AppsMenu//DropdownItem" position="attributes">
+            <attribute name="attrs">{ href: app.href, 'data-menu-xmlid': app.xmlid, 'data-section': app.id, 'aria-label': app.label }</attribute>
+        </xpath>
+        <xpath expr="//AppsMenu/t[@t-set-slot='content']/DropdownItem" position="after">
+            <footer class="o_mapilla_workspace_footer"><span dir="ltr">MAPILLA · FURNITURE, THOUGHTFULLY MADE.</span><span>مساحة تجمع فريقك وشغلك</span></footer>
+        </xpath>
+    </t>
+
+    <t t-name="mapilla_backend_theme.MobileWorkspaceLink" t-inherit="web.NavBar.AppsMenu.Sidebar" t-inherit-mode="extension">
+        <xpath expr="//a[@t-on-click.prevent='onAllAppsBtnClick']" position="attributes">
+            <attribute name="t-on-click.prevent">() => { this._closeAppMenuSidebar(); this.mapillaAppsState.open(); }</attribute>
+        </xpath>
+    </t>
+
+    <t t-name="mapilla_backend_theme.SidebarExperience" t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('mk_apps_sidebar_panel')]" position="attributes">
+            <attribute name="id">mapilla-app-drawer</attribute>
+            <attribute name="t-att-style">'top: ' + this.mapillaDrawer.top + 'px'</attribute>
+            <attribute name="inert">inert</attribute>
+            <attribute name="aria-hidden">true</attribute>
+            <attribute name="aria-label">التطبيقات</attribute>
+        </xpath>
+        <xpath expr="//ul[hasclass('mk_apps_sidebar_menu')]" position="before">
+            <button class="o_mapilla_sidebar_home" t-on-click="mapillaOpenApps" title="كل التطبيقات" aria-label="فتح مساحة العمل">
+                <img src="/mapilla_backend_theme/static/src/img/mapilla_emblem_light.png" alt=""/>
+                <span class="o_mapilla_sidebar_caption">مساحة العمل<small dir="ltr">MAPILLA WORKSPACE</small></span>
+                <i class="oi oi-apps" aria-hidden="true"/>
+            </button>
+        </xpath>
+        <xpath expr="//a[hasclass('nav-link')]/img[1]" position="replace"><MapillaAppIcon app="app"/></xpath>
+        <xpath expr="//a[hasclass('nav-link')]/img" position="replace"/>
+        <xpath expr="//a[hasclass('nav-link')]" position="attributes">
+            <attribute name="t-att-title">app.label</attribute>
+            <attribute name="t-att-aria-label">app.label</attribute>
+            <attribute name="t-att-aria-current">app.id === this.appMenuService.getCurrentApp()?.id ? 'page' : undefined</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_mapilla_sidebar_brand')]" position="replace">
+            <button class="mk_apps_sidebar_logo o_mapilla_sidebar_brand" t-on-click="mapillaOpenApps" title="كل التطبيقات">
+                <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/><i class="fa fa-angle-right" aria-hidden="true"/>
+            </button>
+        </xpath>
+    </t>
+
+    <t t-name="mapilla_backend_theme.BrandHomeLink" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//a[hasclass('o_mapilla_nav_brand')]" position="attributes">
+            <attribute name="t-on-click.prevent">() => this.mapillaAppsState.open()</attribute>
+        </xpath>
+    </t>
+</templates>

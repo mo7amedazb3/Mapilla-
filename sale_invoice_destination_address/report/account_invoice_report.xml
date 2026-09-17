@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Keep the invoice body compact because its logo is rendered in-body. -->
+    <record id="paperformat_mapilla_invoice" model="report.paperformat">
+        <field name="name">MAPILLA Invoice - Compact Header</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">18</field>
+        <field name="margin_bottom">32</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">8</field>
+        <field name="dpi">90</field>
+        <field name="css_margins" eval="True"/>
+    </record>
+
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="paperformat_id" ref="paperformat_mapilla_invoice"/>
+    </record>
+
+    <template id="report_invoice_document_destination_address"
+              inherit_id="account.report_invoice_document">
+        <!-- Pass a report-local flag through web.external_layout. -->
+        <xpath expr="//t[@t-call='web.external_layout']/t[@t-set='o']"
+               position="after">
+            <t t-set="show_invoice_brand_logo" t-value="True"/>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="after">
+            <div class="row mb-4" t-if="o.destination_address or o.destination_address_id">
+                <div class="col" name="destination_address">
+                    <strong>العنوان</strong>
+                    <div t-out="o.destination_address or o.destination_address_id.name"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- The invoice has its own in-body logo, so it does not need Wave's PDF header. -->
+    <template id="external_layout_wave_compact_invoice_header"
+              inherit_id="web.external_layout_wave"
+              priority="40">
+        <xpath expr="//div[contains(@t-attf-class, 'header o_company_')]"
+               position="attributes">
+            <attribute name="t-if">not show_invoice_brand_logo</attribute>
+        </xpath>
+    </template>
+
+    <!--
+        Render the wordmark inside the report article rather than wkhtmltopdf's
+        detachable header.  This keeps it visible on servers whose wkhtmltopdf
+        build ignores the detachable PDF header, and the flag limits it to invoices.
+    -->
+    <template id="address_layout_invoice_brand_logo"
+              inherit_id="web.address_layout"
+              priority="40">
+        <xpath expr="//t[@t-set='colclass']" position="before">
+            <div t-if="show_invoice_brand_logo"
+                 style="width:100%; margin:0 0 10px 0; padding:0 0 8px 0; border-bottom:2px solid #225b57; page-break-inside:avoid;">
+                <t t-set="brand_company" t-value="company"/>
+                <t t-call="sale_invoice_destination_address.report_company_brand_logo_invoice"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>

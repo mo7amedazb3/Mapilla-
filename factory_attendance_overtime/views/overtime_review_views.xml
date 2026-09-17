@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_factory_overtime_approval" model="ir.actions.client">
+        <field name="name">اعتماد الإضافي</field>
+        <field name="tag">factory_attendance_overtime.approval</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_factory_overtime_approval"
+              name="اعتماد الإضافي"
+              parent="hr_attendance.menu_hr_attendance_root"
+              action="action_factory_overtime_approval"
+              sequence="2"
+              groups="base.group_system"/>
+</odoo>

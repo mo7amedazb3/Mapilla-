@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.GroupedPieceRenderer" t-inherit="web.KanbanRenderer" t-inherit-mode="primary">
+        <xpath expr="//KanbanRecord[@record='groupOrRecord.record']" position="attributes">
+            <attribute name="openRecord">(record) => this.openPieceRecord(record)</attribute>
+        </xpath>
+        <xpath expr="//KanbanRecord[@record='groupOrRecord.record']" position="before">
+            <div t-if="groupOrRecord.showGroupHeader and groupOrRecord.expanded" class="o_ntp_identical_header" dir="rtl">
+                <strong><t t-esc="groupOrRecord.pieceGroup.records.length"/> قطع متطابقة</strong>
+                <span>نفس الحالة والمسار · الوقت المعروض للقطعة الواحدة</span>
+                <button type="button" class="btn btn-outline-secondary" t-on-click="() => this.togglePieceGroup(groupOrRecord.pieceGroup.key)">
+                    <t t-if="groupOrRecord.expanded">تجميع القطع</t><t t-else="">تفاصيل القطع / تعديل قطعة</t>
+                </button>
+            </div>
+        </xpath>
+    </t>
+    <t t-name="furniture_need_to_produce.PieceTitle">
+        <span class="o_ntp_piece_title_line">
+            <span t-esc="props.record.data.product_id[1]"/>
+            <strong t-if="count > 1" class="o_ntp_group_quantity"><t t-esc="count"/> قطع</strong>
+        </span>
+    </t>
+    <t t-name="furniture_need_to_produce.PieceReference">
+        <span t-if="count > 1">نفس الحالة والمسار</span>
+        <span t-else="" t-esc="props.record.data.name"/>
+    </t>
+    <t t-name="furniture_need_to_produce.PieceDetails">
+        <span t-if="count > 1">تفاصيل القطع</span><span t-else="">تفاصيل القطعة</span>
+    </t>
+    <t t-name="furniture_need_to_produce.PieceTime"><span dir="ltr" t-esc="value"/></t>
+    <t t-name="furniture_need_to_produce.WorkspacePhoto">
+        <div class="o_ntp_photo">
+            <button type="button" class="o_ntp_photo_preview" t-att-aria-label="(photo.exists ? 'تكبير صورة ' : 'استعراض ') + props.title" t-on-click.stop="preview">
+                <img t-if="photo.exists" t-att-src="url" t-att-alt="props.title" loading="lazy"/>
+                <t t-else=""><t t-set="artKind" t-value="props.kind"/><t t-call="furniture_need_to_produce.FurnitureSketch"/></t>
+            </button>
+            <input t-ref="photoInput" type="file" accept="image/jpeg,image/png,image/webp" class="d-none" t-on-change="upload"/>
+            <button t-if="photo.canWrite and !props.readonly" type="button" class="o_ntp_photo_camera"
+                    t-att-disabled="photo.busy" t-att-title="photo.exists ? 'تغيير الصورة' : 'إضافة صورة'"
+                    t-att-aria-label="(photo.exists ? 'تغيير صورة ' : 'إضافة صورة ') + props.title"
+                    t-on-click.stop="() => this.input.el.click()">
+                <i t-att-class="photo.busy ? 'fa fa-spinner fa-spin' : 'fa fa-camera'" aria-hidden="true"/>
+            </button>
+        </div>
+    </t>
+    <t t-name="furniture_need_to_produce.PieceCustom">
+        <span t-if="props.record.data.custom_bom_modified" class="o_ntp_custom_badge"
+              title="تم تعديل BoM — أوامر منفصلة"><i class="fa fa-sliders" aria-hidden="true"/> Custom</span>
+    </t>
+    <t t-name="furniture_need_to_produce.PipelineView" t-inherit="web.KanbanView" t-inherit-mode="primary">
+        <xpath expr="//t[@t-set-slot='layout-actions']" position="replace"/>
+        <xpath expr="//t[@t-set-slot='control-panel-navigation-additional']" position="replace"/>
+        <xpath expr="//t[@t-set-slot='control-panel-always-buttons']/t[@t-foreach='headerButtons']" position="attributes">
+            <attribute name="t-if">button.clickParams.name !== 'action_refresh' and !evalViewModifier(button.invisible)</attribute>
+        </xpath>
+        <xpath expr="//t[@t-component='props.Renderer']" position="attributes">
+            <attribute name="t-if">workspaceLeafReady</attribute>
+        </xpath>
+        <xpath expr="//t[@t-component='props.Renderer']" position="before">
+            <section t-if="stageShortageLane" class="o_ntp_stage_navigation" dir="rtl" aria-label="نواقص المراحل">
+                <div class="o_ntp_stage_navigation_heading"><strong>نواقص المراحل</strong><span t-esc="stageShortageLabel"/></div>
+                <nav class="o_ntp_stage_tabs" aria-label="اختيار المرحلة">
+                    <button t-foreach="stageShortageOptions" t-as="stage" t-key="stage.lane" type="button"
+                            t-att-data-stage-lane="stage.lane" t-att-class="stageShortageLane === stage.lane ? 'is-active' : ''"
+                            t-att-aria-current="stageShortageLane === stage.lane ? 'page' : undefined"
+                            t-att-disabled="pipelineBulk.busy or pipelineBulk.confirming"
+                            t-on-click="() => this.openStageShortages(stage)">
+                        <i t-att-class="'fa ' + stage.icon" aria-hidden="true"/><span t-esc="stage.label"/>
+                    </button>
+                </nav>
+            </section>
+            <section class="o_ntp_workspace_nav o_ntp_model_theme" t-att-style="this.modelThemeStyle(pipelineFilters.modelId)" dir="rtl">
+                <nav aria-label="مستويات احتياج الإنتاج">
+                    <button type="button" class="o_ntp_workspace_home" t-on-click="clearPipelineModelFilter"
+                            title="العودة لاختيار الموديل" aria-label="الرئيسية — اختيار الموديل"
+                            t-att-disabled="pipelineBulk.busy or pipelineBulk.confirming"
+                            t-att-aria-current="!pipelineFilters.modelId ? 'page' : undefined">
+                        <i class="fa fa-home" aria-hidden="true"/> الرئيسية
+                    </button>
+                    <t t-if="pipelineFilters.modelId">
+                        <i class="fa fa-angle-left" aria-hidden="true"/>
+                        <button type="button" t-on-click="showWorkspaceProducts" t-att-disabled="pipelineBulk.busy or pipelineBulk.confirming"
+                                t-att-class="!workspace.productId ? 'is-current' : 'is-done'"><span class="o_ntp_step_number">2</span> <t t-esc="pipelineFilters.modelName"/></button>
+                    </t>
+                    <t t-else=""><i class="fa fa-angle-left" aria-hidden="true"/><span class="o_ntp_step_pending"><span class="o_ntp_step_number">2</span> الأصناف</span></t>
+                    <t t-if="workspace.productId">
+                        <i class="fa fa-angle-left" aria-hidden="true"/>
+                        <strong class="o_ntp_step_active"><span class="o_ntp_step_number">3</span> <t t-esc="workspaceProduct?.name || 'القطع'"/></strong>
+                    </t>
+                    <t t-else=""><i class="fa fa-angle-left" aria-hidden="true"/><span class="o_ntp_step_pending"><span class="o_ntp_step_number">3</span> القطع والمسارات</span></t>
+                </nav>
+                <t t-foreach="headerButtons" t-as="refreshButton" t-key="refreshButton.id">
+                    <MultiRecordViewButton
+                        t-if="refreshButton.clickParams.name === 'action_refresh' and refreshButton.display === 'always' and !evalViewModifier(refreshButton.invisible)"
+                        list="model.root"
+                        className="refreshButton.className + ' o_ntp_workspace_refresh'"
+                        clickParams="refreshButton.clickParams"
+                        defaultRank="'btn-secondary'"
+                        domain="props.domain"
+                        icon="refreshButton.icon"
+                        string="'تحديث'"
+                        title="'تحديث'"
+                        attrs="refreshButton.attrs"
+                        disabled="pipelineBulk.busy or pipelineBulk.confirming or workspace.loading or pipelineFilters.loading"
+                    />
+                </t>
+            </section>
+
+            <section t-if="!pipelineFilters.modelId" class="o_ntp_workspace_welcome" dir="rtl">
+                <div class="o_ntp_workspace_intro">
+                    <div class="o_ntp_workspace_intro_copy">
+                        <span class="o_ntp_workspace_kicker"><i class="fa fa-th-large" aria-hidden="true"/> <t t-esc="stageShortageLane ? 'نواقص المراحل / ' + stageShortageLabel : 'النواقص'"/></span>
+                        <h1>نبدأ بموديل إيه؟</h1>
+                        <p>موديلك، أصنافه، وكل قطعة بمسارها.</p>
+                        <span class="o_ntp_workspace_intro_tag"><span/> مراجعة قبل الاعتماد</span>
+                    </div>
+                    <div class="o_ntp_workspace_intro_art" aria-hidden="true">
+                        <t t-set="artKind" t-value="'collection'"/><t t-call="furniture_need_to_produce.FurnitureSketch"/>
+                    </div>
+                </div>
+                <div class="o_ntp_workspace_section_title"><h2>اختار الموديل</h2><span><t t-esc="pipelineModelOptions.length"/> موديل</span></div>
+                <p t-if="pipelineFilters.loading" class="o_ntp_workspace_message" role="status"><i class="fa fa-spinner fa-spin"/> جاري تحميل الموديلات…</p>
+                <p t-elif="!pipelineFilters.loadError and !pipelineModelOptions.length" class="o_ntp_workspace_message">لا توجد نواقص بانتظار الاعتماد.</p>
+                <div t-else="" class="o_ntp_workspace_models">
+                    <article t-foreach="pipelineModelOptions" t-as="option" t-key="option.id"
+                            class="o_ntp_workspace_model_card o_ntp_model_theme" t-att-data-model-id="option.id" t-att-style="this.modelThemeStyle(option.id)"
+                            t-att-aria-label="'موديل ' + option.name">
+                        <div class="o_ntp_workspace_model_art"><WorkspacePhoto resModel="'furniture.product.model'" resId="option.id" title="option.name" kind="'collection'" onNavigate="() => this.setWorkspaceLocation(option.id)"/></div>
+                        <!-- Model options are loaded from draft pieces only. -->
+                        <button type="button" class="o_ntp_workspace_model_caption" t-att-disabled="pipelineFilters.loading or pipelineBulk.busy or pipelineBulk.confirming" t-on-click="() => this.setWorkspaceLocation(option.id)"><span><small>الموديل</small><strong t-esc="option.name"/><t t-call="furniture_need_to_produce.PendingApprovalBadge"/></span><i class="fa fa-arrow-left" aria-hidden="true"/></button>
+                    </article>
+                </div>
+            </section>
+            <section t-if="pipelineFilters.loadError or workspace.error" class="o_ntp_workspace_message" role="alert" dir="rtl">
+                تعذّر تحميل الاحتياجات.
+                <button type="button" class="btn btn-outline-secondary" t-on-click="refreshWorkspace">إعادة المحاولة</button>
+            </section>
+            <section t-elif="workspace.loading" class="o_ntp_workspace_message" role="status" dir="rtl">
+                <i class="fa fa-spinner fa-spin" aria-hidden="true"/> جاري تحميل احتياج الموديل…
+            </section>
+
+            <t t-if="pipelineFilters.modelId and !workspace.loading and !workspace.error and !pipelineFilters.loadError">
+                <section class="o_ntp_workspace_summary o_ntp_model_theme" t-att-style="this.modelThemeStyle(pipelineFilters.modelId)" dir="rtl">
+                    <div class="o_ntp_workspace_summary_identity">
+                        <small class="o_ntp_workspace_kicker" t-if="workspace.productId">قطع الموديل / <t t-esc="pipelineFilters.modelName"/></small><small class="o_ntp_workspace_kicker" t-else="">احتياج الموديل</small>
+                        <h1 t-esc="workspace.productId ? (workspaceProduct?.name || 'القطع') : pipelineFilters.modelName"/>
+                        <div class="o_ntp_workspace_summary_counts">
+                            <span t-if="!workspace.productId"><i class="fa fa-th-large" aria-hidden="true"/> <b t-esc="workspace.groups.length"/> أصناف</span>
+                            <span><i class="fa fa-cube" aria-hidden="true"/> <b t-esc="workspace.productId ? (workspaceProduct?.rows.length || 0) : workspace.rows.length"/> قطعة</span>
+                            <t t-if="this.hasPendingPieces(workspace.productId ? workspaceProduct?.rows : workspace.rows)" t-call="furniture_need_to_produce.PendingApprovalBadge"/>
+                        </div>
+                    </div>
+                    <div class="o_ntp_workspace_summary_art o_ntp_summary_photo"><WorkspacePhoto t-key="pipelineFilters.modelId + ':' + workspace.productId" resModel="workspace.productId ? 'product.product' : 'furniture.product.model'" resId="workspace.productId || +pipelineFilters.modelId" title="workspaceProduct?.name || pipelineFilters.modelName" kind="workspace.productId ? this.illustrationFor(workspaceProduct?.name) : 'collection'" readonly="true"/></div>
+                    <div class="o_ntp_workspace_summary_time">
+                        <small t-if="workspace.productId">الوقت التقديري للصنف بالكامل</small><small t-else="">الوقت التقديري للموديل بالكامل</small>
+                        <t t-set="summaryTime" t-value="workspace.productId ? workspaceProduct?.time : workspace.time"/>
+                        <t t-call="furniture_need_to_produce.WorkspaceTime"/>
+                    </div>
+                    <button t-if="pipelineBulk.canApprove" type="button" class="btn btn-primary o_ntp_workspace_approve_scope"
+                            t-att-disabled="!workspace.rows.length or (workspace.productId and (!workspaceProduct or !workspaceLeafReady)) or pipelineFilters.loading or pipelineBulk.busy or pipelineBulk.confirming"
+                            t-on-click="approveWorkspaceScope">
+                        <i t-att-class="pipelineBulk.busy ? 'fa fa-spinner fa-spin' : 'fa fa-check'" aria-hidden="true"/>
+                        <t t-esc="workspaceApprovalLabel"/>
+                    </button>
+                </section>
+
+                <t t-if="!workspace.productId">
+                    <div class="o_ntp_workspace_section_title o_ntp_workspace_products_title" dir="rtl"><h2>أصناف <t t-esc="pipelineFilters.modelName"/></h2><span>كل صنف، وقطعُه</span></div>
+                    <section class="o_ntp_workspace_products o_ntp_model_theme" t-att-style="this.modelThemeStyle(pipelineFilters.modelId)" dir="rtl" aria-label="أصناف الموديل">
+                        <article t-foreach="workspace.groups" t-as="group" t-key="group.id" class="o_ntp_workspace_product"
+                                 t-att-data-product-id="group.id" t-att-class="workspace.selectedProducts.includes(group.id) ? 'is-selected' : ''">
+                            <div class="o_ntp_workspace_product_visual" t-att-data-kind="this.illustrationFor(group.name)">
+                                <span t-if="group.isPartiallyApproved" class="o_ntp_partial_ribbon" role="status"
+                                      t-att-aria-label="'اعتماد جزئي: ' + group.approvedCount + ' معتمد، ' + group.rows.length + ' متبقي'">
+                                    <span>جزئي</span>
+                                </span>
+                                <WorkspacePhoto resModel="'product.product'" resId="group.id" title="group.name" kind="this.illustrationFor(group.name)" onNavigate="() => this.openWorkspaceProduct(group)"/>
+                            </div>
+                            <div class="o_ntp_workspace_product_body">
+                            <div class="o_ntp_workspace_product_top">
+                                <h2 t-esc="group.name"/>
+                                <span class="o_ntp_workspace_quantity"><strong t-esc="group.rows.length"/> قطعة</span>
+                            </div>
+                            <div t-if="this.hasPendingPieces(group.rows)" class="o_ntp_workspace_product_pending"><t t-call="furniture_need_to_produce.PendingApprovalBadge"/></div>
+                            <div class="o_ntp_workspace_product_time">
+                                <small class="o_ntp_workspace_time_label"><i class="fa fa-clock-o" aria-hidden="true"/> وقت الصنف التقديري</small>
+                                <t t-set="summaryTime" t-value="group.time"/>
+                                <t t-call="furniture_need_to_produce.WorkspaceTime"/>
+                            </div>
+                            <div t-if="group.siblings and group.siblings.length" class="o_ntp_siblings" aria-label="استكمال أصناف الطقم في المرحلة">
+                                <div class="o_ntp_siblings_title"><i class="fa fa-cubes" aria-hidden="true"/> من نفس الطقم في المرحلة</div>
+                                <div t-foreach="group.siblings" t-as="sibling" t-key="sibling.rule_id" class="o_ntp_sibling">
+                                    <div class="o_ntp_sibling_heading"><strong t-esc="sibling.name"/><span><b t-esc="this.formatTime(sibling.total)"/> قطعة</span></div>
+                                    <small><t t-esc="this.formatTime(sibling.stock)"/> بالمخزن + <t t-esc="this.formatTime(sibling.incoming)"/> في أوامر الإنتاج · الماكس <t t-esc="this.formatTime(sibling.max)"/></small>
+                                    <button t-if="sibling.missing > 0 and pipelineBulk.canApprove" type="button" class="btn btn-primary o_ntp_sibling_complete"
+                                            t-att-disabled="pipelineBulk.busy or pipelineBulk.confirming"
+                                            t-on-click.stop="() => this.completeStageSibling(sibling)">
+                                        <i class="fa fa-plus" aria-hidden="true"/> استكمال <t t-esc="this.formatTime(sibling.missing)"/> قطعة للماكس
+                                    </button>
+                                    <span t-elif="sibling.missing &lt;= 0" class="o_ntp_sibling_full"><i class="fa fa-check" aria-hidden="true"/> الرصيد مكتمل</span>
+                                </div>
+                            </div>
+                            <div class="o_ntp_workspace_product_actions">
+                                <button type="button" class="btn btn-outline-secondary o_ntp_workspace_open_product"
+                                        t-att-disabled="pipelineBulk.busy or pipelineBulk.confirming"
+                                        t-on-click="() => this.openWorkspaceProduct(group)">عرض القطع والمسارات <i class="fa fa-angle-left" aria-hidden="true"/></button>
+                            </div>
+                            </div>
+                        </article>
+                    </section>
+                    <section t-if="!workspace.groups.length" class="o_ntp_workspace_message" dir="rtl">لا توجد نواقص بانتظار الاعتماد لهذا الموديل.</section>
+                </t>
+                <section t-if="workspaceLeafReady and pipelineBulk.canApprove" class="o_ntp_bulk_toolbar" dir="rtl" aria-label="تحديد القطع">
+                    <button type="button" class="btn btn-outline-secondary o_ntp_select_page" t-on-click="togglePipelinePage"
+                            t-att-disabled="!pipelineSelectableRecords.length or pipelineBulk.busy or pipelineBulk.confirming">
+                        <i t-att-class="pipelinePageSelected ? 'fa fa-check-square-o' : 'fa fa-square-o'" aria-hidden="true"/>
+                        <t t-if="pipelinePageSelected">إلغاء تحديد الكل</t><t t-else="">تحديد الكل</t>
+                    </button>
+                    <span class="o_ntp_selected_count" role="status" aria-live="polite">المحدد: <strong t-esc="workspaceSelectedPieces.length"/> قطعة</span>
+                    <small>التحديد للصفحة الحالية</small>
+                    <div class="o_ntp_toolbar_identity" aria-label="الموديل والصنف الحالي">
+                        <div><span class="o_ntp_toolbar_identity_label">الموديل</span><strong t-esc="pipelineFilters.modelName"/></div>
+                        <span class="o_ntp_toolbar_identity_divider" aria-hidden="true"/>
+                        <div><span class="o_ntp_toolbar_identity_label">الصنف</span><strong t-esc="workspaceProduct?.name || ''"/></div>
+                    </div>
+                </section>
+                <section t-if="workspace.productId and !workspaceLeafReady" class="o_ntp_workspace_message" role="status" dir="rtl">
+                    <i class="fa fa-spinner fa-spin" aria-hidden="true"/> جاري تحميل القطع…
+                </section>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="furniture_need_to_produce.PendingApprovalBadge">
+        <span class="o_ntp_pending_approval" title="بانتظار اعتماد القطع"><i class="fa fa-hourglass-half" aria-hidden="true"/> جاري الانتظار</span>
+    </t>
+
+    <t t-name="furniture_need_to_produce.WorkspaceTime">
+        <div class="o_ntp_workspace_time" title="تقدير مبدئي مع توازي المراحل وقطعة واحدة لكل مرحلة. يوم العمل ١٠ ساعات؛ لا يشمل الانتظار أو أحمال المصنع الأخرى.">
+            <span class="o_ntp_workspace_metric"><strong t-esc="formatTime(summaryTime?.hours)"/><span>ساعة</span></span>
+            <span class="o_ntp_workspace_metric"><strong t-esc="formatTime(summaryTime?.days)"/><span>يوم عمل</span></span>
+        </div>
+        <small t-if="summaryTime?.hours === null" class="o_ntp_workspace_wait">تعذّر تقدير المدة</small>
+        <small t-elif="summaryTime?.unknown" class="o_ntp_workspace_wait"><i class="fa fa-hourglass-half" aria-hidden="true"/> بخلاف انتظار الأوامر القائمة</small>
+    </t>
+
+    <!-- Code-native decorative sketches. Not product photographs or production routes. -->
+    <t t-name="furniture_need_to_produce.FurnitureSketch">
+        <svg t-att-class="'o_ntp_furniture_art is-' + artKind" viewBox="0 0 600 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <path class="ntp_art_arch" d="M133 225V138a167 167 0 0 1 334 0v87Z"/>
+            <path class="ntp_art_guide" d="M70 239H535M104 243v8m392-8v8M94 62h27m-13-13v27m376 27h17m-8-8v17"/>
+            <ellipse class="ntp_art_shadow" cx="300" cy="243" rx="196" ry="17"/>
+            <g t-if="artKind === 'armchair'">
+                <path class="ntp_art_leg" d="m216 225-6 24h12l11-24m135 0 10 24h12l-5-24"/>
+                <path class="ntp_art_dark" d="M192 192h216v31a10 10 0 0 1-10 10H202a10 10 0 0 1-10-10Z"/>
+                <rect class="ntp_art_main" x="206" y="75" width="188" height="129" rx="36"/>
+                <rect class="ntp_art_light" x="223" y="87" width="155" height="98" rx="24"/>
+                <rect class="ntp_art_main" x="218" y="175" width="164" height="41" rx="14"/>
+                <rect class="ntp_art_light" x="180" y="150" width="42" height="76" rx="16"/>
+                <rect class="ntp_art_light" x="378" y="150" width="42" height="76" rx="16"/>
+                <path class="ntp_art_seam" d="M237 98q63-10 126 0M229 191h142M191 162v47m199-47v47"/>
+            </g>
+            <g t-elif="artKind === 'chaise'">
+                <path class="ntp_art_leg" d="m158 223-9 24h12l13-24m262 0 9 24h12l-6-24"/>
+                <path class="ntp_art_dark" d="M140 194h319v26a12 12 0 0 1-12 12H152a12 12 0 0 1-12-12Z"/>
+                <path class="ntp_art_main" d="M137 189V104q0-26 27-26h81q24 0 32 26l28 82Z"/>
+                <path class="ntp_art_light" d="M156 170v-58q0-21 21-21h59q19 0 25 19l17 55Z"/>
+                <rect class="ntp_art_light" x="166" y="175" width="302" height="35" rx="15"/>
+                <rect class="ntp_art_main" x="127" y="146" width="42" height="80" rx="16"/>
+                <path class="ntp_art_seam" d="M185 184h251M290 184v17M140 160v49m29-105q26-5 65 0"/>
+                <path class="ntp_art_accent" d="m205 121 38-5q10-1 12 10l5 29q2 10-9 11l-38 5q-11 1-12-10l-5-29q-2-9 9-11Z"/>
+            </g>
+            <g t-else="">
+                <path class="ntp_art_leg" d="m148 221-8 25h12l12-25m272 0 12 25h12l-8-25"/>
+                <path class="ntp_art_dark" d="M127 190h347v30q0 12-13 12H140q-13 0-13-12Z"/>
+                <rect class="ntp_art_main" x="142" y="87" width="318" height="118" rx="30"/>
+                <rect class="ntp_art_light" x="157" y="98" width="138" height="82" rx="20"/>
+                <rect class="ntp_art_light" x="301" y="98" width="143" height="82" rx="20"/>
+                <rect class="ntp_art_main" x="150" y="177" width="149" height="33" rx="11"/>
+                <rect class="ntp_art_main" x="301" y="177" width="149" height="33" rx="11"/>
+                <rect class="ntp_art_light" x="117" y="151" width="42" height="77" rx="14"/>
+                <rect class="ntp_art_light" x="442" y="151" width="42" height="77" rx="14"/>
+                <path class="ntp_art_seam" d="M169 109h111m34 0h116M163 190h122m28 0h122M129 165v45m324-45v45"/>
+                <path class="ntp_art_accent" d="m180 132 34-7q10-2 12 8l6 27q2 9-8 11l-34 7q-9 2-11-8l-6-27q-2-9 7-11Z"/>
+                <path class="ntp_art_accent" d="m396 125 24 4q10 2 8 12l-5 27q-2 9-12 7l-23-4q-10-2-8-12l5-26q2-10 11-8Z"/>
+            </g>
+            <g t-if="artKind === 'collection'" class="ntp_art_room">
+                <path class="ntp_art_guide" d="M514 220v-94m0 56q-30-12-29-42 31 3 29 42Zm0-17q31-11 30-39-30 2-30 39Z"/>
+                <path class="ntp_art_pot" d="M497 203h36l-6 33h-24Z"/>
+                <path class="ntp_art_guide" d="M80 219V100m-25 0h50L93 67H68Z"/>
+                <path class="ntp_art_leg" d="M63 221h34v4H63Z"/>
+            </g>
+        </svg>
+    </t>
+
+    <t t-name="furniture_need_to_produce.PieceSelector">
+        <label t-if="bulkState?.canApprove and props.record.data.state === 'draft'" class="o_ntp_piece_selector" t-on-click.stop="() => {}">
+            <input type="checkbox" class="form-check-input" t-att-checked="allSelected" t-att-data-piece-id="props.record.resId"
+                   t-att-disabled="bulkState.busy or bulkState.confirming" t-att-aria-label="'تحديد ' + (props.record.data.name || 'القطعة')"
+                   t-on-change.stop="onChange"/>
+            <span><t t-if="pieceRecords.length > 1">تحديد <strong class="o_ntp_selector_quantity"><t t-esc="pieceRecords.length"/> قطع</strong></t><t t-else="">تحديد</t></span>
+        </label>
+    </t>
+</templates>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- The original product record is noupdate, so update it explicitly. -->
+    <function model="decimal.precision" name="write">
+        <value model="decimal.precision"
+               search="[('name', '=', 'Product Unit of Measure')]"/>
+        <value eval="{'digits': 3}"/>
+    </function>
+    <function model="uom.uom" name="write">
+        <value eval="[ref('uom.product_uom_unit')]"/>
+        <value eval="{'rounding': 0.001}"/>
+    </function>
+    <record id="furniture_uom_unit" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">الوحدة</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_meter" model="uom.uom">
+        <field name="name">المتر</field>
+        <field name="furniture_mrp_bom_uom" eval="False"/>
+    </record>
+    <record id="furniture_uom_cm" model="uom.uom">
+        <field name="name">السم</field>
+        <field name="furniture_mrp_bom_uom" eval="False"/>
+    </record>
+    <record id="furniture_uom_kgm" model="uom.uom">
+        <field name="name">الكيلو جرام</field>
+        <field name="furniture_mrp_bom_uom" eval="False"/>
+    </record>
+    <record id="furniture_uom_gram" model="uom.uom">
+        <field name="name">بالجرام</field>
+        <field name="furniture_mrp_bom_uom" eval="False"/>
+    </record>
+    <record id="furniture_uom_litre" model="uom.uom">
+        <field name="name">اللتر</field>
+        <field name="furniture_mrp_bom_uom" eval="False"/>
+    </record>
+    <record id="furniture_bom_uom_meter" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">المتر</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_bom_uom_cubic_meter" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">متر مكعب</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_bom_uom_cm" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">السم</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_bom_uom_kgm" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">الكيلو جرام</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_bom_uom_gram" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">بالجرام</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_bom_uom_litre" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">اللتر</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_roll" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">لفة</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_bolt" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">توب</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_sheet" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">فرخ</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_board" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">لوح</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+    <record id="furniture_uom_box" model="uom.uom">
+        <field name="category_id" ref="uom.product_uom_categ_unit"/>
+        <field name="name">علبة</field>
+        <field name="furniture_mrp_bom_uom" eval="True"/>
+        <field name="uom_type">bigger</field>
+        <field name="factor_inv" eval="1.0"/>
+        <field name="rounding" eval="0.001"/>
+    </record>
+</odoo>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_stage_product_batch_bom_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.product.batch.bom.wizard.form</field>
+        <field name="model">furniture.mrp.stage.product.batch.bom.wizard</field>
+        <field name="arch" type="xml">
+            <form string="خامات الصنف" create="false" edit="false" delete="false"
+                  class="o_furniture_stage_bom_wizard">
+                <div class="o_furniture_stage_bom_wizard__shell">
+                    <section class="o_furniture_stage_bom_wizard__hero">
+                        <div class="o_furniture_stage_bom_wizard__identity">
+                            <span class="o_furniture_stage_bom_wizard__eyebrow">
+                                <i class="fa fa-cube" aria-hidden="true"/> الموديل
+                            </span>
+                            <h1 class="o_furniture_stage_bom_wizard__model">
+                                <field name="model_name" nolabel="1" readonly="1"/>
+                            </h1>
+                            <div class="o_furniture_stage_bom_wizard__product">
+                                <span>الصنف</span>
+                                <strong>
+                                    <field name="product_name" nolabel="1" readonly="1"/>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="o_furniture_stage_bom_wizard__stage">
+                            <span>مرحلة التشغيل</span>
+                            <strong>
+                                <field name="stage_name" nolabel="1" readonly="1"/>
+                            </strong>
+                        </div>
+                    </section>
+
+                    <section class="o_furniture_stage_bom_wizard__materials">
+                        <div class="o_furniture_stage_bom_wizard__materials_header" role="group">
+                            <div>
+                                <span class="o_furniture_stage_bom_wizard__materials_icon">
+                                    <i class="fa fa-list-ul" aria-hidden="true"/>
+                                </span>
+                                <div>
+                                    <h2>خامات المرحلة</h2>
+                                    <p>الكميات المطلوبة لتشغيل هذا الصنف في المرحلة الحالية</p>
+                                </div>
+                            </div>
+                            <span class="o_furniture_stage_bom_wizard__count" invisible="not has_materials">
+                                <field name="material_count" nolabel="1" readonly="1"/>
+                                <span>خامات</span>
+                            </span>
+                        </div>
+
+                        <field name="has_materials" invisible="1"/>
+                        <div class="o_furniture_stage_bom_wizard__empty" role="alert"
+                             invisible="has_materials">
+                            <i class="fa fa-info-circle" aria-hidden="true"/>
+                            <div>
+                                <strong>لا توجد خامات لهذه المرحلة</strong>
+                                <span>لم تُسجل خامات مطلوبة لهذا الصنف في المرحلة الحالية.</span>
+                            </div>
+                        </div>
+                        <field name="line_ids" nolabel="1" readonly="1"
+                               class="o_furniture_stage_bom_wizard__materials_list"
+                               invisible="not has_materials">
+                            <list create="false" edit="false" delete="false">
+                                <field name="sequence" column_invisible="True"/>
+                                <field name="material_name" string="الخامة"/>
+                                <field name="required_qty" string="الكمية المطلوبة"/>
+                                <field name="uom_name" string="الوحدة"/>
+                            </list>
+                        </field>
+                    </section>
+                </div>
+                <footer>
+                    <button string="إغلاق" special="cancel" class="btn btn-primary" icon="fa-times"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

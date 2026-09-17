@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_destination_address_list" model="ir.ui.view">
+        <field name="name">sale.destination.address.list</field>
+        <field name="model">sale.destination.address</field>
+        <field name="arch" type="xml">
+            <list string="Addresses" decoration-muted="not active">
+                <header>
+                    <button name="%(action_address_sales_report_wizard)d"
+                            string="Sales Report"
+                            type="action"
+                            class="btn-primary"
+                            display="always"
+                            groups="sales_team.group_sale_manager"/>
+                </header>
+                <field name="name"/>
+                <field name="company_id"
+                       groups="base.group_multi_company"
+                       optional="hide"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sale_destination_address_form" model="ir.ui.view">
+        <field name="name">sale.destination.address.form</field>
+        <field name="model">sale.destination.address</field>
+        <field name="arch" type="xml">
+            <form string="Address">
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon"
+                            title="Archived"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Address"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Port Said, Alexandria, Mansoura"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sale_destination_address_search" model="ir.ui.view">
+        <field name="name">sale.destination.address.search</field>
+        <field name="model">sale.destination.address</field>
+        <field name="arch" type="xml">
+            <search string="Search Addresses">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <separator/>
+                <filter name="archived"
+                        string="Archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sale_destination_address" model="ir.actions.act_window">
+        <field name="name">Addresses</field>
+        <field name="res_model">sale.destination.address</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sale_destination_address_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first sales address</p>
+            <p>Use addresses on quotations and customer invoices, then analyze sales by destination.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sale_destination_address"
+              name="Addresses"
+              parent="sale.sale_menu_root"
+              action="action_sale_destination_address"
+              groups="sales_team.group_sale_salesman"
+              sequence="35"/>
+</odoo>

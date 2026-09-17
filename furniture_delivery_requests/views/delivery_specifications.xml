@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_delivery_spec_wizard" model="ir.ui.view">
+        <field name="name">furniture.delivery.spec.wizard.form</field>
+        <field name="model">furniture.delivery.spec.wizard</field>
+        <field name="arch" type="xml">
+            <form string="المقاس والأقمشة والتكاوي" class="o_furniture_tailoring_material_editor_form o_delivery_spec_editor">
+                <sheet class="o_furniture_tailoring_material_editor_sheet">
+                    <field name="delivery_line_id" invisible="1"/><field name="customer_spec_id" invisible="1"/>
+                    <field name="source_snapshot" invisible="1"/>
+                    <div class="o_furniture_tailoring_material_editor_header">
+                        <div class="o_furniture_tailoring_material_editor_title"><strong>تفاصيل الصنف</strong></div>
+                        <div class="o_furniture_tailoring_material_editor_context">
+                            <span class="is-product"><small>الصنف</small><strong><field name="product_id" nolabel="1" widget="company_detail_product_picker" options="{'no_open': True}"/></strong></span>
+                            <span class="is-model"><small>الموديل</small><strong><field name="model_id" widget="company_detail_model_picker" nolabel="1" options="{'no_open': True}"/></strong></span>
+                        </div>
+                    </div>
+                    <div class="o_delivery_equal_dimensions" invisible="not delivery_line_id and context.get('company_standard_materials_only')"><div class="o_delivery_dimension_cell"><label for="width_cm"/><field name="width_cm" widget="furniture_compact_quantity" nolabel="1"/>
+                        </div><div class="o_delivery_dimension_cell"><label for="depth_cm"/><field name="depth_cm" widget="furniture_compact_quantity" nolabel="1"/>
+                        </div><div class="o_delivery_dimension_cell"><label for="height_cm"/><field name="height_cm" widget="furniture_compact_quantity" nolabel="1"/>
+                    </div></div><div class="o_furniture_tailoring_material_editor_help" invisible="context.get('company_standard_materials_only')">أمتار القماش لكل قطعة تُحسب من ريسيبي الصنف والمقاس. اترك المقاسات صفرًا للمقاس الافتراضي.</div>
+                    <notebook class="o_delivery_spec_material_tabs"><page string="الأقمشة" name="fabric_product_ids"><field name="fabric_product_ids" nolabel="1" class="o_furniture_quick_cards_field o_furniture_tailoring_material_choices" widget="furniture_multi_card_selector" domain="[('furniture_is_finished_product', '=', False), ('is_storable', '=', True), ('furniture_tailoring_material_kind', 'in', ['fabric', 'takawe'])]" options="{'no_create': True, 'no_create_edit': True, 'quick_limit': 5, 'always_show_more': True, 'searchable': True, 'search_placeholder': 'ابحث في الأقمشة...', 'card_title': 'الأقمشة', 'card_subtitle': 'الأمتار لكل قطعة تُملأ من ريسيبي الصنف', 'card_icon': 'fa-hand-pointer-o', 'card_variant': 'material', 'order_by': 'name, id'}"/>
+                    <field name="fabric_line_ids" nolabel="1" class="o_furniture_tailoring_material_editor_lines" invisible="not fabric_product_ids or context.get('company_standard_materials_only', False)">
+                        <list editable="bottom" create="0" delete="0">
+                            <field name="kind" readonly="1" force_save="1" column_invisible="True"/>
+                            <field name="product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
+                            <field name="quantity" widget="furniture_compact_quantity"/>
+                            </list>
+                    </field>
+                </page><page string="التكاوي" name="takawe_product_ids"><field name="takawe_product_ids" nolabel="1" class="o_furniture_quick_cards_field o_furniture_tailoring_material_choices" widget="furniture_multi_card_selector" domain="[('furniture_is_finished_product', '=', False), ('is_storable', '=', True), ('furniture_tailoring_material_kind', 'in', ['fabric', 'takawe'])]" options="{'no_create': True, 'no_create_edit': True, 'quick_limit': 5, 'always_show_more': True, 'searchable': True, 'search_placeholder': 'ابحث في التكاوي...', 'card_title': 'التكاوي', 'card_subtitle': 'اختار التكاوي وحدّد كمية ومقاس كل واحدة', 'card_icon': 'fa-hand-pointer-o', 'card_variant': 'material', 'order_by': 'name, id'}"/>
+                    <field name="takawe_line_ids" nolabel="1" class="o_furniture_tailoring_material_editor_lines" invisible="not takawe_product_ids">
+                        <list editable="bottom" create="0" delete="0">
+                            <field name="kind" readonly="1" force_save="1" column_invisible="True"/>
+                            <field name="product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
+                            <field name="piece_count" widget="furniture_compact_quantity"/>
+                            <field name="quantity" string="أمتار التكوة الواحدة" widget="furniture_compact_quantity" column_invisible="context.get('company_standard_materials_only', False)"/>
+                            <field name="total_meters" readonly="1" column_invisible="context.get('company_standard_materials_only', False)"/>
+                            <field name="piece_size" invisible="kind != 'takawe'" required="kind == 'takawe'" widget="furniture_touch_selection" force_save="1"/>
+                        </list>
+                    </field>
+                </page></notebook></sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

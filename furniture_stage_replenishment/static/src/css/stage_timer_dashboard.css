@@ -1,0 +1,62 @@
+.o_furniture_stage_timer {
+    display: inline-flex;
+    min-width: 132px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    padding: 7px 11px;
+    color: #1b6a5e;
+    background: #e9f6f2;
+    border: 1px solid #b9ded5;
+    border-radius: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_furniture_stage_timer strong {
+    direction: ltr;
+    font-size: 18px;
+    line-height: 1.1;
+    letter-spacing: .5px;
+}
+
+.o_furniture_stage_timer small,
+.o_furniture_stage_timer em {
+    font-size: 10px;
+    font-style: normal;
+}
+
+.o_furniture_stage_timer.is-overdue {
+    color: #a22f2b;
+    background: #fde9e7;
+    border-color: #efb9b4;
+    animation: o-furniture-timer-overdue 1.8s ease-in-out infinite;
+}
+
+.o_furniture_stage_timer.is-paused {
+    color: #8a621d;
+    background: #fff4d8;
+    border-color: #eed18f;
+}
+
+.o_furniture_stage_timer.is-finished {
+    color: #56666d;
+    background: #f0f3f4;
+    border-color: #d5dde0;
+}
+
+.o_furniture_stage_timer__buttons {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.o_furniture_stage_timer__buttons .btn {
+    min-height: 28px;
+    padding: 2px 9px;
+    border-radius: 8px;
+}
+
+@keyframes o-furniture-timer-overdue {
+    50% { box-shadow: 0 0 0 4px rgba(196, 71, 61, .10); }
+}

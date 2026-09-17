@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_need_to_produce_manager,Need to Produce manager,model_furniture_need_to_produce,furniture_mrp.group_furniture_mrp_manager,1,1,1,1
+access_need_to_produce_stage_manager,Piece stage manager,model_furniture_need_to_produce_stage,furniture_mrp.group_furniture_mrp_manager,1,1,1,1
+access_need_to_produce_material_manager,Piece material manager,model_furniture_need_to_produce_material,furniture_mrp.group_furniture_mrp_manager,1,1,1,1
+access_need_to_produce_input_manager,Piece input manager,model_furniture_need_to_produce_input,furniture_mrp.group_furniture_mrp_manager,1,1,1,1

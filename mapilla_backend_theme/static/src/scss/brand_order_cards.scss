@@ -1,0 +1,162 @@
+// Textile order presentation only. Native actions, quantities and permissions remain intact.
+@media screen {
+    body.o_web_client .o_furniture_stage_dashboard_view {
+        .o_furniture_stage_dashboard__details_rows:has(> .is-textile-order-card),
+        .o_furniture_order_supervisor_orders:has(> .is-textile-order-card) {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            align-items: start;
+            gap: 9px;
+            > .o_furniture_stage_dashboard__order_separator { display: none; }
+        }
+        .o_furniture_order_supervisor_order.is-textile-order-card {
+            min-width: 0; margin: 0; padding: 0;
+            &.is-model-start { margin-top: 9px; }
+            border: 1px solid var(--mapilla-border); border-radius: 14px;
+            background: var(--mapilla-surface);
+            border-color: #e0d8d1 #bcb0a5 #ada696;
+            box-shadow: 0 2px 0 #bcb0a5, 0 4px 0 #e0d8d1, 0 8px 15px #0c2a4412;
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+            > .o_furniture_order_compact_summary {
+                background: linear-gradient(110deg, #fff, #f2ede7);
+                transition: background-color .2s ease, color .2s ease;
+                .fa-chevron-down { transition: transform .2s ease; }
+            }
+            &[open] {
+                border-color: #315168 #0c2a44 #0c2a44;
+                box-shadow: 0 2px 0 #0c2a44, 0 5px 0 #c9bfb4, 0 10px 22px #0c2a4420;
+                > .o_furniture_order_compact_summary {
+                    background: #0c2a44;
+                    color: #fff;
+                    strong, i { color: #fff !important; }
+                    small { color: #e0d8d1 !important; }
+                    border-bottom-color: #315168;
+                }
+            }
+            @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 3px 0 #ada696, 0 6px 0 #e0d8d1, 0 13px 24px #0c2a4425;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                &, > .o_furniture_order_compact_summary, .fa-chevron-down { transition: none; }
+            }
+            .o_furniture_order_supervisor_order__header {
+                display: grid;
+                grid-template-columns: minmax(160px,1fr) auto auto 48px;
+                grid-template-areas: "status timer actions image";
+                padding: 5px 12px; gap: 8px;
+                background: var(--mapilla-inset);
+                border-bottom: 1px solid var(--mapilla-border);
+            }
+            .o_furniture_order_supervisor_order__identity {
+                min-height: 0; align-items: flex-start; text-align: start; gap: 0;
+                > small {font-size: 10px; color: var(--mapilla-muted);}
+                .o_furniture_textile_order_model {
+                    font-size: 24px; line-height: 1.2; color: var(--mapilla-heading) !important;
+                }
+            }
+            .o_furniture_textile_order_parties {display: block;}
+            .o_furniture_textile_order_party {
+                padding: 0; border: 0; background: transparent; align-items: flex-start;
+            }
+            .o_furniture_textile_order_reference {
+                flex-direction: row; flex-wrap: wrap; gap: 5px;
+                small, b {font-size: 10px; color: var(--mapilla-muted);}
+            }
+            .o_furniture_order_supervisor_order__image {
+                width: 48px; height: 48px; min-height: 48px;
+                border: 1px solid var(--mapilla-border); border-radius: 10px;
+            }
+            .o_furniture_order_supervisor_order__status {
+                min-height: 0; padding: 3px 6px;
+                > span {display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
+                small {font-size: 10px;} strong {font-size: 11px;}
+            }
+            .o_furniture_order_supervisor_order__actions {
+                gap: 4px; justify-content: flex-start;
+                .btn {min-height: 28px; padding: 4px 8px; font-size: 11px;}
+            }
+            .o_furniture_admin_order_dates {
+                margin: 0; padding: 1px 12px; gap: 8px; flex-wrap: wrap;
+                small, strong {font-size: 10px;}
+            }
+            .o_furniture_order_supervisor_order__products {
+                padding: 4px 10px; gap: 5px; background: transparent;
+            }
+            .o_furniture_order_supervisor_order__product {
+                display: grid; position: relative;
+                grid-template-columns: minmax(180px,1.2fr) minmax(120px,1fr) minmax(120px,1fr) minmax(150px,1.1fr) auto;
+                grid-template-areas: "product fabric takawe notes quantity";
+                padding: 0; gap: 5px; background: transparent;
+                border: 0; border-radius: 0; box-shadow: none;
+                &:last-child {border: 0;}
+                align-items: start;
+                + .o_furniture_order_supervisor_order__product {border-top: 1px solid var(--mapilla-border); padding-top: 4px;}
+                > span {min-width: 0; min-height: 0; padding: 3px 6px; gap: 2px; border-radius: 7px;}
+                > span > small {font-size: 10px;}
+                > span > strong {font-size: 12px; line-height: 1.3; overflow-wrap: anywhere;}
+            }
+            .o_furniture_order_supervisor_order__product_name {
+                grid-area: product; padding: 0 !important;
+                display: flex; flex-direction: row; flex-wrap: wrap;
+                align-items: center; justify-content: flex-start; gap: 3px 6px !important;
+                > small {display: none;}
+                > strong {font-size: 14px !important; color: var(--mapilla-heading);}
+                em {font-size: 10px;}
+                .o_furniture_order_supervisor_order__bom {
+                    margin: 0; min-height: 24px; padding: 2px 5px; font-size: 10px;
+                }
+            }
+            .o_furniture_order_supervisor_order__product > .o_furniture_order_supervisor_order__fabric,
+            .o_furniture_order_supervisor_order__product > .o_furniture_order_supervisor_order__takawe,
+            .o_furniture_order_supervisor_order__product > .o_furniture_order_supervisor_order__notes {
+                border: 1px solid var(--mapilla-border) !important;
+                background: var(--mapilla-inset) !important;
+                color: var(--mapilla-heading);
+                min-height: 50px !important; height: auto; align-self: stretch;
+                padding: 1px 10px !important;
+                display: flex; flex-direction: column; flex-wrap: nowrap;
+                align-items: flex-start; justify-content: center;
+                gap: 2px !important;
+                > small {font-size: 12px !important;}
+                > strong {font-size: 15px !important; line-height: 1.4;}
+            }
+            .o_furniture_order_supervisor_order__notes {white-space: pre-wrap; overflow-wrap: anywhere;}
+            .o_furniture_order_supervisor_order__material_items {
+                gap: 3px;
+                > span {padding: 1px 3px;}
+                strong, em {font-size: 15px; line-height: 1.4; overflow-wrap: anywhere;}
+            }
+            .o_furniture_admin_order_quantities {
+                grid-area: quantity; position: static; padding: 0;
+                .o_furniture_admin_order_quantity {min-height: 23px; padding: 2px 6px;}
+            }
+        }
+        @media (max-width: 1199px) {
+            .o_furniture_order_supervisor_order.is-textile-order-card {
+                .o_furniture_order_supervisor_order__header {
+                    grid-template-columns: 1fr auto 48px;
+                    grid-template-areas: "status timer image" "actions actions actions";
+                }
+                .o_furniture_order_supervisor_order__product {
+                    grid-template-columns: repeat(3,minmax(0,1fr));
+                    grid-template-areas: "product product quantity" "fabric takawe notes";
+                }
+            }
+        }
+        @media (max-width: 767px) {
+            .o_furniture_order_supervisor_order.is-textile-order-card {
+                .o_furniture_order_supervisor_order__header {
+                    grid-template-columns: minmax(0,1fr) 48px;
+                    grid-template-areas: "status image" "timer timer" "actions actions";
+                }
+                .o_furniture_order_supervisor_order__product {
+                    grid-template-columns: repeat(2,minmax(0,1fr));
+                    grid-template-areas: "product quantity" "fabric takawe" "notes notes";
+                }
+            }
+        }
+    }
+}

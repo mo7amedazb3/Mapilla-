@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_factory_payroll_batch_wizard_form" model="ir.ui.view">
+        <field name="name">factory.payroll.batch.wizard.form</field>
+        <field name="model">factory.payroll.batch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إنشاء مرتبات المصنع">
+                <div class="alert alert-info" role="alert">
+                    سيتم إنشاء المرتبات كمسودات فقط. راجع الحضور والحوافز والخصومات ثم اعتمد كل مرتب.
+                </div>
+                <group>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="department_id"/>
+                    </group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </group>
+                <field name="employee_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                <footer>
+                    <button name="action_generate" type="object" string="إنشاء المسودات" class="btn-primary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_factory_payroll_batch_wizard" model="ir.actions.act_window">
+        <field name="name">إنشاء مرتبات الشهر</field>
+        <field name="res_model">factory.payroll.batch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_factory_payroll_batch_wizard"
+              name="إنشاء مرتبات الشهر"
+              parent="simple_payroll_salary-2.menu_simple_payroll_root"
+              action="action_factory_payroll_batch_wizard"
+              sequence="10"
+              groups="hr.group_hr_manager"/>
+</odoo>

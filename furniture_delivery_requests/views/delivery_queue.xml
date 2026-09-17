@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_delivery_queue_list" model="ir.ui.view">
+        <field name="name">delivery.queue.list</field><field name="model">furniture.mrp.future.order</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_future_order_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_count']" position="attributes"><attribute name="column_invisible">True</attribute></xpath>
+            <xpath expr="//field[@name='buyer_partner_id']" position="attributes">
+                <attribute name="widget">many2one</attribute>
+                <attribute name="options">{'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_summary']" position="replace">
+                <field name="delivery_model_ids" string="الموديل" widget="many2many_tags" options="{'no_open': True}"/>
+            </xpath>
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="action_cancel" type="object" string="إلغاء الطلبات" confirm="هل تريد إلغاء الطلبات المحددة وتحرير أي كميات محجوزة لها؟"/>
+                    <button name="action_batch_produce" type="object" string="اعتماد وإنتاج العجز" class="btn-primary" confirm="سيتم حجز المتاح من المنتج التام وإنشاء أوامر إنتاج للعجز لكل الطلبات المحددة. هل تريد المتابعة؟"/>
+                    <button name="action_batch_reserve" type="object" string="حجز من المنتج التام" confirm="سيتم حجز كل كميات الطلبات المحددة من المنتج التام. إذا لم يكفِ الرصيد لأي طلب، لن تُعتمد المجموعة. هل تريد المتابعة؟"/>
+                    <button name="action_delete_cancelled" type="object" string="حذف الطلبات الملغاة" confirm="هل تريد حذف الطلبات الملغاة المحددة نهائيًا؟"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='delivery_date']" position="after"><field name="next_week_label" widget="badge"/></xpath>
+        </field>
+    </record>
+    <record id="action_delivery_requests_all" model="ir.actions.act_window"><field name="domain">[('state', 'in', ['pending', 'cancelled'])]</field></record>
+    <record id="furniture_mrp.action_furniture_mrp_future_order" model="ir.actions.act_window"><field name="domain">[('state', '=', 'pending')]</field></record>
+    <record id="action_delivery_requests_decided" model="ir.actions.act_window">
+        <field name="name">الطلبات المعتمدة</field><field name="res_model">furniture.mrp.future.order</field><field name="view_mode">list,form</field><field name="domain">[('state', 'in', ['reserved', 'production'])]</field><field name="context">{}</field><field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+    </record>
+    <menuitem id="menu_delivery_requests_decided" name="المعتمدة" parent="menu_delivery_requests_root" action="action_delivery_requests_decided" sequence="30" groups="base.group_system"/>
+<record id="view_delivery_queue_delete_form" model="ir.ui.view"><field name="name">delivery.queue.delete.cancelled</field><field name="model">furniture.mrp.future.order</field><field name="inherit_id" ref="view_delivery_request_form_workbench"/><field name="arch" type="xml"><xpath expr="//header" position="inside"><button name="action_delete_cancelled" type="object" string="حذف الطلب الملغي" invisible="state != 'cancelled'" confirm="هل تريد حذف طلب التسليم الملغي نهائيًا؟" class="btn-secondary"/></xpath></field></record></odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="fabric_work_type_lycra" model="furniture.fabric.work.type">
+        <field name="name">ليكرا</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="fabric_work_type_linen" model="furniture.fabric.work.type">
+        <field name="name">كتان</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="seq_furniture_mrp_mps_plan" model="ir.sequence">
+        <field name="name">جدولة عمال MPS</field>
+        <field name="code">furniture.mrp.mps.plan</field>
+        <field name="prefix">MPS-W/%(year)s/%(month)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

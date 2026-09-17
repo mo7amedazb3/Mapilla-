@@ -1,0 +1,25 @@
+{
+    'name': 'الاذونات',
+    'version': '18.0.5.0.23',
+    'summary': 'طلبات مشرفي المراحل لتغذية الصالات واستهلاك أوامرها من أرصدتها',
+    'category': 'Manufacturing',
+    'license': 'LGPL-3',
+    'depends': ['furniture_mrp'],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/rules.xml',
+        'views/requisition_views.xml',
+        'views/assembly_views.xml',
+        'views/weekly_report_views.xml',
+        'data/cron.xml',
+    ],
+    'assets': {'web.assets_backend': [
+        'furniture_assembly_requisitions/static/src/css/requisition.css',
+        'furniture_assembly_requisitions/static/src/js/material_period.js',
+        'furniture_assembly_requisitions/static/src/xml/material_period.xml',
+    ]},
+    'post_init_hook': 'post_init_hook',
+    'application': True,
+    'auto_install': False,
+    'installable': True,
+}

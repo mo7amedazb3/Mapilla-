@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_simple_payroll_slip_form_advances" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.form.advances</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')][1]" position="before">
+                <div class="oe_button_box" name="advance_button_box">
+                    <button class="oe_stat_button" type="object" name="action_view_employee_advances" icon="fa-money" invisible="employee_advance_count == 0">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value"><field name="outstanding_advance_balance"/></span>
+                            <span class="o_stat_text">رصيد السلفة</span>
+                        </div>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="employee_advance_total_amount" string="إجمالي السلف" readonly="1"/>
+                <field name="employee_advance_paid_amount" string="المسدد" readonly="1"/>
+                <field name="outstanding_advance_balance" string="الباقي" readonly="1"/>
+                <field name="due_advance_installments" string="القسط المستحق (متابعة فقط)" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_list_advances" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.list.advances</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='net_salary']" position="before">
+                <field name="employee_advance_total_amount" string="إجمالي السلف" optional="show"/>
+                <field name="employee_advance_paid_amount" string="المسدد" optional="show"/>
+                <field name="outstanding_advance_balance" string="الباقي" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

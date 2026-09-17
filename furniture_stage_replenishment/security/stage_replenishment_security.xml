@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_furniture_mrp_stage_replenishment_company" model="ir.rule">
+        <field name="name">Stage replenishment: user companies</field>
+        <field name="model_id" ref="model_furniture_mrp_stage_replenishment_rule"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="rule_furniture_mrp_final_replenishment_company" model="ir.rule">
+        <field name="name">Final replenishment: user companies</field>
+        <field name="model_id" ref="model_furniture_mrp_final_replenishment_rule"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="rule_furniture_mrp_stage_time_standard_company" model="ir.rule">
+        <field name="name">Stage time standards: user companies</field>
+        <field name="model_id" ref="model_furniture_mrp_stage_time_standard"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

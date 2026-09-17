@@ -1,0 +1,27 @@
+# Local runtime and generated files
+__pycache__/
+*.py[cod]
+node_modules/
+.expo/
+.gradle/
+.cxx/
+**/build/
+Pods/
+native-bundles*/
+*.log
+.env
+.env.*
+!.env.example
+local.properties
+*.dump
+*.sql
+*.bak*
+*.p12
+*.jks
+*.keystore
+*.pem
+*.key
+*.apk
+*.aab
+*.ipa
+.DS_Store

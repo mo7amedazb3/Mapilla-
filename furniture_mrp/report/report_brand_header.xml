@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tight, balanced viewport for reports with a light background. -->
+    <template id="report_company_brand_logo">
+        <div t-if="brand_company and brand_company.logo"
+             style="width:100%; text-align:center; direction:ltr; line-height:0; margin:0 0 6px 0; page-break-inside:avoid;">
+            <div style="display:inline-block; position:relative; width:230px; height:33px; overflow:hidden; background:#000; border:0; border-radius:3px; box-sizing:border-box;">
+                <img t-att-src="image_data_uri(brand_company.logo)"
+                     alt="Company Logo"
+                     style="position:absolute; display:block; max-width:none !important; width:349px; height:auto; left:-59px; top:-78px; margin:0; padding:0;"/>
+            </div>
+        </div>
+    </template>
+
+    <!-- Left-aligned variant for the identity block on dark covers. -->
+    <template id="report_company_brand_logo_left">
+        <div t-if="brand_company and brand_company.logo"
+             style="width:100%; text-align:left; direction:ltr; line-height:0; margin:0 0 7px 0; page-break-inside:avoid;">
+            <div style="display:inline-block; position:relative; width:230px; height:33px; overflow:hidden; background:#000; border:0; border-radius:3px; box-sizing:border-box;">
+                <img t-att-src="image_data_uri(brand_company.logo)"
+                     alt="Company Logo"
+                     style="position:absolute; display:block; max-width:none !important; width:349px; height:auto; left:-59px; top:-78px; margin:0; padding:0;"/>
+            </div>
+        </div>
+    </template>
+</odoo>

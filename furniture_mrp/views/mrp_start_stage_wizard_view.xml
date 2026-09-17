@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_start_stage_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.start.stage.wizard.form</field>
+        <field name="model">furniture.mrp.start.stage.wizard</field>
+        <field name="arch" type="xml">
+            <form string="اختيار مرحلة بداية أمر التصنيع"
+                  class="o_furniture_stage_transfer_wizard o_furniture_start_stage_wizard">
+                <div class="o_furniture_start_stage_body">
+                    <div class="o_furniture_transfer_hero o_furniture_start_stage_hero">
+                        <div>
+                            <div class="o_furniture_transfer_eyebrow">بداية تشغيل مرنة</div>
+                            <h2>اختر المرحلة التي سيبدأ منها أمر التشغيل</h2>
+                        </div>
+                        <div class="o_furniture_transfer_icon">
+                            <i class="fa fa-flag-checkered" aria-hidden="true"/>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_start_stage_meta">
+                        <div class="o_furniture_start_stage_meta_icon">
+                            <i class="fa fa-industry" aria-hidden="true"/>
+                        </div>
+                        <div class="o_furniture_start_stage_meta_copy">
+                            <span>أمر التشغيل الأسبوعي</span>
+                            <field name="production_id" nolabel="1" readonly="1"
+                                   class="oe_inline o_furniture_start_stage_production"/>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_start_stage_panel">
+                        <div class="o_furniture_start_stage_heading">
+                            <span class="o_furniture_start_stage_step">1</span>
+                            <div>
+                                <strong>حدد مرحلة البداية</strong>
+                                <small>تظهر المراحل المتاحة فقط وفقًا لمسارات أصناف أمر التشغيل.</small>
+                            </div>
+                        </div>
+                        <field name="stage_code" widget="radio" nolabel="1"
+                               options="{'horizontal': true}"
+                               class="o_furniture_start_stage_radio"/>
+                    </div>
+
+                    <div class="o_furniture_start_stage_note">
+                        <i class="fa fa-info-circle" aria-hidden="true"/>
+                        <span>
+                            سيتم فتح المرحلة المختارة لبدء العمل، بينما تظل حركة الخامات مرتبطة بطلب إذن المخزن المعتاد.
+                        </span>
+                    </div>
+                </div>
+                <footer>
+                    <button name="action_start_selected_stage" string="ابدأ المرحلة المختارة"
+                            type="object" icon="fa-play-circle"
+                            class="btn-primary o_furniture_transfer_confirm"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

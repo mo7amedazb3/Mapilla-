@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_biometric_connection_alert.Alert">
+        <aside t-if="!state.dismissed and (state.devices.length or state.error)"
+               class="o_biometric_connection_alert"
+               t-att-class="{'is-unknown': !state.devices.length}"
+               role="alert" aria-live="assertive" aria-atomic="true" dir="rtl">
+            <div class="o_biometric_connection_alert_heading">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                <strong t-if="state.devices.length">انقطاع اتصال جهاز البصمة</strong>
+                <strong t-else="">تعذر التحقق من اتصال البصمة</strong>
+                <button type="button" class="o_biometric_connection_alert_close"
+                        title="إغلاق التنبيه" aria-label="إغلاق التنبيه"
+                        t-on-click="dismiss">
+                    <i class="fa fa-times" aria-hidden="true"/>
+                </button>
+            </div>
+            <div class="o_biometric_connection_alert_devices">
+                <div t-foreach="state.devices" t-as="device" t-key="device.id"
+                     class="o_biometric_connection_alert_device">
+                    <b t-esc="device.name"/>
+                    <span>آخر اتصال: <bdi t-esc="lastSeen(device.last_seen)"/></span>
+                </div>
+            </div>
+            <p t-if="state.error" class="o_biometric_connection_alert_check_error">
+                تعذر تحديث الحالة من السيرفر؛ لم يتم تأكيد عودة الاتصال.
+            </p>
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    t-att-disabled="state.loading" t-on-click="refresh">
+                <i class="fa fa-refresh" t-att-class="{'fa-spin': state.loading}" aria-hidden="true"/>
+                إعادة التحقق
+            </button>
+        </aside>
+    </t>
+</templates>

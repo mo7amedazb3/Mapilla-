@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_request_mapilla_design" model="ir.ui.view">
+        <field name="name">furniture.delivery.request.mapilla.design</field>
+        <field name="model">furniture.mrp.future.order</field>
+        <field name="inherit_id" ref="view_delivery_request_form_workbench"/>
+        <field name="priority">250</field>
+        <field name="arch" type="xml">
+            <xpath expr="//span[hasclass('o_delivery_request_notes_icon')]/i" position="attributes">
+                <attribute name="class">fa fa-file-text-o</attribute>
+                <attribute name="style">font-size: 18px; line-height: 1;</attribute>
+            </xpath>
+            <xpath expr="//div[hasclass('o_delivery_request_products_hint')]" position="replace"/>
+            <xpath expr="//field[@name='line_ids']/list" position="attributes"><attribute name="create">0</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes"><attribute name="widget">delivery_editable_lines</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='quantity']" position="attributes"><attribute name="widget">furniture_compact_quantity</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='available_qty']" position="attributes"><attribute name="widget">furniture_compact_quantity</attribute><attribute name="column_invisible">True</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='shortage_qty']" position="attributes"><attribute name="widget">furniture_compact_quantity</attribute><attribute name="column_invisible">True</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='quantity']" position="after"><field name="fabric_summary" string="القماش" readonly="1" widget="delivery_material_summary" options="{'names_only': True}"/><field name="takawe_summary" string="التكاوي" readonly="1" widget="delivery_material_summary" column_invisible="True"/><field name="upholstery_data" string="عدد التكاوي" widget="delivery_takawe_counts" column_invisible="True"/></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='route_label']" position="replace"/>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='product_uom_id']" position="attributes"><attribute name="column_invisible">True</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='furniture_model_id']" position="attributes"><attribute name="column_invisible">True</attribute></xpath>
+            <xpath expr="//field[@name='line_ids']" position="before"><div class="o_delivery_order_models" dir="rtl"><strong>الموديلات</strong><field name="delivery_model_ids" widget="many2many_tags" readonly="1" nolabel="1" options="{'no_open': True}"/></div></xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='configuration_error']" position="replace"><field name="dimension_label" string="المقاس" readonly="1" widget="delivery_dimension_summary"/></xpath>
+            <xpath expr="//form" position="attributes"><attribute name="class" add="o_mapilla_delivery_form" separator=" "/></xpath>
+            <xpath expr="//widget[@name='web_ribbon']" position="replace"/>
+            <xpath expr="//div[hasclass('o_delivery_request_workbench_header')]" position="replace">
+
+                <div class="mp_delivery_details">
+                    <section name="delivery_planning_panel"><div class="mp_delivery_section_title"><i class="fa fa-calendar" title="الموعد"/><span>خطة التسليم<small>موعد تسليم الطلب</small></span></div></section>
+                    <section name="delivery_customer_panel"><div class="mp_delivery_section_title"><i class="fa fa-address-book-o" title="العميل"/><span>بيانات العميل<small>المشتري والمستهلك من الطلب</small></span></div></section>
+                </div>
+            </xpath>
+            <xpath expr="//section[@name='delivery_planning_panel']" position="inside"><xpath expr="//div[hasclass('o_delivery_request_planning_strip')]" position="move"/></xpath>
+            <xpath expr="//section[@name='delivery_customer_panel']" position="inside"><xpath expr="//div[hasclass('o_delivery_request_common_strip')]" position="move"/></xpath>
+        </field>
+    </record>
+</odoo>

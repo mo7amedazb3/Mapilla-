@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="employee_stage_priming" model="furniture.mrp.employee.stage">
+        <field name="name">التقديم</field>
+        <field name="code">priming</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="employee_stage_painting" model="furniture.mrp.employee.stage">
+        <field name="name">تصنيع دهانات</field>
+        <field name="code">painting</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="employee_stage_carpentry" model="furniture.mrp.employee.stage">
+        <field name="name">تجميع</field>
+        <field name="code">carpentry</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="employee_stage_finishing" model="furniture.mrp.employee.stage">
+        <field name="name">تجهيز</field>
+        <field name="code">finishing</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="employee_stage_tailoring" model="furniture.mrp.employee.stage">
+        <field name="name">تفصيل</field>
+        <field name="code">tailoring</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="employee_stage_upholstery" model="furniture.mrp.employee.stage">
+        <field name="name">كسوه</field>
+        <field name="code">upholstery</field>
+        <field name="sequence">80</field>
+    </record>
+    <record id="employee_stage_packaging" model="furniture.mrp.employee.stage">
+        <field name="name">التغليف</field>
+        <field name="code">packaging</field>
+        <field name="sequence">90</field>
+    </record>
+    <record id="employee_stage_bases" model="furniture.mrp.employee.stage">
+        <field name="name">القواعد</field>
+        <field name="code">bases</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="employee_stage_sewing" model="furniture.mrp.employee.stage">
+        <field name="name">الخياطة (مرحلة قديمة داخل التفصيل الآن)</field>
+        <field name="code">sewing</field>
+        <field name="sequence">70</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

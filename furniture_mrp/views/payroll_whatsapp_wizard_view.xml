@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_payroll_whatsapp_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.payroll.whatsapp.wizard.form</field>
+        <field name="model">furniture.mrp.payroll.whatsapp.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إرسال كشوف الرواتب عبر واتساب">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>إرسال PDF منفصل لكل موظف</h2>
+                    </div>
+                    <group col="4">
+                        <field name="slip_count" readonly="1"/>
+                        <field name="employee_count" readonly="1"/>
+                        <field name="period_count" readonly="1"/>
+                        <field name="date_from" readonly="1"/>
+                        <field name="date_to" readonly="1"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        كل موظف سيستلم ملف كشف راتبه فقط على رقم الموبايل المسجل في ملفه.
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="period_count &lt;= 1">
+                        التحديد يحتوي على أكثر من فترة؛ الموظف الموجود في أكثر من فترة
+                        سيستلم ملف PDF منفصلًا عن كل كشف محدد.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="missing_phone_count == 0">
+                        <strong>لا يمكن الإرسال: أرقام الموبايل التالية غير مسجلة:</strong>
+                        <field name="missing_phone_names" nolabel="1" readonly="1"/>
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="whatsapp_ready">
+                        حساب واتساب غير متصل حاليًا.
+                    </div>
+                    <field name="missing_phone_count" invisible="1"/>
+                    <field name="whatsapp_ready" invisible="1"/>
+                    <field name="can_send" invisible="1"/>
+                    <field name="slip_ids" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_send" type="object"
+                            string="Send via WhatsApp"
+                            class="btn-primary" icon="fa-whatsapp"
+                            invisible="not can_send"
+                            confirm="سيتم إرسال كشف راتب PDF منفصل لكل موظف محدد. هل تريد المتابعة؟"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

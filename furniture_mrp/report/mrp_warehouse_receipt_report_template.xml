@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_furniture_mrp_warehouse_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="brand_company" t-value="o.company_id"/>
+                    <t t-set="is_aggregate" t-value="o._name == 'furniture.mrp.advance.material.release'"/>
+                    <t t-set="state_labels" t-value="dict(o.fields_get(['state'])['state']['selection'])"/>
+                    <div t-attf-class="page #{'wr-aggregate-page' if is_aggregate else ''}" dir="rtl"
+                         style="font-family:'DejaVu Sans',Arial,sans-serif; color:#18313b; font-size:10px; padding-top:8mm; box-sizing:border-box;">
+                        <style>
+                            .wr-cover { background:#123f49; color:#fff; padding:13px 16px; border-radius:8px; margin-bottom:10px; page-break-inside:avoid; }
+                            .wr-cover h1 { color:#fff !important; margin:0 0 3px; font-size:22px; font-weight:700; }
+                            .wr-cover .wr-number { color:#f3bd55; font-size:18px; font-weight:700; direction:ltr; text-align:right; }
+                            .wr-cover .wr-subtitle { color:#ccebed; font-size:9px; }
+                            .wr-meta { width:100%; border-collapse:collapse; margin:0 0 10px; table-layout:fixed; }
+                            .wr-meta td { width:25%; padding:6px 7px; border:1px solid #d3e0e2; vertical-align:top; word-wrap:break-word; }
+                            .wr-meta .label { display:block; color:#61767c; font-size:8px; margin-bottom:2px; }
+                            .wr-meta .value { color:#173e48; font-weight:700; }
+                            .wr-section { color:#123f49; font-size:13px; font-weight:700; border-right:5px solid #e79b25; padding:3px 8px; margin:10px 0 6px; }
+                            .wr-route { width:100%; border-collapse:separate; border-spacing:5px 0; margin:0 -5px 9px; table-layout:fixed; }
+                            .wr-route td { width:33.33%; padding:7px; background:#f3f8f8; border:1px solid #cfe0e2; text-align:center; word-wrap:break-word; }
+                            .wr-route .route-label { display:block; color:#61767c; font-size:8px; margin-bottom:3px; }
+                            .wr-route strong { display:block; white-space:normal; line-height:1.55; font-size:9px; }
+                            table.wr-lines { width:100%; border-collapse:collapse; margin-bottom:8px; table-layout:fixed; }
+                            table.wr-lines thead { display:table-header-group; }
+                            table.wr-lines th { background:#195966; color:#fff; padding:6px 3px; border:1px solid #174d58; text-align:center; font-size:8px; }
+                            table.wr-lines td { padding:6px 3px; border:1px solid #d6e1e3; text-align:center; vertical-align:middle; word-wrap:break-word; }
+                            table.wr-lines tbody tr:nth-child(even) { background:#f5f8f8; }
+                            table.wr-lines .product { text-align:right; direction:rtl; font-weight:700; line-height:1.45; overflow:hidden; word-wrap:break-word; }
+                            table.wr-lines .product-name { display:block; white-space:normal; overflow:hidden; word-wrap:break-word; word-break:break-all; }
+                            table.wr-lines .code { display:block; direction:ltr; text-align:right; color:#6c7f84; font-size:8px; font-weight:400; }
+                            table.wr-lines .line-context { display:block; color:#6c7f84; font-size:7px; font-weight:400; margin-top:2px; }
+                            .wr-aggregate-page { padding-top:1mm !important; color:#202d31 !important; font-size:14px !important; }
+                            .wr-compact-head { background:#004c5d; color:#fff; border-radius:8px; padding:14px 16px 12px; margin:0 0 12px; page-break-inside:avoid; }
+                            .wr-compact-head table { width:100%; border-collapse:collapse; table-layout:fixed; }
+                            .wr-compact-title { font-size:24px; line-height:1.25; font-weight:700; color:#fff; vertical-align:middle; }
+                            .wr-compact-number { margin-top:4px; direction:ltr; text-align:right; }
+                            .wr-compact-number strong { color:#ffcc48; display:inline-block; font-size:17px; }
+                            .wr-compact-logo { width:36%; text-align:left; vertical-align:middle; }
+                            .wr-compact-logo > div { margin-bottom:0 !important; }
+                            table.wr-compact-lines { width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; margin:0; border:1px solid #ccd5d7; border-radius:7px; overflow:hidden; }
+                            table.wr-compact-lines thead { display:table-header-group; }
+                            table.wr-compact-lines th { padding:10px 10px; background:#00586a; border-bottom:1px solid #004553; color:#fff; font-size:15px; line-height:1.3; font-weight:700; text-align:center; }
+                            table.wr-compact-lines td { padding:13.5px 10px; border-bottom:1px solid #d9dfe0; vertical-align:middle; font-size:14px; line-height:1.3; text-align:center; word-wrap:break-word; }
+                            table.wr-compact-lines tbody tr:nth-child(even) { background:#f7f8f8; }
+                            table.wr-compact-lines tbody tr:last-child td { border-bottom:0; }
+                            table.wr-compact-lines .order { width:40%; direction:ltr; color:#26383d; white-space:nowrap; border-left:1px solid #d9dfe0; }
+                            table.wr-compact-lines .material { width:60%; direction:rtl; color:#16292e; font-weight:500; }
+                            table.wr-compact-lines .material-name { display:inline-block; max-width:100%; unicode-bidi:bidi-override; white-space:nowrap; }
+                            .wr-compact-empty { padding:8px 0; color:#6a777a; }
+                            .wr-note { white-space:normal; direction:rtl; text-align:right; border:1px solid #efd597; background:#fff8e8; padding:7px 9px; margin:7px 0; line-height:1.65; }
+                            .wr-note-text { display:block; white-space:pre-wrap; direction:rtl; text-align:right; }
+                            .wr-empty { border:1px dashed #aebfc2; background:#f5f7f7; color:#64777d; padding:12px; text-align:center; }
+                            .wr-signatures { width:100%; margin-top:22px; page-break-inside:avoid; table-layout:fixed; }
+                            .wr-signatures td { width:33.33%; text-align:center; padding:27px 12px 0; }
+                            .wr-signature-line { border-top:1px solid #71858a; padding-top:5px; }
+                            .wr-footer-note { color:#6a7e83; font-size:8px; text-align:center; margin-top:12px; }
+                        </style>
+
+                        <div class="wr-cover" t-if="not is_aggregate">
+                            <table style="width:100%; table-layout:fixed; color:#fff;">
+                                <tr>
+                                    <td style="width:65%; vertical-align:top;">
+                                        <h1>
+                                            <t t-if="is_aggregate">إذن استلام خامات مجمّع</t>
+                                            <t t-else="">إذن استلام خامات مرحلة</t>
+                                        </h1>
+                                        <div class="wr-subtitle">مستند تسليم المخزن واستلام الإنتاج</div>
+                                    </td>
+                                    <td style="width:35%; text-align:left; vertical-align:top;">
+                                        <t t-call="furniture_mrp.report_company_brand_logo_left"/>
+                                        <div class="wr-number"><t t-esc="o.name"/></div>
+                                        <div class="wr-subtitle"><t t-esc="o.company_id.name"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table class="wr-meta" t-if="not is_aggregate">
+                            <tr>
+                                <td>
+                                    <span class="label">رقم الإذن</span>
+                                    <span class="value"><t t-esc="o.name"/></span>
+                                </td>
+                                <td>
+                                    <span class="label">الحالة</span>
+                                    <span class="value"><t t-esc="state_labels.get(o.state, o.state)"/></span>
+                                </td>
+                                <td>
+                                    <span class="label">وقت الطلب</span>
+                                    <span class="value" t-field="o.requested_at" t-options="{'widget':'datetime'}"/>
+                                </td>
+                                <td>
+                                    <span class="label">أمين المخزن</span>
+                                    <span class="value"><t t-esc="o.assigned_to_id.name or '-'"/></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="label">طالب الصرف</span>
+                                    <span class="value"><t t-esc="o.requested_by_id.name or '-'"/></span>
+                                </td>
+                                <td>
+                                    <span class="label">اعتمد / صرف بواسطة</span>
+                                    <span class="value"><t t-esc="o.approved_by_id.name or '-'"/></span>
+                                </td>
+                                <td>
+                                    <span class="label">وقت الاعتماد / الصرف</span>
+                                    <span t-if="o.approved_at" class="value" t-field="o.approved_at" t-options="{'widget':'datetime'}"/>
+                                    <span t-else="" class="value">-</span>
+                                </td>
+                                <td>
+                                    <span class="label">تاريخ الطباعة</span>
+                                    <span class="value" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <t t-if="not is_aggregate">
+                            <t t-set="stage_labels" t-value="dict(o.fields_get(['stage_code'])['stage_code']['selection'])"/>
+                            <t t-set="request_kind_labels" t-value="dict(o.fields_get(['request_kind'])['request_kind']['selection'])"/>
+                            <div class="wr-section">بيانات أمر الإنتاج والاستلام</div>
+                            <table class="wr-meta">
+                                <tr>
+                                    <td>
+                                        <span class="label">أمر الإنتاج</span>
+                                        <span class="value"><t t-esc="o.production_id.name or '-'"/></span>
+                                    </td>
+                                    <td>
+                                        <span class="label">المرحلة</span>
+                                        <span class="value"><t t-esc="stage_labels.get(o.stage_code, o.stage_code)"/></span>
+                                    </td>
+                                    <td>
+                                        <span class="label">أمر المرحلة</span>
+                                        <span class="value"><t t-esc="o.stage_order_name or '-'"/></span>
+                                    </td>
+                                    <td>
+                                        <span class="label">نوع الطلب</span>
+                                        <span class="value"><t t-esc="request_kind_labels.get(o.request_kind, o.request_kind)"/></span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="wr-route">
+                                <tr>
+                                    <td>
+                                        <span class="route-label">من المخزن</span>
+                                        <strong><t t-esc="o.source_location_id.complete_name or '-'"/></strong>
+                                    </td>
+                                    <td>
+                                        <span class="route-label">عهدة التسليم</span>
+                                        <strong><t t-esc="o.handover_location_id.complete_name or '-'"/></strong>
+                                    </td>
+                                    <td>
+                                        <span class="route-label">إلى صالة المرحلة</span>
+                                        <strong><t t-esc="o.destination_location_id.complete_name or '-'"/></strong>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div t-if="o.requested_product_summary" class="wr-note">
+                                <div><strong>المنتجات المطلوب تشغيلها:</strong></div>
+                                <div class="wr-note-text" t-esc="o.requested_product_summary"/>
+                            </div>
+
+                            <div class="wr-section">الأصناف والكميات داخل الإذن</div>
+                            <table class="wr-lines" t-if="o.material_line_ids">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5%;">م</th>
+                                        <th style="width:32%;">الخامة</th>
+                                        <th style="width:9%;">المطلوب</th>
+                                        <th style="width:9%;">المتاح</th>
+                                        <th style="width:9%;">العجز</th>
+                                        <th style="width:9%;">المصروف</th>
+                                        <th style="width:9%;">المستلم</th>
+                                        <th style="width:9%;">الفرق</th>
+                                        <th style="width:9%;">الوحدة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.material_line_ids" t-as="line">
+                                        <td><t t-esc="line_index + 1"/></td>
+                                        <td class="product">
+                                            <span class="product-name" t-esc="line.product_id.name"/>
+                                            <span t-if="line.product_id.default_code" class="code"><t t-esc="line.product_id.default_code"/></span>
+                                        </td>
+                                        <td><span t-field="line.requested_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><span t-field="line.available_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><span t-field="line.shortage_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><span t-field="line.issued_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><span t-field="line.received_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><span t-field="line.receipt_difference_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                        <td><t t-esc="line.product_uom_id.name"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="wr-empty" t-else="">لا توجد خامات مسجلة داخل هذا الإذن.</div>
+
+                            <div t-if="o.receipt_note" class="wr-note">
+                                <strong>ملاحظة الاستلام:</strong>
+                                <span class="wr-note-text" t-esc="o.receipt_note"/>
+                            </div>
+                        </t>
+
+                        <t t-if="is_aggregate">
+                            <t t-set="all_material_lines" t-value="o.stage_line_ids.mapped('material_line_ids')"/>
+                            <div class="wr-compact-head">
+                                <table>
+                                    <tr>
+                                        <td class="wr-compact-title" style="width:64%;">
+                                            <div>إذن استلام خامات مخزن</div>
+                                            <div class="wr-compact-number">
+                                                <strong><t t-esc="o.name"/></strong>
+                                            </div>
+                                        </td>
+                                        <td class="wr-compact-logo">
+                                            <t t-call="furniture_mrp.report_company_brand_logo_left"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <table class="wr-compact-lines" t-if="all_material_lines">
+                                <thead>
+                                    <tr>
+                                        <th style="width:40%;">رقم أمر الإنتاج</th>
+                                        <th style="width:60%;">الصنف / الخامة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="all_material_lines" t-as="line">
+                                        <td class="order">
+                                            <t t-esc="line.production_id.name"/>
+                                        </td>
+                                        <td class="material">
+                                            <span class="material-name" dir="auto" t-esc="line.product_id.name"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="wr-compact-empty" t-else="">لا توجد خامات مسجلة داخل هذا الإذن.</div>
+                        </t>
+
+                        <table class="wr-signatures" t-if="not is_aggregate">
+                            <tr>
+                                <td><div class="wr-signature-line">طالب الصرف</div></td>
+                                <td><div class="wr-signature-line">أمين المخزن</div></td>
+                                <td><div class="wr-signature-line">المستلم / مسؤول الإنتاج</div></td>
+                            </tr>
+                        </table>
+                        <div class="wr-footer-note" t-if="not is_aggregate">تم إنشاء هذا المستند إلكترونيًا من نظام MRP II.</div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Distinct route names are required because the browser resolves a PDF
+         URL by report_name before it knows which model owns the docid. -->
+    <template id="report_furniture_mrp_store_request_receipt">
+        <t t-call="furniture_mrp.report_furniture_mrp_warehouse_receipt"/>
+    </template>
+
+    <template id="report_furniture_mrp_advance_material_release_receipt">
+        <t t-call="furniture_mrp.report_furniture_mrp_warehouse_receipt"/>
+    </template>
+
+    <template id="report_furniture_stock_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="brand_company" t-value="o.company_id"/>
+                    <t t-set="state_labels" t-value="dict(o.fields_get(['state'])['state']['selection'])"/>
+                    <div class="page" dir="rtl"
+                         style="font-family:'DejaVu Sans',Arial,sans-serif; color:#18313b; font-size:10px; padding-top:8mm; box-sizing:border-box;">
+                        <style>
+                            .sr-cover { background:#123f49; color:#fff; padding:13px 16px; border-radius:8px; margin-bottom:11px; page-break-inside:avoid; }
+                            .sr-cover h1 { color:#fff !important; margin:0 0 3px; font-size:22px; font-weight:700; }
+                            .sr-cover .sr-number { color:#f3bd55; font-size:18px; font-weight:700; direction:ltr; text-align:right; }
+                            .sr-cover .sr-subtitle { color:#ccebed; font-size:9px; }
+                            .sr-meta { width:100%; border-collapse:collapse; table-layout:fixed; margin-bottom:10px; }
+                            .sr-meta td { width:25%; padding:6px 7px; border:1px solid #d3e0e2; vertical-align:top; word-wrap:break-word; }
+                            .sr-label { display:block; color:#61767c; font-size:8px; margin-bottom:2px; }
+                            .sr-value { display:block; color:#173e48; font-weight:700; }
+                            .sr-section { color:#123f49; font-size:13px; font-weight:700; border-right:5px solid #e79b25; padding:3px 8px; margin:11px 0 6px; }
+                            .sr-route { width:100%; border-collapse:separate; border-spacing:5px 0; margin:0 -5px 10px; table-layout:fixed; }
+                            .sr-route td { width:50%; padding:8px; background:#f3f8f8; border:1px solid #cfe0e2; text-align:center; word-wrap:break-word; }
+                            .sr-route .sr-label { margin-bottom:4px; }
+                            table.sr-lines { width:100%; border-collapse:collapse; table-layout:fixed; margin-bottom:9px; }
+                            table.sr-lines thead { display:table-header-group; }
+                            table.sr-lines th { background:#195966; color:#fff; padding:7px 4px; border:1px solid #174d58; text-align:center; font-size:9px; }
+                            table.sr-lines td { padding:7px 4px; border:1px solid #d6e1e3; text-align:center; vertical-align:middle; word-wrap:break-word; }
+                            table.sr-lines tbody tr:nth-child(even) { background:#f5f8f8; }
+                            table.sr-lines .product { direction:rtl; text-align:right; font-weight:700; line-height:1.5; }
+                            table.sr-lines .code { display:block; direction:ltr; text-align:right; color:#6c7f84; font-size:8px; font-weight:400; }
+                            .sr-note { border:1px solid #efd597; background:#fff8e8; padding:7px 9px; margin:7px 0; line-height:1.65; white-space:pre-wrap; }
+                            .sr-empty { border:1px dashed #aebfc2; background:#f5f7f7; color:#64777d; padding:13px; text-align:center; }
+                            .sr-signatures { width:100%; margin-top:24px; page-break-inside:avoid; table-layout:fixed; }
+                            .sr-signatures td { width:33.33%; text-align:center; padding:28px 13px 0; }
+                            .sr-signature-line { border-top:1px solid #71858a; padding-top:5px; }
+                            .sr-footer-note { color:#6a7e83; font-size:8px; text-align:center; margin-top:12px; }
+                        </style>
+
+                        <div class="sr-cover">
+                            <table style="width:100%; table-layout:fixed; color:#fff;">
+                                <tr>
+                                    <td style="width:65%; vertical-align:top;">
+                                        <h1>إذن استلام مخزني</h1>
+                                        <div class="sr-subtitle">الأصناف الواردة إلى المخزن والكميات المستلمة</div>
+                                    </td>
+                                    <td style="width:35%; text-align:left; vertical-align:top;">
+                                        <t t-call="furniture_mrp.report_company_brand_logo_left"/>
+                                        <div class="sr-number"><t t-esc="o.name"/></div>
+                                        <div class="sr-subtitle"><t t-esc="o.company_id.name"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table class="sr-meta">
+                            <tr>
+                                <td>
+                                    <span class="sr-label">رقم الإذن</span>
+                                    <span class="sr-value"><t t-esc="o.name"/></span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">الحالة</span>
+                                    <span class="sr-value"><t t-esc="state_labels.get(o.state, o.state)"/></span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">المورد / جهة التوريد</span>
+                                    <span class="sr-value"><t t-esc="o.partner_id.name or '-'"/></span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">نوع العملية</span>
+                                    <span class="sr-value"><t t-esc="o.picking_type_id.name or '-'"/></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="sr-label">المستند المصدر</span>
+                                    <span class="sr-value"><t t-esc="o.origin or '-'"/></span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">التاريخ المجدول</span>
+                                    <span t-if="o.scheduled_date" class="sr-value" t-field="o.scheduled_date" t-options="{'widget':'datetime'}"/>
+                                    <span t-else="" class="sr-value">-</span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">تاريخ الاستلام الفعلي</span>
+                                    <span t-if="o.date_done" class="sr-value" t-field="o.date_done" t-options="{'widget':'datetime'}"/>
+                                    <span t-else="" class="sr-value">-</span>
+                                </td>
+                                <td>
+                                    <span class="sr-label">تاريخ الطباعة</span>
+                                    <span class="sr-value" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="sr-section">مسار الاستلام</div>
+                        <table class="sr-route">
+                            <tr>
+                                <td>
+                                    <span class="sr-label">من</span>
+                                    <strong><t t-esc="o.location_id.complete_name or '-'"/></strong>
+                                </td>
+                                <td>
+                                    <span class="sr-label">إلى المخزن</span>
+                                    <strong><t t-esc="o.location_dest_id.complete_name or '-'"/></strong>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="sr-section">الأصناف والكميات داخل إذن الاستلام</div>
+                        <table class="sr-lines" t-if="o.move_ids_without_package">
+                            <thead>
+                                <tr>
+                                    <th style="width:6%;">م</th>
+                                    <th style="width:38%;">الصنف</th>
+                                    <th style="width:15%;">المطلوب</th>
+                                    <th style="width:15%;">المستلم</th>
+                                    <th style="width:13%;">الوحدة</th>
+                                    <th style="width:13%;">اللوط / السيريال</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.move_ids_without_package" t-as="move">
+                                    <td><t t-esc="move_index + 1"/></td>
+                                    <td class="product">
+                                        <span t-esc="move.product_id.name"/>
+                                        <span t-if="move.product_id.default_code" class="code"><t t-esc="move.product_id.default_code"/></span>
+                                    </td>
+                                    <td><span t-field="move.product_uom_qty" t-options="{'widget':'float','precision':3}"/></td>
+                                    <td><span t-field="move.quantity" t-options="{'widget':'float','precision':3}"/></td>
+                                    <td><t t-esc="move.product_uom.name"/></td>
+                                    <td><t t-esc="'، '.join(move.move_line_ids.mapped('lot_id.name')) or '-'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="sr-empty" t-else="">لا توجد أصناف مسجلة داخل إذن الاستلام.</div>
+
+                        <div t-if="o.note" class="sr-note">
+                            <strong>ملاحظات:</strong>
+                            <t t-esc="o.note"/>
+                        </div>
+
+                        <table class="sr-signatures">
+                            <tr>
+                                <td><div class="sr-signature-line">المورد / المندوب</div></td>
+                                <td><div class="sr-signature-line">أمين المخزن</div></td>
+                                <td><div class="sr-signature-line">المراجعة والاستلام</div></td>
+                            </tr>
+                        </table>
+                        <div class="sr-footer-note">تم إنشاء هذا المستند إلكترونيًا من نظام MRP II.</div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

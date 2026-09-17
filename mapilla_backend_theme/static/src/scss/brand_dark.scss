@@ -1,0 +1,45 @@
+@media screen {
+    body.o_web_client {
+        --mapilla-page: #0f171e;
+        --mapilla-surface: #17222d;
+        --mapilla-surface-soft: #21303c;
+        --mapilla-surface-muted: #263c4d;
+        --mapilla-inset: #1c2b37;
+        --mapilla-selected: #304b60;
+        --mapilla-border: #3c4d58;
+        --mapilla-border-strong: #597080;
+        --mapilla-text: #f0ece8;
+        --mapilla-heading: #f4f1ed;
+        --mapilla-muted: #aab6be;
+        --mapilla-hover: #263c4d;
+        --mapilla-action: #e0d8d1;
+        --mapilla-action-hover: #f5f1ed;
+        --mapilla-action-text: #0c2a44;
+        --mapilla-focus: #c6bdaf;
+        // Native contact/product cards carry light backgrounds at a higher
+        // specificity than the default dark theme. Their text must not become
+        // pale while the card stays white.
+        .o_kanban_renderer .o_kanban_record,
+        .o_kanban_renderer .o_kanban_quick_create {
+            background: var(--mapilla-surface) !important;
+            border-color: var(--mapilla-border) !important;
+            color: var(--mapilla-text) !important;
+        }
+        .o_kanban_renderer .o_kanban_record .text-muted {
+            color: var(--mapilla-muted) !important;
+        }
+        .o_ntp_model_theme {
+            --ntp-model-soft: hsl(var(--ntp-model-hue), 15%, 23%);
+            --ntp-model-border: hsl(var(--ntp-model-hue), 15%, 40%);
+        }
+        .o_ntp_piece_pipeline:has(.o_ntp_piece_selector input:checked) .o_ntp_piece_header {
+            background: #304b60 !important;
+        }
+        .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_copy small,
+        .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_percentage {
+            color: #3d5569 !important;
+        }
+        .o_ntp_piece_pipeline, .o_ntp_workspace_model_caption,
+        .o_ntp_workspace_product_body { background: var(--mapilla-surface); color: var(--mapilla-text); }
+    }
+}

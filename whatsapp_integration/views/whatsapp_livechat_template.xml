@@ -1,0 +1,2397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="whatsapp_web_ui_template" name="MAPILLA WhatsApp">
+        &lt;!DOCTYPE html&gt;
+        <html lang="ar" dir="rtl">
+        <head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>MAPILLA | واتساب</title>
+            <meta name="theme-color" content="#0c2a44"/>
+            <link rel="icon" href="/mapilla_backend_theme/static/src/img/favicon_64.png"/>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+            <style>
+                *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: #1c1c1e; color: #e5e5ea;
+                    display: flex; height: 100vh; overflow: hidden;
+                }
+                /* ===== LOADER ===== */
+                #loader {
+                    position: fixed; inset: 0; background: #1c1c1e; z-index: 9999;
+                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    gap: 16px; transition: opacity 0.4s;
+                }
+                #loader svg { width: 64px; height: 64px; fill: #25d366; }
+                #loader span { color: #8e8e93; font-size: 15px; letter-spacing: 0.3px; }
+
+                /* ===== SIDEBAR ===== */
+                .wa-sidebar {
+                    width: 320px; min-width: 280px; background: #1c1c1e;
+                    border-left: 1px solid #2c2c2e;
+                    display: flex; flex-direction: column; flex-shrink: 0;
+                }
+                .sidebar-header {
+                    padding: 12px 16px 10px;
+                    display: flex; align-items: center; justify-content: space-between;
+                    border-bottom: 1px solid #2c2c2e;
+                    background: #1c1c1e;
+                }
+                .sidebar-title { font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; }
+
+                /* Search */
+                .wa-search-bar { padding: 8px 12px; background: #1c1c1e; }
+                .wa-search-bar input {
+                    width: 100%; background: #2c2c2e; border: none; border-radius: 10px;
+                    padding: 8px 14px; color: #e5e5ea; font-size: 14px; outline: none;
+                }
+                .wa-search-bar input::placeholder { color: #636366; }
+
+                /* Contact List */
+                .wa-contact-list { flex: 1; overflow-y: auto; }
+                .wa-contact-list::-webkit-scrollbar { width: 4px; }
+                .wa-contact-list::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 4px; }
+
+                .wa-contact-item {
+                    display: flex; padding: 10px 14px; align-items: center; cursor: pointer;
+                    border-bottom: 1px solid rgba(255,255,255,0.04);
+                    transition: background 0.15s ease;
+                    position: relative;
+                }
+                .wa-contact-item:hover { background: #2c2c2e; }
+                .wa-contact-item.active { background: #2c2c2e; }
+                .wa-contact-item.active::before {
+                    content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+                    width: 3px; background: #25d366; border-radius: 3px 0 0 3px;
+                }
+
+                /* Avatar */
+                .wa-avatar {
+                    width: 50px; height: 50px; border-radius: 50%;
+                    background: linear-gradient(135deg, #25d366, #128c7e);
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 19px; font-weight: 600; color: white;
+                    flex-shrink: 0; margin-left: 12px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+                }
+                .wa-avatar.color-1 { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+                .wa-avatar.color-2 { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+                .wa-avatar.color-3 { background: linear-gradient(135deg, #fd79a8, #e84393); }
+                .wa-avatar.color-4 { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+                .wa-avatar.color-5 { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+                .wa-avatar.color-6 { background: linear-gradient(135deg, #55efc4, #00b894); }
+
+                .wa-contact-info { flex: 1; min-width: 0; }
+                .wa-contact-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+                .wa-contact-name {
+                    font-size: 15px; font-weight: 500; color: #ffffff;
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+                }
+                .wa-contact-time { font-size: 11.5px; color: #636366; white-space: nowrap; }
+                .wa-contact-bottom {
+                    font-size: 13px; color: #636366;
+                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+                }
+
+                /* ===== BLANK STATE ===== */
+                .wa-blank-state {
+                    flex: 1; background: #1c1c1e;
+                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    gap: 14px; text-align: center; padding: 40px;
+                    border-right: none;
+                }
+                .wa-blank-logo { width: 80px; height: 80px; fill: #3a3a3c; }
+                .wa-blank-state h2 { font-size: 22px; font-weight: 500; color: #ffffff; }
+                .wa-blank-state p { font-size: 14px; color: #636366; max-width: 340px; line-height: 1.6; }
+                .wa-blank-line { width: 40px; height: 3px; background: #25d366; border-radius: 3px; margin-bottom: 6px; }
+
+                /* ===== CHAT AREA ===== */
+                .wa-chat-container {
+                    flex: 1; display: flex; flex-direction: column;
+                    background-color: #0b141a;
+                    background-image: url("https://raw.githubusercontent.com/sivayogasubramanian/react-whatsapp-clone/master/src/images/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png");
+                    background-repeat: repeat;
+                    background-size: 400px;
+                }
+                .wa-chat-header {
+                    background: #1c1c1e; padding: 10px 18px;
+                    display: flex; align-items: center;
+                    border-bottom: 1px solid #2c2c2e; min-height: 62px;
+                }
+                .wa-chat-header .wa-avatar { width: 40px; height: 40px; font-size: 16px; margin-left: 12px; margin-right: 0; }
+                .wa-chat-header-info { flex: 1; min-width: 0; }
+                .wa-chat-header-name { font-size: 16px; font-weight: 600; color: #ffffff; }
+                .wa-chat-header-sub { font-size: 12.5px; color: #636366; }
+
+                /* Messages */
+                .wa-chat-history {
+                    flex: 1; padding: 16px 10%; overflow-y: auto;
+                    display: flex; flex-direction: column; gap: 2px;
+                }
+                .wa-chat-history::-webkit-scrollbar { width: 5px; }
+                .wa-chat-history::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 4px; }
+
+                .wa-message-row { display: flex; margin-bottom: 4px; width: 100%; }
+                .wa-bubble {
+                    max-width: 68%; padding: 8px 10px 6px 10px;
+                    border-radius: 12px; position: relative;
+                    font-size: 14.5px; line-height: 1.45;
+                    word-wrap: break-word; word-break: break-word;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+                }
+                .wa-message-row:hover .wa-message-actions { opacity: 1; }
+                .wa-message-actions {
+                    align-self: center; display: flex; gap: 4px; margin: 0 7px;
+                    opacity: 0.35; transition: opacity 0.15s; flex-shrink: 0;
+                }
+                .wa-message-reply-btn, .wa-message-forward-btn {
+                    width: 30px; height: 30px; border-radius: 50%;
+                    border: none; background: #2c2c2e; color: #a1a1a6; cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    transition: color 0.15s, background 0.15s; font-size: 17px;
+                }
+                .wa-message-reply-btn:hover, .wa-message-forward-btn:hover {
+                    color: #25d366; background: #3a3a3c;
+                }
+                .wa-quoted-message {
+                    background: rgba(0,0,0,0.22); border-right: 3px solid #25d366;
+                    border-radius: 7px; padding: 6px 9px; margin-bottom: 7px;
+                    max-width: 100%; overflow: hidden;
+                }
+                .wa-quoted-sender { color: #25d366; font-size: 12px; font-weight: 600; }
+                .wa-quoted-text {
+                    color: #a1a1a6; font-size: 12px; white-space: nowrap;
+                    overflow: hidden; text-overflow: ellipsis; max-width: 280px;
+                }
+                .wa-bubble img { max-width: 100%; border-radius: 8px; margin-bottom: 4px; display: block; max-height: 280px; object-fit: contain; }
+                .wa-chat-image { cursor: zoom-in; transition: opacity .15s ease; }
+                .wa-chat-image:hover { opacity: .9; }
+                .wa-image-viewer {
+                    position: fixed; inset: 0; z-index: 12000; display: none;
+                    background: rgba(11,20,26,.96); color: #e9edef;
+                    user-select: none; overflow: hidden;
+                }
+                .wa-image-viewer.open { display: flex; flex-direction: column; }
+                .wa-image-viewer-toolbar {
+                    height: 58px; display: flex; align-items: center; gap: 8px;
+                    padding: 0 16px; background: rgba(17,27,33,.92);
+                    box-shadow: 0 1px 0 rgba(255,255,255,.06); z-index: 2;
+                }
+                .wa-image-viewer-name {
+                    flex: 1; min-width: 0; direction: auto; white-space: nowrap;
+                    overflow: hidden; text-overflow: ellipsis; font-size: 13px; color: #d1d7db;
+                }
+                .wa-image-viewer-btn {
+                    width: 38px; height: 38px; border: 0; border-radius: 50%;
+                    background: transparent; color: #d1d7db; font-size: 22px;
+                    cursor: pointer; display: grid; place-items: center;
+                }
+                .wa-image-viewer-btn:hover { background: rgba(255,255,255,.1); }
+                .wa-image-viewer-stage {
+                    position: relative; flex: 1; overflow: hidden; cursor: grab;
+                    display: flex; align-items: center; justify-content: center;
+                }
+                .wa-image-viewer-stage.dragging { cursor: grabbing; }
+                .wa-image-viewer-image {
+                    max-width: 92vw; max-height: calc(100vh - 90px); object-fit: contain;
+                    transform-origin: center; will-change: transform; pointer-events: none;
+                    transition: transform .12s ease-out;
+                }
+                .wa-image-viewer-stage.dragging .wa-image-viewer-image { transition: none; }
+                .wa-bubble video { max-width: 100%; border-radius: 8px; margin-bottom: 4px; display: block; max-height: 280px; }
+                .wa-bubble audio { max-width: 260px; margin-top: 4px; }
+                .wa-bubble .o_attachment_box {
+                    display: flex; align-items: center; background: rgba(0,0,0,0.2);
+                    padding: 8px 10px; border-radius: 8px; margin-bottom: 4px;
+                    color: inherit; text-decoration: none;
+                }
+                .wa-bubble .o_attachment_box svg { width: 28px; height: 28px; fill: #25d366; margin-left: 10px; }
+                .wa-bubble .o_attachment_box:hover { background: rgba(0,0,0,0.3); }
+                .wa-attachment-actions {
+                    display: flex; align-items: center; gap: 8px; margin-top: 6px;
+                }
+                .wa-attachment-actions a {
+                    flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+                    padding: 7px 10px; border-radius: 7px; color: #25d366;
+                    background: rgba(0,0,0,0.16); text-decoration: none;
+                    font-size: 12px; font-weight: 600;
+                }
+                .wa-attachment-actions a:hover { background: rgba(0,0,0,0.28); color: #39e77a; }
+
+                .wa-msg-in { justify-content: flex-start; }
+                .wa-msg-in .wa-bubble {
+                    background: #1e1e1e; color: #e5e5ea;
+                    border-top-right-radius: 4px;
+                }
+                .wa-msg-out { justify-content: flex-end; }
+                .wa-msg-out .wa-bubble {
+                    background: #054640; color: #e9edef;
+                    border-top-left-radius: 4px;
+                }
+                .wa-msg-time {
+                    font-size: 11px; color: rgba(255,255,255,0.45);
+                    float: left; margin-top: 4px; margin-right: 10px;
+                    display: block; clear: left;
+                }
+
+                /* Reply Box */
+                .wa-reply-preview {
+                    display: none; align-items: stretch; gap: 0; background: #1c1c1e;
+                    padding: 8px 14px 0; border-top: 1px solid #2c2c2e;
+                }
+                .wa-reply-preview-content {
+                    flex: 1; min-width: 0; background: #2c2c2e; border-right: 4px solid #25d366;
+                    border-radius: 8px; padding: 7px 10px;
+                }
+                .wa-reply-preview-sender { color: #25d366; font-size: 12px; font-weight: 600; }
+                .wa-reply-preview-text {
+                    color: #a1a1a6; font-size: 12px; white-space: nowrap;
+                    overflow: hidden; text-overflow: ellipsis;
+                }
+                .wa-reply-preview-close {
+                    width: 36px; border: none; background: transparent; color: #8e8e93;
+                    cursor: pointer; font-size: 20px;
+                }
+                .wa-reply-preview-close:hover { color: #ff453a; }
+                .wa-reply-box {
+                    background: #1c1c1e; padding: 10px 14px;
+                    display: flex; align-items: center; gap: 10px;
+                    border-top: 1px solid #2c2c2e; min-height: 58px;
+                }
+                .wa-reply-box input {
+                    flex: 1; background: #2c2c2e; border: none; border-radius: 22px;
+                    padding: 11px 18px; color: #e5e5ea; font-size: 15px; outline: none;
+                    font-family: inherit;
+                }
+                .wa-reply-box input::placeholder { color: #636366; }
+                .wa-send-btn, .wa-attach-btn, .wa-mic-btn {
+                    background: transparent; border: none; cursor: pointer;
+                    padding: 6px; display: flex; align-items: center; justify-content: center;
+                    border-radius: 50%; transition: background 0.15s;
+                    flex-shrink: 0;
+                }
+                .wa-send-btn:hover, .wa-attach-btn:hover, .wa-mic-btn:hover { background: rgba(255,255,255,0.06); }
+                .wa-send-btn svg, .wa-attach-btn svg, .wa-mic-btn svg { width: 24px; height: 24px; fill: #636366; transition: fill 0.2s; }
+                .wa-send-btn:hover svg, .wa-attach-btn:hover svg, .wa-mic-btn:hover svg { fill: #25d366; }
+                .wa-send-btn.ready svg { fill: #25d366; }
+                .wa-send-btn.sending { cursor: wait; opacity: 0.65; }
+                .wa-mic-recording svg { fill: #ff453a !important; animation: pulse 0.8s infinite alternate; }
+                @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+                .wa-recording-panel {
+                    flex: 1; display: none; align-items: center; gap: 12px;
+                    height: 42px; padding: 0 14px; border-radius: 22px;
+                    background: #2c2c2e; color: #e5e5ea;
+                }
+                .wa-recording-dot {
+                    width: 9px; height: 9px; border-radius: 50%; background: #ff453a;
+                    animation: recordingBlink 0.8s infinite alternate;
+                }
+                .wa-recording-wave {
+                    flex: 1; height: 24px; display: flex; align-items: center;
+                    justify-content: center; gap: 3px;
+                }
+                .wa-recording-wave span {
+                    width: 3px; height: 4px; min-height: 4px; max-height: 22px;
+                    border-radius: 3px; background: #25d366;
+                    transition: height 70ms linear;
+                }
+                .wa-recording-time { min-width: 42px; direction: ltr; font-variant-numeric: tabular-nums; }
+                .wa-recording-status { color: #8e8e93; font-size: 13px; white-space: nowrap; }
+                @keyframes recordingBlink { from { opacity: 0.35; } to { opacity: 1; } }
+                .wa-emoji-btn {
+                    background: transparent; border: none; cursor: pointer; padding: 6px;
+                    color: #8e8e93; font-size: 24px; line-height: 1; border-radius: 50%;
+                }
+                .wa-emoji-btn:hover { background: rgba(255,255,255,0.06); color: #25d366; }
+                .wa-emoji-picker {
+                    display: none; position: absolute; bottom: 68px; right: 68px;
+                    width: 330px; max-width: calc(100% - 100px); z-index: 30;
+                    background: #202c33; border: 1px solid #344047; border-radius: 14px;
+                    box-shadow: 0 12px 35px rgba(0,0,0,.45); overflow: hidden;
+                }
+                .wa-picker-tabs { display: flex; border-bottom: 1px solid #344047; }
+                .wa-picker-tab {
+                    flex: 1; padding: 11px; background: none; border: none; color: #8696a0;
+                    cursor: pointer; font-family: inherit; font-size: 14px;
+                }
+                .wa-picker-tab.active { color: #25d366; border-bottom: 2px solid #25d366; }
+                .wa-picker-grid {
+                    display: grid; grid-template-columns: repeat(8, 1fr);
+                    gap: 4px; padding: 10px; max-height: 230px; overflow-y: auto;
+                }
+                .wa-picker-grid button {
+                    border: none; background: transparent; border-radius: 8px; cursor: pointer;
+                    font-size: 25px; height: 38px; display: flex; align-items: center; justify-content: center;
+                }
+                .wa-picker-grid button:hover { background: rgba(255,255,255,.08); transform: scale(1.12); }
+                .wa-sticker-grid button { font-size: 31px; height: 54px; background: rgba(255,255,255,.03); }
+
+                /* File Preview */
+                #mediaInput { display: none; }
+                .wa-file-preview {
+                    display: none; background: #1c1c1e; padding: 8px 16px;
+                    border-top: 1px solid #2c2c2e;
+                    align-items: center; justify-content: space-between;
+                }
+                .wa-file-preview span { color: #25d366; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+                .wa-file-preview button { background: none; border: none; color: #ff453a; cursor: pointer; font-size: 18px; line-height: 1; }
+
+                /* Instance Switcher */
+                .wa-instances-bar {
+                    padding: 8px 12px;
+                    display: flex; gap: 8px;
+                    overflow-x: auto;
+                    border-bottom: 1px solid #2c2c2e;
+                    background: #1c1c1e;
+                }
+                .wa-instances-bar::-webkit-scrollbar { height: 3px; }
+                .instance-pill {
+                    padding: 4px 12px; border-radius: 12px;
+                    background: #2c2c2e; color: #8e8e93;
+                    font-size: 12px; cursor: pointer; white-space: nowrap;
+                    transition: all 0.2s; border: 1px solid transparent;
+                }
+                .instance-pill.active {
+                    background: #25d36622; color: #25d366;
+                    border-color: #25d36655;
+                }
+                .instance-pill .status-dot {
+                    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+                    margin-left: 6px;
+                }
+                .status-ready { background: #25d366; box-shadow: 0 0 5px #25d366; }
+                .status-offline { background: #ff453a; }
+                .status-qr { background: #ffd60a; }
+
+                /* ===== LABELS ===== */
+                .wa-label-tag {
+                    display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 4px; margin-bottom: 2px; color: #fff;
+                }
+                .wa-label-dot {
+                    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 4px;
+                }
+                .wa-chat-labels {
+                    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
+                }
+
+                /* ===== TOOLS SIDEBAR ===== */
+                .wa-tools-sidebar {
+                    width: 350px; min-width: 300px; max-width: 22vw;
+                    background: #1c1c1e; border-right: 1px solid #2c2c2e;
+                    display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
+                    overflow: hidden;
+                }
+                .wa-tools-buttons {
+                    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+                    padding: 12px; border-bottom: 1px solid #2c2c2e;
+                    background: #18181a;
+                }
+                .tool-btn {
+                    width: 100%; height: 48px; border-radius: 10px; background: #2c2c2e;
+                    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+                    transition: all 0.2s;
+                }
+                .tool-btn:hover { background: #3a3a3c; }
+                .tool-btn.active { background: #25d36622; box-shadow: inset 0 0 0 1px #25d36666; }
+                .tool-btn svg { width: 22px; height: 22px; fill: #25d366; }
+                .wa-tools-details {
+                    position: relative; flex: 1; min-height: 0; overflow: hidden;
+                    display: flex; flex-direction: column;
+                }
+                .wa-tools-empty {
+                    flex: 1; display: flex; flex-direction: column; align-items: center;
+                    justify-content: center; text-align: center; padding: 28px; gap: 16px;
+                    color: #636366;
+                }
+                .wa-tools-empty-logo {
+                    width: min(240px, 88%); max-height: 72%; object-fit: contain;
+                    border-radius: 22px; opacity: 0.82;
+                    box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+                    transition: opacity 0.25s, transform 0.25s;
+                }
+                .wa-tools-empty-logo:hover { opacity: 1; transform: scale(1.015); }
+                .wa-tools-empty span {
+                    color: #636366; font-size: 12px; line-height: 1.7;
+                }
+
+                /* ===== MODAL ===== */
+                .wa-modal {
+                    position: static; inset: auto; background: transparent; z-index: auto;
+                    flex: 1; min-height: 0; width: 100%;
+                    align-items: stretch; justify-content: stretch; overflow: hidden;
+                }
+                .wa-modal-content {
+                    background: #1c1c1e; width: 100% !important; height: 100%;
+                    border-radius: 0; box-shadow: none; overflow-y: auto;
+                    display: flex; flex-direction: column;
+                }
+                .wa-modal-header { padding: 16px; border-bottom: 1px solid #2c2c2e; display: flex; justify-content: space-between; align-items: center; }
+                .wa-modal-header h3 { color: #fff; font-size: 18px; font-weight: 600; margin: 0; }
+                .wa-modal-header button { background: none; border: none; color: #8e8e93; font-size: 20px; cursor: pointer; }
+                .wa-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+                .wa-modal-body label { color: #8e8e93; font-size: 13px; margin-bottom: -10px; }
+                .wa-modal-body input {
+                    background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 8px;
+                    padding: 12px; color: #fff; font-size: 15px; outline: none; width: 100%;
+                }
+                .wa-modal-footer { padding: 16px; border-top: 1px solid #2c2c2e; display: flex; justify-content: flex-end; }
+                .wa-modal-footer button {
+                    background: #25d366; color: #fff; border: none; padding: 10px 20px; border-radius: 8px;
+                    font-size: 15px; font-weight: 600; cursor: pointer;
+                }
+                .wa-modal-footer button:hover { background: #20b858; }
+                .wa-forward-overlay {
+                    position: fixed; inset: 0; z-index: 2000; display: none;
+                    align-items: center; justify-content: center; padding: 24px;
+                    background: rgba(0,0,0,0.72); backdrop-filter: blur(3px);
+                }
+                .wa-forward-dialog {
+                    width: min(440px, 94vw); max-height: 78vh; background: #1c1c1e;
+                    border: 1px solid #3a3a3c; border-radius: 14px;
+                    box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+                    display: flex; flex-direction: column; overflow: hidden;
+                }
+                .wa-forward-preview {
+                    margin: 12px 16px 0; padding: 9px 11px; border-radius: 8px;
+                    background: #2c2c2e; border-right: 4px solid #25d366;
+                    color: #a1a1a6; font-size: 12px; white-space: nowrap;
+                    overflow: hidden; text-overflow: ellipsis;
+                }
+                .wa-forward-search {
+                    margin: 12px 16px; background: #2c2c2e; border: 1px solid #3a3a3c;
+                    border-radius: 9px; padding: 10px 12px; color: #fff; outline: none;
+                }
+                .wa-forward-list { overflow-y: auto; min-height: 120px; padding: 0 10px 10px; }
+                .wa-forward-item {
+                    width: 100%; display: flex; align-items: center; gap: 10px;
+                    padding: 9px 10px; border: none; border-radius: 9px;
+                    background: transparent; color: #e5e5ea; cursor: pointer; text-align: right;
+                }
+                .wa-forward-item:hover { background: #2c2c2e; }
+                .wa-forward-item.selected { background: #25d36622; box-shadow: inset 0 0 0 1px #25d36666; }
+                .wa-forward-item .wa-avatar { width: 38px; height: 38px; font-size: 14px; margin: 0; }
+                .wa-forward-item-info { min-width: 0; flex: 1; }
+                .wa-forward-item-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .wa-forward-item-mobile { font-size: 11px; color: #8e8e93; direction: ltr; text-align: right; }
+                .wa-forward-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+                @media (max-width: 1250px) {
+                    .wa-tools-sidebar { width: 300px; min-width: 280px; max-width: 24vw; }
+                    .wa-modal-body { padding: 14px; }
+                }
+            </style>
+            <link rel="stylesheet" href="/whatsapp_integration/static/src/css/mapilla_chat.css?v=20260917-1"/>
+        </head>
+        <body>
+            <header class="mapilla-topbar">
+                <div class="mapilla-app-title"><span>مساحة التواصل</span><small dir="ltr">WHATSAPP INBOX</small></div>
+                <div class="mapilla-topbar-spacer"></div>
+                <span class="mapilla-connection" id="mapillaConnection" role="status"><i></i><span>جاري الاتصال</span></span>
+                <a class="mapilla-topbar-link" href="/odoo/action-706" title="إعدادات اتصال واتساب" aria-label="إعدادات اتصال واتساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></a>
+                <a class="mapilla-back-link" href="/odoo">العودة لأودو <span aria-hidden="true">↗</span></a>
+                <a class="mapilla-brand" href="/odoo" aria-label="MAPILLA — العودة إلى أودو">
+                    <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/>
+                </a>
+            </header>
+            <div id="loader">
+                <strong class="mapilla-loader-brand" dir="ltr">MAPILLA<span>.</span></strong>
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <span>جاري تحميل المحادثات...</span>
+            </div>
+
+            <div class="wa-sidebar">
+                <div class="sidebar-header">
+                    <div><span class="sidebar-title">المحادثات</span><p class="mapilla-sidebar-caption">قريب من عملائك، دائمًا.</p></div>
+                    <span class="mapilla-count" id="mapillaChatCount">0</span>
+                </div>
+                <div class="wa-instances-bar" id="instanceList">
+                    <!-- Instances will be injected here -->
+                </div>
+                <div class="wa-search-bar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+                    <input type="search" id="searchInput" aria-label="البحث في المحادثات" placeholder="ابحث بالاسم أو رقم الهاتف" oninput="filterSessions(this.value)"/>
+                </div>
+                <div class="mapilla-list-heading"><span>كل المحادثات</span><span>الأحدث أولًا</span></div>
+                <div class="wa-contact-list" id="sessionList"></div>
+                <div class="mapilla-sidebar-footer"><span class="mapilla-footer-dot"></span> مساحة التواصل في أودو <span dir="ltr">MAPILLA</span></div>
+            </div>
+
+            <div id="blankState" class="wa-blank-state">
+                <div class="mapilla-welcome-art" aria-hidden="true"><div class="mapilla-art-orbit"></div><div class="mapilla-art-card"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 15h36a5 5 0 0 1 5 5v23a5 5 0 0 1-5 5H29L17 56v-8h-3a5 5 0 0 1-5-5V20a5 5 0 0 1 5-5Z"/><path d="M21 27h22M21 36h15"/></svg></div><span class="mapilla-art-check">✓</span></div>
+                <span class="mapilla-eyebrow" dir="ltr">MAPILLA · WHATSAPP</span>
+                <h2>كل محادثة، بداية جديدة.</h2>
+                <p>مساحة واحدة للتواصل مع عملائك ومتابعة التفاصيل.<br/>اختر محادثة من القائمة وابدأ من هنا.</p>
+                <div class="mapilla-welcome-tags"><span>رسائل وملفات</span><span>جهات اتصال</span><span>متابعة العملاء</span></div>
+            </div>
+
+            <div class="wa-forward-overlay" id="forwardOverlay" onclick="if (event.target === this) closeForwardModal()">
+                <div class="wa-forward-dialog">
+                    <div class="wa-modal-header">
+                        <h3>إعادة توجيه الرسالة</h3>
+                        <button type="button" onclick="closeForwardModal()">✕</button>
+                    </div>
+                    <div class="wa-forward-preview" id="forwardMessagePreview"></div>
+                    <input class="wa-forward-search" id="forwardSearchInput" type="text"
+                           placeholder="ابحث عن محادثة..." oninput="renderForwardSessions(this.value)" />
+                    <div class="wa-forward-list" id="forwardSessionList"></div>
+                    <div class="wa-modal-footer">
+                        <button type="button" class="wa-forward-submit" id="forwardSubmitBtn"
+                                onclick="submitForwardMessage()" disabled="disabled">إعادة توجيه</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Chat -->
+            <div id="activeChat" class="wa-chat-container" style="display:none;">
+                <div class="wa-chat-header">
+                    <button type="button" class="mapilla-mobile-back" onclick="showConversationList()" aria-label="العودة إلى قائمة المحادثات">→</button>
+                    <div class="wa-avatar" id="chatHeaderAvatar">?</div>
+                    <div class="wa-chat-header-info">
+                        <div class="wa-chat-header-name" id="chatHeaderName">الاسم</div>
+                        <div class="wa-chat-header-sub" id="chatHeaderMobile"></div>
+                        <div id="chatHeaderLabels" class="wa-chat-labels"></div>
+                    </div>
+                    <span class="mapilla-chat-channel"><span></span> واتساب</span>
+                </div>
+
+                <div class="wa-chat-history" id="chatHistoryBox"></div>
+
+                <div class="wa-file-preview" id="filePreviewBar">
+                    <span id="filePreviewName">لم يتم اختيار ملف</span>
+                    <button onclick="clearSelectedFile()">✕</button>
+                    <input type="file" id="mediaInput" onchange="handleFileSelect(event)" />
+                </div>
+
+                <div class="wa-emoji-picker" id="emojiPicker">
+                    <div class="wa-picker-tabs">
+                        <button class="wa-picker-tab active" id="emojiTabBtn" onclick="showPickerTab('emoji')">إيموجي</button>
+                        <button class="wa-picker-tab" id="stickerTabBtn" onclick="showPickerTab('sticker')">استيكر</button>
+                    </div>
+                    <div class="wa-picker-grid" id="emojiGrid"></div>
+                    <div class="wa-picker-grid wa-sticker-grid" id="stickerGrid" style="display:none;"></div>
+                </div>
+
+                <div class="mapilla-voice-preview" id="voicePreview" style="display:none;">
+                    <span>معاينة التسجيل</span><audio id="voicePreviewAudio" controls="controls"></audio>
+                    <button type="button" onclick="clearSelectedFile()" aria-label="حذف التسجيل">✕</button>
+                </div>
+
+                <div class="wa-reply-preview" id="replyPreviewBar">
+                    <div class="wa-reply-preview-content">
+                        <div class="wa-reply-preview-sender" id="replyPreviewSender">رد على رسالة</div>
+                        <div class="wa-reply-preview-text" id="replyPreviewText"></div>
+                    </div>
+                    <button type="button" class="wa-reply-preview-close" onclick="clearReplyTarget()" title="إلغاء الرد">✕</button>
+                </div>
+
+                <div class="wa-reply-box">
+                    <button class="wa-emoji-btn" onclick="toggleEmojiPicker()" title="إيموجي واستيكر">☺</button>
+                    <button class="wa-attach-btn" onclick="document.getElementById('mediaInput').click()" title="إرفاق ملف" aria-label="إرفاق ملف">
+                        <svg viewBox="0 0 24 24"><path d="M11.83,5.17l-7.79,7.79a3.7,3.7,0,0,0,5.23,5.23l7.46-7.46a2.1,2.1,0,0,0-2.93-2.93L6.91,14.69a.63.63,0,0,0,.89.89l6.89-6.89a.83.83,0,0,1,1.17,1.17l-7.46,7.46a2.44,2.44,0,0,1-3.44-3.44l7.79-7.79a1.26,1.26,0,0,1,1.78,1.78l-7.79,7.79a.63.63,0,1,0,.89.89l7.79-7.79Z"/></svg>
+                    </button>
+                    <input type="text" id="messageInput" aria-label="نص الرسالة" placeholder="اكتب رسالتك هنا…" autocomplete="off" oninput="toggleSendBtn()"/>
+                    <div class="wa-recording-panel" id="recordingPanel">
+                        <span class="wa-recording-dot"></span>
+                        <span class="wa-recording-time" id="recordingTime">00:00</span>
+                        <div class="wa-recording-wave" id="recordingWave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <span class="wa-recording-status" id="recordingStatus">جاري التسجيل</span>
+                        <button type="button" class="mapilla-cancel-recording" onclick="cancelRecording()" title="إلغاء التسجيل">إلغاء</button>
+                    </div>
+                    <button type="button" class="wa-send-btn" id="sendBtn" onclick="sendMessage()" style="display:none;" title="إرسال">
+                        <svg viewBox="0 0 24 24"><path d="M1.101,21.757L23.8,12.028L1.101,2.3l0.011,7.912l13.623,1.816L1.112,13.845 L1.101,21.757z"></path></svg>
+                    </button>
+                    <button class="wa-mic-btn" id="micBtn" onclick="toggleRecording()" title="تسجيل رسالة صوتية" aria-label="تسجيل رسالة صوتية">
+                        <svg viewBox="0 0 24 24"><path d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.531 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.001z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tools Sidebar -->
+            <div class="wa-tools-sidebar">
+                <div class="wa-tools-buttons">
+                    <button class="tool-btn" id="btnAddContact" onclick="openAddContactModal()" title="إضافة كجهة اتصال">
+                        <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </button>
+                    <button class="tool-btn" id="btnFinancials" onclick="openFinancialsModal()" title="الحساب المالي (Financials)" style="opacity: 0.5; pointer-events: none;">
+                        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                    </button>
+                </div>
+                <div class="wa-tools-details">
+                    <div class="wa-tools-empty" id="toolsEmptyState">
+                        <span class="mapilla-tools-monogram" aria-hidden="true">M<span>.</span></span>
+                        <span class="mapilla-tools-hint">أدوات المحادثة</span>
+                    </div>
+
+            <!-- Add Contact Modal -->
+            <div id="addContactModal" class="wa-modal" style="display:none;">
+                <div class="wa-modal-content">
+                    <div class="wa-modal-header">
+                        <h3>إضافة كجهة اتصال</h3>
+                        <button onclick="closeAddContactModal()">✕</button>
+                    </div>
+                    <div class="wa-modal-body">
+                        <label>الاسم</label>
+                        <input type="text" id="newContactName" placeholder="أدخل اسم العميل" autocomplete="off" />
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="newContactPhone" placeholder="رقم الهاتف" />
+                    </div>
+                    <div class="wa-modal-footer">
+                        <button id="saveContactBtn" onclick="submitNewContact()">حفظ جهة الاتصال</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Reserve Modal -->
+            <div id="quickReserveModal" class="wa-modal" style="display:none;">
+                <div class="wa-modal-content" style="width: 500px;">
+                    <div class="wa-modal-header">
+                        <h3>حجز سريع (Quick Reserve)</h3>
+                        <button onclick="closeQuickReserveModal()">✕</button>
+                    </div>
+                    <div class="wa-modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="grid-column: span 2;">
+                            <label>العميل</label>
+                            <input type="text" id="qrCustomerName" readonly="1" />
+                            <input type="hidden" id="qrPartnerId" />
+                        </div>
+                        
+                        <div style="grid-column: span 2;">
+                            <label>الخدمة (Service)</label>
+                            <select id="qrService" onchange="qrUpdatePrice()" style="background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 8px; padding: 12px; color: #fff; width: 100%; outline: none;">
+                                <option value="">اختر الخدمة...</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label>التاريخ (Date)</label>
+                            <input type="date" id="qrDate" />
+                        </div>
+                        
+                        <div>
+                            <label>الوقت (Time)</label>
+                            <select id="qrTime" style="background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 8px; padding: 12px; color: #fff; width: 100%; outline: none;">
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label>المدة (Duration - Mins)</label>
+                            <input type="number" id="qrDuration" value="60" onchange="qrUpdatePrice()" />
+                        </div>
+                        
+                        <div>
+                            <label>السعر (Price)</label>
+                            <input type="number" id="qrPrice" value="0" />
+                        </div>
+                        
+                        <div>
+                            <label>الغرفة (Room)</label>
+                            <select id="qrRoom" style="background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 8px; padding: 12px; color: #fff; width: 100%; outline: none;">
+                                <option value="">بدون غرفة</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label>المختص (Specialist)</label>
+                            <select id="qrSpecialist" style="background: #2c2c2e; border: 1px solid #3a3a3c; border-radius: 8px; padding: 12px; color: #fff; width: 100%; outline: none;">
+                                <option value="">بدون مختص</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="wa-modal-footer">
+                        <button id="qrSubmitBtn" onclick="submitQuickReserve()">Reserve</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financials Modal -->
+            <div id="financialsModal" class="wa-modal" style="display:none;">
+                <div class="wa-modal-content" style="width: 350px;">
+                    <div class="wa-modal-header">
+                        <h3>الحساب المالي (Financials)</h3>
+                        <button onclick="closeFinancialsModal()">✕</button>
+                    </div>
+                    <div class="wa-modal-body" style="padding: 20px;">
+                        <div style="background: #2c2c2e; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #007aff;">
+                            <div style="color: #8e8e93; font-size: 13px; margin-bottom: 5px;">إجمالي الفواتير (Total Invoiced)</div>
+                            <div id="finTotalInvoiced" style="font-size: 18px; font-weight: bold; color: #fff;">...</div>
+                        </div>
+                        <div style="background: #2c2c2e; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #34c759;">
+                            <div style="color: #8e8e93; font-size: 13px; margin-bottom: 5px;">إجمالي المدفوع (Total Paid)</div>
+                            <div id="finTotalPaid" style="font-size: 18px; font-weight: bold; color: #fff;">...</div>
+                        </div>
+                        <div style="background: #2c2c2e; border-radius: 8px; padding: 15px; border-left: 4px solid #ff3b30;">
+                            <div style="color: #8e8e93; font-size: 13px; margin-bottom: 5px;">المتبقي عليه (Remaining Due)</div>
+                            <div id="finRemainingDue" style="font-size: 18px; font-weight: bold; color: #fff;">...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Core SPA Logic -->
+            <script type="text/javascript">
+            <![CDATA[
+                let activeSessionId = null;
+                let activeInstanceId = null;
+                let selectedFileBase64 = null;
+                let selectedFileName = null;
+                let selectedFileMime = null;
+                let selectedFileAsSticker = false;
+                let selectedFilePreparing = false;
+                let selectedFileReadyPromise = null;
+                let replyTarget = null;
+                let forwardTarget = null;
+                let forwardDestinationSessionId = null;
+                let mediaRecorder = null;
+                let audioChunks = [];
+                let recordingStream = null;
+                let activeRecording = null;
+                let recordingStarting = false;
+                let voicePreviewUrl = null;
+                let recordingAudioContext = null;
+                let recordingAnalyser = null;
+                let recordingAnimationFrame = null;
+                let recordingTimer = null;
+                let recordingStartedAt = 0;
+                let sendingVoice = false;
+                let isRecording = false;
+                let sendInFlight = false;
+                let allSessions = [];
+                let allInstances = [];
+                const pickerEmojis = [
+                    '😀','😂','🤣','😊','😍','🥰','😘','😎','🤩','🥳','🤔','🙄','😴','😭','😢','😡',
+                    '🤯','😱','🤗','🤭','🫡','🤝','👏','🙌','👍','👎','👌','✌️','🤞','💪','🙏','❤️',
+                    '💚','💙','🔥','✨','🎉','🎂','💯','✅','❌','⭐','🌹','☕','🎁','🚀','💰','📞'
+                ];
+                const pickerStickers = [
+                    '😂','🤣','😍','🥰','😎','🤩','🥳','😭','😡','🤯','😱','🤗',
+                    '🫡','👏','🙌','👍','👎','👌','✌️','💪','🙏','❤️','🔥','🎉',
+                    '💯','✅','❌','⭐','🌹','🎁','🚀','💰'
+                ];
+
+                // Avatar color based on name
+                function avatarColor(name) {
+                    const n = (name || '').charCodeAt(0) % 6;
+                    return 'color-' + (n + 1);
+                }
+
+                function escapeHtml(value) {
+                    return String(value == null ? '' : value)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                }
+
+                function messagePreview(body, mediaType, mediaFilename) {
+                    const type = String(mediaType || '').toLowerCase();
+                    if (type === 'call_log') return body || 'مكالمة واتساب';
+                    if (type.startsWith('image') || type === 'sticker') return 'صورة';
+                    if (type.startsWith('audio') || type === 'ptt') return 'رسالة صوتية';
+                    if (type.startsWith('video')) return 'فيديو';
+                    if (type && mediaFilename) return mediaFilename;
+                    if (type) return 'ملف مرفق';
+                    return String(body || 'رسالة').replace(/\s+/g, ' ').trim().slice(0, 160);
+                }
+
+                function startReplyFromButton(button) {
+                    const waMessageId = button.dataset.waMessageId || '';
+                    if (!waMessageId) return;
+                    replyTarget = {
+                        waMessageId,
+                        body: button.dataset.replyBody || 'رسالة',
+                        sender: button.dataset.replySender || 'رسالة',
+                    };
+                    document.getElementById('replyPreviewSender').innerText = replyTarget.sender;
+                    document.getElementById('replyPreviewText').innerText = replyTarget.body;
+                    document.getElementById('replyPreviewBar').style.display = 'flex';
+                    document.getElementById('messageInput').focus();
+                }
+
+                function clearReplyTarget() {
+                    replyTarget = null;
+                    document.getElementById('replyPreviewBar').style.display = 'none';
+                    document.getElementById('replyPreviewSender').innerText = 'رد على رسالة';
+                    document.getElementById('replyPreviewText').innerText = '';
+                }
+
+                function openForwardModal(button) {
+                    const waMessageId = button.dataset.waMessageId || '';
+                    if (!waMessageId) return;
+                    forwardTarget = {
+                        waMessageId,
+                        preview: button.dataset.forwardPreview || 'رسالة',
+                    };
+                    forwardDestinationSessionId = null;
+                    document.getElementById('forwardMessagePreview').innerText = forwardTarget.preview;
+                    document.getElementById('forwardSearchInput').value = '';
+                    document.getElementById('forwardSubmitBtn').disabled = true;
+                    renderForwardSessions('');
+                    document.getElementById('forwardOverlay').style.display = 'flex';
+                    document.getElementById('forwardSearchInput').focus();
+                }
+
+                function closeForwardModal() {
+                    forwardTarget = null;
+                    forwardDestinationSessionId = null;
+                    document.getElementById('forwardOverlay').style.display = 'none';
+                    document.getElementById('forwardSessionList').innerHTML = '';
+                    document.getElementById('forwardSubmitBtn').disabled = true;
+                }
+
+                function renderForwardSessions(query = '') {
+                    const q = String(query || '').trim().toLowerCase();
+                    const sessions = allSessions.filter(session => {
+                        if (String(session.id) === String(activeSessionId)) return false;
+                        return !q
+                            || String(session.name || '').toLowerCase().includes(q)
+                            || String(session.mobile || '').includes(q);
+                    });
+                    document.getElementById('forwardSessionList').innerHTML = sessions.map(session => {
+                        const avatarContent = session.image_url
+                            ? `<img src="${escapeHtml(session.image_url)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/>`
+                            : escapeHtml(session.initials || '?');
+                        const avatarClasses = session.image_url ? 'wa-avatar' : `wa-avatar ${avatarColor(session.name)}`;
+                        const selected = String(forwardDestinationSessionId) === String(session.id);
+                        return `
+                            <button type="button" class="wa-forward-item ${selected ? 'selected' : ''}"
+                                    data-session-id="${session.id}" onclick="selectForwardSession(this)">
+                                <div class="${avatarClasses}">${avatarContent}</div>
+                                <div class="wa-forward-item-info">
+                                    <div class="wa-forward-item-name">${escapeHtml(session.name || session.mobile)}</div>
+                                    <div class="wa-forward-item-mobile">${escapeHtml(session.mobile || '')}</div>
+                                </div>
+                            </button>
+                        `;
+                    }).join('') || '<div style="padding:25px;text-align:center;color:#636366;">لا توجد محادثات مطابقة</div>';
+                }
+
+                function selectForwardSession(button) {
+                    forwardDestinationSessionId = Number(button.dataset.sessionId);
+                    document.querySelectorAll('.wa-forward-item').forEach(item => {
+                        item.classList.toggle('selected', item === button);
+                    });
+                    document.getElementById('forwardSubmitBtn').disabled = false;
+                }
+
+                async function submitForwardMessage() {
+                    if (!forwardTarget || !forwardDestinationSessionId) return;
+                    const button = document.getElementById('forwardSubmitBtn');
+                    const destination = allSessions.find(session => String(session.id) === String(forwardDestinationSessionId));
+                    button.disabled = true;
+                    button.innerText = 'جاري الإرسال...';
+                    try {
+                        const result = await jsonRpc('/whatsapp/api/forward_message', {
+                            wa_message_id: forwardTarget.waMessageId,
+                            target_session_id: forwardDestinationSessionId,
+                        });
+                        if (!result || result.status !== 'success') {
+                            throw new Error((result && result.message) || 'تعذر إعادة توجيه الرسالة');
+                        }
+                        closeForwardModal();
+                        alert(`تمت إعادة توجيه الرسالة إلى ${destination ? destination.name : 'المحادثة'}`);
+                    } catch (error) {
+                        button.disabled = false;
+                        alert('فشل إعادة التوجيه: ' + ((error && error.message) || 'خطأ غير معروف'));
+                    } finally {
+                        button.innerText = 'إعادة توجيه';
+                    }
+                }
+
+                function toggleSendBtn() {
+                    const text = document.getElementById('messageInput').value.trim();
+                    const sendBtn = document.getElementById('sendBtn');
+                    document.getElementById('micBtn').style.display = 'flex';
+                    if (!isRecording && (text.length > 0 || selectedFileBase64 || selectedFilePreparing)) {
+                        sendBtn.style.display = 'flex';
+                        sendBtn.classList.add('ready');
+                    } else {
+                        document.getElementById('micBtn').style.display = 'flex';
+                        sendBtn.style.display = 'none';
+                        sendBtn.classList.remove('ready', 'sending');
+                    }
+                }
+
+                // Handle File Selection
+                function handleFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const maxFileSize = 50 * 1024 * 1024;
+                    if (file.size > maxFileSize) {
+                        event.target.value = "";
+                        alert('حجم الملف أكبر من 50 ميجابايت');
+                        return;
+                    }
+
+                    selectedFileName = file.name;
+                    selectedFileMime = file.type || 'application/octet-stream';
+                    selectedFileBase64 = null;
+                    selectedFileAsSticker = false;
+                    selectedFilePreparing = true;
+
+                    document.getElementById('filePreviewName').innerText = `${selectedFileName} - جاري التجهيز...`;
+                    document.getElementById('filePreviewBar').style.display = 'flex';
+                    toggleSendBtn();
+
+                    selectedFileReadyPromise = new Promise((resolve, reject) => {
+                        const finishFile = (dataUrl, mimeType) => {
+                            const parts = String(dataUrl || '').split(',');
+                            if (parts.length < 2 || !parts[1]) {
+                                reject(new Error('تعذر قراءة محتوى الملف'));
+                                return;
+                            }
+                            selectedFileBase64 = parts[1];
+                            selectedFileMime = mimeType || file.type || 'application/octet-stream';
+                            selectedFilePreparing = false;
+                            document.getElementById('filePreviewName').innerText = `${selectedFileName} - جاهز للإرسال`;
+                            toggleSendBtn();
+                            resolve();
+                        };
+
+                        const failFile = (message) => {
+                            selectedFilePreparing = false;
+                            selectedFileReadyPromise = null;
+                            clearSelectedFile();
+                            reject(new Error(message || 'تعذر تجهيز الملف'));
+                        };
+
+                        if (file.type.startsWith('image/') && file.type !== 'image/gif') {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = new Image();
+                            img.onload = function() {
+                                const MAX_WIDTH = 1200;
+                                const MAX_HEIGHT = 1200;
+                                let width = img.width;
+                                let height = img.height;
+
+                                if (width > height) {
+                                    if (width > MAX_WIDTH) {
+                                        height *= MAX_WIDTH / width;
+                                        width = MAX_WIDTH;
+                                    }
+                                } else {
+                                    if (height > MAX_HEIGHT) {
+                                        width *= MAX_HEIGHT / height;
+                                        height = MAX_HEIGHT;
+                                    }
+                                }
+
+                                const canvas = document.createElement('canvas');
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                                    finishFile(dataUrl, 'image/jpeg');
+                            };
+                                img.onerror = function() {
+                                    const fallbackReader = new FileReader();
+                                    fallbackReader.onload = function(fallbackEvent) {
+                                        finishFile(fallbackEvent.target.result, file.type || 'application/octet-stream');
+                                    };
+                                    fallbackReader.onerror = function() {
+                                        failFile('صيغة الصورة غير مدعومة أو الملف تالف');
+                                    };
+                                    fallbackReader.readAsDataURL(file);
+                                };
+                            img.src = e.target.result;
+                        };
+                            reader.onerror = function() {
+                                failFile('تعذر قراءة الصورة');
+                            };
+                        reader.readAsDataURL(file);
+                        } else {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                                finishFile(e.target.result, file.type || 'application/octet-stream');
+                        };
+                            reader.onerror = function() {
+                                failFile('تعذر قراءة الملف');
+                            };
+                        reader.readAsDataURL(file);
+                        }
+                    });
+                    selectedFileReadyPromise.catch((error) => {
+                        alert(error.message || 'تعذر تجهيز الملف');
+                    });
+                }
+
+                function clearSelectedFile() {
+                    if (voicePreviewUrl) URL.revokeObjectURL(voicePreviewUrl);
+                    voicePreviewUrl = null;
+                    const preview = document.getElementById('voicePreviewAudio');
+                    preview.pause(); preview.removeAttribute('src'); preview.load();
+                    document.getElementById('voicePreview').style.display = 'none';
+                    selectedFileBase64 = null;
+                    selectedFileName = null;
+                    selectedFileMime = null;
+                    selectedFileAsSticker = false;
+                    selectedFilePreparing = false;
+                    selectedFileReadyPromise = null;
+                    document.getElementById('mediaInput').value = "";
+                    document.getElementById('filePreviewBar').style.display = 'none';
+                    document.getElementById('filePreviewName').innerText = "لم يتم اختيار ملف";
+                    toggleSendBtn();
+                }
+
+                function restoreSelectedFile(base64, name, mime, asSticker = false) {
+                    selectedFileBase64 = base64 || null;
+                    selectedFileName = name || null;
+                    selectedFileMime = mime || null;
+                    selectedFileAsSticker = Boolean(asSticker);
+                    selectedFilePreparing = false;
+                    selectedFileReadyPromise = null;
+                    document.getElementById('mediaInput').value = "";
+                    if (selectedFileBase64) {
+                        document.getElementById('filePreviewName').innerText = selectedFileName || "ملف مرفق";
+                        document.getElementById('filePreviewBar').style.display = 'flex';
+                    } else {
+                        document.getElementById('filePreviewBar').style.display = 'none';
+                        document.getElementById('filePreviewName').innerText = "لم يتم اختيار ملف";
+                    }
+                    toggleSendBtn();
+                }
+
+                function initializeEmojiPicker() {
+                    document.getElementById('emojiGrid').innerHTML = pickerEmojis.map(emoji =>
+                        `<button type="button" onclick="insertEmoji('${emoji}')">${emoji}</button>`
+                    ).join('');
+                    document.getElementById('stickerGrid').innerHTML = pickerStickers.map(emoji =>
+                        `<button type="button" onclick="sendEmojiSticker('${emoji}')">${emoji}</button>`
+                    ).join('');
+                }
+
+                function toggleEmojiPicker() {
+                    const picker = document.getElementById('emojiPicker');
+                    picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
+                }
+
+                function showPickerTab(tab) {
+                    const isEmoji = tab === 'emoji';
+                    document.getElementById('emojiGrid').style.display = isEmoji ? 'grid' : 'none';
+                    document.getElementById('stickerGrid').style.display = isEmoji ? 'none' : 'grid';
+                    document.getElementById('emojiTabBtn').classList.toggle('active', isEmoji);
+                    document.getElementById('stickerTabBtn').classList.toggle('active', !isEmoji);
+                }
+
+                function insertEmoji(emoji) {
+                    const input = document.getElementById('messageInput');
+                    const start = input.selectionStart || input.value.length;
+                    input.value = input.value.slice(0, start) + emoji + input.value.slice(input.selectionEnd || start);
+                    input.focus();
+                    input.selectionStart = input.selectionEnd = start + emoji.length;
+                    toggleSendBtn();
+                }
+
+                function sendEmojiSticker(emoji) {
+                    if (!activeSessionId || sendInFlight) return;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 512;
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, 512, 512);
+                    ctx.font = '360px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(emoji, 256, 270);
+                    selectedFileBase64 = canvas.toDataURL('image/png').split(',')[1];
+                    selectedFileName = 'emoji_sticker.png';
+                    selectedFileMime = 'image/png';
+                    selectedFileAsSticker = true;
+                    document.getElementById('emojiPicker').style.display = 'none';
+                    sendMessage();
+                }
+
+                async function toggleRecording() {
+                    if (!activeSessionId || sendInFlight || recordingStarting) return;
+                    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+                        alert('التسجيل غير متاح في هذا المتصفح. افتح الصفحة عبر HTTPS في متصفح يدعم الميكروفون.');
+                        return;
+                    }
+                    
+                    const micBtn = document.getElementById('micBtn');
+                    const msgInput = document.getElementById('messageInput');
+                    
+                    if (!isRecording) {
+                        if (selectedFileBase64 || selectedFilePreparing) {
+                            alert('احذف المرفق أو التسجيل الحالي أولًا قبل بدء تسجيل جديد.');
+                            return;
+                        }
+                        const targetSession = activeSessionId;
+                        recordingStarting = true;
+                        const recording = { cancelled: false };
+                        activeRecording = recording;
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            if (recording.cancelled || activeSessionId !== targetSession) {
+                                stream.getTracks().forEach(track => track.stop());
+                                return;
+                            }
+                            recordingStream = stream;
+                            // Detect best supported mime type for this browser
+                            const preferredMimes = [
+                                'audio/ogg; codecs=opus',
+                                'audio/webm; codecs=opus',
+                                'audio/webm',
+                                'audio/mp4',
+                            ];
+                            const supportedMime = preferredMimes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+                            mediaRecorder = supportedMime ? new MediaRecorder(stream, { mimeType: supportedMime }) : new MediaRecorder(stream);
+                            const actualMime = mediaRecorder.mimeType || supportedMime || 'audio/webm';
+                            audioChunks = [];
+                            
+                            mediaRecorder.addEventListener("dataavailable", event => {
+                                audioChunks.push(event.data);
+                            });
+                            
+                            mediaRecorder.addEventListener("stop", () => {
+                                const audioBlob = new Blob(audioChunks, { type: actualMime });
+                                stream.getTracks().forEach(track => track.stop());
+                                stopRecordingVisualization(false);
+                                isRecording = false;
+                                resetRecordingUI();
+                                if (recording.cancelled || activeSessionId !== targetSession || !audioBlob.size) {
+                                    toggleSendBtn(); return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    if (recording.cancelled || activeSessionId !== targetSession) return;
+                                    selectedFileBase64 = e.target.result.split(',')[1];
+                                    selectedFileName = actualMime.includes('ogg') ? 'voice_note.ogg' : (actualMime.includes('mp4') ? 'voice_note.mp4' : 'voice_note.webm');
+                                    selectedFileMime = actualMime.split(';')[0].trim();
+                                    selectedFileAsSticker = false;
+                                    voicePreviewUrl = URL.createObjectURL(audioBlob);
+                                    document.getElementById('voicePreviewAudio').src = voicePreviewUrl;
+                                    document.getElementById('voicePreview').style.display = 'flex';
+                                    toggleSendBtn();
+                                };
+                                reader.readAsDataURL(audioBlob);
+                            });
+
+                            mediaRecorder.start();
+                            isRecording = true;
+                            micBtn.classList.add('wa-mic-recording');
+                            micBtn.title = 'إيقاف التسجيل ومعاينته';
+                            micBtn.setAttribute('aria-label', micBtn.title);
+                            toggleSendBtn();
+                            startRecordingVisualization(stream);
+                        } catch (err) {
+                            console.error("Mic error:", err);
+                            cancelRecording();
+                            alert(err.name === 'NotAllowedError' ? 'اسمح باستخدام الميكروفون من إعدادات المتصفح ثم حاول مجددًا.' : 'تعذّر بدء التسجيل. تأكد من توصيل الميكروفون وإتاحته للمتصفح.');
+                        } finally {
+                            recordingStarting = false;
+                        }
+                    } else {
+                        mediaRecorder.stop();
+                        isRecording = false;
+                        micBtn.classList.remove('wa-mic-recording');
+                        msgInput.placeholder = "اكتب رسالة...";
+                    }
+                }
+
+                function cancelRecording() {
+                    if (activeRecording) activeRecording.cancelled = true;
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+                    if (recordingStream) recordingStream.getTracks().forEach(track => track.stop());
+                    stopRecordingVisualization(false);
+                    isRecording = false;
+                    resetRecordingUI();
+                    toggleSendBtn();
+                }
+
+                function startRecordingVisualization(stream) {
+                    const input = document.getElementById('messageInput');
+                    const panel = document.getElementById('recordingPanel');
+                    input.style.display = 'none';
+                    panel.style.display = 'flex';
+                    document.getElementById('recordingStatus').innerText = 'جاري التسجيل';
+                    recordingStartedAt = Date.now();
+                    recordingTimer = setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - recordingStartedAt) / 1000);
+                        document.getElementById('recordingTime').innerText =
+                            String(Math.floor(elapsed / 60)).padStart(2, '0') + ':' +
+                            String(elapsed % 60).padStart(2, '0');
+                    }, 250);
+                    recordingAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    recordingAnalyser = recordingAudioContext.createAnalyser();
+                    recordingAnalyser.fftSize = 64;
+                    recordingAudioContext.createMediaStreamSource(stream).connect(recordingAnalyser);
+                    const data = new Uint8Array(recordingAnalyser.frequencyBinCount);
+                    const bars = Array.from(document.querySelectorAll('#recordingWave span'));
+                    const draw = () => {
+                        recordingAnalyser.getByteFrequencyData(data);
+                        bars.forEach((bar, index) => {
+                            const value = data[Math.floor(index * data.length / bars.length)] || 0;
+                            bar.style.height = Math.max(4, Math.round(value / 12)) + 'px';
+                        });
+                        recordingAnimationFrame = requestAnimationFrame(draw);
+                    };
+                    draw();
+                }
+
+                function stopRecordingVisualization(isSending) {
+                    if (recordingTimer) clearInterval(recordingTimer);
+                    if (recordingAnimationFrame) cancelAnimationFrame(recordingAnimationFrame);
+                    if (recordingAudioContext) recordingAudioContext.close().catch(() => {});
+                    recordingTimer = null;
+                    recordingAnimationFrame = null;
+                    recordingAudioContext = null;
+                    recordingAnalyser = null;
+                    if (isSending) {
+                        document.getElementById('recordingStatus').innerText = 'جاري إرسال الصوت...';
+                        document.querySelectorAll('#recordingWave span').forEach((bar, i) => {
+                            bar.style.height = (6 + (i % 5) * 3) + 'px';
+                        });
+                    }
+                }
+
+                function resetRecordingUI() {
+                    document.getElementById('recordingPanel').style.display = 'none';
+                    document.getElementById('messageInput').style.display = '';
+                    document.getElementById('recordingTime').innerText = '00:00';
+                    document.getElementById('recordingStatus').innerText = 'جاري التسجيل';
+                    document.getElementById('micBtn').classList.remove('wa-mic-recording');
+                    document.getElementById('micBtn').title = 'تسجيل رسالة صوتية';
+                    document.getElementById('micBtn').setAttribute('aria-label', 'تسجيل رسالة صوتية');
+                    sendingVoice = false;
+                }
+
+                // Call JSON-RPC Endpoint
+                async function jsonRpc(url, params = {}) {
+                    if (url === '/whatsapp/api/send_message' || url === '/whatsapp/api/forward_message') {
+                        params = { ...params, request_id: params.request_id || crypto.randomUUID() };
+                    }
+                    const payload = {
+                        jsonrpc: "2.0",
+                        method: "call",
+                        params: params,
+                        id: Math.floor(Math.random() * 1000000)
+                    };
+                    const res = await fetch(url, {
+                        method: 'POST', credentials: 'same-origin',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    const json = await res.json();
+                    return json.error ? null : json.result;
+                }
+
+                // Initial Startup
+                async function initialize() {
+                    initializeEmojiPicker();
+                    await loadInstances();
+                    await loadSessions();
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+                    
+                    document.getElementById("messageInput").addEventListener("keyup", function(event) {
+                        if (event.key === "Enter") {
+                            event.preventDefault();
+                            sendMessage();
+                        }
+                    });
+
+                    // Check for deep-linking
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sid = urlParams.get('session_id');
+                    if (sid) {
+                        const session = allSessions.find(s => String(s.id) === String(sid));
+                        if (session) {
+                            openChat(session.id, session.name, session.mobile, session.initials);
+                        }
+                    }
+
+                    // Sync Loops
+                    setInterval(loadInstances, 5000);
+                    setInterval(loadSessions, 4000);
+                    setInterval(() => {
+                        if(activeSessionId) loadMessages(activeSessionId, false);
+                    }, 3000);
+                }
+
+                async function loadInstances() {
+                    const instances = await jsonRpc('/whatsapp/api/get_instances');
+                    if (!instances) return;
+                    allInstances = instances;
+                    if (!activeInstanceId) {
+                        const preferred = allInstances.find(inst => inst.status === 'ready') || allInstances.find(inst => inst.status === 'authenticated');
+                        if (preferred) {
+                            activeInstanceId = preferred.id;
+                        }
+                    } else {
+                        const current = allInstances.find(inst => inst.id === activeInstanceId);
+                        if (!current || !['ready', 'authenticated'].includes(current.status)) {
+                            const fallback = allInstances.find(inst => inst.status === 'ready') || allInstances.find(inst => inst.status === 'authenticated');
+                            activeInstanceId = fallback ? fallback.id : null;
+                        }
+                    }
+                    renderInstances();
+                }
+
+                function renderInstances() {
+                    const list = document.getElementById('instanceList');
+                    const html = allInstances.map(inst => `
+                        <div class="instance-pill ${activeInstanceId === inst.id ? 'active' : ''}" onclick="switchInstance(${inst.id})">
+                            <span class="status-dot status-${inst.status === 'ready' ? 'ready' : (inst.status === 'qr' ? 'qr' : 'offline')}"></span>
+                            ${escapeHtml(inst.name || 'حساب واتساب')}
+                        </div>
+                    `).join('');
+                    list.innerHTML = html || '<div style="font-size:10px; color:#636366; padding:4px;">لا يوجد حسابات متصلة</div>';
+                    const current = allInstances.find(inst => inst.id === activeInstanceId);
+                    const status = document.getElementById('mapillaConnection');
+                    status.classList.toggle('connected', !!current && current.status === 'ready');
+                    status.querySelector('span').textContent = current && current.status === 'ready' ? 'واتساب متصل' : (current && current.status === 'authenticated' ? 'جاري المزامنة' : 'غير متصل');
+                }
+
+                async function switchInstance(id) {
+                    if (activeInstanceId === id) return;
+                    if (isRecording || recordingStarting) cancelRecording();
+                    if (voicePreviewUrl) clearSelectedFile();
+                    activeInstanceId = id;
+                    activeSessionId = null;
+                    document.body.classList.remove('mapilla-chat-open');
+                    closeToolPanels();
+                    document.getElementById('blankState').style.display = 'flex';
+                    document.getElementById('activeChat').style.display = 'none';
+                    renderInstances();
+                    await loadSessions();
+                }
+
+                let lastSessionsHash = null;
+                let sessionsRequestVersion = 0;
+
+                async function loadSessions() {
+                    const version = ++sessionsRequestVersion;
+                    const instanceId = activeInstanceId;
+                    const sessions = await jsonRpc('/whatsapp/api/get_sessions', { instance_id: instanceId });
+                    if (!sessions || version !== sessionsRequestVersion || instanceId !== activeInstanceId) return;
+                    allSessions = sessions;
+                    const activeProfile = allSessions.find(s => s.id === activeSessionId);
+                    if (activeProfile) {
+                        document.getElementById('chatHeaderName').textContent = activeProfile.name;
+                        const avatar = document.getElementById('chatHeaderAvatar');
+                        const profileKey = activeProfile.image_url || activeProfile.initials;
+                        if (avatar.dataset.profileKey !== profileKey) {
+                            avatar.dataset.profileKey = profileKey;
+                            avatar.innerHTML = activeProfile.image_url
+                                ? `<img src="${escapeHtml(activeProfile.image_url)}" alt="" style="width:100%;height:100%;object-fit:cover;"/>`
+                                : escapeHtml(activeProfile.initials);
+                        }
+                    }
+
+                    if (activeSessionId && !allSessions.find(s => s.id === activeSessionId)) {
+                        activeSessionId = null;
+                        document.body.classList.remove('mapilla-chat-open');
+                        closeToolPanels();
+                        document.getElementById('chatHistoryBox').innerHTML = '';
+                        document.getElementById('blankState').style.display = 'flex';
+                        document.getElementById('activeChat').style.display = 'none';
+                    }
+                    refreshActiveSessionTools();
+                    
+                    const query = document.getElementById('searchInput').value.toLowerCase();
+                    renderSessions(allSessions.filter(s => 
+                        s.name.toLowerCase().includes(query) || s.mobile.includes(query)
+                    ));
+                }
+
+                function filterSessions(query) {
+                    const q = query.toLowerCase();
+                    renderSessions(allSessions.filter(s => 
+                        s.name.toLowerCase().includes(q) || s.mobile.includes(q)
+                    ));
+                }
+
+                function renderSessions(sessions) {
+                    document.getElementById('mapillaChatCount').textContent = allSessions.length;
+                    const listHtml = sessions.map(s => {
+                        const labelsHtml = (s.labels || []).map(l => `<span class="wa-label-tag" style="background-color: ${escapeHtml(l.color)}">${escapeHtml(l.name)}</span>`).join('');
+                        const avatarContent = s.image_url ? `<img src="${escapeHtml(s.image_url)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/>` : escapeHtml(s.initials);
+                        const avatarClasses = s.image_url ? 'wa-avatar' : `wa-avatar ${avatarColor(s.name)}`;
+                        return `
+                        <button type="button" class="wa-contact-item ${activeSessionId === s.id ? 'active' : ''}" onclick="openChatById(${s.id})" aria-label="${escapeHtml(s.name)}" aria-pressed="${activeSessionId === s.id}">
+                            <div class="${avatarClasses}">${avatarContent}</div>
+                            <div class="wa-contact-info">
+                                <div class="wa-contact-top">
+                                    <span class="wa-contact-name">${escapeHtml(s.name)}</span>
+                                    <span class="wa-contact-time">${escapeHtml(s.time)}</span>
+                                </div>
+                                <div class="wa-contact-bottom">${escapeHtml(s.last_msg || s.mobile)}</div>
+                                ${labelsHtml ? `<div class="wa-chat-labels">${labelsHtml}</div>` : ''}
+                            </div>
+                        </button>
+                    `}).join('');
+                    
+                    const currentHash = sessions.map(s => s.id + s.name + s.time + (activeSessionId === s.id) + s.last_msg + s.image_url).join('|');
+                    if(lastSessionsHash !== currentHash) {
+                        document.getElementById('sessionList').innerHTML = listHtml || '<div class="mapilla-no-results"><strong>لا توجد محادثات</strong><span>جرّب اسمًا أو رقمًا آخر.</span></div>';
+                        lastSessionsHash = currentHash;
+                    }
+                }
+
+                function refreshActiveSessionTools() {
+                    const session = allSessions.find(s => s.id === activeSessionId);
+                    const registered = Boolean(session && session.is_registered && session.partner_id);
+                    [['btnFinancials', registered]].forEach(([id, enabled]) => {
+                        const button = document.getElementById(id);
+                        button.disabled = !enabled;
+                        button.setAttribute('aria-disabled', String(!enabled));
+                        button.style.opacity = enabled ? '1' : '0.5';
+                        button.style.pointerEvents = enabled ? 'auto' : 'none';
+                    });
+                    document.getElementById('chatHeaderLabels').innerHTML = (session?.labels || []).map(l => `<span class="wa-label-tag" style="background-color: ${l.color}">${escapeHtml(l.name)}</span>`).join('');
+                }
+
+                async function openChat(id, name, mobile, initials) {
+                    if (activeSessionId !== id) {
+                        if (isRecording || recordingStarting) cancelRecording();
+                        if (voicePreviewUrl) clearSelectedFile();
+                    }
+                    document.body.classList.add('mapilla-chat-open');
+                    if (activeSessionId !== id) closeToolPanels();
+                    activeSessionId = id;
+                    document.getElementById('blankState').style.display = 'none';
+                    document.getElementById('activeChat').style.display = 'flex';
+                    
+                    const session = allSessions.find(s => s.id === id);
+                    refreshActiveSessionTools();
+                    
+                    document.getElementById('chatHeaderName').innerText = name;
+                    document.getElementById('chatHeaderMobile').innerText = mobile;
+                    const headerAvatar = document.getElementById('chatHeaderAvatar');
+                    if (session && session.image_url) {
+                        headerAvatar.innerHTML = `<img src="${session.image_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/>`;
+                        headerAvatar.className = 'wa-avatar';
+                    } else {
+                        headerAvatar.innerText = initials || name.charAt(0);
+                        headerAvatar.className = 'wa-avatar ' + avatarColor(name);
+                    }
+                    
+                    previousMessageCount = 0;
+                    document.getElementById('chatHistoryBox').innerHTML = '';
+                    clearReplyTarget();
+                    
+                    renderSessions(allSessions);
+                    await loadMessages(id, true);
+                    if (window.innerWidth > 700) document.getElementById('messageInput').focus();
+                }
+
+                function openChatById(id) {
+                    const session = allSessions.find(item => item.id === id);
+                    if (session) return openChat(id, session.name, session.mobile, session.initials);
+                }
+
+                function showConversationList() {
+                    if (isRecording || recordingStarting) cancelRecording();
+                    closeToolPanels();
+                    document.body.classList.remove('mapilla-chat-open');
+                }
+
+                let previousMessageCount = 0;
+
+                async function loadMessages(id, forceScrollBottom) {
+                    let messages = null;
+                    try {
+                        messages = await jsonRpc('/whatsapp/api/get_messages', { session_id: id });
+                    } catch (e) {
+                        console.error('get_messages failed', e);
+                    }
+                    if (!messages || !Array.isArray(messages) || id !== activeSessionId) return;
+                    
+                    const msgBox = document.getElementById('chatHistoryBox');
+                    
+                    messages.forEach(m => {
+                        const msgId = `wa-msg-${m.id}`;
+                        // If already exists in DOM, skip it to prevent media playback interruption
+                        const existingNode = document.getElementById(msgId);
+                        if (existingNode) {
+                            const callUpdated = m.media_type === 'call_log' && existingNode.dataset.messageType !== 'call_log';
+                            if (!callUpdated && (!existingNode.dataset.missingMedia || !(m.media_url || m.media_b64))) return;
+                        }
+                        
+                        const alignClass = m.type === 'in' ? 'wa-msg-in' : 'wa-msg-out';
+                        const currentSession = allSessions.find(session => session.id === activeSessionId);
+                        const replySender = m.type === 'in'
+                            ? ((currentSession && currentSession.name) || 'العميل')
+                            : 'أنت';
+                        
+                        // Normalize short-form mediaType (e.g. "audio" => "audio/ogg") for old records
+                        let mt = (m.media_type && m.media_type !== 'False') ? m.media_type.trim() : '';
+                        if (mt === 'image') mt = 'image/jpeg';
+                        else if (mt === 'audio') mt = 'audio/ogg';
+                        else if (mt === 'video') mt = 'video/mp4';
+                        else if (mt === 'sticker') mt = 'image/webp';
+                        else if (mt === 'document') mt = 'application/octet-stream';
+                        
+                        // Detect vCard from body
+                        const isVCard = m.body && typeof m.body === 'string' && m.body.includes('BEGIN:VCARD');
+                        const locationMatch = String(m.body || '').match(
+                            /https:\/\/www\.google\.com\/maps\?q=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/
+                        );
+                        const isLocation = mt === 'location' || Boolean(locationMatch);
+                        const isCall = mt === 'call_log';
+                        
+                        let mediaHtml = '';
+                        
+                        if (isCall) {
+                            const outgoing = m.type === 'out';
+                            mediaHtml = `<div class="mapilla-call-card">
+                                <span class="mapilla-call-icon" aria-hidden="true">☎</span>
+                                <div><div class="mapilla-call-title">${outgoing ? 'مكالمة صادرة' : 'مكالمة واردة'} <span aria-hidden="true">${outgoing ? '↗' : '↙'}</span></div>
+                                <div class="mapilla-call-subtitle">مكالمة واتساب</div></div>
+                            </div>`;
+                        } else if (isLocation) {
+                            const latitude = locationMatch ? Number(locationMatch[1]) : null;
+                            const longitude = locationMatch ? Number(locationMatch[2]) : null;
+                            const hasCoordinates = Number.isFinite(latitude)
+                                ? Number.isFinite(longitude)
+                                : false;
+                            const urlSeparator = String.fromCharCode(38);
+                            const locationUrl = hasCoordinates
+                                ? `https://www.google.com/maps/search/?api=1${urlSeparator}query=${encodeURIComponent(`${latitude},${longitude}`)}`
+                                : '';
+                            const mapDelta = 0.006;
+                            const mapPreviewUrl = hasCoordinates
+                                ? `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
+                                    `${longitude - mapDelta},${latitude - mapDelta},${longitude + mapDelta},${latitude + mapDelta}`
+                                  )}${urlSeparator}layer=mapnik${urlSeparator}marker=${encodeURIComponent(`${latitude},${longitude}`)}`
+                                : '';
+                            const locationLabel = escapeHtml(
+                                String(m.body || 'الموقع')
+                                    .replace(/https:\/\/www\.google\.com\/maps\?q=[^\s]+/, '')
+                                    .replace(/^📍\s*/, '')
+                                    .trim() || 'الموقع'
+                            );
+                            const mapPreview = hasCoordinates ? `
+                                <div style="height:165px; position:relative; overflow:hidden; background:#d8ded9;">
+                                    <iframe src="${escapeHtml(mapPreviewUrl)}"
+                                        loading="lazy" tabindex="-1" aria-hidden="true"
+                                        style="position:absolute; inset:-18px; width:calc(100% + 36px); height:calc(100% + 36px); border:0; pointer-events:none;"></iframe>
+                                    <div style="position:absolute; inset:0; background:linear-gradient(to bottom,transparent 68%,rgba(0,0,0,.16)); pointer-events:none;"></div>
+                                </div>
+                            ` : `
+                                <div style="height:130px; display:flex; align-items:center; justify-content:center; background:#d8ded9; color:#54656f; font-size:44px;">📍</div>
+                            `;
+                            const locationCardInner = `
+                                ${mapPreview}
+                                <div style="padding:10px 12px; background:#1f2c33;">
+                                    <div style="font-weight:600; color:#e9edef; font-size:14px;">${locationLabel}</div>
+                                    <div style="font-size:12px; color:${hasCoordinates ? '#00a884' : '#8696a0'}; margin-top:4px;">
+                                        ${hasCoordinates ? 'عرض الموقع على الخريطة' : 'تعذر قراءة إحداثيات هذا الموقع القديم'}
+                                    </div>
+                                </div>
+                            `;
+                            mediaHtml = hasCoordinates ? `
+                                <a href="${escapeHtml(locationUrl)}" target="_blank" rel="noopener noreferrer"
+                                   style="display:block; width:310px; max-width:72vw; color:inherit; text-decoration:none; border-radius:9px; overflow:hidden; background:#1f2c33;">
+                                    ${locationCardInner}
+                                </a>
+                            ` : `
+                                <div style="display:block; width:310px; max-width:72vw; border-radius:9px; overflow:hidden; background:#1f2c33;">
+                                    ${locationCardInner}
+                                </div>
+                            `;
+                        } else if (isVCard) {
+                            // Parse vCard and show a nice contact card with action buttons
+                            const fnMatch = m.body.match(/FN:([^\r\n]+)/);
+                            const telMatch = m.body.match(/TEL[^:]*:([^\r\n]+)/);
+                            const contactName = fnMatch ? fnMatch[1].trim() : 'جهة اتصال';
+                            const rawTel = telMatch ? telMatch[1].trim() : '';
+                            // clean the number: remove waid=... prefix if present
+                            const contactTel = rawTel.replace(/waid=[^;]+;/,'').replace(/waid=[^:]+:/,'').replace(/[^0-9+]/g,'');
+                            mediaHtml = `
+                                <div style="background:rgba(0,0,0,0.15); border-radius:10px; overflow:hidden; min-width:220px;">
+                                    <div style="display:flex; align-items:center; padding:12px 12px 10px;">
+                                        <div style="width:44px; height:44px; border-radius:50%; background:#00a884; display:flex; align-items:center; justify-content:center; font-size:22px; color:white; flex-shrink:0;">👤</div>
+                                        <div style="margin-right:10px; margin-left:10px; flex:1;">
+                                            <div style="font-weight:600; color:#e9edef; font-size:14px;">${contactName}</div>
+                                            ${contactTel ? `<div style="font-size:12px; color:#8696a0; direction:ltr;">${contactTel}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="border-top:1px solid rgba(255,255,255,0.08); display:flex;">
+                                        <button data-name="${contactName.replace(/"/g,'&quot;')}" data-tel="${contactTel}" onclick="messageVCardContact(this.dataset.name, this.dataset.tel)"
+                                            style="flex:1; padding:9px 6px; background:none; border:none; ${contactTel ? 'border-left:1px solid rgba(255,255,255,0.08);' : ''} color:#00a884; font-size:13px; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:5px;">
+                                            💬 مراسلة
+                                        </button>
+                                        ${contactTel ? `<button data-name="${contactName.replace(/"/g,'&quot;')}" data-tel="${contactTel}" id="add-btn-${contactTel.replace(/\D/g,'')}" onclick="addVCardToOdoo(this.dataset.name, this.dataset.tel)"
+                                            style="flex:1; padding:9px 6px; background:none; border:none; color:#8696a0; font-size:13px; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:5px;">
+                                            ➕ إضافة للجهات
+                                        </button>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        } else if (mt) {
+                            if (!m.media_url && !m.media_b64) {
+                                const isVoice = mt.startsWith('audio/') || mt === 'ptt';
+                                const preview = isVoice
+                                    ? '<audio controls controlslist="nodownload" preload="none" aria-label="رسالة صوتية"></audio>'
+                                    : `<div class="mapilla-media-placeholder" aria-hidden="true">${mt.startsWith('video/') ? '▶' : mt.startsWith('image/') ? '▧' : '▤'}</div>`;
+                                mediaHtml = `<div class="mapilla-inline-media" data-media-id="${m.id}" data-session-id="${id}">
+                                    ${preview}
+                                    <div class="mapilla-media-status" role="status">جاري تجهيز ${isVoice ? 'الصوت للاستماع' : 'المرفق للعرض'}…</div>
+                                    <button type="button" class="mapilla-media-retry" hidden onclick="queueChatMedia(this.parentElement)">إعادة المحاولة</button>
+                                </div>`;
+                            } else if (mt.startsWith('image/')) {
+                                const imageUrl = m.media_url || `data:${mt};base64,${m.media_b64 || ''}`;
+                                const imageName = m.media_filename
+                                    ? (m.media_filename !== 'False' ? m.media_filename : 'صورة واتساب')
+                                    : 'صورة واتساب';
+                                mediaHtml = `<img class="wa-chat-image" src="${escapeHtml(imageUrl)}"
+                                    data-image-name="${escapeHtml(imageName)}"
+                                    onclick="openImageViewer(this.src, this.dataset.imageName)"
+                                    alt="صورة واتساب" title="اضغط لفتح الصورة وتكبيرها" />`;
+                            } else if (mt.startsWith('video/')) {
+                                mediaHtml = `<video controls playsinline controlslist="nodownload" preload="metadata" aria-label="فيديو" src="${escapeHtml(m.media_url || `data:${mt};base64,${m.media_b64 || ''}`)}"></video>`;
+                            } else if (mt.startsWith('audio/') || mt === 'ptt') {
+                                let mime = m.media_mime && m.media_mime !== 'False' ? m.media_mime : (mt === 'ptt' ? 'audio/ogg' : mt);
+                                mime = mime.split(';')[0].trim();
+                                mediaHtml = `<audio controls controlslist="nodownload" preload="metadata" aria-label="رسالة صوتية" src="${escapeHtml(m.media_url || `data:${mime};base64,${m.media_b64}`)}"></audio>`;
+                            } else {
+                                // Generic Document
+                                const mediaUrl = m.media_url || `data:${mt};base64,${m.media_b64 || ''}`;
+                                const downloadUrl = m.media_url
+                                    ? `${m.media_url}${m.media_url.includes('?') ? '&' : '?'}download=1`
+                                    : mediaUrl;
+                                const fileName = m.media_filename && m.media_filename !== 'False'
+                                    ? m.media_filename
+                                    : 'Document';
+                                const safeMediaUrl = escapeHtml(mediaUrl);
+                                const safeDownloadUrl = escapeHtml(downloadUrl);
+                                const safeFileName = escapeHtml(fileName);
+                                mediaHtml = `
+                                    <a class="o_attachment_box" href="${safeMediaUrl}" target="_blank" rel="noopener noreferrer" title="فتح الملف">
+                                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                        <div style="margin-left: 10px; flex: 1;">
+                                            <div style="font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 220px;">${safeFileName}</div>
+                                            <div style="font-size: 11px; color: #8696a0;">${mt}</div>
+                                        </div>
+                                    </a>
+                                    <div class="wa-attachment-actions">
+                                        <a href="${safeMediaUrl}" target="_blank" rel="noopener noreferrer">↗ فتح</a>
+                                        <a href="${safeDownloadUrl}" download="${safeFileName}">↓ تحميل</a>
+                                    </div>
+                                `;
+                            }
+                        }
+
+                        // Show text body under media if it's not just a placeholder
+                        let textHtml = '';
+                        if (!isLocation && !isVCard && m.body && m.body !== 'False' && m.body !== '[media]' && !m.body.match(/^\[(audio|video|image|document)\]$/i) && !mt) {
+                            textHtml = `<span class="o_chat_text">${m.body}</span>`;
+                        } else if (!isLocation && !isVCard && !mt && (!m.body || m.body === 'False')) {
+                            textHtml = `<span class="o_chat_text"></span>`;
+                        } else if (!isLocation && !isVCard && mt && m.body && m.body !== 'False' && !m.body.match(/^\[/)) {
+                            textHtml = `<div style="margin-top:4px; font-size:13px;">${m.body}</div>`;
+                        }
+
+                        if (isCall) textHtml = '';
+                        const quotedHtml = m.quoted_wa_message_id ? `
+                            <div class="wa-quoted-message">
+                                <div class="wa-quoted-sender">${escapeHtml(m.quoted_sender || 'رسالة مقتبسة')}</div>
+                                <div class="wa-quoted-text">${escapeHtml(m.quoted_body || 'رسالة')}</div>
+                            </div>
+                        ` : '';
+                        const replyBody = messagePreview(m.body, mt, m.media_filename);
+                        const messageActions = m.wa_message_id && !isCall ? `
+                            <div class="wa-message-actions">
+                                <button type="button" class="wa-message-reply-btn"
+                                    data-wa-message-id="${escapeHtml(m.wa_message_id)}"
+                                    data-reply-body="${escapeHtml(replyBody)}"
+                                    data-reply-sender="${escapeHtml(replySender)}"
+                                    onclick="startReplyFromButton(this)" title="رد على الرسالة">↩</button>
+                                <button type="button" class="wa-message-forward-btn"
+                                    data-wa-message-id="${escapeHtml(m.wa_message_id)}"
+                                    data-forward-preview="${escapeHtml(replyBody)}"
+                                    onclick="openForwardModal(this)" title="إعادة توجيه">↪</button>
+                            </div>
+                        ` : '';
+                        const bubbleHtml = `
+                            <div class="wa-message-row ${alignClass}" id="${msgId}" data-message-type="${escapeHtml(mt)}" ${mt && !isCall && !isLocation && !m.media_url && !m.media_b64 ? 'data-missing-media="true"' : ''}>
+                                ${m.type === 'out' ? messageActions : ''}
+                                <div class="wa-bubble">
+                                    ${quotedHtml}
+                                    ${mediaHtml || textHtml || `<span class="o_chat_text">${m.body || ''}</span>`}
+                                    ${mediaHtml && textHtml ? textHtml : ''}
+                                    <span class="wa-msg-time">${m.time}</span>
+                                </div>
+                                ${m.type === 'in' ? messageActions : ''}
+                            </div>
+                        `;
+                        
+                        // Append new message node efficiently
+                        if (existingNode) {
+                            existingNode.insertAdjacentHTML('beforebegin', bubbleHtml);
+                            existingNode.remove();
+                        } else msgBox.insertAdjacentHTML('beforeend', bubbleHtml);
+                    });
+
+
+                    // Remove optimistic UI bubbles ONLY if we fetched new messages
+                    const hasNewMessage = (messages.length > previousMessageCount);
+                    if (hasNewMessage) {
+                        const optimistics = msgBox.querySelectorAll('.wa-message-row:not([id])');
+                        optimistics.forEach(node => node.remove());
+                    }
+                    
+                    // Always scroll to bottom if a new message arrived or if forced
+                    previousMessageCount = messages.length;
+
+                    // If height hasn't changed drastically, user is probably scrolled up, so don't snap back to bottom unless forced or new msg
+                    const isAtBottom = (msgBox.scrollHeight - msgBox.clientHeight <= msgBox.scrollTop + 50);
+
+                    if (forceScrollBottom || isAtBottom || hasNewMessage) {
+                        msgBox.scrollTop = msgBox.scrollHeight;
+                    }
+                    observeChatMedia(msgBox);
+                }
+
+                let lastUnconfirmedSend = null;
+                const chatMediaQueue = [];
+                const chatMediaPending = new Map();
+                let chatMediaActive = 0;
+                let chatMediaObserver = null;
+                let chatMediaSession = null;
+
+                function observeChatMedia(box) {
+                    if (chatMediaSession !== activeSessionId) {
+                        if (chatMediaObserver) chatMediaObserver.disconnect();
+                        chatMediaQueue.length = 0;
+                        chatMediaSession = activeSessionId;
+                        chatMediaObserver = new IntersectionObserver(entries => {
+                            entries.forEach(entry => {
+                                if (!entry.isIntersecting) return;
+                                chatMediaObserver.unobserve(entry.target);
+                                queueChatMedia(entry.target);
+                            });
+                        }, {root:box, rootMargin:'200px'});
+                    }
+                    box.querySelectorAll('.mapilla-inline-media:not([data-observed])').forEach(node => {
+                        node.dataset.observed = 'true';
+                        chatMediaObserver.observe(node);
+                    });
+                }
+
+                function queueChatMedia(node) {
+                    if (!node.isConnected || node.dataset.loading) return;
+                    node.dataset.loading = 'true';
+                    node.querySelector('button').hidden = true;
+                    node.querySelector('[role="status"]').textContent = 'جاري تجهيز المرفق…';
+                    chatMediaQueue.push(node);
+                    drainChatMedia();
+                }
+
+                function drainChatMedia() {
+                    while (chatMediaActive < 2 && chatMediaQueue.length) {
+                        const node = chatMediaQueue.shift();
+                        if (!node.isConnected || Number(node.dataset.sessionId) !== activeSessionId) continue;
+                        const id = Number(node.dataset.mediaId);
+                        chatMediaActive++;
+                        fetchChatMedia(node, id).finally(() => {
+                            chatMediaActive--;
+                            drainChatMedia();
+                        });
+                    }
+                }
+
+                async function fetchChatMedia(node, id) {
+                    try {
+                        if (!chatMediaPending.has(id)) {
+                            const request = jsonRpc('/whatsapp/api/fetch_media', { message_id: id })
+                                .finally(() => chatMediaPending.delete(id));
+                            chatMediaPending.set(id, request);
+                        }
+                        const result = await chatMediaPending.get(id);
+                        if (!node.isConnected || Number(node.dataset.sessionId) !== activeSessionId) return;
+                        if (result?.status !== 'success') throw new Error('المرفق غير متاح حاليًا من واتساب.');
+                        await loadMessages(activeSessionId, false);
+                        if (node.isConnected) throw new Error('تعذّر تجهيز المرفق حاليًا.');
+                    } catch (_) {
+                        if (node.isConnected) {
+                            node.querySelector('[role="status"]').textContent = 'المرفق غير متاح حاليًا من واتساب.';
+                            node.querySelector('button').hidden = false;
+                        }
+                    } finally { delete node.dataset.loading; }
+                }
+                async function sendMessage() {
+                        if (isRecording || recordingStarting) return;
+                        const input = document.getElementById('messageInput');
+                        const text = input.value.trim();
+                        if (sendInFlight) return;
+                        if (selectedFilePreparing && selectedFileReadyPromise) {
+                            const sendBtn = document.getElementById('sendBtn');
+                            sendBtn.classList.add('sending');
+                            document.getElementById('filePreviewName').innerText = `${selectedFileName || 'الملف'} - جاري التجهيز...`;
+                            try {
+                                await selectedFileReadyPromise;
+                            } catch (error) {
+                                sendBtn.classList.remove('sending');
+                                return;
+                            }
+                        }
+                        const fileState = {
+                            base64: selectedFileBase64,
+                            name: selectedFileName,
+                            mime: selectedFileMime,
+                            asSticker: selectedFileAsSticker,
+                        };
+                        const replyState = replyTarget ? { ...replyTarget } : null;
+
+                        if (!text && !fileState.base64) return;
+                        if (!activeSessionId) return;
+                        if (sendInFlight) return;
+
+                        sendInFlight = true;
+                        document.getElementById('sendBtn').classList.add('sending');
+                        input.value = '';
+
+                        // Optimistic UI Append
+                        const msgBox = document.getElementById('chatHistoryBox');
+
+                        let optimisticMediaHtml = '';
+                        if (fileState.base64) {
+                             if ((fileState.mime || '').startsWith('image/')) {
+                                 optimisticMediaHtml = `<img src="data:${fileState.mime};base64,${fileState.base64}" style="opacity: 0.7;"/>`;
+                             } else if ((fileState.mime || '').startsWith('audio/')) {
+                                 optimisticMediaHtml = `<div style="color:#25d366;font-weight:600;">◉ جاري إرسال الرسالة الصوتية...</div>`;
+                             } else {
+                                 optimisticMediaHtml = `<div style="color:#00a884; font-weight:bold;">[جار إرسال ملف...]</div>`;
+                             }
+                        }
+
+                        const bubbleHtml = `
+                            <div class="wa-message-row wa-msg-out">
+                                <div class="wa-bubble">
+                                    ${replyState ? `
+                                        <div class="wa-quoted-message">
+                                            <div class="wa-quoted-sender">${escapeHtml(replyState.sender)}</div>
+                                            <div class="wa-quoted-text">${escapeHtml(replyState.body)}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${optimisticMediaHtml ? optimisticMediaHtml : `<span class="o_chat_text">${escapeHtml(text)}</span>`}
+                                    <span class="wa-msg-time">...</span>
+                                </div>
+                            </div>
+                        `;
+                        msgBox.insertAdjacentHTML('beforeend', bubbleHtml);
+                        msgBox.scrollTop = msgBox.scrollHeight;
+
+                        const payload = {
+                            session_id: activeSessionId,
+                            body: text
+                        };
+                        if (replyState) {
+                            payload.quoted_message_id = replyState.waMessageId;
+                            payload.quoted_body = replyState.body;
+                            payload.quoted_sender = replyState.sender;
+                        }
+
+                        if (fileState.base64) {
+                            payload.media_b64 = fileState.base64;
+                            payload.media_name = fileState.name;
+                            payload.media_type = fileState.mime;
+                            payload.media_is_sticker = fileState.asSticker;
+                        }
+
+                        const signature = JSON.stringify(payload);
+                        payload.request_id = lastUnconfirmedSend && lastUnconfirmedSend.signature === signature
+                            ? lastUnconfirmedSend.requestId : crypto.randomUUID();
+                        lastUnconfirmedSend = { signature, requestId: payload.request_id };
+
+                        try {
+                            const result = await jsonRpc('/whatsapp/api/send_message', payload);
+                            if (!result || result.status !== 'success') {
+                                throw new Error((result && result.message) || 'تعذر إرسال الرسالة');
+                            }
+                            clearSelectedFile();
+                            clearReplyTarget();
+                            lastUnconfirmedSend = null;
+                            // Do not loadMessages here. Let the webhook handle it via longpolling.
+                        } catch (error) {
+                            input.value = text;
+                            restoreSelectedFile(fileState.base64, fileState.name, fileState.mime, fileState.asSticker);
+                            if (replyState) {
+                                replyTarget = replyState;
+                                document.getElementById('replyPreviewSender').innerText = replyState.sender;
+                                document.getElementById('replyPreviewText').innerText = replyState.body;
+                                document.getElementById('replyPreviewBar').style.display = 'flex';
+                            }
+                            const optimistics = document.getElementById('chatHistoryBox').querySelectorAll('.wa-message-row:not([id])');
+                            optimistics.forEach(node => node.remove());
+                            alert('تعذّر تأكيد الإرسال: ' + ((error && error.message) || 'راجع المحادثة قبل إرسال رسالة جديدة لتجنّب التكرار.'));
+                        } finally {
+                            if (sendingVoice) resetRecordingUI();
+                            toggleSendBtn();
+                            input.focus();
+                            sendInFlight = false;
+                            document.getElementById('sendBtn').classList.remove('sending');
+                        }
+                    }
+
+                // === vCard Contact Actions ===
+                async function messageVCardContact(name, tel) {
+                    if (!tel) { alert('لا يوجد رقم هاتف لهذه الجهة'); return; }
+                    // clean phone number
+                    const mobile = tel.replace(/[^0-9]/g, '');
+                    const result = await jsonRpc('/whatsapp/api/get_or_create_session', { mobile, name });
+                    if (result && result.session_id) {
+                        await openChat(result.session_id, result.name || mobile, mobile);
+                    } else {
+                        alert('تعذر فتح المحادثة: ' + (result && result.message ? result.message : 'خطأ غير معروف'));
+                    }
+                }
+
+                async function addVCardToOdoo(name, tel) {
+                    if (!tel) { alert('لا يوجد رقم هاتف لهذه الجهة'); return; }
+                    const mobile = tel.replace(/[^0-9+]/g, '');
+                    const btn = document.getElementById('add-btn-' + mobile.replace(/\D/g,''));
+                    if (btn) { btn.disabled = true; btn.innerText = '⏳ جاري الإضافة...'; }
+                    const result = await jsonRpc('/whatsapp/api/add_odoo_contact', { name, mobile });
+                    if (result) {
+                        if (result.status === 'created') {
+                            if (btn) { btn.innerText = '✅ تمت الإضافة'; }
+                            alert('تم حفظ جهة الاتصال بنجاح!');
+                        } else if (result.status === 'exists') {
+                            if (btn) { btn.innerText = 'ℹ️ موجود مسبقاً'; }
+                            alert('جهة الاتصال هذه موجودة بالفعل!');
+                        } else {
+                            if (btn) { btn.disabled = false; btn.innerText = '➕ إضافة للجهات'; }
+                            alert('تعذر الحفظ: ' + result.message);
+                        }
+                    }
+                }
+
+                // === Tools Sidebar Actions ===
+                const toolPanelIds = [
+                    'addContactModal',
+                    'quickReserveModal',
+                    'financialsModal'
+                ];
+
+                function showToolPanel(panelId, buttonId) {
+                    document.body.classList.add('mapilla-tools-open');
+                    toolPanelIds.forEach(id => {
+                        document.getElementById(id).style.display = id === panelId ? 'flex' : 'none';
+                    });
+                    document.getElementById('toolsEmptyState').style.display = 'none';
+                    document.querySelectorAll('.wa-tools-buttons .tool-btn').forEach(button => {
+                        button.classList.toggle('active', button.id === buttonId);
+                    });
+                }
+
+                function closeToolPanels() {
+                    document.body.classList.remove('mapilla-tools-open');
+                    toolPanelIds.forEach(id => {
+                        document.getElementById(id).style.display = 'none';
+                    });
+                    document.getElementById('toolsEmptyState').style.display = 'flex';
+                    document.querySelectorAll('.wa-tools-buttons .tool-btn').forEach(button => {
+                        button.classList.remove('active');
+                    });
+                }
+
+                function openAddContactModal() {
+                    if (!activeSessionId) {
+                        alert("الرجاء تحديد محادثة أولاً لإضافة العميل.");
+                        return;
+                    }
+                    const session = allSessions.find(s => s.id === activeSessionId);
+                    if (!session) return;
+                    
+                    if (session.mobile && session.mobile.includes('@g.us')) {
+                        alert("هذه المحادثة عبارة عن مجموعة (Group)، لا يمكن حفظها كجهة اتصال فردية.");
+                        return;
+                    }
+
+                    document.getElementById('newContactName').value = session.name === session.mobile ? '' : session.name;
+                    document.getElementById('newContactPhone').value = session.mobile;
+                    
+                    if (session.lid || (session.mobile && session.mobile.includes('@lid'))) {
+                        document.getElementById('newContactPhone').placeholder = 'مخفي بواسطة واتساب - هذا مجرد كود';
+                    } else {
+                        document.getElementById('newContactPhone').placeholder = '';
+                    }
+                    
+                    showToolPanel('addContactModal', 'btnAddContact');
+                    setTimeout(() => document.getElementById('newContactName').focus(), 100);
+                }
+
+                function closeAddContactModal() {
+                    closeToolPanels();
+                }
+
+                async function submitNewContact() {
+                    const submittedSessionId = activeSessionId;
+                    const nameInput = document.getElementById('newContactName');
+                    const name = nameInput.value.trim();
+                    const phone = document.getElementById('newContactPhone').value.trim();
+                    
+                    if (!name) { 
+                        alert("الرجاء إدخال الاسم"); 
+                        nameInput.focus();
+                        return; 
+                    }
+                    
+                    const btn = document.getElementById('saveContactBtn');
+                    btn.disabled = true;
+                    btn.innerText = 'جاري الحفظ...';
+                    
+                    try {
+                        const result = await jsonRpc('/whatsapp/api/add_odoo_contact', { 
+                            name: name, 
+                            mobile: phone,
+                            session_id: submittedSessionId
+                        });
+                        if (result) {
+                            if (result.status === 'created' || result.status === 'exists') {
+                                // Apply the confirmed partner link immediately. Discard any
+                                // polling response begun before this save completed.
+                                sessionsRequestVersion++;
+                                const savedSession = allSessions.find(s => s.id === submittedSessionId);
+                                if (savedSession && result.partner_id) {
+                                    savedSession.partner_id = result.partner_id;
+                                    savedSession.is_registered = true;
+                                }
+                                refreshActiveSessionTools();
+                                alert(result.status === 'created' ? 'تمت إضافة جهة الاتصال بنجاح!' : 'رقم الهاتف محفوظ مسبقاً في جهات الاتصال!');
+                                if (activeSessionId === submittedSessionId) closeAddContactModal();
+                                await loadSessions();
+                            } else {
+                                alert('حدث خطأ: ' + (result.message || 'غير معروف'));
+                            }
+                        } else {
+                            alert('حدث خطأ أثناء الاتصال بالخادم');
+                        }
+                    } catch (e) {
+                        alert('حدث خطأ غير متوقع');
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = 'حفظ جهة الاتصال';
+                    }
+                }
+
+                // === Quick Reserve Actions ===
+                let qrData = null;
+
+                async function fetchQrData() {
+                    if (qrData) return; // already fetched
+                    const res = await jsonRpc('/whatsapp/api/get_reservation_data', {});
+                    if (res && res.status === 'success') {
+                        qrData = res;
+                        
+                        // Populate Services
+                        const serviceSel = document.getElementById('qrService');
+                        res.products.forEach(p => {
+                            let opt = document.createElement('option');
+                            opt.value = p.id;
+                            opt.text = p.name;
+                            opt.dataset.price = p.price;
+                            serviceSel.appendChild(opt);
+                        });
+                        
+                        // Populate Time Slots
+                        const timeSel = document.getElementById('qrTime');
+                        res.time_slots.forEach(t => {
+                            let opt = document.createElement('option');
+                            opt.value = t.id;
+                            opt.text = t.name;
+                            timeSel.appendChild(opt);
+                        });
+                        
+                        // Populate Rooms
+                        const roomSel = document.getElementById('qrRoom');
+                        res.rooms.forEach(r => {
+                            let opt = document.createElement('option');
+                            opt.value = r.id;
+                            opt.text = r.name;
+                            roomSel.appendChild(opt);
+                        });
+                        
+                        // Populate Specialists
+                        const specSel = document.getElementById('qrSpecialist');
+                        res.specialists.forEach(s => {
+                            let opt = document.createElement('option');
+                            opt.value = s.id;
+                            opt.text = s.name;
+                            specSel.appendChild(opt);
+                        });
+                    }
+                }
+
+                async function openQuickReserveModal() {
+                    if (!activeSessionId) return;
+                    const session = allSessions.find(s => s.id === activeSessionId);
+                    if (!session || !session.is_registered || !session.partner_id) return;
+                    
+                    await fetchQrData();
+                    
+                    document.getElementById('qrCustomerName').value = session.name;
+                    document.getElementById('qrPartnerId').value = session.partner_id;
+                    
+                    // Use the browser's local date; valueAsDate can show yesterday after
+                    // midnight in Cairo because it is interpreted through UTC.
+                    const today = new Date();
+                    document.getElementById('qrDate').value = [
+                        today.getFullYear(),
+                        String(today.getMonth() + 1).padStart(2, '0'),
+                        String(today.getDate()).padStart(2, '0')
+                    ].join('-');
+                    
+                    showToolPanel('quickReserveModal', 'btnQuickReserve');
+                }
+
+                function closeQuickReserveModal() {
+                    closeToolPanels();
+                }
+
+                function qrUpdatePrice() {
+                    const sel = document.getElementById('qrService');
+                    const opt = sel.options[sel.selectedIndex];
+                    const duration = parseFloat(document.getElementById('qrDuration').value) || 0;
+                    if (opt && opt.value) {
+                        const basePrice = parseFloat(opt.dataset.price) || 0;
+                        const price = Math.round((basePrice / 60.0) * duration);
+                        document.getElementById('qrPrice').value = price;
+                    } else {
+                        document.getElementById('qrPrice').value = 0;
+                    }
+                }
+
+                async function submitQuickReserve() {
+                    const partnerId = document.getElementById('qrPartnerId').value;
+                    const productId = document.getElementById('qrService').value;
+                    const duration = document.getElementById('qrDuration').value;
+                    const priceUnit = document.getElementById('qrPrice').value;
+                    const date = document.getElementById('qrDate').value;
+                    const timeId = document.getElementById('qrTime').value;
+                    const roomId = document.getElementById('qrRoom').value;
+                    const specId = document.getElementById('qrSpecialist').value;
+                    
+                    if (!productId || !date || !timeId || !duration) {
+                        alert("الرجاء إكمال البيانات الأساسية (الخدمة، التاريخ، الوقت، المدة)");
+                        return;
+                    }
+                    
+                    const btn = document.getElementById('qrSubmitBtn');
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
+                    
+                    try {
+                        const result = await jsonRpc('/whatsapp/api/create_quick_reservation', {
+                            partner_id: partnerId,
+                            product_id: productId,
+                            duration: duration,
+                            price_unit: priceUnit,
+                            booking_date: date,
+                            booking_time_id: timeId,
+                            room_id: roomId || false,
+                            specialist_id: specId || false
+                        });
+                        
+                        if (result && result.status === 'success') {
+                            closeQuickReserveModal();
+                            // Redirect to Odoo Sale Order form in the same tab
+                            const url = '/web#id=' + result.order_id + '&view_type=form&model=sale.order';
+                            window.location.href = url;
+                        } else {
+                            alert('تعذر إنشاء الحجز: ' + (result ? result.message : 'Unknown error'));
+                        }
+                    } catch (e) {
+                        alert('حدث خطأ أثناء الاتصال');
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = 'Reserve';
+                    }
+                }
+
+                // === FINANCIALS Actions ===
+                async function openFinancialsModal() {
+                    if (!activeSessionId) return;
+                    const session = allSessions.find(s => s.id === activeSessionId);
+                    if (!session || !session.is_registered || !session.partner_id) return;
+                    
+                    document.getElementById('finTotalInvoiced').innerText = 'جاري الحساب...';
+                    document.getElementById('finTotalPaid').innerText = 'جاري الحساب...';
+                    document.getElementById('finRemainingDue').innerText = 'جاري الحساب...';
+                    showToolPanel('financialsModal', 'btnFinancials');
+                    
+                    try {
+                        const res = await jsonRpc('/whatsapp/api/get_customer_dues', { partner_id: session.partner_id });
+                        if (res && res.status === 'success') {
+                            document.getElementById('finTotalInvoiced').innerText = res.total_invoiced;
+                            document.getElementById('finTotalPaid').innerText = res.total_paid;
+                            document.getElementById('finRemainingDue').innerText = res.remaining_due;
+                        } else {
+                            alert('تعذر جلب البيانات المالية: ' + (res ? res.message : ''));
+                            closeFinancialsModal();
+                        }
+                    } catch (e) {
+                        alert('حدث خطأ أثناء الاتصال');
+                        closeFinancialsModal();
+                    }
+                }
+
+                function closeFinancialsModal() {
+                    closeToolPanels();
+                }
+
+                // === WhatsApp-style image viewer ===
+                let imageViewerScale = 1;
+                let imageViewerX = 0;
+                let imageViewerY = 0;
+                let imageViewerDragging = false;
+                let imageViewerStartX = 0;
+                let imageViewerStartY = 0;
+
+                function ensureImageViewer() {
+                    let viewer = document.getElementById('waImageViewer');
+                    if (viewer) return viewer;
+
+                    viewer = document.createElement('div');
+                    viewer.id = 'waImageViewer';
+                    viewer.className = 'wa-image-viewer';
+                    viewer.innerHTML = `
+                        <div class="wa-image-viewer-toolbar">
+                            <button class="wa-image-viewer-btn" type="button" onclick="closeImageViewer()" title="إغلاق">×</button>
+                            <div class="wa-image-viewer-name" id="waImageViewerName"></div>
+                            <button class="wa-image-viewer-btn" type="button" onclick="zoomImageViewer(-0.25)" title="تصغير">−</button>
+                            <button class="wa-image-viewer-btn" type="button" onclick="resetImageViewer()" title="الحجم الأصلي">↺</button>
+                            <button class="wa-image-viewer-btn" type="button" onclick="zoomImageViewer(0.25)" title="تكبير">＋</button>
+                            <a class="wa-image-viewer-btn" id="waImageViewerDownload" href="#" download title="تحميل"
+                               style="text-decoration:none; font-size:18px;">↓</a>
+                        </div>
+                        <div class="wa-image-viewer-stage" id="waImageViewerStage">
+                            <img class="wa-image-viewer-image" id="waImageViewerImage" alt="صورة واتساب"/>
+                        </div>
+                    `;
+                    document.body.appendChild(viewer);
+
+                    const stage = document.getElementById('waImageViewerStage');
+                    stage.addEventListener('wheel', function(event) {
+                        event.preventDefault();
+                        zoomImageViewer(event.deltaY < 0 ? 0.2 : -0.2);
+                    }, { passive: false });
+                    stage.addEventListener('pointerdown', function(event) {
+                        if (imageViewerScale <= 1) return;
+                        imageViewerDragging = true;
+                        imageViewerStartX = event.clientX - imageViewerX;
+                        imageViewerStartY = event.clientY - imageViewerY;
+                        stage.classList.add('dragging');
+                        stage.setPointerCapture(event.pointerId);
+                    });
+                    stage.addEventListener('pointermove', function(event) {
+                        if (!imageViewerDragging) return;
+                        imageViewerX = event.clientX - imageViewerStartX;
+                        imageViewerY = event.clientY - imageViewerStartY;
+                        applyImageViewerTransform();
+                    });
+                    stage.addEventListener('pointerup', stopImageViewerDrag);
+                    stage.addEventListener('pointercancel', stopImageViewerDrag);
+                    stage.addEventListener('dblclick', function() {
+                        if (imageViewerScale > 1) resetImageViewer();
+                        else zoomImageViewer(1);
+                    });
+                    stage.addEventListener('click', function(event) {
+                        if (event.target === stage) {
+                            if (!imageViewerDragging) closeImageViewer();
+                        }
+                    });
+                    return viewer;
+                }
+
+                function openImageViewer(src, name) {
+                    if (!src) return;
+                    const viewer = ensureImageViewer();
+                    const image = document.getElementById('waImageViewerImage');
+                    image.src = src;
+                    document.getElementById('waImageViewerName').innerText = name || 'صورة واتساب';
+                    const download = document.getElementById('waImageViewerDownload');
+                    download.href = src;
+                    download.download = name || 'whatsapp-image';
+                    resetImageViewer();
+                    viewer.classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeImageViewer() {
+                    const viewer = document.getElementById('waImageViewer');
+                    if (!viewer) return;
+                    viewer.classList.remove('open');
+                    document.body.style.overflow = '';
+                    stopImageViewerDrag();
+                }
+
+                function zoomImageViewer(change) {
+                    imageViewerScale = Math.min(5, Math.max(1, imageViewerScale + change));
+                    if (imageViewerScale === 1) {
+                        imageViewerX = 0;
+                        imageViewerY = 0;
+                    }
+                    applyImageViewerTransform();
+                }
+
+                function resetImageViewer() {
+                    imageViewerScale = 1;
+                    imageViewerX = 0;
+                    imageViewerY = 0;
+                    applyImageViewerTransform();
+                }
+
+                function applyImageViewerTransform() {
+                    const image = document.getElementById('waImageViewerImage');
+                    if (!image) return;
+                    image.style.transform = `translate(${imageViewerX}px, ${imageViewerY}px) scale(${imageViewerScale})`;
+                }
+
+                function stopImageViewerDrag() {
+                    imageViewerDragging = false;
+                    const stage = document.getElementById('waImageViewerStage');
+                    if (stage) stage.classList.remove('dragging');
+                }
+
+                document.addEventListener('keydown', function(event) {
+                    const viewer = document.getElementById('waImageViewer');
+                    if (!viewer || !viewer.classList.contains('open')) return;
+                    if (event.key === 'Escape') closeImageViewer();
+                    else if (event.key === '+' || event.key === '=') zoomImageViewer(0.25);
+                    else if (event.key === '-') zoomImageViewer(-0.25);
+                    else if (event.key === '0') resetImageViewer();
+                });
+
+                // Boot SPA
+                window.onload = initialize;
+            ]]>
+            </script>
+        </body>
+        </html>
+    </template>
+
+    <!-- Open the standalone chat UI without registering backend JS assets. -->
+    <record id="action_whatsapp_backend_ui" model="ir.actions.act_url">
+        <field name="name">WhatsApp Web</field>
+        <field name="url">/whatsapp/chat</field>
+        <field name="target">self</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_app_root"
+              name="WhatsApp"
+              action="action_whatsapp_backend_ui"
+              sequence="36"
+              web_icon="whatsapp_integration,static/description/icon.png"/>
+
+    <!-- Create a separate menu for the SPA Instead of overwriting the Kanban -->
+    <menuitem id="menu_whatsapp_spa"
+              name="WhatsApp Web (Full Screen)"
+              parent="whatsapp_integration.menu_whatsapp_msg_root"
+              action="action_whatsapp_backend_ui"
+              sequence="1"/>
+</odoo>

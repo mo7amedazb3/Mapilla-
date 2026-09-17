@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_biometric_root" name="البصمة" parent="hr_attendance.menu_hr_attendance_root" sequence="30" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_device" name="أجهزة البصمة" parent="menu_biometric_root" action="action_biometric_device" sequence="10" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_identity" name="بصمات الموظفين" parent="menu_biometric_root" action="action_biometric_identity" sequence="20" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_event" name="سجل الحركات" parent="menu_biometric_root" action="action_biometric_event" sequence="30" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_biometric_command" name="أوامر الأجهزة" parent="menu_biometric_root" action="action_biometric_command" sequence="40" groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_employee_biometric_directory"
+              name="دليل البصمات"
+              parent="hr.menu_hr_employee_payroll"
+              action="action_employee_biometric_directory"
+              sequence="2"
+              groups="hr_attendance.group_hr_attendance_manager"/>
+</odoo>

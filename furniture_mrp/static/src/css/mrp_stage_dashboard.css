@@ -1,0 +1,5383 @@
+/* Dashboard-only stage navigation.  Every selector is scoped to the custom
+ * controller root so the weekly operations action and all other Kanban views
+ * retain Odoo's original layout. */
+
+.o_furniture_stage_dashboard_view {
+    --stage-dashboard-ink: #18373b;
+    --stage-dashboard-muted: #6d8183;
+    --stage-dashboard-teal: #277d75;
+    --stage-dashboard-teal-dark: #1f645f;
+    --stage-dashboard-blue: #3d7395;
+    --stage-dashboard-border: #d9e7e5;
+    --stage-dashboard-surface: #f7fbfa;
+    --stage-dashboard-shadow: 0 14px 34px rgba(24, 55, 59, 0.08);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_analytics_button {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 7px;
+    padding-inline: 14px;
+    border-color: #b9d8d4;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #eff8f6 0%, #edf4f8 100%);
+    color: #246c66;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(36, 108, 102, 0.08);
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_analytics_button:hover:not(:disabled),
+.o_furniture_stage_dashboard_view .o_furniture_stage_analytics_button:focus-visible {
+    transform: translateY(-1px);
+    border-color: #75afa8;
+    outline: none;
+    background: linear-gradient(135deg, #e4f4f0 0%, #e7f0f6 100%);
+    box-shadow: 0 8px 18px rgba(36, 108, 102, 0.15);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_analytics_button i {
+    font-size: 0.95rem;
+}
+
+.o_furniture_stage_dashboard_page {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 12% 0%, rgba(76, 143, 136, 0.08), transparent 34%),
+        #eef5f4;
+}
+
+.o_furniture_stage_dashboard_page__header {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    min-height: 66px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 11px 24px;
+    border-bottom: 1px solid #d7e5e3;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 3px 14px rgba(24, 55, 59, 0.05);
+}
+
+.o_furniture_stage_dashboard_page__overdue {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_page__overdue_button {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 11px;
+    border: 1px solid #e2c9a2;
+    border-radius: 11px;
+    background: #fff8ec;
+    color: #8a5a16;
+    font-weight: 900;
+    white-space: nowrap;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.o_furniture_stage_dashboard_page__overdue_button:hover,
+.o_furniture_stage_dashboard_page__overdue_button:focus-visible,
+.o_furniture_stage_dashboard_page__overdue_button.is-open {
+    transform: translateY(-1px);
+    outline: none;
+    box-shadow: 0 8px 18px rgba(138, 90, 22, 0.16);
+}
+
+.o_furniture_stage_dashboard_page__overdue_button.has-overdue {
+    border-color: #e5aaa4;
+    background: linear-gradient(135deg, #fff4ef, #fff8e9);
+    color: #a23e32;
+}
+
+.o_furniture_stage_dashboard_page__overdue_button strong {
+    display: inline-flex;
+    min-width: 27px;
+    height: 27px;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 7px;
+    border-radius: 999px;
+    background: #a23e32;
+    color: #fff;
+    font-size: 0.82rem;
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel {
+    position: absolute;
+    top: calc(100% + 9px);
+    right: 0;
+    width: min(520px, calc(100vw - 32px));
+    max-height: min(68vh, 620px);
+    overflow: hidden;
+    border: 1px solid #e8d9cf;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 20px 52px rgba(38, 55, 58, 0.22);
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #f0ddd5;
+    background: linear-gradient(135deg, #fff8f4, #fffdf7);
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel_header > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel_header strong {
+    color: #723e37;
+    font-size: 0.98rem;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel_header small {
+    color: #98746e;
+}
+
+.o_furniture_stage_dashboard_page__overdue_panel_header button {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 10px;
+    background: #f6e8e3;
+    color: #8f5148;
+}
+
+.o_furniture_stage_dashboard_page__overdue_status {
+    display: flex;
+    min-height: 150px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 24px;
+    color: #6d8183;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_page__overdue_status.is-empty i {
+    color: #27806f;
+    font-size: 1.3rem;
+}
+
+.o_furniture_stage_dashboard_page__overdue_status.is-error {
+    flex-direction: column;
+    color: #9c4138;
+}
+
+.o_furniture_stage_dashboard_page__overdue_status.is-error button {
+    min-height: 38px;
+    border: 1px solid #e0b2ad;
+    border-radius: 9px;
+    background: #fff7f5;
+    color: #8b3e36;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_page__overdue_list {
+    display: grid;
+    max-height: calc(min(68vh, 620px) - 70px);
+    gap: 8px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 9px 14px;
+    padding: 12px;
+    border: 1px solid #e6eceb;
+    border-inline-start: 4px solid #d6685b;
+    border-radius: 12px;
+    background: #fff;
+    color: #28474a;
+    text-align: right;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order:hover,
+.o_furniture_stage_dashboard_page__overdue_order:focus-visible {
+    border-color: #dfaaa3;
+    outline: none;
+    background: #fffaf8;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_main,
+.o_furniture_stage_dashboard_page__overdue_order_main > span {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_main {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_main strong {
+    color: #173f42;
+    font-size: 0.96rem;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_main em {
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #fbe6e2;
+    color: #a43f34;
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_main > small {
+    overflow: hidden;
+    color: #526d70;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_meta {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_meta > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: #f6f9f8;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_meta small {
+    color: #829395;
+    font-size: 0.66rem;
+}
+
+.o_furniture_stage_dashboard_page__overdue_order_meta strong {
+    overflow: hidden;
+    color: #35575a;
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_page__overdue_open {
+    display: inline-flex;
+    align-items: center;
+    align-self: start;
+    gap: 5px;
+    color: #2a756e;
+    font-size: 0.76rem;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_page__overdue_limited {
+    padding: 8px;
+    color: #7c6966;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_page__heading,
+.o_furniture_stage_dashboard_page__heading > span:last-child {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 11px;
+}
+
+.o_furniture_stage_dashboard_page__heading > span:last-child {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_page__heading strong {
+    color: #183f42;
+    font-size: 1.08rem;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_page__heading small {
+    color: #718789;
+    font-size: 0.72rem;
+}
+
+.o_furniture_stage_dashboard_page__icon {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e2f3ef, #e6f0f5);
+    color: #287b73;
+    font-size: 1rem;
+}
+
+.o_furniture_stage_dashboard_page__actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_page__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_page__action.is-new {
+    min-width: 92px;
+    justify-content: center;
+}
+
+.o_furniture_stage_dashboard_page__action.is-material-check {
+    border-color: #286f6a !important;
+    background: linear-gradient(135deg, #348b83, #2b746f) !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    box-shadow: 0 5px 12px rgba(43, 116, 111, 0.18);
+}
+
+.o_furniture_stage_dashboard_page__action.is-material-check:hover,
+.o_furniture_stage_dashboard_page__action.is-material-check:focus-visible {
+    border-color: #205d59 !important;
+    outline: none;
+    background: linear-gradient(135deg, #2b7972, #225f5b) !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    box-shadow: 0 7px 16px rgba(34, 95, 91, 0.24);
+}
+
+.o_furniture_stage_dashboard_page__action.is-material-check i,
+.o_furniture_stage_dashboard_page__action.is-material-check span {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+.o_furniture_stage_dashboard_page__header
+    .o_furniture_stage_dashboard__date_filter.is-header {
+    width: auto;
+    min-height: 0;
+    flex: 0 1 auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.o_furniture_stage_dashboard_page__header
+    .o_furniture_stage_dashboard__date_field {
+    min-width: 145px;
+}
+
+.o_furniture_stage_dashboard_page__header
+    .o_furniture_stage_dashboard__date_active {
+    align-self: flex-end;
+    min-height: 36px;
+    padding-inline: 7px;
+    border-radius: 9px;
+    background: #e9f6f2;
+}
+
+.o_furniture_stage_dashboard_page__body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 14px 20px 22px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard_workspace {
+    margin: 12px 16px 2px;
+    color: var(--stage-dashboard-ink);
+}
+
+.o_furniture_stage_dashboard_page.o_furniture_stage_dashboard_view
+    .o_furniture_stage_dashboard_workspace {
+    width: min(100%, 1680px);
+    margin: 0 auto;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_navigation {
+    position: relative;
+    z-index: 2;
+    padding: 13px 14px 14px;
+    overflow: hidden;
+    border: 1px solid #d8e6e4;
+    border-radius: 17px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 8px 24px rgba(24, 55, 59, 0.06);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_navigation::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #2d8d82, #477ba1);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_navigation .o_furniture_stage_dashboard__heading {
+    margin-bottom: 10px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_navigation .o_furniture_stage_dashboard__title_icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    border-radius: 11px;
+    font-size: 0.95rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_navigation .o_furniture_stage_dashboard__title strong {
+    font-size: 0.94rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter {
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    min-height: 58px;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto 12px;
+    padding: 9px 11px;
+    border: 1px solid #d6e6e3;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f8fcfb 0%, #f3f8fa 100%);
+    box-shadow: 0 5px 15px rgba(24, 55, 59, 0.045);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro {
+    display: flex;
+    min-width: 210px;
+    align-items: center;
+    gap: 9px;
+    align-self: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro strong {
+    color: #285f5c;
+    font-size: 0.82rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro small {
+    color: #748789;
+    font-size: 0.68rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_icon {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e3f2ef;
+    color: #277d75;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_field {
+    display: flex;
+    min-width: 150px;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_field > span {
+    padding-inline: 2px;
+    color: #526d70;
+    font-size: 0.69rem;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_field input {
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 9px;
+    border: 1px solid #c8dcda;
+    border-radius: 10px;
+    background: #fff;
+    color: #24474a;
+    font-weight: 700;
+    outline: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_field input:focus {
+    border-color: #5ea49c;
+    box-shadow: 0 0 0 3px rgba(39, 125, 117, 0.11);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_apply,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_clear {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding-inline: 13px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_apply {
+    border-color: #2c8178;
+    background: linear-gradient(135deg, #2d847a, #3b7591);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_clear {
+    border-color: #cadbd9;
+    background: #fff;
+    color: #526e70;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_active {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-end;
+    color: #26756d;
+    font-size: 0.7rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard {
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    padding: 15px 17px 16px;
+    overflow: visible;
+    border: 1px solid var(--stage-dashboard-border);
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 4% 8%, rgba(51, 142, 132, 0.09), transparent 27%),
+        linear-gradient(145deg, #ffffff 0%, var(--stage-dashboard-surface) 100%);
+    box-shadow: var(--stage-dashboard-shadow);
+    color: var(--stage-dashboard-ink);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 5px;
+    background: linear-gradient(180deg, #2d8d82, #477ba1);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading_actions,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__current {
+    display: flex;
+    align-items: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading {
+    position: sticky;
+    top: 7px;
+    z-index: 17;
+    justify-content: space-between;
+    gap: 16px;
+    margin: -2px -2px 15px;
+    padding: 8px 10px;
+    border: 1px solid rgba(186, 219, 214, 0.88);
+    border-radius: 14px;
+    background: rgba(250, 253, 252, 0.94);
+    box-shadow: 0 9px 24px rgba(25, 73, 70, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title {
+    min-width: 0;
+    gap: 11px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title > span:last-child {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title strong {
+    font-size: 1.08rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title small {
+    color: var(--stage-dashboard-muted);
+    font-size: 0.77rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_manual_quality {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_quality_state {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8b6b21;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_quality_state.is-pass {
+    color: #267343;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_quality_state.is-reject {
+    color: #b23636;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_manual_quality .btn-outline-success {
+    color: #267343;
+    background: #edf8f1;
+    border: 1px solid #70ae86;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_manual_quality .btn-outline-danger {
+    color: #b23636;
+    background: #fff1f1;
+    border: 1px solid #d89595;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_manual_quality .btn:disabled {
+    opacity: 0.5;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_incoming_quality {
+    flex-basis: 100%;
+    border-top: 1px solid #e7d7b5;
+    padding-top: 10px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > article {
+    flex-wrap: wrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs {
+    display: grid;
+    gap: 9px;
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px solid #e6c66d;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fff9e7, #fffdf6);
+    box-shadow: 0 8px 20px rgba(124, 91, 15, 0.08);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > header,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > header > span,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > article,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoff_copy {
+    display: flex;
+    align-items: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > header {
+    justify-content: space-between;
+    gap: 12px;
+    color: #725313;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > header > span {
+    gap: 7px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > header small,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoff_copy small {
+    color: #806d43;
+    font-size: 0.72rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs > article {
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 11px;
+    border: 1px solid #ead9a6;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoff_copy {
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoff_copy strong {
+    color: #634b18;
+    font-size: 0.84rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__handoffs .btn {
+    display: inline-flex;
+    min-width: 132px;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-color: #d6a53d;
+    border-radius: 9px;
+    background: #f3c764;
+    color: #4e3a0e;
+    font-size: 0.76rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__title_icon {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #e8f5f2;
+    color: var(--stage-dashboard-teal);
+    font-size: 1.13rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading_actions {
+    flex: 0 0 auto;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__current {
+    gap: 7px;
+    min-height: 36px;
+    padding: 7px 12px;
+    border: 1px solid #cfe3df;
+    border-radius: 12px;
+    background: rgba(239, 248, 246, 0.92);
+    color: var(--stage-dashboard-teal-dark);
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__refresh {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d6e4e2;
+    border-radius: 12px;
+    background: #fff;
+    color: #4f6c70;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__refresh:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #9fc9c3;
+    box-shadow: 0 7px 15px rgba(39, 125, 117, 0.13);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__refresh:disabled {
+    cursor: wait;
+    opacity: 0.66;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stages {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(108px, 1fr));
+    gap: 9px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    min-height: 82px;
+    grid-template-columns: 35px minmax(0, 1fr) auto;
+    grid-template-rows: 1fr 4px;
+    align-items: center;
+    gap: 7px 8px;
+    padding: 11px 10px 9px;
+    overflow: hidden;
+    border: 1px solid #dbe7e6;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #38565a;
+    text-align: start;
+    box-shadow: 0 4px 12px rgba(27, 67, 69, 0.035);
+    transition:
+        transform 190ms ease,
+        border-color 190ms ease,
+        background 190ms ease,
+        color 190ms ease,
+        box-shadow 190ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: #a9cfca;
+    box-shadow: 0 9px 20px rgba(31, 100, 95, 0.11);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected {
+    border-color: transparent;
+    background: linear-gradient(135deg, #2b8279 0%, #3d7191 100%);
+    color: #fff;
+    box-shadow: 0 10px 23px rgba(36, 107, 102, 0.22);
+    animation: furniture_stage_dashboard_select 240ms ease-out;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage:disabled {
+    cursor: wait;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_icon {
+    display: inline-flex;
+    width: 35px;
+    height: 35px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #edf6f4;
+    color: var(--stage-dashboard-teal);
+    font-size: 0.95rem;
+    transition: background 190ms ease, color 190ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_icon {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_copy strong {
+    overflow: visible;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1.25;
+    overflow-wrap: normal;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_copy small {
+    color: #819295;
+    font-size: 0.66rem;
+    font-weight: 650;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_copy small {
+    color: rgba(255, 255, 255, 0.77);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_percentage {
+    align-self: start;
+    padding-top: 2px;
+    color: #698184;
+    font-size: 0.64rem;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_percentage {
+    color: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_track {
+    grid-column: 1 / -1;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e7efee;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_track > span {
+    display: block;
+    width: var(--furniture-stage-progress, 0%);
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #4b9a91, #5b85a2);
+    transition: width 320ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_track {
+    background: rgba(255, 255, 255, 0.19);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_track > span {
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage_check {
+    position: absolute;
+    inset-block-start: 5px;
+    inset-inline-start: 6px;
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--stage-dashboard-teal);
+    font-size: 0.59rem;
+    opacity: 0;
+    transform: scale(0.55);
+    transition: opacity 170ms ease, transform 170ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__status:empty {
+    display: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 9px 12px;
+    border-radius: 11px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__message.is-loading {
+    background: #eef6f8;
+    color: #3c6c82;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__message.is-error {
+    background: #fff3ef;
+    color: #a34c39;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 11px;
+    border: 1px solid #e0e9e8;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.86);
+    color: inherit;
+    text-align: start;
+    box-shadow: 0 3px 9px rgba(28, 67, 68, 0.025);
+    transition:
+        transform 170ms ease,
+        border-color 170ms ease,
+        background 170ms ease,
+        box-shadow 170ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:hover,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:focus-visible {
+    z-index: 1;
+    transform: translateY(-2px);
+    border-color: #9fcac4;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 9px 20px rgba(31, 100, 95, 0.12);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-active {
+    border-color: #3f8d85;
+    background: linear-gradient(135deg, #f4fbf9 0%, #f3f8fb 100%);
+    box-shadow: 0 8px 18px rgba(31, 100, 95, 0.13);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:disabled {
+    cursor: default;
+    opacity: 0.56;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:disabled:hover {
+    transform: none;
+    border-color: #e0e9e8;
+    box-shadow: 0 3px 9px rgba(28, 67, 68, 0.025);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric_icon {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #edf5f4;
+    color: #52777a;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-working .o_furniture_stage_dashboard__metric_icon {
+    background: #e8f2f8;
+    color: #3f7394;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-quality .o_furniture_stage_dashboard__metric_icon {
+    background: #fff4dc;
+    color: #9a6c18;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-completed .o_furniture_stage_dashboard__metric_icon {
+    background: #e8f6ed;
+    color: #2f7c4d;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-remaining .o_furniture_stage_dashboard__metric_icon {
+    background: #f2eff7;
+    color: #705d89;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric_copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric_copy small {
+    overflow: hidden;
+    color: var(--stage-dashboard-muted);
+    font-size: 0.67rem;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric_copy strong {
+    color: #25464a;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric_hint {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    align-items: center;
+    justify-content: center;
+    margin-inline-start: auto;
+    border-radius: 7px;
+    background: #f0f5f4;
+    color: #799092;
+    font-size: 0.58rem;
+    transition: transform 170ms ease, background 170ms ease, color 170ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:hover .o_furniture_stage_dashboard__metric_hint,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric:focus-visible .o_furniture_stage_dashboard__metric_hint,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-active .o_furniture_stage_dashboard__metric_hint {
+    background: #dcefeb;
+    color: var(--stage-dashboard-teal-dark);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-active .o_furniture_stage_dashboard__metric_hint {
+    transform: rotate(-90deg);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details {
+    margin-top: 11px;
+    overflow: hidden;
+    border: 1px solid #cfe2df;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 12px 25px rgba(24, 55, 59, 0.075);
+    animation: furniture_stage_details_open 220ms ease-out;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_header {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto 30px;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 12px;
+    border-bottom: 1px solid #e1ebea;
+    background: linear-gradient(135deg, #f3faf8, #f4f8fa);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_icon,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_icon {
+    width: 36px;
+    height: 36px;
+    background: #e4f2ef;
+    color: var(--stage-dashboard-teal-dark);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_title {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_title small {
+    color: #72888a;
+    font-size: 0.65rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_title strong {
+    color: #244b4e;
+    font-size: 0.88rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_total {
+    padding: 6px 10px;
+    border-radius: 9px;
+    background: #e5f3f0;
+    color: #256c65;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_close {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #d5e2e0;
+    background: #fff;
+    color: #6c8183;
+    transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_close:hover {
+    transform: rotate(4deg);
+    border-color: #e1aaa0;
+    color: #a64e40;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e1ebea;
+    background: #fbfdfd;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary > span,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 9px;
+    border: 1px solid #dce8e7;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary small,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities small {
+    color: #778d8f;
+    font-size: 0.61rem;
+    font-weight: 700;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary strong,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities strong {
+    color: #294e51;
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary .is-working,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities .is-working {
+    border-color: #bed8e8;
+    background: #f0f7fb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary .is-not-working,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities .is-not-working {
+    border-color: #eadcc7;
+    background: #fff9f0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_rows {
+    display: grid;
+    gap: 0;
+    padding: 8px;
+    background: transparent;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__order_separator {
+    display: block;
+    height: 4px;
+    margin-block: 12px;
+    margin-inline: 16px;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        #000000 7%,
+        #000000 50%,
+        #000000 93%,
+        transparent 100%
+    );
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.22);
+    pointer-events: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row {
+    --order-card-border: #dce8e6;
+    --order-card-header: #f3f8f7;
+    --order-card-body: #ffffff;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--order-card-border);
+    border-radius: 11px;
+    background: var(--order-card-body);
+    color: #35575a;
+    text-align: start;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row.is-tone-sage {
+    --order-card-border: #bddbd5;
+    --order-card-header: #edf8f4;
+    --order-card-body: #fbfefd;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row.is-tone-sky {
+    --order-card-border: #c6dbe8;
+    --order-card-header: #eef6fb;
+    --order-card-body: #fbfdff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row.is-tone-sand {
+    --order-card-border: #e4d6bd;
+    --order-card-header: #fbf6ec;
+    --order-card-body: #fffdf9;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row.is-tone-lilac {
+    --order-card-border: #d9cfe5;
+    --order-card-header: #f6f1fa;
+    --order-card-body: #fefcff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row.is-tone-rose {
+    --order-card-border: #e3cfcc;
+    --order-card-header: #faf1ef;
+    --order-card-body: #fffdfc;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_header {
+    display: grid;
+    grid-template-areas:
+        "reference model dates actions"
+        "customers customers metrics actions";
+    grid-template-columns: minmax(135px, 0.65fr) minmax(175px, 0.85fr) minmax(260px, 1.35fr) auto;
+    align-items: center;
+    gap: 7px 16px;
+    padding: 8px 11px;
+    border-bottom: 1px solid #e5eeec;
+    background: linear-gradient(135deg, #fff, var(--order-card-header));
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_reference {
+    grid-area: reference;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model {
+    grid-area: model;
+    padding: 7px 11px;
+    border: 1px solid #a8d3cd;
+    border-inline-start: 4px solid #2f8b83;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e8f7f3, #edf6fa);
+    box-shadow: 0 4px 10px rgba(47, 139, 131, 0.09);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model small {
+    color: #5f807f;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model strong {
+    overflow: visible;
+    color: #145a55;
+    font-size: 1.02rem;
+    font-weight: 950;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_state {
+    grid-area: state;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_team {
+    grid-area: team;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_dates {
+    grid-area: dates;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_dates > span,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_customers > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_customers {
+    grid-area: customers;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_customers > span {
+    padding: 5px 8px;
+    border: 1px solid #dce8e6;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_value,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities {
+    grid-area: metrics;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities > span {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    padding: 5px 8px;
+    border-radius: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities small,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities strong {
+    overflow: visible;
+    line-height: 1.1;
+    text-align: center;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row:last-child {
+    border-bottom: 1px solid #dce8e6;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row:hover,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    border-color: #9fc9c3;
+    box-shadow: 0 8px 18px rgba(40, 91, 87, 0.1);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_reference,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_state,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_team,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_value {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row small {
+    color: #839496;
+    font-size: 0.61rem;
+    line-height: 1.2;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row strong {
+    color: #294e51;
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    line-height: 1.28;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_team > span {
+    color: #6d8183;
+    font-size: 0.62rem;
+    line-height: 1.25;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_open {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    justify-self: end;
+    align-self: center;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: #e7f3f1;
+    color: #286f68;
+    font-size: 0.62rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_actions {
+    grid-area: actions;
+    display: flex;
+    min-width: 112px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    justify-self: end;
+    align-self: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 0.67rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status i {
+    width: 4px;
+    height: 16px;
+    flex: 0 0 4px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: none;
+    opacity: 1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status.is-completed {
+    border-color: #b9ddc4;
+    background: #eff9f2;
+    color: #25824a;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status.is-running {
+    border-color: #ead49b;
+    background: #fff8e5;
+    color: #b27b0d;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status.is-shortage {
+    border-color: #e4a11b;
+    background: #fff2cc;
+    color: #9a5b00;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_status.is-not-started {
+    border-color: #e8bdbb;
+    background: #fff1f0;
+    color: #bc4540;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_products {
+    display: grid;
+    background: var(--order-card-body);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_report_row {
+    position: relative;
+    display: grid;
+    grid-template-areas: "quantities";
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 7px 16px;
+    padding: 9px 11px 10px;
+    border-bottom: 1px solid #edf2f1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_report_row:nth-child(even) {
+    background: #fcfefd;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_report_row:last-child {
+    border-bottom: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity {
+    grid-area: identity;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 2px 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity > small {
+    grid-column: 1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity > strong {
+    grid-column: 2;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_badges {
+    grid-column: 1 / -1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity > strong {
+    overflow: visible;
+    color: #173f42;
+    font-size: 0.96rem;
+    font-weight: 900;
+    line-height: 1.3;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_model {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 0;
+    padding: 4px 8px;
+    border: 1px solid #b9d9d4;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e8f6f2, #edf5f8);
+    color: #1f645f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_model small {
+    color: #668587;
+    font-size: 0.58rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_model strong {
+    overflow: visible;
+    color: #1d5f5a;
+    font-size: 0.86rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-inline-start: auto;
+    margin-top: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_badges em {
+    padding: 1px 5px;
+    border: 1px solid #cfe2df;
+    border-radius: 999px;
+    background: #f1f8f6;
+    color: #39736d;
+    font-size: 0.55rem;
+    font-style: normal;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_badges .is-dimension {
+    padding: 3px 8px;
+    border-color: #a9d3cd;
+    background: #e7f5f2;
+    color: #1e665f;
+    font-size: 0.72rem;
+    font-weight: 850;
+    line-height: 1.25;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_customer {
+    grid-area: customer;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 7px;
+    padding-inline-start: 12px;
+    border-inline-start: 1px solid #e6efed;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_customer > span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route {
+    grid-area: route;
+    padding-inline-start: 12px;
+    border-inline-start: 1px solid #e6efed;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_customer strong,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route strong {
+    overflow: visible;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities {
+    grid-area: quantities;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(150px, 1fr) repeat(3, minmax(0, 1fr)) 22px;
+    gap: 7px;
+    padding-top: 7px;
+    border-top: 1px dashed #e2ecea;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span:not(.o_furniture_stage_dashboard__product_signal) {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid #dce8e7;
+    border-radius: 8px;
+    background: #fbfdfd;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-working small,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-completed small,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-remaining small {
+    color: #31575a;
+    font-size: 0.75rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities small {
+    overflow: visible;
+    width: auto;
+    line-height: 1.2;
+    text-align: start;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities strong {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    text-align: end;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span.is-working {
+    border-color: #afd3e6;
+    background: #e8f4fb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span.is-product-name {
+    padding-block: 6px;
+    padding-inline: 10px;
+    border-color: #b8ddd6;
+    border-inline-start: 3px solid #3a8f88;
+    border-radius: 8px;
+    background: #eaf6f3;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-product-name small {
+    color: #668381;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-product-name strong {
+    overflow: visible;
+    color: #123f3c;
+    font-size: 0.86rem;
+    font-weight: 950;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal {
+    display: inline-flex;
+    width: 22px;
+    height: 100%;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal i {
+    width: 9px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 2px currentColor, 0 0 6px currentColor;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal.is-completed {
+    color: #35a35b;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal.is-running {
+    color: #e4a923;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal.is-shortage {
+    color: #e08a00;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_signal.is-not-started {
+    color: #dc524c;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-quality {
+    border-color: #ecdba9;
+    background: #fff9e9;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span.is-completed {
+    border-color: #add8ba;
+    background: #eaf7ee;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span.is-remaining {
+    border-color: #d9cbe6;
+    background: #f5effa;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_product_fallback {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_product_fallback strong {
+    font-size: 1rem;
+    white-space: pre-line;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_groups {
+    display: grid;
+    gap: 9px;
+    padding: 9px;
+    background: #f7faf9;
+}
+
+/* A model boundary adds exactly one ordinary row gap, without a header bar. */
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_groups > .is-model-start {
+    margin-top: 9px;
+}
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_orders {
+    gap: 9px;
+}
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_orders > .is-model-start {
+    margin-top: 9px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group {
+    --product-card-accent: #4c968d;
+    --product-card-border: #cfe2df;
+    --product-card-bg: #f5faf8;
+    --product-card-bg-hover: #edf7f4;
+    --product-card-soft: #eaf6f3;
+    --product-card-ink: #1d625d;
+    overflow: hidden;
+    border: 1px solid #cfe2df;
+    border-color: var(--product-card-border);
+    border-inline-start: 4px solid var(--product-card-accent);
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(36, 85, 81, 0.05);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-tone-sage {
+    --product-card-accent: #4c968d;
+    --product-card-border: #c8e0dc;
+    --product-card-bg: #f3faf7;
+    --product-card-bg-hover: #eaf6f1;
+    --product-card-soft: #e5f3ef;
+    --product-card-ink: #246a62;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-tone-sky {
+    --product-card-accent: #628fac;
+    --product-card-border: #cfdee8;
+    --product-card-bg: #f4f8fb;
+    --product-card-bg-hover: #ebf3f8;
+    --product-card-soft: #e8f1f7;
+    --product-card-ink: #386b89;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-tone-sand {
+    --product-card-accent: #b18a4e;
+    --product-card-border: #e7dcc8;
+    --product-card-bg: #fcfaf5;
+    --product-card-bg-hover: #f8f3e9;
+    --product-card-soft: #f5edde;
+    --product-card-ink: #7f612f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-tone-lilac {
+    --product-card-accent: #8b7aa4;
+    --product-card-border: #ddd6e7;
+    --product-card-bg: #faf8fc;
+    --product-card-bg-hover: #f3eff8;
+    --product-card-soft: #f0ebf6;
+    --product-card-ink: #66547f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-tone-rose {
+    --product-card-accent: #aa7773;
+    --product-card-border: #e5d4d2;
+    --product-card-bg: #fcf8f7;
+    --product-card-bg-hover: #f8efed;
+    --product-card-soft: #f5eae8;
+    --product-card-ink: #7d514e;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_summary {
+    display: grid;
+    min-width: 0;
+    grid-template-areas:
+        "identity expand"
+        "customers customers"
+        "quantities quantities";
+    grid-template-columns: minmax(260px, 1fr) auto;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 11px 13px;
+    cursor: pointer;
+    list-style: none;
+    background: linear-gradient(135deg, #fff 18%, var(--product-card-bg));
+    transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_summary::-webkit-details-marker {
+    display: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_summary:hover,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_summary:focus-visible {
+    outline: none;
+    background: linear-gradient(135deg, #fff 10%, var(--product-card-bg-hover));
+    box-shadow: inset 0 0 0 1px var(--product-card-border);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_identity {
+    grid-area: identity;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_identity > small {
+    color: #809395;
+    font-size: 0.61rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_identity_line {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_model,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_dimension {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 1px solid var(--product-card-border);
+    border-radius: 8px;
+    background: var(--product-card-soft);
+    color: var(--product-card-ink);
+    font-style: normal;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_model small {
+    color: #69898a;
+    font-size: 0.57rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_model strong {
+    font-size: 1.12rem;
+    font-weight: 900;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_dimension {
+    font-size: 0.78rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_product {
+    display: inline-flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 4px;
+    color: #31575a;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_product small {
+    color: #7a8f91;
+    font-size: 0.57rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_product strong {
+    overflow-wrap: anywhere;
+    font-size: 0.92rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers {
+    grid-area: customers;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 7px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers > span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 1px solid #d9e7e5;
+    border-radius: 8px;
+    background: var(--product-card-bg);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers small {
+    color: #829496;
+    font-size: 0.57rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers strong {
+    overflow: hidden;
+    color: #31575a;
+    font-size: 0.67rem;
+    font-weight: 850;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities {
+    grid-area: quantities;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities > span {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    padding: 6px 9px;
+    border: 1px solid #dce8e7;
+    border-radius: 8px;
+    background: #fbfdfd;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities small {
+    color: #7a8f91;
+    font-size: 0.73rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities strong {
+    color: #294e51;
+    font-size: 0.73rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities .is-working {
+    border-color: #afd3e6;
+    background: #e8f4fb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities .is-completed {
+    border-color: #add8ba;
+    background: #eaf7ee;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities .is-remaining {
+    border-color: #d9cbe6;
+    background: #f5effa;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_expand {
+    grid-area: expand;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--product-card-ink);
+    font-size: 0.64rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_expand i {
+    transition: transform 180ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group[open]
+    .o_furniture_stage_dashboard__product_group_expand i {
+    transform: rotate(180deg);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_orders {
+    display: grid;
+    border-top: 1px solid #dce8e6;
+    background: #f8fbfa;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.75fr) minmax(160px, 1fr) minmax(170px, 1fr) minmax(200px, 1.2fr) minmax(100px, 0.55fr) auto;
+    align-items: center;
+    gap: 9px 14px;
+    padding: 9px 12px;
+    border-bottom: 1px solid #e3ecea;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order:last-child {
+    border-bottom: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order small {
+    color: #859698;
+    font-size: 0.56rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order strong {
+    overflow-wrap: anywhere;
+    color: #31575a;
+    font-size: 0.68rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order em {
+    color: #728688;
+    font-size: 0.56rem;
+    font-style: normal;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order_value strong {
+    color: #1f665f;
+    font-size: 0.75rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order_open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 9px;
+    border: 0;
+    border-radius: 8px;
+    background: #e6f3f0;
+    color: #286f68;
+    font-size: 0.62rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order_open:hover,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order_open:focus-visible {
+    outline: none;
+    background: #cfe8e3;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_empty {
+    padding: 18px;
+    color: #718789;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__progress {
+    margin-top: 12px;
+    padding: 11px 13px 12px;
+    border: 1px solid #dce8e7;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__progress_heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    color: #526c6f;
+    font-size: 0.76rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__progress_value {
+    color: var(--stage-dashboard-teal-dark);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segments {
+    display: flex;
+    width: 100%;
+    height: 11px;
+    overflow: hidden;
+    direction: ltr;
+    border-radius: 999px;
+    background: #edf2f1;
+    box-shadow: inset 0 1px 2px rgba(31, 65, 68, 0.09);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segment {
+    display: block;
+    min-width: 0;
+    height: 100%;
+    transition: width 360ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segment.is-completed,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend .is-completed i {
+    background: #4a9a67;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segment.is-quality,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend .is-quality i {
+    background: #d8a23f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segment.is-working,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend .is-working i {
+    background: #4b83a6;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__segment.is-not-started,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend .is-not-started i {
+    background: #a5b2b2;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 15px;
+    margin-top: 9px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #667b7e;
+    font-size: 0.68rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend i {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__legend strong {
+    color: #38575a;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__empty {
+    display: flex;
+    min-height: 112px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 14px;
+    border: 1px dashed #bfd7d3;
+    border-radius: 15px;
+    background: rgba(244, 250, 249, 0.82);
+    color: #4e7475;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__empty > i {
+    margin-bottom: 4px;
+    color: #6b9b95;
+    font-size: 1.2rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__empty small {
+    color: #7d9092;
+    font-size: 0.72rem;
+}
+
+/*
+ * Native Kanban cards remain native; only their dashboard geometry is scoped.
+ *
+ * This stylesheet is loaded after furniture_mrp.css and this selector is more
+ * specific than the factory-dashboard rule there.  Keep the responsive columns
+ * here as the final cascade authority so the stage controller cannot collapse
+ * the order dashboard back to a single full-width card.
+ */
+.o_furniture_stage_dashboard_view .o_kanban_renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)) !important;
+    align-content: start;
+    gap: 14px !important;
+}
+
+.o_furniture_stage_dashboard_view .o_kanban_record,
+.o_furniture_stage_dashboard_view .o_kanban_record > div,
+.o_furniture_stage_dashboard_view .o_furniture_dashboard_card {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+.o_furniture_stage_dashboard_view .o_kanban_record {
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_kanban_record:hover {
+    transform: translateY(-1px);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_dashboard_card {
+    border-radius: 17px !important;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_dashboard_metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_dashboard_chip {
+    max-width: 100%;
+}
+
+@keyframes furniture_stage_dashboard_select {
+    0% {
+        transform: scale(0.985);
+        opacity: 0.86;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes furniture_stage_details_open {
+    0% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Restricted supervisors reuse the administrator KPI/product-card palette. */
+.o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard {
+    display: grid;
+    gap: 11px;
+    margin-top: 11px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics.is-supervisor-batch {
+    grid-template-columns: minmax(220px, 360px);
+    justify-content: start;
+    margin-top: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-supervisor-batch {
+    min-height: 58px;
+    cursor: default;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metric.is-supervisor-batch:hover {
+    transform: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details.is-supervisor-batch {
+    margin-top: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details.is-supervisor-batch
+    .o_furniture_stage_dashboard__details_header {
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_bulk_actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_selected_count {
+    color: #287f76;
+    font-size: 0.72rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_request_selected {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 13px;
+    border-color: #287f76;
+    border-radius: 10px;
+    background: #287f76;
+    font-size: 0.76rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_request_selected:hover:not(:disabled) {
+    border-color: #1f675f;
+    background: #1f675f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_request_selected:disabled {
+    border-color: #cbd8d6;
+    background: #e8efee;
+    color: #829694;
+    opacity: 1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_summary {
+    min-height: 58px;
+    grid-template-areas: "selector identity quantities actions";
+    grid-template-columns: 36px minmax(315px, 1fr) minmax(128px, 0.27fr) auto;
+    gap: 8px;
+    padding: 7px 9px;
+    cursor: default;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-selected {
+    border-color: #287f76;
+    box-shadow: 0 0 0 2px rgba(40, 127, 118, 0.13), 0 5px 14px rgba(40, 127, 118, 0.14);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-selected
+    .o_furniture_stage_dashboard__product_group_summary {
+    background: linear-gradient(135deg, #f6fcfa 18%, #e1f1ed);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector {
+    grid-area: selector;
+    display: inline-flex;
+    width: 36px;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector span {
+    position: relative;
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #87a09e;
+    border-radius: 7px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(12, 42, 68, 0.09);
+    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector:hover {
+    background: rgba(40, 127, 118, 0.08);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector:hover span {
+    border-color: #287f76;
+    box-shadow: 0 2px 6px rgba(40, 127, 118, 0.18);
+    transform: scale(1.03);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector input:focus-visible + span {
+    outline: 3px solid rgba(40, 127, 118, 0.24);
+    outline-offset: 2px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector input:checked + span {
+    border-color: #287f76;
+    background: #287f76;
+    box-shadow: 0 2px 6px rgba(40, 127, 118, 0.24);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector input:checked + span::after {
+    content: "\2713";
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_selector:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_summary:hover {
+    background: linear-gradient(135deg, #fff 18%, var(--product-card-bg));
+    box-shadow: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_identity {
+    min-height: 42px;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    padding: 5px 9px;
+    border: 1px solid var(--product-card-border);
+    border-radius: 10px;
+    background: var(--product-card-soft);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_identity_line {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_model {
+    flex: 0 0 auto;
+    gap: 5px;
+    padding: 0 0 0 10px;
+    border: 0;
+    border-inline-end: 1px solid var(--product-card-border);
+    border-radius: 0;
+    background: transparent;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_model strong {
+    font-size: 0.95rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_product {
+    flex: 1 1 auto;
+    gap: 5px;
+    padding-inline-start: 10px;
+    overflow: hidden;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_product strong {
+    overflow: hidden;
+    font-size: 0.86rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_dimension {
+    flex: 0 0 auto;
+    margin-inline-start: 8px;
+    padding: 3px 6px;
+    font-size: 0.66rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single > span {
+    min-height: 42px;
+    padding: 5px 8px;
+    border-color: var(--product-card-border);
+    background: var(--product-card-soft);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single strong {
+    color: var(--product-card-ink);
+    font-size: 0.9rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > :is(.is-unrequested, .is-not-started, .is-remaining) {
+    border-color: #d9cbe6;
+    background: #f5effa;
+    color: #705d89;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > :is(
+        .is-waiting-store,
+        .is-waiting-receipt,
+        .is-material-pending,
+        .is-pending,
+        .is-awaiting-receipt
+    ) {
+    border-color: #ecdba9;
+    background: #fff9e9;
+    color: #8b651b;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > .is-ready {
+    border-color: #a8d4cc;
+    background: #eaf6f3;
+    color: #246a62;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > .is-in-progress {
+    border-color: #afd3e6;
+    background: #e8f4fb;
+    color: #17658f;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > :is(.is-done, .is-completed) {
+    border-color: #add8ba;
+    background: #eaf7ee;
+    color: #247243;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single
+    > .is-cancelled {
+    border-color: #dfc7c7;
+    background: #fbefef;
+    color: #8d4444;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions {
+    grid-area: actions;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .btn {
+    display: inline-flex;
+    min-width: auto;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 0.72rem;
+    font-weight: 850;
+    white-space: nowrap;
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .is-start,
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .is-request-materials {
+    border-color: #287f76;
+    background: #287f76;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .is-receive-materials {
+    border-color: #d6a53d;
+    background: #f3c764;
+    color: #4e3a0e;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .is-bom {
+    border-color: var(--product-card-accent);
+    background: #fff;
+    color: var(--product-card-ink);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions
+    .is-production-warning {
+    border-color: #d89a24;
+    background: #fff9e9;
+    color: #80590e;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_timer {
+    display: inline-grid;
+    min-width: 104px;
+    min-height: 40px;
+    align-content: center;
+    gap: 1px;
+    margin-inline-end: auto;
+    padding: 3px 8px;
+    border: 1px solid var(--product-card-border);
+    border-radius: 11px;
+    background: #fff;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions
+    > .o_furniture_stage_timer {
+    min-width: 104px;
+    min-height: 40px;
+    gap: 0;
+    padding: 3px 8px;
+    border-radius: 9px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions
+    > .o_furniture_stage_timer strong {
+    font-size: 0.86rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions
+    > .o_furniture_stage_timer :is(small, em) {
+    font-size: 0.54rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_timer small {
+    color: #718789;
+    font-size: 0.6rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_timer strong {
+    direction: ltr;
+    color: #294e51;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.86rem;
+    letter-spacing: 0.04em;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_timer.is-running strong {
+    color: #17658f;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-state-completed {
+    --product-card-accent: #2f8e59;
+    --product-card-border: #88cba0;
+    --product-card-bg: #e2f5e8;
+    --product-card-bg-hover: #d8f0e0;
+    --product-card-soft: #d5efde;
+    --product-card-ink: #216d42;
+    border-color: #75bd8d;
+    background: #e7f7ec;
+    box-shadow: 0 5px 15px rgba(37, 126, 75, 0.16);
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-state-completed
+    .o_furniture_stage_dashboard__product_group_summary {
+    background: linear-gradient(135deg, #edfaF1 10%, #d5efde);
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-state-completed
+    :is(
+        .o_furniture_stage_dashboard__product_group_identity,
+        .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single > span
+    ) {
+    border-color: #75bd8d;
+    background: rgba(255, 255, 255, 0.58);
+}
+
+@media (max-width: 767.98px) {
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics.is-supervisor-batch {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+        .o_furniture_stage_dashboard__product_group_summary {
+        grid-template-areas:
+            "selector identity"
+            "quantities quantities"
+            "actions actions";
+        grid-template-columns: 42px minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details.is-supervisor-batch
+        .o_furniture_stage_dashboard__details_header {
+        grid-template-columns: 36px minmax(0, 1fr) auto;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_bulk_actions {
+        grid-column: 1 / -1;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__batch_request_selected {
+        flex: 1 1 auto;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions .btn {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_actions {
+        flex-wrap: wrap;
+        padding-top: 6px;
+        border-top: 1px solid var(--product-card-border);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+        .o_furniture_stage_dashboard__product_group_identity_line {
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_batch_timer {
+        width: 100%;
+        margin-inline-end: 0;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    .o_furniture_stage_dashboard_page__header {
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_stage_dashboard_page__header
+        .o_furniture_stage_dashboard__date_filter.is-header {
+        width: auto;
+        flex: 1 1 520px;
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stages {
+        grid-template-columns: repeat(4, minmax(128px, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_header {
+        grid-template-areas:
+            "reference model actions"
+            "dates customers actions"
+            "metrics metrics actions";
+        grid-template-columns: minmax(145px, 0.75fr) minmax(240px, 1.25fr) auto;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_report_row {
+        grid-template-areas: "quantities";
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route {
+        padding: 6px 0 0;
+        border-top: 1px solid #edf2f1;
+        border-inline-start: 0;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_furniture_stage_dashboard_page__header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 9px;
+        padding: 10px 12px;
+    }
+
+    .o_furniture_stage_dashboard_page__actions {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_page__overdue,
+    .o_furniture_stage_dashboard_page__overdue_button {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_page__overdue {
+        flex-direction: column;
+    }
+
+    .o_furniture_stage_dashboard_page__overdue_panel {
+        position: fixed;
+        top: 92px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-height: calc(100vh - 112px);
+    }
+
+    .o_furniture_stage_dashboard_page__overdue_list {
+        max-height: calc(100vh - 190px);
+    }
+
+    .o_furniture_stage_dashboard_page__overdue_order_meta {
+        grid-template-columns: 1fr;
+    }
+
+    .o_furniture_stage_dashboard_page__action {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    .o_furniture_stage_dashboard_page__header
+        .o_furniture_stage_dashboard__date_filter.is-header {
+        width: 100%;
+        flex: 0 0 auto;
+        align-items: stretch;
+    }
+
+    .o_furniture_stage_dashboard_page__body {
+        padding: 8px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard_workspace {
+        margin: 8px;
+    }
+
+    .o_furniture_stage_dashboard_page.o_furniture_stage_dashboard_view
+        .o_furniture_stage_dashboard_workspace {
+        margin: 0;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_navigation {
+        padding: 12px;
+        border-radius: 15px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard {
+        margin-top: 8px;
+        padding: 13px;
+        border-radius: 16px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__heading_actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_filter_intro {
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_field {
+        min-width: 0;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__date_active {
+        align-self: center;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stages {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__working_summary {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_header,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_report_row {
+        grid-template-areas: none;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_reference,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_customers,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_state,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_team,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_dates,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_value,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_actions,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_open,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_identity,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_customer,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities {
+        grid-area: auto;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_customer,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_route {
+        padding: 6px 0 0;
+        border-top: 1px solid #edf2f1;
+        border-inline-start: 0;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) 22px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities > span:not(.o_furniture_stage_dashboard__product_signal) {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities .is-product-name {
+        grid-column: 1 / -1;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities small,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_quantities strong {
+        width: 100%;
+        text-align: center;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_quantities {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_open {
+        justify-self: stretch;
+        justify-content: center;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_actions {
+        width: 100%;
+        min-width: 0;
+        justify-self: stretch;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_summary {
+        grid-template-areas:
+            "identity identity"
+            "customers customers"
+            "quantities quantities"
+            "expand expand";
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_identity_line {
+        align-items: flex-start;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers {
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers > span {
+        width: auto;
+        flex: 1 1 180px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_order_open {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_view .o_kanban_renderer {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 10px !important;
+        padding-inline: 8px !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__stages,
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__metrics {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_header {
+        grid-template-columns: 34px minmax(0, 1fr) 28px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_total {
+        display: none;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_quantities {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__product_group_customers strong {
+        white-space: normal;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_furniture_stage_dashboard_view *,
+    .o_furniture_stage_dashboard_view *::before,
+    .o_furniture_stage_dashboard_view *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Tailoring, upholstery and packaging supervisors work per production order. */
+.o_furniture_stage_dashboard_view
+    .o_furniture_stage_dashboard.is-order-supervisor-mode {
+    overflow: visible;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_dashboard {
+    display: grid;
+    gap: 16px;
+    margin-top: 12px;
+    direction: rtl;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics.is-sticky {
+    position: sticky;
+    top: 7px;
+    z-index: 18;
+    display: grid;
+    gap: 8px;
+    padding: 9px;
+    border: 1px solid #badbd6;
+    border-radius: 16px;
+    background: rgba(247, 252, 251, 0.96);
+    box-shadow: 0 12px 28px rgba(25, 73, 70, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope {
+    display: flex;
+    min-height: 31px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-inline: 5px;
+    color: #4e7071;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope > span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope > span i {
+    color: #267c73;
+    font-size: 0.93rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope > span strong {
+    display: inline-flex;
+    min-width: 25px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #287f76;
+    color: #fff;
+    font-size: 0.75rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope button {
+    min-height: 44px;
+    padding: 5px 11px;
+    border: 1px solid #c8ddda;
+    border-radius: 9px;
+    background: #fff;
+    color: #2a716b;
+    font-size: 0.7rem;
+    font-weight: 850;
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric {
+    display: flex;
+    min-width: 0;
+    min-height: 64px;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 11px;
+    border: 1px solid #d8e6e4;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 11px rgba(28, 75, 72, 0.055);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric > span:last-child {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric small {
+    color: #6d8586;
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric strong {
+    color: #254e51;
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 950;
+    line-height: 1.1;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric__icon {
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #e9f5f2;
+    color: #287d75;
+    font-size: 1rem;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_metric.is-completed
+    .o_furniture_order_supervisor_metric__icon {
+    background: #e9f7ed;
+    color: #25834a;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_metric.is-remaining
+    .o_furniture_order_supervisor_metric__icon {
+    background: #f4edfa;
+    color: #765a91;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_orders {
+    display: grid;
+    gap: 18px;
+}
+
+/* Native disclosure keeps timers mounted and leaves all action clicks independent. */
+body.o_web_client .o_furniture_stage_dashboard_view details.o_furniture_order_supervisor_order {
+    padding: 0;
+    min-height: 0;
+}
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_order_compact_summary {
+    display: flex;
+    align-items: center;
+    gap: 12px 24px;
+    padding: 9px 14px;
+    min-height: 54px;
+    list-style: none;
+    cursor: pointer;
+    background: linear-gradient(110deg, #fff, #eff7fc);
+    color: #0c2a44;
+}
+.o_furniture_order_compact_summary::-webkit-details-marker { display: none; }
+.o_furniture_order_compact_summary > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.o_furniture_order_compact_summary small { font-size: 10px; color: #638095; }
+.o_furniture_order_compact_summary strong { font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.o_furniture_order_compact_summary .o_furniture_order_compact_model strong { font-size: 18px; font-weight: 800; }
+.o_furniture_order_compact_summary .o_furniture_order_compact_timer strong { font-variant-numeric: tabular-nums; }
+.o_furniture_order_compact_summary .o_furniture_order_compact_hint { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 8px; }
+.o_furniture_order_compact_summary .is-open { display: none; }
+details[open] > .o_furniture_order_compact_summary { border-bottom: 1px solid #d5e4ed; }
+details[open] > .o_furniture_order_compact_summary .is-closed { display: none; }
+details[open] > .o_furniture_order_compact_summary .is-open { display: inline; }
+details[open] > .o_furniture_order_compact_summary .fa-chevron-down { transform: rotate(180deg); }
+.o_furniture_order_compact_summary:focus-visible { outline: 2px solid #588ead; outline-offset: -3px; }
+@media (max-width: 600px) {
+    body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_order_compact_summary { flex-wrap: wrap; gap: 8px 12px; padding: 8px 10px; }
+    .o_furniture_order_compact_summary > span { flex: 1 1 40%; }
+    .o_furniture_order_compact_summary .o_furniture_order_compact_hint small { display: none; }
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order {
+    --order-supervisor-accent: #3c8d85;
+    --order-supervisor-border: #bfded8;
+    --order-supervisor-soft: #eff8f5;
+    overflow: hidden;
+    border: 1px solid var(--order-supervisor-border);
+    border-inline-start: 5px solid var(--order-supervisor-accent);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(26, 71, 68, 0.075);
+    transition: border-color 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order.is-tone-sky {
+    --order-supervisor-accent: #4c86a8;
+    --order-supervisor-border: #c7ddea;
+    --order-supervisor-soft: #eef7fb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order.is-tone-sand {
+    --order-supervisor-accent: #b68a45;
+    --order-supervisor-border: #e4d5b8;
+    --order-supervisor-soft: #fcf7ed;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order.is-tone-lilac {
+    --order-supervisor-accent: #8567a0;
+    --order-supervisor-border: #dacde6;
+    --order-supervisor-soft: #f7f1fb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order.is-tone-rose {
+    --order-supervisor-accent: #ae6c65;
+    --order-supervisor-border: #e4cfcc;
+    --order-supervisor-soft: #fbf2f0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order.is-selected {
+    transform: translateY(-1px);
+    border-color: var(--order-supervisor-accent);
+    box-shadow:
+        0 0 0 3px rgba(40, 127, 118, 0.17),
+        0 13px 28px rgba(25, 75, 71, 0.14);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__header {
+    display: grid;
+    grid-template-areas: "select identity status image actions";
+    grid-template-columns: 64px minmax(190px, 1fr) auto 88px minmax(148px, auto);
+    align-items: center;
+    gap: 10px;
+    padding: 11px;
+    border-bottom: 1px solid var(--order-supervisor-border);
+    background: linear-gradient(135deg, #fff, var(--order-supervisor-soft));
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__select {
+    grid-area: select;
+    display: inline-flex;
+    min-width: 58px;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    margin: 0;
+    border: 1px solid var(--order-supervisor-border);
+    border-radius: 11px;
+    background: #fff;
+    color: #5e7a7b;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__select input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__select > span {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #9dbbb7;
+    border-radius: 8px;
+    background: #fff;
+    color: transparent;
+    font-size: 0.8rem;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__select input:checked + span {
+    border-color: var(--order-supervisor-accent);
+    background: var(--order-supervisor-accent);
+    color: #fff;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__select:focus-within {
+    outline: 3px solid rgba(40, 127, 118, 0.16);
+    outline-offset: 2px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__select strong {
+    color: inherit;
+    font-size: 0.62rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__identity {
+    grid-area: identity;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__identity small,
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status small {
+    color: #74898a;
+    font-size: 0.64rem;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__identity strong {
+    color: #174c49;
+    font-size: 1.12rem;
+    font-weight: 950;
+    line-height: 1.2;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__identity em {
+    color: #607c7d;
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__stage_overview {
+    grid-area: status;
+    display: grid;
+    grid-template-columns: minmax(158px, auto) minmax(116px, auto);
+    align-items: stretch;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model {
+    display: flex;
+    min-width: 158px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+    padding: 6px 14px;
+    border: 1px solid #abd5cf;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f6fffd, #e5f5f1);
+    box-shadow: 0 5px 13px rgba(38, 116, 109, 0.1);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model small {
+    color: #668786;
+    font-size: 0.62rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model strong {
+    overflow: hidden;
+    max-width: 260px;
+    color: #174c49;
+    font-size: clamp(1.42rem, 2.1vw, 1.92rem);
+    font-weight: 950;
+    line-height: 1.05;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__customers {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 3px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__customers em {
+    overflow: hidden;
+    max-width: 260px;
+    padding: 2px 6px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.76);
+    font-size: 0.64rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status {
+    grid-area: status;
+    display: inline-flex;
+    min-width: 116px;
+    min-height: 48px;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 9px;
+    border: 1px solid #d9e5e3;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__stage_overview
+    > .o_furniture_order_supervisor_order__status {
+    grid-area: auto;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status > i {
+    width: 5px;
+    height: 27px;
+    flex: 0 0 5px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status > span {
+    display: flex;
+    flex-direction: column;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status strong {
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status.is-completed {
+    border-color: #b8ddc3;
+    background: #edf8f0;
+    color: #247b46;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status.is-running {
+    border-color: #b6d9e9;
+    background: #edf7fb;
+    color: #246f95;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status.is-shortage {
+    border-color: #edcf83;
+    background: #fff8e5;
+    color: #9b6a0a;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status.is-not-started {
+    border-color: #e1c9d9;
+    background: #f9f1f7;
+    color: #855e79;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image {
+    grid-area: image;
+    position: relative;
+    display: inline-flex;
+    width: 88px;
+    height: 66px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid var(--order-supervisor-border);
+    border-radius: 11px;
+    background: #fff;
+    color: #789091;
+    touch-action: manipulation;
+}
+
+button.o_furniture_order_supervisor_order__image:hover,
+button.o_furniture_order_supervisor_order__image:focus-visible {
+    border-color: var(--order-supervisor-accent);
+    outline: none;
+    box-shadow: 0 7px 16px rgba(30, 89, 84, 0.16);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image > span {
+    position: absolute;
+    inset: auto 5px 5px auto;
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(23, 69, 66, 0.82);
+    color: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image.is-empty {
+    flex-direction: column;
+    gap: 3px;
+    font-size: 1rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image.is-empty small {
+    color: #839697;
+    font-size: 0.58rem;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions {
+    grid-area: actions;
+    display: grid;
+    min-width: 148px;
+    gap: 7px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions .btn {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-inline: 12px;
+    border-radius: 10px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    white-space: normal;
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions .is-materials {
+    border-color: #287f76;
+    background: linear-gradient(135deg, #2d887e, #26746d);
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions
+    .is-materials.is-receive-materials {
+    border-color: #d6a53d;
+    background: #f3c764;
+    color: #4e3a0e;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions
+    .is-materials.is-receive-materials:hover,
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions
+    .is-materials.is-receive-materials:focus-visible {
+    border-color: #c8952f;
+    background: #eaba52;
+    color: #3f2e08;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions .is-start {
+    border-color: #357396;
+    background: linear-gradient(135deg, #4383a5, #346f91);
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__actions .is-finish {
+    border-color: #c62f43;
+    background: linear-gradient(135deg, #e2374d, #c5293d);
+    color: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__products {
+    display: grid;
+    background: #f8fbfa;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product {
+    display: grid;
+    grid-template-areas: "product fabric takawe notes";
+    grid-template-columns:
+        minmax(170px, 1.05fr)
+        minmax(170px, 1fr)
+        minmax(170px, 1fr)
+        minmax(220px, 1.35fr);
+    gap: 8px;
+    padding: 9px 10px;
+    border-bottom: 1px solid #e4eeec;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product:last-child {
+    border-bottom: 0;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product:nth-child(even) {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product > span {
+    display: flex;
+    min-width: 0;
+    min-height: 66px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 10px;
+    border: 1px solid #dbe8e6;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product > span > small {
+    color: #718687;
+    font-size: 0.64rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product > span > strong {
+    overflow-wrap: anywhere;
+    color: #294f51;
+    font-size: 0.78rem;
+    font-weight: 850;
+    line-height: 1.35;
+    white-space: pre-line;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product_name {
+    grid-area: product;
+    border-color: #b9dbd5 !important;
+    border-inline-start: 4px solid #3d8e86 !important;
+    background: #edf8f5 !important;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product_name > strong {
+    color: #174f4a !important;
+    font-size: 0.98rem !important;
+    font-weight: 950 !important;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product_name > em {
+    color: #3d716d;
+    font-size: 0.66rem;
+    font-style: normal;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__bom {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 5px;
+    padding: 6px 12px;
+    border: 1px solid #3d8e86;
+    border-radius: 9px;
+    background: #fff;
+    color: #176e67;
+    font-size: 0.72rem;
+    font-weight: 900;
+    box-shadow: 0 3px 8px rgba(28, 100, 93, 0.08);
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__bom:hover,
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__bom:focus-visible {
+    border-color: #246f68;
+    background: #dff3ee;
+    color: #105c56;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__bom:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__production_warning {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 5px;
+    padding: 6px 12px;
+    border: 1px solid #d89a24;
+    border-radius: 9px;
+    background: #fff9e9;
+    color: #80590e;
+    font-size: 0.72rem;
+    font-weight: 900;
+    box-shadow: 0 3px 8px rgba(128, 89, 14, 0.1);
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__production_warning:hover,
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__production_warning:focus-visible {
+    border-color: #bd7d08;
+    background: #fff1c7;
+    color: #674606;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__production_warning:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.o_furniture_production_warning_dialog .modal-body {
+    direction: rtl;
+    white-space: pre-line;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product_start {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 39px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 4px;
+    padding: 7px 13px;
+    border: 1px solid #287f76;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #2d887e, #26746d);
+    color: #fff;
+    font-size: 0.73rem;
+    font-weight: 950;
+    box-shadow: 0 4px 10px rgba(28, 100, 93, 0.16);
+    touch-action: manipulation;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product_start:hover,
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product_start:focus-visible {
+    border-color: #176860;
+    background: linear-gradient(135deg, #267d73, #1f6861);
+    color: #fff;
+    outline: none;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product_start:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__fabric {
+    grid-area: fabric;
+    border-color: #add7cf !important;
+    background: #edf8f5 !important;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__takawe {
+    grid-area: takawe;
+    border-color: #e6c992 !important;
+    background: #fff8e9 !important;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__notes {
+    grid-area: notes;
+    border-color: #cadce6 !important;
+    background: #f5f9fb !important;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__material_items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__material_items > span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 7px;
+    border: 1px solid rgba(63, 118, 112, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.76);
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__material_items strong {
+    color: #285652;
+    font-size: 0.72rem;
+    font-weight: 850;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__material_items em,
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product .is-size {
+    color: #657e7e;
+    font-size: 0.64rem;
+    font-style: normal;
+    font-weight: 800;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__fabric .is-size {
+    color: #267269;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__takawe .is-size {
+    color: #9a6819;
+}
+
+.o_furniture_stage_dashboard_view
+    .o_furniture_order_supervisor_order__product .is-empty {
+    color: #9aabab;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__empty,
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_dashboard__empty {
+    display: flex;
+    min-height: 90px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px;
+    color: #718687;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_dashboard__empty {
+    min-height: 180px;
+    flex-direction: column;
+    border: 1px dashed #c9deda;
+    border-radius: 14px;
+    background: #f8fcfb;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_dashboard__empty i {
+    color: #4d8e88;
+    font-size: 1.45rem;
+}
+
+.o_furniture_order_supervisor_image_lightbox {
+    position: fixed;
+    z-index: 1090;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.o_furniture_order_supervisor_image_lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: rgba(9, 26, 28, 0.78);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.o_furniture_order_supervisor_image_lightbox figure {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: min(92vw, 1100px);
+    max-height: 90vh;
+    gap: 8px;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.38);
+}
+
+.o_furniture_order_supervisor_image_lightbox figure > img {
+    width: 100%;
+    max-height: calc(90vh - 70px);
+    border-radius: 11px;
+    object-fit: contain;
+}
+
+.o_furniture_order_supervisor_image_lightbox figcaption {
+    color: #31575a;
+    font-size: 0.8rem;
+    font-weight: 850;
+    text-align: center;
+}
+
+.o_furniture_order_supervisor_image_lightbox__close {
+    position: absolute;
+    z-index: 2;
+    top: 19px;
+    right: 19px;
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 12px;
+    background: rgba(17, 55, 55, 0.88);
+    color: #fff;
+    font-size: 1.05rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    touch-action: manipulation;
+}
+
+@media (max-width: 1199.98px) {
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__header {
+        grid-template-areas:
+            "select identity status image"
+            "actions actions actions actions";
+        grid-template-columns: 64px minmax(180px, 1fr) auto 88px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 899.98px) {
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product {
+        grid-template-areas:
+            "product product"
+            "fabric takawe"
+            "notes notes";
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics.is-sticky {
+        top: 4px;
+        padding: 7px;
+        border-radius: 13px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope {
+        min-height: 28px;
+        font-size: 0.66rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric {
+        min-height: 57px;
+        gap: 6px;
+        padding: 6px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric__icon {
+        width: 31px;
+        height: 31px;
+        flex-basis: 31px;
+        font-size: 0.82rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric small {
+        font-size: 0.58rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metric strong {
+        font-size: 0.96rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__header {
+        grid-template-areas:
+            "select identity status"
+            "image actions actions";
+        grid-template-columns: 58px minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__select {
+        min-width: 54px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__identity strong {
+        font-size: 0.98rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status {
+        min-width: 102px;
+        padding-inline: 7px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__stage_overview {
+        grid-template-columns: minmax(135px, auto) minmax(102px, auto);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model {
+        min-width: 135px;
+        padding-inline: 9px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model strong {
+        max-width: 180px;
+        font-size: 1.35rem;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__image {
+        width: 72px;
+        height: 58px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions {
+        min-width: 0;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions .btn {
+        min-height: 52px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product {
+        grid-template-areas:
+            "product"
+            "fabric"
+            "takawe"
+            "notes";
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_order_supervisor_image_lightbox {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_metrics__scope button {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__header {
+        grid-template-areas:
+            "select identity"
+            "status status"
+            "image actions";
+        grid-template-columns: 58px minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__status {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__stage_overview {
+        width: 100%;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model {
+        width: 100%;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Non-textile stages do not reserve empty fabric/takawe/notes grid tracks. */
+.o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__product.is-compact-product {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.o_furniture_stage_dashboard_view .is-compact-product > .o_furniture_order_supervisor_order__product_name {
+    flex: 1 1 220px;
+}
+
+.o_furniture_stage_dashboard_view .is-compact-product > .o_furniture_admin_order_quantities {
+    flex: 0 1 240px;
+}
+
+/* Manager orders reuse the stage-supervisor card without workflow controls. */
+.o_furniture_stage_dashboard_view .is-admin-order-card .o_furniture_order_supervisor_order__header {
+    grid-template-areas: "identity status image actions";
+    grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) 88px auto;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_admin_order_dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--order-supervisor-border);
+    background: #fff;
+}
+
+.o_furniture_admin_order_dates > span {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    color: #607a7d;
+}
+
+.o_furniture_admin_order_dates strong {
+    color: #234b4f;
+    font-size: 0.85rem;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_admin_order_quantities {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_admin_order_quantities > .o_furniture_admin_order_quantity {
+    display: inline-flex;
+    flex: 0 1 240px;
+    min-width: 0;
+    min-height: 44px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 12px;
+    border: 1px solid #dbe7e4;
+    border-radius: 10px;
+}
+
+.o_furniture_admin_order_quantities > .is-working { background: #eaf5fb; }
+.o_furniture_admin_order_quantities > .is-completed { background: #eaf7ee; }
+.o_furniture_admin_order_quantities > .is-remaining { background: #f5effb; }
+
+@media (max-width: 900px) {
+    .o_furniture_stage_dashboard_view .is-admin-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "identity image" "status actions";
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .o_furniture_stage_dashboard_view .is-admin-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "identity image" "status status" "actions actions";
+        grid-template-columns: minmax(0, 1fr) 72px;
+    }
+}
+
+/* Compact textile worksheet: the same visual language as the fabric/takawe popup.
+ * Presentation only: shared by managers and supervisors, scoped to two stages. */
+.o_furniture_stage_dashboard_view .is-textile-order-card {
+    --order-supervisor-border: #d1e2df;
+    border-inline-start-width: 1px;
+    border-radius: 16px;
+    background: #f3f7f7;
+    box-shadow: 0 5px 18px rgba(27, 69, 70, 0.06);
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__header {
+    grid-template-areas:
+        "select identity identity identity identity image"
+        "parties parties parties parties parties parties"
+        "status status timer actions actions actions";
+    grid-template-columns: 48px minmax(110px, .65fr) minmax(0, 1fr) minmax(0, 1fr) minmax(110px, .65fr) 54px;
+    gap: 6px;
+    padding: 8px 12px 6px;
+    border-bottom: 0;
+    background: linear-gradient(180deg, #eaf5f3 0, #f8fcfb 70px, #f3f7f7 70px);
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card.is-admin-order-card .o_furniture_order_supervisor_order__header {
+    grid-template-areas:
+        "identity identity identity identity identity image"
+        "parties parties parties parties parties parties"
+        "status status timer actions actions actions";
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__identity {
+    min-height: 52px;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__identity > small {
+    font-size: 11px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_textile_order_model {
+    font-size: 26px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_reference {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    color: #627d80;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_reference small {
+    font-size: 12px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_reference b {
+    font-size: 14px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__stage_overview {
+    display: contents;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__stage_overview > .o_furniture_order_supervisor_order__status {
+    grid-area: status;
+    min-width: 0;
+    min-height: 36px;
+    padding: 4px 8px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__header > .o_furniture_stage_timer {
+    grid-area: timer;
+    min-width: 0;
+    width: auto;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__actions {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__actions .btn {
+    min-height: 34px;
+    padding: 5px 12px;
+    font-size: 12px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__image {
+    width: 52px;
+    height: 52px;
+    min-height: 52px;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_parties {
+    grid-area: parties;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(0, .85fr) repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_party {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 10px;
+    text-align: center;
+    border: 1px solid #d8e5e4;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_party small {
+    color: #627d80;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.o_furniture_stage_dashboard_view .o_furniture_textile_order_party strong {
+    color: #214d50;
+    font-size: 20px;
+    font-weight: 850;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__products {
+    gap: 6px;
+    padding: 4px 12px 10px;
+    background: #f3f7f7;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product {
+    grid-template-columns: minmax(180px, .85fr) minmax(180px, 1.25fr) minmax(180px, 1fr) minmax(180px, 1.15fr);
+    align-items: stretch;
+    padding: 5px 7px;
+    border: 1px solid #dbe6e6;
+    border-inline-start: 3px solid #68a8a2;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(27, 69, 70, .04);
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product:last-child {
+    border-bottom: 1px solid #dbe6e6;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product > span {
+    min-height: 48px;
+    padding: 5px 8px;
+    gap: 3px;
+    text-align: right;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product > span > small {
+    font-size: 11px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product > span > strong {
+    font-size: 13px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product_name {
+    border: 0 !important;
+    background: transparent !important;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product_name > strong {
+    font-size: 18px !important;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_textile_product_quantity {
+    font-size: 12px;
+    color: #607a7d;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__material_items {
+    gap: 4px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__material_items > span {
+    padding: 4px 6px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__material_items strong {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__material_items em {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Keep the manager's existing quantity badge beneath the product identity,
+ * in the same grid cell, instead of adding a full-width empty row per item. */
+.o_furniture_stage_dashboard_view .is-textile-order-card.is-admin-order-card .o_furniture_order_supervisor_order__product_name {
+    padding-bottom: 38px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_admin_order_quantities {
+    grid-area: product;
+    align-self: end;
+    padding: 0 6px 4px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_admin_order_quantity {
+    flex: 1 1 100%;
+    min-height: 28px;
+    padding: 3px 8px;
+}
+
+.o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_admin_order_dates {
+    margin: 0 12px 4px;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+}
+
+@media (max-width: 1099.98px) {
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "select identity image" "parties parties parties" "status status status" "timer timer timer" "actions actions actions";
+        grid-template-columns: 48px minmax(0, 1fr) 54px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card.is-admin-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "identity identity image" "parties parties parties" "status status status" "timer timer timer" "actions actions actions";
+        grid-template-columns: minmax(100px, .5fr) minmax(0, 1fr) 54px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product {
+        grid-template-areas: "product notes" "fabric takawe";
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 599.98px) {
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "select identity image" "parties parties parties" "status status status" "timer timer timer" "actions actions actions";
+        grid-template-columns: 44px minmax(0, 1fr) 50px;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card.is-admin-order-card .o_furniture_order_supervisor_order__header {
+        grid-template-areas: "identity identity image" "parties parties parties" "status status status" "timer timer timer" "actions actions actions";
+        grid-template-columns: 44px minmax(0, 1fr) 50px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__image {
+        width: 48px;
+        height: 48px;
+        min-height: 48px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_textile_order_model {
+        font-size: 23px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_textile_order_party strong {
+        font-size: 19px;
+    }
+
+    .o_furniture_stage_dashboard_view .o_furniture_textile_order_parties {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__products {
+        padding: 4px 8px 8px;
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__product {
+        grid-template-areas: "product" "fabric" "takawe" "notes";
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_stage_dashboard_view .is-textile-order-card .o_furniture_order_supervisor_order__actions .btn {
+        flex: 1 1 150px;
+        min-height: 44px;
+    }
+}
+
+/* Worker-first MPS client action. Kept fully scoped so legacy list, calendar
+ * and pivot views retain Odoo's standard layout when opened by a manager. */
+.o_furniture_mps_dashboard {
+    --mps-ink: #173c3f;
+    --mps-muted: #6b8082;
+    --mps-border: #d9e6e4;
+    --mps-teal: #287c73;
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 10% 0%, rgba(45, 141, 130, 0.1), transparent 30%),
+        #eff5f4;
+    color: var(--mps-ink);
+}
+
+.o_furniture_mps_dashboard__header {
+    display: flex;
+    min-height: 72px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--mps-border);
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 4px 16px rgba(23, 60, 63, 0.05);
+}
+
+.o_furniture_mps_dashboard__title,
+.o_furniture_mps_dashboard__title > span:last-child {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 11px;
+}
+
+.o_furniture_mps_dashboard__title > span:last-child {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.o_furniture_mps_dashboard__title_icon {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #dff2ed, #e3edf5);
+    color: var(--mps-teal);
+    font-size: 1.05rem;
+}
+
+.o_furniture_mps_dashboard__title strong {
+    color: #163f42;
+    font-size: 1.12rem;
+    font-weight: 900;
+}
+
+.o_furniture_mps_dashboard__title small {
+    color: var(--mps-muted);
+    font-size: 0.73rem;
+}
+
+.o_furniture_mps_dashboard__actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.o_furniture_mps_dashboard__button {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-inline: 13px;
+    border-radius: 10px;
+    font-weight: 850;
+}
+
+.o_furniture_mps_dashboard__button.is-settings {
+    border-color: #27766f;
+    background: linear-gradient(135deg, #338a81, #286f6a);
+}
+
+.o_furniture_mps_dashboard__body {
+    width: min(100%, 1320px);
+    min-height: 0;
+    flex: 1 1 auto;
+    align-self: center;
+    overflow-y: auto;
+    padding: 18px 22px 28px;
+}
+
+.o_furniture_mps_dashboard__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.o_furniture_mps_dashboard__metric {
+    display: flex;
+    min-height: 78px;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1px solid var(--mps-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 7px 20px rgba(23, 60, 63, 0.05);
+}
+
+.o_furniture_mps_dashboard__metric > i {
+    display: inline-flex;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #e8f4f1;
+    color: #2b7972;
+    font-size: 1rem;
+}
+
+.o_furniture_mps_dashboard__metric.is-assignments > i {
+    background: #e8f0f7;
+    color: #426f91;
+}
+
+.o_furniture_mps_dashboard__metric.is-pieces > i {
+    background: #fff2dd;
+    color: #9b671a;
+}
+
+.o_furniture_mps_dashboard__metric.is-hours > i {
+    background: #f0eafb;
+    color: #7150a0;
+}
+
+.o_furniture_mps_dashboard__metric > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.o_furniture_mps_dashboard__metric small {
+    color: var(--mps-muted);
+    font-size: 0.72rem;
+}
+
+.o_furniture_mps_dashboard__metric strong {
+    color: #183f42;
+    font-size: 1.32rem;
+    font-weight: 900;
+}
+
+.o_furniture_mps_dashboard__status {
+    display: flex;
+    min-height: 300px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    padding: 32px;
+    border: 1px dashed #cbdedb;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--mps-muted);
+    text-align: center;
+}
+
+.o_furniture_mps_dashboard__status > i {
+    color: var(--mps-teal);
+    font-size: 2rem;
+}
+
+.o_furniture_mps_dashboard__status.is-error > i,
+.o_furniture_mps_dashboard__status.is-error strong {
+    color: #a64a40;
+}
+
+.o_furniture_mps_dashboard__status.is-empty small {
+    max-width: 520px;
+}
+
+.o_furniture_mps_dashboard__workers {
+    display: grid;
+    gap: 14px;
+}
+
+.o_furniture_mps_dashboard__worker {
+    overflow: hidden;
+    border: 1px solid var(--mps-border);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(23, 60, 63, 0.065);
+}
+
+.o_furniture_mps_dashboard__worker_header {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(160px, 2fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #e1ecea;
+    background: linear-gradient(135deg, #f8fcfb, #f4f8fa);
+}
+
+.o_furniture_mps_dashboard__worker_identity,
+.o_furniture_mps_dashboard__worker_identity > span:last-child {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.o_furniture_mps_dashboard__worker_identity > span:last-child {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.o_furniture_mps_dashboard__avatar {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #dcefeb;
+    color: #24746c;
+}
+
+.o_furniture_mps_dashboard__worker_identity small,
+.o_furniture_mps_dashboard__worker_totals small {
+    color: #7b8e90;
+    font-size: 0.66rem;
+}
+
+.o_furniture_mps_dashboard__worker_identity strong {
+    overflow: hidden;
+    max-width: 260px;
+    color: #173f42;
+    font-size: 1rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__stage_chips {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.o_furniture_mps_dashboard__stage_chip {
+    display: inline-flex;
+    min-height: 25px;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 9px;
+    border: 1px solid #cde2de;
+    border-radius: 999px;
+    background: #eaf6f3;
+    color: #276d67;
+    font-size: 0.7rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__stage_chip.is-stage-painting,
+.o_furniture_mps_dashboard__stage_chip.is-stage-upholstery {
+    border-color: #cbddec;
+    background: #eaf2f8;
+    color: #396b8e;
+}
+
+.o_furniture_mps_dashboard__stage_chip.is-stage-carpentry,
+.o_furniture_mps_dashboard__stage_chip.is-stage-bases {
+    border-color: #ead8b9;
+    background: #fff5e4;
+    color: #8a621e;
+}
+
+.o_furniture_mps_dashboard__stage_chip.is-stage-tailoring,
+.o_furniture_mps_dashboard__stage_chip.is-stage-packaging {
+    border-color: #dfd1ee;
+    background: #f5eefc;
+    color: #72549a;
+}
+
+.o_furniture_mps_dashboard__worker_totals {
+    display: flex;
+    align-items: stretch;
+    gap: 5px;
+}
+
+.o_furniture_mps_dashboard__worker_totals > span {
+    display: flex;
+    min-width: 65px;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 9px;
+    background: #edf5f3;
+}
+
+.o_furniture_mps_dashboard__worker_totals strong {
+    color: #245f5b;
+    font-size: 0.88rem;
+    font-weight: 900;
+}
+
+.o_furniture_mps_dashboard__assignment_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 10px;
+    padding: 12px;
+}
+
+.o_furniture_mps_dashboard__assignment {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #dfe9e7;
+    border-inline-start: 4px solid #4b9089;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(23, 60, 63, 0.035);
+}
+
+.o_furniture_mps_dashboard__assignment_header,
+.o_furniture_mps_dashboard__assignment_footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.o_furniture_mps_dashboard__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #80601f;
+    font-size: 0.7rem;
+    font-weight: 850;
+}
+
+.o_furniture_mps_dashboard__state i {
+    font-size: 0.46rem;
+}
+
+.o_furniture_mps_dashboard__state.is-state-approved {
+    color: #24715f;
+}
+
+.o_furniture_mps_dashboard__state.is-state-in_progress {
+    color: #336f98;
+}
+
+.o_furniture_mps_dashboard__assignment_main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+}
+
+.o_furniture_mps_dashboard__piece_count {
+    display: flex;
+    min-width: 94px;
+    min-height: 64px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e7f4f1, #edf4f8);
+    color: #236c66;
+}
+
+.o_furniture_mps_dashboard__piece_count strong {
+    font-size: 1.55rem;
+    font-weight: 950;
+    line-height: 1;
+}
+
+.o_furniture_mps_dashboard__piece_count span {
+    margin-top: 3px;
+    font-size: 0.67rem;
+    font-weight: 850;
+}
+
+.o_furniture_mps_dashboard__assignment_copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.o_furniture_mps_dashboard__assignment_copy strong {
+    overflow: hidden;
+    color: #173f42;
+    font-size: 0.91rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__assignment_copy small {
+    overflow: hidden;
+    color: #768a8c;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__products {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.o_furniture_mps_dashboard__product {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1px 8px;
+    min-width: min(100%, 175px);
+    padding: 7px 9px;
+    border: 1px solid #e2e9e8;
+    border-radius: 9px;
+    background: #f7faf9;
+}
+
+.o_furniture_mps_dashboard__product strong {
+    overflow: hidden;
+    color: #36585a;
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__product em {
+    color: #266f68;
+    font-size: 0.7rem;
+    font-style: normal;
+    font-weight: 900;
+}
+
+.o_furniture_mps_dashboard__product small {
+    grid-column: 1 / -1;
+    color: #829294;
+    font-size: 0.63rem;
+}
+
+.o_furniture_mps_dashboard__product.is-summary {
+    display: block;
+    width: 100%;
+    color: #526d70;
+    font-size: 0.74rem;
+}
+
+.o_furniture_mps_dashboard__assignment_footer {
+    margin-top: auto;
+    flex-wrap: wrap;
+    padding-top: 9px;
+    border-top: 1px solid #edf1f0;
+    color: #657a7c;
+    font-size: 0.68rem;
+}
+
+.o_furniture_mps_dashboard__order,
+.o_furniture_mps_dashboard__hours,
+.o_furniture_mps_dashboard__time_range {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.o_furniture_mps_dashboard__order {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_mps_dashboard__hours {
+    color: #2e706b;
+}
+
+.o_furniture_mps_dashboard__time_range {
+    width: 100%;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: #f5f8f7;
+}
+
+.o_furniture_mps_dashboard__time_range i {
+    color: #8ca09f;
+}
+
+@media (max-width: 900px) {
+    .o_furniture_mps_dashboard__header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 12px 16px;
+    }
+
+    .o_furniture_mps_dashboard__actions {
+        width: 100%;
+    }
+
+    .o_furniture_mps_dashboard__summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .o_furniture_mps_dashboard__worker_header {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .o_furniture_mps_dashboard__stage_chips {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 560px) {
+    .o_furniture_mps_dashboard__body {
+        padding: 12px 10px 20px;
+    }
+
+    .o_furniture_mps_dashboard__title small {
+        display: none;
+    }
+
+    .o_furniture_mps_dashboard__actions > button {
+        flex: 1 1 auto;
+    }
+
+    .o_furniture_mps_dashboard__summary {
+        gap: 7px;
+    }
+
+    .o_furniture_mps_dashboard__metric {
+        min-height: 66px;
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .o_furniture_mps_dashboard__metric > i {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+    }
+
+    .o_furniture_mps_dashboard__metric strong {
+        font-size: 1rem;
+    }
+
+    .o_furniture_mps_dashboard__worker_header {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .o_furniture_mps_dashboard__worker_totals {
+        grid-row: auto;
+    }
+
+    .o_furniture_mps_dashboard__stage_chips {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    .o_furniture_mps_dashboard__assignment_grid {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 8px;
+    }
+}
+
+.o_furniture_stage_dashboard__date_field.o_stage_visibility_expired { color: #b42332; }
+.o_furniture_stage_dashboard__date_field.o_stage_visibility_expired input {
+    background: #fff0f1 !important; border-color: #d94c59 !important; color: #b42332 !important;
+}
+
+/* Supervisor batches share the compact order appearance, without disclosure. */
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch {
+        border: 1px solid #ded6ce;
+        border-color: #e0d8d1 #bcb0a5 #ada696;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 2px 0 #bcb0a5, 0 4px 0 #e0d8d1, 0 8px 15px #0c2a4412;
+        transform: none;
+        transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_summary {
+        min-height: 62px;
+        padding: 9px 14px;
+        gap: 12px 24px;
+        background: linear-gradient(110deg, #fff, #f1ede8);
+        box-shadow: none;
+        cursor: default;
+        transform: none;
+        transition: background 160ms ease;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_identity {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_identity_line {
+        gap: 24px;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    :is(.o_furniture_stage_dashboard__product_group_model,
+        .o_furniture_stage_dashboard__product_group_product) {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 0;
+        border: 0;
+        color: #0d2c43;
+        background: transparent;
+        white-space: normal;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    :is(.o_furniture_stage_dashboard__product_group_model,
+        .o_furniture_stage_dashboard__product_group_product) small {
+        font-size: 10px;
+        color: #638095;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_model strong {
+        font-size: 18px;
+        line-height: 1.3;
+        font-weight: 800;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group.is-supervisor-batch
+    .o_furniture_stage_dashboard__product_group_product strong {
+        font-size: 15px;
+        line-height: 1.3;
+        white-space: normal;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single > span {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single strong {
+        color: #0d2c43;
+        font-size: 15px;
+        font-variant-numeric: tabular-nums;
+    
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches .o_furniture_stage_dashboard__product_group_quantities.is-supervisor-single small {
+        color: #638095;
+        font-size: 10px;
+    
+}
+
+/* Keep batch selection visible in the compact supervisor layout. */
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-selected {
+        border-color: #287f76;
+        background: #e8f4f1;
+        box-shadow: 0 2px 0 #287f76, 0 5px 0 #c9e2dc, 0 10px 20px rgba(40, 127, 118, 0.18);
+}
+
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-selected
+    .o_furniture_stage_dashboard__product_group_summary,
+body.o_web_client .o_furniture_stage_dashboard_view .o_furniture_supervisor_dashboard.is-compact-batches
+    .o_furniture_stage_dashboard__product_group.is-supervisor-batch.is-selected
+    .o_furniture_stage_dashboard__product_group_summary:hover {
+        background: linear-gradient(110deg, #f7fcfb, #dcefeb);
+        box-shadow: inset 4px 0 #287f76;
+}
+
+.o_delivery_set_supervisor_notes {
+    display: block; margin: 6px 10px; padding: 7px 10px;
+    border-inline-start: 3px solid #b99a53; border-radius: 6px;
+    background: #faf8f2; color: #304d60; font-size: 14px;
+    white-space: pre-wrap; overflow-wrap: anywhere; text-align: start;
+}
+.o_delivery_set_supervisor_notes > span { display: block; }
+.o_delivery_set_supervisor_notes small { margin-inline-end: 6px; }

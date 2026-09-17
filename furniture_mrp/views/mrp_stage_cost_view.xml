@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_stage_cost_entry_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.cost.entry.list</field>
+        <field name="model">furniture.mrp.stage.cost.entry</field>
+        <field name="arch" type="xml">
+            <list string="تفصيل التكلفة حسب المنتج والمرحلة" create="0" edit="0" delete="0"
+                  decoration-success="stage_total_cost &gt; 0">
+                <field name="accepted_at"/>
+                <field name="production_id"/>
+                <field name="stage_order_name"/>
+                <field name="product_id"/>
+                <field name="dimension_label" widget="badge"/>
+                <field name="stage" widget="badge"/>
+                <field name="quantity" sum="إجمالي الكمية"/>
+                <field name="product_uom_id"/>
+                <field name="previous_material_cost" sum="الخامات السابقة"/>
+                <field name="previous_labor_cost" sum="العمالة السابقة"/>
+                <field name="stage_material_cost" sum="خامات المراحل"/>
+                <field name="stage_labor_cost" sum="عمالة المراحل"/>
+                <field name="stage_total_cost" sum="تكلفة المراحل"/>
+                <field name="cumulative_total_cost" sum="التكلفة التراكمية"/>
+                <field name="current_unit_cost"/>
+                <field name="accepted_by_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_stage_cost_entry_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.cost.entry.form</field>
+        <field name="model">furniture.mrp.stage.cost.entry</field>
+        <field name="arch" type="xml">
+            <form string="تكلفة دفعة في مرحلة" create="0" edit="0" delete="0">
+                <sheet>
+                    <div class="oe_title"><h1><field name="product_id" readonly="1"/></h1></div>
+                    <group>
+                        <group string="الدفعة والمرحلة">
+                            <field name="production_id" readonly="1"/>
+                            <field name="source_production_id" readonly="1"/>
+                            <field name="production_line_id" readonly="1"/>
+                            <field name="dimension_label" widget="badge" readonly="1"/>
+                            <field name="stage" widget="badge" readonly="1"/>
+                            <field name="stage_order_name" readonly="1"/>
+                            <field name="quantity" readonly="1"/>
+                            <field name="product_uom_id" readonly="1"/>
+                        </group>
+                        <group string="التكلفة المعتمدة">
+                            <field name="previous_material_cost" readonly="1"/>
+                            <field name="previous_labor_cost" readonly="1"/>
+                            <field name="stage_material_cost" readonly="1"/>
+                            <field name="stage_labor_cost" readonly="1"/>
+                            <field name="stage_total_cost" readonly="1"/>
+                            <field name="cumulative_material_cost" readonly="1"/>
+                            <field name="cumulative_labor_cost" readonly="1"/>
+                            <field name="cumulative_total_cost" readonly="1"/>
+                            <field name="current_unit_cost" readonly="1" class="fw-bold"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="accepted_at" readonly="1"/>
+                        <field name="accepted_by_id" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_stage_cost_entry_pivot" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.cost.entry.pivot</field>
+        <field name="model">furniture.mrp.stage.cost.entry</field>
+        <field name="arch" type="xml">
+            <pivot string="التكلفة حسب المنتج والمرحلة">
+                <field name="product_id" type="row"/>
+                <field name="dimension_label" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="quantity" type="measure"/>
+                <field name="stage_material_cost" type="measure"/>
+                <field name="stage_labor_cost" type="measure"/>
+                <field name="stage_total_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_stage_cost_entry_graph" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.cost.entry.graph</field>
+        <field name="model">furniture.mrp.stage.cost.entry</field>
+        <field name="arch" type="xml">
+            <graph string="تكلفة المراحل" type="bar" stacked="1">
+                <field name="stage"/>
+                <field name="stage_material_cost" type="measure"/>
+                <field name="stage_labor_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_stage_cost_entry_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.cost.entry.search</field>
+        <field name="model">furniture.mrp.stage.cost.entry</field>
+        <field name="arch" type="xml">
+            <search string="بحث في تكاليف المراحل">
+                <field name="production_id"/>
+                <field name="product_id"/>
+                <field name="dimension_label"/>
+                <field name="stage"/>
+                <filter name="group_product" string="المنتج" context="{'group_by': 'product_id'}"/>
+                <filter name="group_dimension" string="المقاس" context="{'group_by': 'dimension_label'}"/>
+                <filter name="group_stage" string="المرحلة" context="{'group_by': 'stage'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_cost_actual_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.cost.actual.inherit</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_production_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_start_stage_selector']" position="after">
+                <button name="action_print_cost_report" string="🧾 تقرير التكاليف PDF" type="object" class="btn-info" invisible="state == 'draft'"/>
+            </xpath>
+            <xpath expr="//field[@name='cost_per_unit']" position="before">
+                <field name="actual_costed_quantity" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_priming_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.priming.cost.inherit</field><field name="model">furniture.mrp.priming</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_priming_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_painting_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.painting.cost.inherit</field><field name="model">furniture.mrp.painting</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_painting_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_carpentry_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.carpentry.cost.inherit</field><field name="model">furniture.mrp.carpentry</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_carpentry_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_finishing_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.finishing.cost.inherit</field><field name="model">furniture.mrp.finishing</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_finishing_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_tailoring_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.cost.inherit</field><field name="model">furniture.mrp.tailoring</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_tailoring_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_upholstery_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.upholstery.cost.inherit</field><field name="model">furniture.mrp.upholstery</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_upholstery_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+    <record id="view_furniture_mrp_packaging_cost_inherit" model="ir.ui.view">
+        <field name="name">furniture.mrp.packaging.cost.inherit</field><field name="model">furniture.mrp.packaging</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_packaging_form"/>
+        <field name="arch" type="xml"><xpath expr="//sheet/notebook" position="before"><group string="💰 تكلفة الدفعات"><group><field name="carried_material_cost" readonly="1"/><field name="carried_labor_cost" readonly="1"/><field name="approved_cumulative_cost" readonly="1"/></group><group><field name="approved_stage_material_cost" readonly="1"/><field name="approved_stage_labor_cost" readonly="1"/><field name="current_stage_unit_cost" readonly="1"/><button name="action_print_cost_report" string="تقرير التكاليف PDF" type="object" class="btn-info"/></group></group></xpath></field>
+    </record>
+</odoo>

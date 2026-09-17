@@ -1,0 +1,232 @@
+// The MAPILLA workspace: one icon language, editorial surfaces and restrained
+// motion. Screen-only; no selectors for reports, graph nodes or stock statuses.
+@media screen {
+    body.o_web_client {
+        .o_mapilla_app_glyph {
+            display: inline-flex; align-items: center; justify-content: center;
+            flex: 0 0 auto; width: 48px; height: 48px; border-radius: 15px;
+            color: #0c2a44; background: #e8e2dc;
+            svg { width: 26px; height: 26px; }
+            img { width: 28px; height: 28px; object-fit: contain; }
+        }
+
+        // MuK sets a background image inline when opened. Override that image,
+        // not the component: its native keyboard navigation stays intact.
+        .mk_app_menu.dropdown-menu {
+            display: grid !important;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            align-content: start; align-items: stretch; gap: 14px;
+            padding: 28px unquote('max(32px, calc((100vw - 1280px) / 2))') 22px !important;
+            background: #f6f3ef !important;
+            color: #0c2a44; border-radius: 0 !important;
+            overflow-y: auto !important;
+            font-family: var(--mapilla-font); isolation: isolate;
+
+            // Decorative, viewport-anchored furniture backdrop. The upper
+            // workspace remains clear; opaque cards keep their full contrast.
+            &::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: -1;
+                pointer-events: none;
+                background: url('/mapilla_backend_theme/static/src/img/workspace_furniture_background.webp') center bottom / cover no-repeat;
+                opacity: .38;
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 38%, rgba(0, 0, 0, .25) 62%, #000 100%);
+                mask-image: linear-gradient(to bottom, transparent 0%, transparent 38%, rgba(0, 0, 0, .25) 62%, #000 100%);
+            }
+
+            > .o_app {
+                width: auto !important; min-width: 0; margin: 0 !important;
+                padding: 0 !important; border-radius: 17px;
+                border: 1px solid #ded7cf;
+                background: #fff !important;
+                box-shadow: 0 3px 0 #e7e1da, 0 5px 15px #0c2a4405;
+                white-space: normal; text-decoration: none;
+                transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+
+                &:nth-of-type(3n + 2) .o_mapilla_app_glyph { background: #e8edf0; }
+                &:nth-of-type(3n) .o_mapilla_app_glyph { background: #f0eeea; }
+                &:hover, &:focus-visible, &.focus {
+                    border-color: #ada696; outline: 2px solid #0c2a44; outline-offset: 2px;
+                    transform: translateY(-3px); box-shadow: 0 5px 0 #dcd3c8, 0 12px 25px #0c2a4410;
+                    .o_mapilla_app_glyph { background: #0c2a44; color: #fff; }
+                    .o_mapilla_app_arrow { opacity: 1; transform: translateX(-3px); }
+                }
+                &:active { transform: translateY(1px); }
+            }
+        }
+        .o_mapilla_app_card {
+            display: flex; flex-direction: column; align-items: flex-start;
+            min-height: 132px; padding: 16px 18px 14px; position: relative;
+            .o_mapilla_app_glyph { transition: background-color 180ms, color 180ms; }
+            .o_mapilla_app_text { display: flex; flex-direction: column; margin-top: 11px; min-width: 0; }
+            .mk_app_name { color: #0c2a44 !important; font-size: 15px; line-height: 1.3; font-weight: 700; }
+            small { color: #637078; font-size: 11px; margin-top: 3px; }
+        }
+        .o_mapilla_app_arrow {
+            position: absolute; top: 21px; left: 18px; color: #7d817d;
+            opacity: .5; font-size: 19px; transition: transform 180ms, opacity 180ms;
+        }
+        .o_mapilla_workspace_header { grid-column: 1 / -1; min-width: 0; }
+        .o_mapilla_workspace_topline {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 18px; padding-bottom: 22px; direction: ltr;
+            > img { width: 188px; height: auto; }
+        }
+        .o_mapilla_workspace_tools { display: flex; align-items: center; gap: 18px; }
+        .o_mapilla_company {
+            display: flex; align-items: center; gap: 8px;
+            color: #53616a; font-size: 12px;
+        }
+        .o_mapilla_launcher_close {
+            border: 1px solid #d4ccc2; border-radius: 50%; width: 34px; height: 34px;
+            background: transparent; color: #0c2a44;
+            &:hover { background: #e0d8d1; }
+        }
+        .o_mapilla_workspace_section {
+            display: flex; align-items: center; justify-content: space-between; padding-top: 6px;
+            h2 { color: #0c2a44 !important; font-size: 20px; margin: 0; font-weight: 700; }
+            > span { color: #6f777a; font-size: 12px; }
+        }
+        .o_mapilla_workspace_footer {
+            grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 15px;
+            margin-top: 12px; padding-top: 18px; border-top: 1px solid #ded7cf;
+            font-size: 10px; color: #737c81;
+            > span:first-child { font-size: 9px; letter-spacing: .15em; }
+        }
+
+        // Sidebar: preserve MuK's large / compact / hidden preferences. Only
+        // its own app list scrolls; the content area's scroll is not touched.
+        > .mk_apps_sidebar_panel {
+            background: #0c2a44 !important;
+            border-inline-end: 1px solid #ffffff15;
+            box-shadow: 5px 0 20px #0c2a4408;
+            overflow: hidden;
+            .mk_apps_sidebar { min-height: 0; padding: 12px 9px 0; }
+            .mk_apps_sidebar_menu {
+                flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+                margin: 0; padding: 8px 1px 16px; scrollbar-width: thin;
+                scrollbar-color: #ffffff28 transparent;
+                > li { margin-bottom: 3px; }
+                > li > a {
+                    display: flex; align-items: center; gap: 10px;
+                    min-height: 42px; padding: 7px 10px; border-radius: 11px;
+                    border: 1px solid transparent; color: #e2e7eb; font-size: 13px;
+                    font-weight: 500; transition: background-color 160ms, color 160ms, border-color 160ms;
+                    .mk_apps_sidebar_name { min-width: 0; white-space: normal; line-height: 1.25; }
+                    .o_mapilla_app_glyph {
+                        width: 28px; height: 28px; border-radius: 8px;
+                        background: #ffffff0b; color: #bcb5a9;
+                        svg { width: 19px; height: 19px; }
+                        img { width: 20px; height: 20px; }
+                    }
+                    &:focus-visible { outline: 2px solid #e0d8d1; outline-offset: -2px; }
+                }
+                > li.active > a {
+                    background: #e0d8d1 !important; color: #0c2a44 !important;
+                    box-shadow: inset 3px 0 #ada696, 0 4px 10px #00000010;
+                    border-color: #ede7e1; font-weight: 700;
+                    .o_mapilla_app_glyph { background: #0c2a44; color: #fff; }
+                }
+                > li:not(.active) > a:hover {
+                    border-color: #ffffff20; background: #ffffff0f !important;
+                    .o_mapilla_app_glyph { color: #fff; background: #ffffff15; }
+                }
+            }
+        }
+        .o_mapilla_sidebar_home {
+            display: flex; align-items: center; gap: 9px; width: 100%;
+            background: transparent; color: #fff; border: 0; border-bottom: 1px solid #ffffff18;
+            text-align: start; padding: 4px 9px 17px; margin-bottom: 7px;
+            > img { width: 25px; height: 25px; object-fit: contain; }
+            > i { margin-inline-start: auto; opacity: .55; font-size: 13px; }
+            .o_mapilla_sidebar_caption { font-weight: 700; font-size: 14px; }
+            small { display: block; font-size: 7px; letter-spacing: .13em; color: #bcb5a9; margin-top: 3px; }
+            &:hover > i { opacity: 1; }
+        }
+        .o_mapilla_sidebar_brand {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            border: 0; border-top: 1px solid #ffffff18; color: #e0d8d1;
+            background: transparent; padding: 15px 12px; flex: 0 0 auto;
+            img { width: 115px; height: auto; }
+            i { opacity: .6; }
+        }
+        .o_main_navbar {
+            border-bottom: 1px solid #ada69666 !important;
+            .o_menu_sections > button:not(.o_menu_sections_more) { border-radius: 8px; }
+            .o_menu_sections > button:hover { background-color: #ffffff14 !important; }
+        }
+
+        @media (min-width: 1200px) {
+            &.mk_sidebar_type_large { --mk-sidebar-width: 210px; }
+        }
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            &.mk_sidebar_type_large { --mk-sidebar-width: 184px; }
+        }
+        &.mk_sidebar_type_small {
+            .o_mapilla_sidebar_caption, .o_mapilla_sidebar_home > i, .o_mapilla_sidebar_brand { display: none; }
+            > .mk_apps_sidebar_panel {
+                .mk_apps_sidebar { padding-inline: 3px; }
+                .mk_apps_sidebar_menu > li > a { justify-content: center; padding-inline: 3px; }
+            }
+            .o_mapilla_sidebar_home { justify-content: center; padding-inline: 0; }
+        }
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            &.mk_sidebar_type_large {
+                .o_mapilla_sidebar_caption, .o_mapilla_sidebar_home > i, .o_mapilla_sidebar_brand { display: none; }
+                > .mk_apps_sidebar_panel {
+                    .mk_apps_sidebar { padding-inline: 3px; }
+                    .mk_apps_sidebar_menu > li > a { justify-content: center; padding-inline: 3px; }
+                }
+                .o_mapilla_sidebar_home { justify-content: center; padding-inline: 0; }
+            }
+        }
+        &.o_fullscreen, &.o_home_menu_background, &.editor_has_snippets_hide_backend_navbar { --mk-sidebar-width: 0; }
+        &.mk_sidebar_type_invisible, &.o_fullscreen, &.o_home_menu_background, &.editor_has_snippets_hide_backend_navbar {
+            > .mk_apps_sidebar_panel { border: 0; }
+        }
+        @media (max-width: 1100px) {
+            .mk_app_menu.dropdown-menu { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-inline: 28px !important; }
+        }
+        @media (max-width: 767.98px) {
+            > .mk_apps_sidebar_panel { border: 0; }
+            .o_navbar_apps_menu button { padding-inline: 9px !important; }
+            .mk_app_menu.dropdown-menu { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 20px !important; }
+            .o_mapilla_app_card { min-height: 126px; padding: 14px; }
+            .o_mapilla_company { display: none; }
+            .o_mapilla_workspace_topline > img { width: 158px; }
+        }
+        @media (max-width: 480px) {
+            .mk_app_menu.dropdown-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px !important; }
+            .o_mapilla_app_card .mk_app_name { font-size: 14px; }
+            .o_mapilla_workspace_section > span { font-size: 10px; }
+            .o_mapilla_workspace_footer { flex-direction: column; gap: 5px; }
+        }
+
+        // Animate mounted surfaces only, without changing fixed/sticky
+        // containing blocks or adding timers / mutation observers per screen.
+        @media (prefers-reduced-motion: no-preference) {
+            .o_action_manager > .o_action { animation: mapilla-surface-in 240ms ease-out; }
+            .modal-content { animation: mapilla-dialog-in 200ms ease-out; }
+            .o-dropdown--menu:not(.mk_app_menu) { animation: mapilla-surface-in 140ms ease-out; }
+            .mk_app_menu > .o_app { animation: mapilla-card-in 320ms backwards; }
+            @for $i from 1 through 26 {
+                .mk_app_menu > .o_app:nth-of-type(#{$i}) { animation-delay: #{($i % 6) * 25}ms; }
+            }
+            .o_mapilla_workspace_header { animation: mapilla-surface-in 280ms ease-out; }
+            .o_kanban_record, .o_ntp_workspace_model_card, .o_ntp_workspace_product_card {
+                transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+            }
+            .btn:not(:disabled):hover { box-shadow: 0 4px 12px #0c2a4415; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .mk_app_menu > .o_app, .o_mapilla_app_glyph, .o_mapilla_app_arrow,
+            .mk_apps_sidebar_menu > li > a,
+            .o_ntp_workspace_model_card, .o_ntp_workspace_product_card { transition: none !important; }
+        }
+    }
+    @keyframes mapilla-surface-in { from { opacity: .5; } to { opacity: 1; } }
+    @keyframes mapilla-dialog-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: none; } }
+    @keyframes mapilla-card-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}

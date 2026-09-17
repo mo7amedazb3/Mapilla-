@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.PiecePartners">
+        <div t-if="props.record.data.is_custom" class="o_ntp_piece_partners" dir="rtl" t-on-click.stop="() => {}">
+            <div><small>المشتري</small><strong t-esc="props.record.data.custom_partners?.buyer_partner_id?.[1] || '—'"/></div>
+            <div><small>المستهلك</small><strong t-esc="props.record.data.custom_partners?.beneficiary_partner_id?.[1] || '—'"/></div>
+            <button t-if="state.canEdit and props.record.data.state === 'draft'" type="button"
+                    class="btn btn-outline-secondary o_ntp_edit_partners" t-att-disabled="!editable" t-on-click.stop="open">
+                <i class="fa fa-pencil" aria-hidden="true"/> اختيار
+            </button>
+        </div>
+    </t>
+    <t t-name="furniture_need_to_produce.PiecePartnersDialog">
+        <Dialog title="'المشتري والمستهلك — Custom'" size="'md'">
+            <div class="o_ntp_partners_dialog" dir="rtl">
+                <p class="text-muted" t-esc="props.record.data.name"/>
+                <div t-if="state.error" class="alert alert-danger" role="alert" t-esc="state.error"/>
+                <fieldset t-att-disabled="state.saving">
+                    <div class="mb-3 o_ntp_buyer_picker">
+                        <label for="ntp_custom_buyer" class="form-label">المشتري</label>
+                        <Many2XAutocomplete id="'ntp_custom_buyer'" resModel="'res.partner'" fieldString="'المشتري'"
+                            value="state.buyer?.[1] || ''" activeActions="activeActions" getDomain="() => this.partnerDomain(true)"
+                            update="(records) => this.selectPartner('buyer', records)" placeholder="'اختار المشتري'"/>
+                    </div>
+                    <div class="o_ntp_beneficiary_picker">
+                        <label for="ntp_custom_beneficiary" class="form-label">المستهلك</label>
+                        <Many2XAutocomplete id="'ntp_custom_beneficiary'" resModel="'res.partner'" fieldString="'المستهلك'"
+                            value="state.beneficiary?.[1] || ''" activeActions="activeActions" getDomain="() => this.partnerDomain()"
+                            update="(records) => this.selectPartner('beneficiary', records)" placeholder="'اختار المستهلك'"/>
+                    </div>
+                </fieldset>
+            </div>
+            <t t-set-slot="footer">
+                <button type="button" class="btn btn-primary o_ntp_save_partners" t-on-click="save" t-att-disabled="state.saving">
+                    <i t-if="state.saving" class="fa fa-spinner fa-spin"/> حفظ
+                </button>
+                <button type="button" class="btn btn-secondary" t-on-click="props.close" t-att-disabled="state.saving">إلغاء</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

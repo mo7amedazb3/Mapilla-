@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_tailoring_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.form</field>
+        <field name="model">furniture.mrp.tailoring</field>
+        <field name="arch" type="xml">
+            <form string="أمر تفصيل">
+                <header>
+                    <button name="action_view_current_stage_products" string="👁️ عرض المنتجات الموجودة" type="object" class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_request_store_approval" string="📨 طلب إذن المخزن" type="object" class="btn-info o_furniture_store_request_button" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state not in ('none', 'started', 'rejected', 'cancelled')"/>
+                    <button name="action_open_store_request" string="⏳ الإذن بانتظار المخزن" type="object" class="btn-warning o_furniture_store_request_pending" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'pending'"/>
+                    <button name="action_open_advance_material_receipt" string="📥 استلام من المخزن" type="object" class="btn-warning o_furniture_material_receipt_button" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'awaiting_receipt'" groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_open_store_request" string="✅ الإذن معتمد" type="object" class="btn-success" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'approved'"/>
+                    <button name="action_start" string="▶️ بدء تفصيل" type="object" class="btn-primary o_furniture_store_start_ready" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state != 'approved'"/>
+                    <button name="action_send_to_quality" string="🔍 إرسال للجودة" type="object" class="btn-warning" invisible="state != 'in_progress' or not all_substages_done"/>
+                    <button name="action_approve_quality" string="✅ قبول وتسليم للمخزن" type="object" class="btn-success" invisible="state != 'quality_check'"/>
+                    <button name="action_reject_quality" string="❌ رفض" type="object" class="btn-danger" invisible="state != 'quality_check'"/>
+                    <field name="all_substages_done" invisible="1"/>
+                    <button name="action_transfer_finished_product" string="📦 تحويل للمخزن التام" type="object" class="btn-info o_furniture_finished_transfer_button" invisible="not production_can_transfer_finished_product"/>
+                    <field name="production_can_transfer_finished_product" invisible="1"/>
+                    <field name="can_start_stage_work" invisible="1"/>
+                    <field name="can_operate_stage_actions" invisible="1"/>
+                    <field name="store_request_id" invisible="1"/>
+                    <field name="store_request_state" invisible="1"/>
+                    <field name="has_material_shortage" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <field name="tailoring_display_state" widget="statusbar"
+                           statusbar_visible="pending,in_progress,material_shortage,quality_check,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not has_material_shortage">
+                        <strong>⚠️ بدأت مرحلة التفصيل مع وجود مواد ناقصة</strong>
+                        <p>يمكن متابعة العمل، وسيظل أمر التفصيل ظاهرًا بحالة «مواد ناقصة» بدل «منتهي».</p>
+                        <field name="material_shortage_details" nolabel="1"
+                               readonly="1" widget="text"/>
+                    </div>
+                    <group>
+                        <group string="بيانات الأمر">
+                            <field name="production_order_id" readonly="1"/>
+                            <field name="finishing_order_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not kit_piece_notes_summary">
+                        <strong>📝 ملاحظات القطع من تقسيمة الأطقم</strong>
+                        <field name="kit_piece_notes_summary" nolabel="1" readonly="1" widget="text"/>
+                    </div>
+                    <notebook>
+                        <page string="🧩 مراحل التفصيل">
+                            <group>
+                                <group string="ملخص التنفيذ">
+                                    <field name="current_substage" readonly="1"/>
+                                    <field name="substage_summary" readonly="1"/>
+                                    <field name="substage_progress" widget="progressbar" readonly="1"/>
+                                </group>
+                                <group string="المراحل الداخلية" col="1">
+                                    <group col="2">
+                                        <label for="substage_cutting_state"/>
+                                        <div class="o_furniture_internal_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_cutting_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_cutting_state == 'pending'"
+                                                   decoration-info="substage_cutting_state == 'in_progress'"
+                                                   decoration-success="substage_cutting_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'tailoring_internal_substage': 'cutting'}"
+                                                    invisible="state != 'in_progress' or substage_cutting_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                    <group col="2">
+                                        <label for="substage_sewing_state"/>
+                                        <div class="o_furniture_internal_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_sewing_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_sewing_state == 'pending'"
+                                                   decoration-info="substage_sewing_state == 'in_progress'"
+                                                   decoration-success="substage_sewing_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'tailoring_internal_substage': 'sewing'}"
+                                                    invisible="state != 'in_progress' or substage_sewing_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                    <group col="2">
+                                        <label for="substage_ironing_state"/>
+                                        <div class="o_furniture_internal_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_ironing_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_ironing_state == 'pending'"
+                                                   decoration-info="substage_ironing_state == 'in_progress'"
+                                                   decoration-success="substage_ironing_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'tailoring_internal_substage': 'ironing'}"
+                                                    invisible="state != 'in_progress' or substage_ironing_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="✂️ مواد التفصيل" invisible="1">
+                            <group>
+                                <field name="fabric_qty_cut_m"/>
+                                <field name="waste_fabric_m"/>
+                                <field name="thread_spools"/>
+                                <field name="needles_count"/>
+                                <field name="lining_qty_m"/>
+                                <field name="velcro_meters"/>
+                            </group>
+                        </page>
+                        <page string="👷 العمالة والتكاليف">
+                            <group>
+                                <group string="الفريق">
+                                    <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','tailoring')]"/>
+                                    <field name="worker_user_ids" widget="many2many_tags" domain="[('share','=',False), ('employee_ids.furniture_mrp_role','=','worker'), ('employee_ids.furniture_mrp_worker_stage_ids.code','=','tailoring')]"/>
+                                </group>
+                                <group string="تكلفة العمالة">
+                                    <field name="expected_labor_hours"/>
+                                    <field name="waiting_labor_hours" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="waiting_labor_cost" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_hours" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="🏁 الفحص النهائي">
+                            <group>
+                                <field name="final_inspector_id"/>
+                                <field name="final_inspection" widget="radio"/>
+                                <field name="inspection_notes"/>
+                                <field name="ready_for_stock"/>
+                            </group>
+                        </page>
+                        <page string="🔍 الجودة">
+                            <group>
+                                <field name="quality_inspector_id"/>
+                                <field name="quality_check" widget="radio"/>
+                                <field name="quality_notes"/>
+                            </group>
+                        </page>
+                        <page string="⏱ سجل الوقت" invisible="state not in ('quality_check', 'done')">
+                            <field name="worker_time_log_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="user_id"/>
+                                    <field name="start_datetime"/>
+                                    <field name="end_datetime"/>
+                                    <field name="duration_hours"/>
+                                    <field name="employee_id"/>
+                                    <field name="contract_id"/>
+                                    <field name="contract_wage"/>
+                                    <field name="hourly_rate"/>
+                                    <field name="labor_cost"/>
+                                    <field name="is_active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_tailoring_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.list</field>
+        <field name="model">furniture.mrp.tailoring</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="tailoring_display_state == 'material_shortage'"
+                  decoration-success="tailoring_display_state == 'done'"
+                  decoration-warning="tailoring_display_state == 'quality_check'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="current_substage"/>
+                <field name="substage_progress" widget="progressbar"/>
+                <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','tailoring')]"/>
+                <field name="expected_labor_hours"/>
+                <field name="waiting_labor_hours" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="waiting_labor_cost" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                <field name="labor_cost" invisible="state not in ('quality_check', 'done')"/>
+                <field name="final_inspection"/>
+                <field name="ready_for_stock"/>
+                <field name="tailoring_display_state" widget="badge"
+                       decoration-danger="tailoring_display_state == 'material_shortage'"
+                       decoration-success="tailoring_display_state == 'done'"
+                       decoration-warning="tailoring_display_state == 'quality_check'"/>
+                <field name="state" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_tailoring" model="ir.actions.act_window">
+        <field name="name">تفصيل</field>
+        <field name="res_model">furniture.mrp.tailoring</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

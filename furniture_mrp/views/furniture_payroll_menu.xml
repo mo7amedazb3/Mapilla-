@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="factory_payroll.menu_factory_payroll_batch_wizard"
+            model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="simple_payroll_salary-2.menu_simple_payroll_slips"
+            model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="simple_payroll_salary-2.menu_simple_payroll_summary"
+            model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="action_furniture_payroll_time_slips"
+            model="ir.actions.act_window">
+        <field name="name">كشوف أجور عمال الوقت</field>
+        <field name="res_model">simple.payroll.slip</field>
+        <field name="view_mode">list,form</field>
+        <field name="mobile_view_mode">list</field>
+        <field name="search_view_id"
+               ref="simple_payroll_salary-2.view_simple_payroll_slip_search"/>
+        <field name="domain">[('furniture_pay_basis', '=', 'time')]</field>
+        <field name="context">{'furniture_payroll_pay_basis': 'time'}</field>
+        <field name="limit">200</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد كشوف أجور لعمال الوقت في الفترة المختارة.</p>
+        </field>
+    </record>
+
+    <record id="action_furniture_payroll_production_slips"
+            model="ir.actions.act_window">
+        <field name="name">كشوف أجور عمال الإنتاج</field>
+        <field name="res_model">simple.payroll.slip</field>
+        <field name="view_mode">list,form</field>
+        <field name="mobile_view_mode">list</field>
+        <field name="search_view_id"
+               ref="simple_payroll_salary-2.view_simple_payroll_slip_search"/>
+        <field name="domain">[('furniture_pay_basis', '=', 'production')]</field>
+        <field name="context">{'furniture_payroll_pay_basis': 'production'}</field>
+        <field name="limit">200</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد كشوف أجور لعمال الإنتاج في الفترة المختارة.</p>
+        </field>
+    </record>
+
+    <record id="simple_payroll_salary-2.menu_simple_payroll_root"
+            model="ir.ui.menu">
+        <field name="action" ref="simple_payroll_salary-2.action_simple_payroll_reports"/>
+    </record>
+
+    <menuitem id="menu_furniture_payroll_attendance"
+              name="Payroll"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="20"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+
+    <record id="menu_furniture_payroll_attendance" model="ir.ui.menu">
+        <field name="action" eval="False"/>
+    </record>
+
+    <menuitem id="menu_furniture_payroll_attendance_slips"
+              name="كشوف الأجور"
+              parent="menu_furniture_payroll_attendance"
+              action="action_furniture_payroll_time_slips"
+              sequence="10"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+
+    <menuitem id="menu_furniture_payroll_time_slips"
+              name="عمال بالوقت"
+              parent="menu_furniture_payroll_attendance"
+              action="action_furniture_payroll_time_slips"
+              sequence="10"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+
+    <menuitem id="menu_furniture_payroll_production_slips"
+              name="عمال بالإنتاج"
+              parent="menu_furniture_payroll_attendance"
+              action="action_furniture_payroll_production_slips"
+              sequence="11"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+
+    <menuitem id="menu_furniture_payroll_single_slip"
+              name="إنشاء كشف أجر"
+              parent="menu_furniture_payroll_attendance"
+              action="action_furniture_mrp_payroll_slip_wizard"
+              sequence="20"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+
+    <menuitem id="menu_furniture_payroll_batch_slip"
+              name="إنشاء كشوف كل العمال"
+              parent="menu_furniture_payroll_attendance"
+              action="action_furniture_mrp_payroll_batch_wizard"
+              sequence="30"
+              groups="furniture_mrp.group_furniture_mrp_manager,hr.group_hr_manager,hr_contract.group_hr_contract_manager,hr_attendance.group_hr_attendance_manager"/>
+</odoo>

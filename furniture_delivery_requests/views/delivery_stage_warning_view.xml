@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_stage_warning_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.delivery.request.stage.warning.wizard.form</field>
+        <field name="model">furniture.delivery.request.stage.warning.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إضافة تحذير لأمر إنتاج العجز"
+                  class="o_furniture_stage_transfer_wizard o_furniture_stage_warning_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">تنبيه قادم من طلب التسليم</div>
+                        <h2>ماذا يجب أن يعرف مشرف المرحلة؟</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">⚠</div>
+                </div>
+                <group>
+                    <field name="order_id" options="{'no_open': True}"/>
+                    <field name="stage"/>
+                    <field name="message" placeholder="اكتب التحذير أو التعليمات المهمة هنا..."/>
+                </group>
+                <div class="alert alert-warning" role="alert">
+                    عند اعتماد «إنتاج العجز» سينتقل التحذير إلى كل أمر إنتاج يحتوي المرحلة،
+                    وسيظهر لمشرفها بعد نجاح «قبول التحويل» مباشرة.
+                </div>
+                <footer>
+                    <button name="action_add_warning" string="حفظ التحذير"
+                            type="object" class="btn-primary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,669 @@
+// Mapilla backend theme. Keep all UI rules screen-only so printed reports stay native.
+
+:root {
+    --mapilla-oxford: #0c2a44;
+    --mapilla-oxford-700: #173c59;
+    --mapilla-oxford-500: #3d5569;
+    --mapilla-timberwolf: #e0d8d1;
+    --mapilla-quick-silver: #ada696;
+    --mapilla-platinum: #e2e2e2;
+    --mapilla-page: #f7f5f2;
+    --mapilla-surface: #ffffff;
+    --mapilla-surface-soft: #f2efec;
+    --mapilla-surface-muted: #eaf0f4;
+    --mapilla-border: #e0d8d1;
+    --mapilla-border-strong: #c8c1b9;
+    --mapilla-text: #2d2d2d;
+    --mapilla-heading: #0c2a44;
+    --mapilla-muted: #6d7f8f;
+    --mapilla-hover: #edf2f5;
+    --mapilla-shadow-sm: 0 2px 8px rgba(12, 42, 68, 0.08);
+    --mapilla-shadow-md: 0 10px 28px rgba(12, 42, 68, 0.12);
+}
+
+@media screen {
+    html,
+    body.o_web_client {
+        background: var(--mapilla-page);
+    }
+
+    body.o_web_client {
+        color: var(--mapilla-text);
+    }
+
+    body.o_web_client ::selection {
+        background: rgba(12, 42, 68, 0.22);
+    }
+
+    // -------------------------------------------------------------------------
+    // Main navigation
+    // -------------------------------------------------------------------------
+    .o_main_navbar {
+        position: relative;
+        z-index: 100;
+        border-bottom: 1px solid #071c2e !important;
+        background: var(--mapilla-oxford);
+        box-shadow: 0 3px 16px rgba(7, 28, 46, 0.24);
+
+        .o_mapilla_nav_brand {
+            display: flex;
+            align-items: center;
+            align-self: stretch;
+            flex: 0 0 auto;
+            margin-inline: 10px 8px;
+            padding-inline-end: 14px;
+            border-inline-end: 1px solid rgba(255, 255, 255, 0.18);
+            text-decoration: none;
+
+            img {
+                display: block;
+                width: 112px;
+                max-height: 24px;
+                object-fit: contain;
+            }
+        }
+
+        .o_menu_brand {
+            font-weight: 650;
+            letter-spacing: 0.01em;
+        }
+
+        .o_navbar_apps_menu .dropdown-toggle,
+        .o_menu_systray > * > .dropdown-toggle,
+        .o_menu_systray > * > button {
+            transition: background-color 150ms ease, color 150ms ease;
+        }
+
+        .o_menu_systray .badge {
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.18);
+        }
+    }
+
+    .o_app_menu_sidebar {
+        background-color: var(--mapilla-oxford);
+        background-image: linear-gradient(rgba(12, 42, 68, 0.94), rgba(12, 42, 68, 0.94)),
+            url("/mapilla_backend_theme/static/src/img/mapilla_pattern.svg");
+        background-size: auto, 280px 280px;
+        color: #ffffff;
+
+        .o_sidebar_topbar,
+        .o_burger_menu_content {
+            background: transparent;
+            color: inherit;
+        }
+
+        .o_app,
+        .o_sidebar_close {
+            color: #ffffff;
+            border-radius: 10px;
+        }
+
+        .o_app:hover,
+        .o_app:focus {
+            background: rgba(255, 255, 255, 0.10);
+        }
+    }
+
+    // The target database uses MuK AppsBar. Keep its navigation extension in
+    // place, but bring its surfaces into the same Mapilla palette.
+    .mk_apps_sidebar_panel {
+        background-color: var(--mapilla-oxford);
+        background-image: linear-gradient(rgba(12, 42, 68, 0.96), rgba(12, 42, 68, 0.96)),
+            url("/mapilla_backend_theme/static/src/img/mapilla_pattern.svg");
+        background-size: auto, 240px 240px;
+
+        .mk_apps_sidebar_menu > li > a {
+            color: rgba(255, 255, 255, 0.88);
+            font-weight: 500;
+        }
+
+        .mk_apps_sidebar_menu > li.active > a,
+        .mk_apps_sidebar_menu > li:hover > a,
+        .mk_apps_sidebar_menu > li > a:focus {
+            background: rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+        }
+    }
+
+    .mk_app_menu.dropdown-menu {
+        background-color: var(--mapilla-oxford);
+        background-image: linear-gradient(rgba(12, 42, 68, 0.94), rgba(12, 42, 68, 0.94)),
+            url("/mapilla_backend_theme/static/src/img/mapilla_pattern.svg");
+        background-size: auto, 320px 320px;
+    }
+
+    // -------------------------------------------------------------------------
+    // Control panel, search and breadcrumbs
+    // -------------------------------------------------------------------------
+    .o_control_panel {
+        background: var(--mapilla-surface);
+        border-bottom-color: var(--mapilla-border);
+        box-shadow: 0 1px 0 rgba(12, 42, 68, 0.02);
+
+        .o_last_breadcrumb_item,
+        .breadcrumb-item.active,
+        .o_breadcrumb .active {
+            color: var(--mapilla-heading);
+            font-weight: 650;
+        }
+
+        .o_searchview {
+            min-height: 34px;
+            border: 1px solid var(--mapilla-border);
+            border-radius: 10px;
+            background: var(--mapilla-surface);
+            box-shadow: inset 0 1px 2px rgba(12, 42, 68, 0.03);
+            transition: border-color 150ms ease, box-shadow 150ms ease;
+
+            &:focus-within {
+                border-color: var(--mapilla-oxford-500);
+                box-shadow: 0 0 0 3px rgba(12, 42, 68, 0.10);
+            }
+        }
+
+        .o_searchview_facet {
+            overflow: hidden;
+            border: 1px solid rgba(12, 42, 68, 0.12);
+            border-radius: 7px;
+            background: var(--mapilla-surface-muted);
+
+            .o_searchview_facet_label {
+                background: var(--mapilla-oxford);
+                color: #ffffff;
+            }
+        }
+    }
+
+    .o_search_bar_menu,
+    .o_filter_menu,
+    .o_group_by_menu,
+    .o_favorite_menu {
+        .dropdown-header {
+            color: var(--mapilla-heading);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Buttons and generic interactive controls
+    // -------------------------------------------------------------------------
+    .btn {
+        border-radius: 8px;
+        transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease,
+            border-color 120ms ease;
+
+        &:not(:disabled):active {
+            transform: translateY(1px);
+        }
+    }
+
+    .btn-primary {
+        box-shadow: 0 2px 7px rgba(12, 42, 68, 0.18);
+
+        &:hover,
+        &:focus {
+            box-shadow: 0 4px 12px rgba(12, 42, 68, 0.24);
+        }
+    }
+
+    .btn-secondary,
+    .btn-light {
+        border-color: var(--mapilla-border);
+    }
+
+    .btn-link,
+    a:not(.btn) {
+        text-underline-offset: 2px;
+    }
+
+    // -------------------------------------------------------------------------
+    // Inputs and field widgets
+    // -------------------------------------------------------------------------
+    .form-control,
+    .form-select,
+    .o_input,
+    .o_field_widget input,
+    .o_field_widget textarea,
+    .o_field_widget select {
+        border-radius: 7px;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    .o_input:focus,
+    .o_field_widget input:focus,
+    .o_field_widget textarea:focus,
+    .o_field_widget select:focus {
+        border-color: var(--mapilla-oxford-500);
+        box-shadow: 0 0 0 3px rgba(12, 42, 68, 0.10);
+    }
+
+    .o_required_modifier.o_input,
+    .o_required_modifier .o_input,
+    .o_required_modifier input,
+    .o_required_modifier textarea,
+    .o_required_modifier select {
+        border-color: rgba(12, 42, 68, 0.42);
+    }
+
+    // -------------------------------------------------------------------------
+    // Form view and statusbar
+    // -------------------------------------------------------------------------
+    .o_form_view {
+        background: var(--mapilla-page);
+
+        .o_form_statusbar {
+            border-bottom: 1px solid var(--mapilla-border);
+            background: var(--mapilla-surface);
+            box-shadow: 0 2px 8px rgba(12, 42, 68, 0.04);
+        }
+
+        .o_form_sheet_bg {
+            background-color: var(--mapilla-page);
+            padding-top: 18px;
+            padding-bottom: 24px;
+        }
+
+        .o_form_sheet {
+            border: 1px solid var(--mapilla-border);
+            border-radius: 14px;
+            background: var(--mapilla-surface);
+            box-shadow: var(--mapilla-shadow-sm);
+        }
+
+        .oe_title h1,
+        .oe_title h2,
+        .oe_title h3,
+        .o_form_label,
+        .o_horizontal_separator {
+            color: var(--mapilla-heading);
+        }
+
+        .o_horizontal_separator {
+            border-bottom-color: var(--mapilla-border);
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .oe_button_box .oe_stat_button {
+            border-color: var(--mapilla-border);
+            background: var(--mapilla-surface);
+
+            &:hover,
+            &:focus {
+                background: var(--mapilla-hover);
+            }
+
+            .o_stat_value,
+            .o_button_icon {
+                color: var(--mapilla-oxford);
+            }
+        }
+    }
+
+    .o_statusbar_status {
+        .o_arrow_button,
+        .btn {
+            font-weight: 600;
+        }
+
+        .o_arrow_button.o_arrow_button_current,
+        .btn-primary {
+            color: #ffffff;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Notebook tabs
+    // -------------------------------------------------------------------------
+    .o_notebook .nav-tabs,
+    .nav-tabs {
+        border-bottom-color: var(--mapilla-border);
+
+        .nav-link {
+            color: var(--mapilla-muted);
+            border: 0;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            font-weight: 550;
+
+            &:hover,
+            &:focus {
+                color: var(--mapilla-heading);
+                border-bottom-color: var(--mapilla-quick-silver);
+            }
+
+            &.active {
+                border-bottom-color: var(--mapilla-oxford);
+                background: transparent;
+                color: var(--mapilla-heading);
+                font-weight: 700;
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // List / tree views
+    // -------------------------------------------------------------------------
+    .o_list_renderer,
+    .o_list_view {
+        background: var(--mapilla-surface);
+    }
+
+    .o_list_table {
+        --table-bg: var(--mapilla-surface);
+        --table-border-color: var(--mapilla-border);
+
+        thead {
+            background: var(--mapilla-surface-soft);
+        }
+
+        thead > tr > th {
+            border-bottom: 1px solid var(--mapilla-border-strong);
+            color: var(--mapilla-oxford-500);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.035em;
+            text-transform: uppercase;
+        }
+
+        tbody > tr {
+            transition: background-color 100ms ease;
+
+            &:hover > td {
+                background: var(--mapilla-hover);
+            }
+
+            &.table-info > td,
+            &.o_data_row_selected > td {
+                background: var(--mapilla-surface-muted);
+            }
+        }
+
+        tfoot {
+            background: var(--mapilla-surface-soft);
+            color: var(--mapilla-heading);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Kanban and cards
+    // -------------------------------------------------------------------------
+    .o_kanban_renderer {
+        background: var(--mapilla-page);
+    }
+
+    .o_kanban_record,
+    .o_kanban_quick_create,
+    .card {
+        border-color: var(--mapilla-border);
+        border-radius: 12px;
+        background: var(--mapilla-surface);
+        box-shadow: var(--mapilla-shadow-sm);
+    }
+
+    .o_kanban_record {
+        transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+
+        &:hover {
+            border-color: rgba(12, 42, 68, 0.28);
+            box-shadow: var(--mapilla-shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .o_kanban_record_title,
+        .o_kanban_record_title a {
+            color: var(--mapilla-heading);
+            font-weight: 700;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Dropdowns, dialogs, popovers and notifications
+    // -------------------------------------------------------------------------
+    .dropdown-menu,
+    .o-dropdown--menu,
+    .popover,
+    .o_popover {
+        overflow: hidden;
+        border-color: var(--mapilla-border);
+        border-radius: 10px;
+        background: var(--mapilla-surface);
+        box-shadow: var(--mapilla-shadow-md);
+    }
+
+    .dropdown-item {
+        border-radius: 6px;
+
+        &:hover,
+        &:focus {
+            background: var(--mapilla-hover);
+            color: var(--mapilla-heading);
+        }
+
+        &.active,
+        &:active {
+            background: var(--mapilla-surface-muted);
+            color: var(--mapilla-heading);
+        }
+    }
+
+    .modal-content {
+        overflow: hidden;
+        border-color: var(--mapilla-border);
+        border-radius: 14px;
+        background: var(--mapilla-surface);
+        box-shadow: 0 24px 70px rgba(7, 28, 46, 0.26);
+    }
+
+    .modal-header,
+    .modal-footer {
+        border-color: var(--mapilla-border);
+        background: var(--mapilla-surface-soft);
+    }
+
+    .o_notification_manager .o_notification,
+    .o_notification {
+        overflow: hidden;
+        border-color: var(--mapilla-border);
+        border-radius: 10px;
+        background: var(--mapilla-surface);
+        box-shadow: var(--mapilla-shadow-md);
+    }
+
+    // -------------------------------------------------------------------------
+    // Chatter / Discuss surfaces
+    // -------------------------------------------------------------------------
+    .o-mail-Chatter,
+    .o-mail-Thread,
+    .o_Chatter,
+    .o_chatter {
+        background: var(--mapilla-surface);
+    }
+
+    .o-mail-Message,
+    .o_Message {
+        border-color: var(--mapilla-border);
+    }
+
+    .o-mail-Composer,
+    .o_Composer {
+        border-color: var(--mapilla-border);
+        border-radius: 10px;
+        background: var(--mapilla-surface-soft);
+    }
+
+    // -------------------------------------------------------------------------
+    // Settings, dashboards and misc. surfaces
+    // -------------------------------------------------------------------------
+    .o_base_settings .o_setting_container,
+    .o_setting_container,
+    .o_settings_container,
+    .o_graph_renderer,
+    .o_pivot_renderer,
+    .o_calendar_renderer,
+    .o_activity_view {
+        background: var(--mapilla-surface);
+    }
+
+    .o_setting_box {
+        border-color: var(--mapilla-border);
+        border-radius: 10px;
+
+        &:hover {
+            background: var(--mapilla-hover);
+        }
+    }
+
+    .badge,
+    .o_tag {
+        border-radius: 999px;
+    }
+
+    // -------------------------------------------------------------------------
+    // Scrollbars (progressive enhancement)
+    // -------------------------------------------------------------------------
+    .o_web_client * {
+        scrollbar-color: var(--mapilla-quick-silver) transparent;
+        scrollbar-width: thin;
+    }
+
+    .o_web_client *::-webkit-scrollbar {
+        width: 9px;
+        height: 9px;
+    }
+
+    .o_web_client *::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 999px;
+        background: var(--mapilla-quick-silver);
+        background-clip: padding-box;
+    }
+
+    .o_web_client *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    // -------------------------------------------------------------------------
+    // Responsive adjustments
+    // -------------------------------------------------------------------------
+    @media (max-width: 991.98px) {
+        .o_main_navbar .o_mapilla_nav_brand {
+            margin-inline: 6px;
+            padding-inline-end: 8px;
+
+            img {
+                width: 92px;
+            }
+        }
+
+        .o_form_view .o_form_sheet_bg {
+            padding-top: 8px;
+        }
+
+        .o_form_view .o_form_sheet {
+            border-radius: 10px;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .o_main_navbar .o_mapilla_nav_brand {
+            display: none;
+        }
+
+        .o_form_view .o_form_sheet {
+            border-inline: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .o_kanban_record,
+        .o_main_navbar * {
+            transition: none !important;
+        }
+    }
+}
+
+// A quieter employee directory, scoped away from other kanban screens.
+.o_action.o_hr_employee_kanban {
+    .o_search_panel {
+        background: #fff;
+        padding: 20px 12px;
+        border-inline-end: 1px solid #e4e9ed;
+        .o_search_panel_section_header { color: #526475; margin-bottom: 12px; }
+        .o_search_panel_category_value {
+            margin-block: 3px;
+            border-radius: 7px;
+            padding-block: 5px;
+        }
+        .o_search_panel_label { line-height: 1.65; }
+        .o_search_panel_category_value.active { background: #eaf0f5; color: #102f46; }
+    }
+    .o_kanban_renderer {
+        background: #f5f7f9;
+        padding: 14px !important;
+        gap: 10px !important;
+        align-content: start;
+        .o_kanban_record {
+            position: relative;
+            margin: 0 !important;
+            padding: 10px 12px !important;
+            min-height: 60px !important;
+            height: auto !important;
+            border: 1px solid #e1e7ed !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 5px rgba(16, 47, 70, .025) !important;
+            align-items: center;
+            transition: border-color .15s ease, box-shadow .15s ease;
+            &:hover, &:focus-visible {
+                border-color: #aebfcd !important;
+                box-shadow: 0 4px 12px rgba(16, 47, 70, .07) !important;
+            }
+            .o_kanban_aside_full {
+                display: none !important;
+            }
+            main {
+                flex: 1;
+                min-width: 0;
+                margin-inline-start: 0 !important;
+                min-height: 0 !important;
+                > div:first-child {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                    margin-bottom: 0;
+                    .fw-bold { font-size: 15px !important; line-height: 1.7; color: #15364e; }
+                }
+                .o_text_overflow:has(.fa-envelope) { display: none !important; }
+                .o_text_overflow .fa { color: #8998a5 !important; margin-inline-end: 5px !important; }
+            }
+            .o_employee_availability { font-size: 10px; }
+            main > :not(:first-child) { display: none !important; }
+            [name="user_id"] { display: none !important; }
+            .o_field_many2one_avatar img { width: 18px; height: 18px; }
+            .o-mail-ActivityButton { opacity: .65; &:hover, &:focus { opacity: 1; } }
+        }
+    }
+    @media (max-width: 767.98px) {
+        .o_kanban_renderer { padding: 12px !important; gap: 10px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .o_kanban_renderer .o_kanban_record { transition: none; }
+    }
+}
+
+.o_action.o_hr_employee_kanban .o_searchview_autocomplete {
+    max-height: 380px;
+    overflow-y: auto;
+    li[id^="employee-suggestion-"] {
+        padding: 10px 16px;
+        color: #15364e;
+        line-height: 1.7;
+        a::before { content: '\f007'; font-family: FontAwesome; margin-inline-end: 10px; color: #8596a4; }
+    }
+}

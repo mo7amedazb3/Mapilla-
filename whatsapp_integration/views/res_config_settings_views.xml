@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_whatsapp" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.whatsapp</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="WhatsApp" name="whatsapp_integration">
+                    <block title="Integration">
+                        <setting id="whatsapp_default_instance_setting" string="Default WhatsApp Instance">
+                            <field name="whatsapp_default_instance_id"/>
+                        </setting>
+                        <setting id="whatsapp_notification_window_setting" string="Notification Window">
+                            <field name="whatsapp_notification_window"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_settings" model="ir.actions.act_window">
+        <field name="name">WhatsApp Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'whatsapp_integration'}</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_settings"
+              name="Settings"
+              parent="menu_whatsapp_msg_root"
+              action="action_whatsapp_settings"
+              sequence="30"
+              groups="base.group_system"/>
+</odoo>

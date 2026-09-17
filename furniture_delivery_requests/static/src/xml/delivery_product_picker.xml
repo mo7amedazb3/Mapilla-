@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_delivery_requests.AddProducts">
+        <button type="button" class="btn btn-primary mp_delivery_add" t-on-click="open"><i class="fa fa-plus me-2"/>إضافة منتجات</button>
+    </t>
+    <t t-name="furniture_delivery_requests.ProductPicker">
+        <Dialog title="'إضافة منتجات لطلب التسليم'" size="'lg'">
+            <div class="mp_delivery_picker" dir="rtl">
+                <div class="mp_delivery_picker_banner"><div><small>MAPILLA · طلبات التسليم</small><h3>اختار منتجات طلبك</h3><p>حدّد الموديل والأصناف والكميات المطلوبة.</p></div><i class="fa fa-cubes"/></div>
+                <div t-if="state.error" class="alert alert-danger" role="alert" t-esc="state.error"/>
+                <section><h4>الموديل</h4><div class="mp_delivery_choices">
+                    <button t-foreach="state.models" t-as="model" t-key="model.id" type="button" t-att-class="{ 'is-selected': state.modelId === model.id }" t-att-aria-pressed="state.modelId === model.id" t-att-disabled="state.busy" t-on-click="() => this.chooseModel(model.id)"><i class="fa fa-cube"/><span t-esc="model.name"/><i t-if="state.modelId === model.id" class="fa fa-check-circle"/></button>
+                </div><p t-if="!state.models.length" class="text-muted">لا توجد موديلات متاحة للتسليم.</p></section>
+                <section t-if="state.modelId"><div class="mp_delivery_picker_heading"><h4>المنتجات النهائية</h4><input class="form-control" placeholder="ابحث عن صنف..." aria-label="البحث عن صنف" t-model="state.search"/></div>
+                    <div class="mp_delivery_choices"><button t-foreach="products" t-as="product" t-key="product.id" type="button" t-att-class="{ 'is-selected': state.selected[product.id] !== undefined }" t-att-aria-pressed="state.selected[product.id] !== undefined" t-att-disabled="state.busy" t-on-click="() => this.toggle(product.id)"><i class="fa fa-cubes"/><span><t t-esc="product.name"/><small t-if="product.is_kit">طقم كامل</small></span><i t-if="state.selected[product.id] !== undefined" class="fa fa-check-circle"/></button></div>
+                    <p t-if="!products.length" class="text-muted mt-3">لا توجد أصناف مطابقة.</p>
+                </section>
+                <section t-if="selectedProducts.length"><h4>الكميات المطلوبة <small>(<t t-esc="selectedProducts.length"/> أصناف)</small></h4><div class="mp_delivery_qty" t-foreach="selectedProducts" t-as="product" t-key="product.id"><strong t-esc="product.name"/><input type="number" min="0.001" step="any" t-att-aria-label="'كمية ' + product.name" t-model="state.selected[product.id]" t-att-disabled="state.busy"/></div></section>
+            </div>
+            <t t-set-slot="footer"><button type="button" class="btn btn-primary" t-on-click="add" t-att-disabled="state.busy || !selectedProducts.length"><i t-if="state.busy" class="fa fa-spinner fa-spin me-2"/>إضافة المنتجات</button><button type="button" class="btn btn-secondary" t-on-click="props.close" t-att-disabled="state.busy">إلغاء</button></t>
+        </Dialog>
+    </t>
+</templates>

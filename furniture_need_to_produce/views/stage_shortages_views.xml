@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reuse the reviewed piece planner and views; never duplicate policies. -->
+    <record id="action_stage_shortages_frame" model="ir.actions.act_window">
+        <field name="name">نواقص المراحل — النجارة</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="domain">[('buffer_rule_id', '!=', False), ('final_rule_id', '=', False), ('target_lane', '=', 'frame')]</field>
+        <field name="context">{'search_default_draft': 1, 'ntp_stage_shortages': 'frame'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <record id="action_stage_shortages_bases" model="ir.actions.act_window">
+        <field name="name">نواقص المراحل — القواعد</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="domain">[('buffer_rule_id', '!=', False), ('final_rule_id', '=', False), ('target_lane', 'in', ['bases', 'preparation'])]</field>
+        <field name="context">{'search_default_draft': 1, 'ntp_stage_shortages': 'bases'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <record id="action_stage_shortages_preparation" model="ir.actions.act_window">
+        <field name="name">نواقص المراحل — التجهيز</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="domain">[('buffer_rule_id', '!=', False), ('final_rule_id', '=', False), ('target_lane', 'in', ['bases', 'preparation'])]</field>
+        <field name="context">{'search_default_draft': 1, 'ntp_stage_shortages': 'preparation'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <record id="action_stage_shortages_tailoring" model="ir.actions.act_window">
+        <field name="name">نواقص المراحل — التفصيل</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="domain">[('buffer_rule_id', '!=', False), ('final_rule_id', '=', False), ('target_lane', '=', 'tailoring')]</field>
+        <field name="context">{'search_default_draft': 1, 'ntp_stage_shortages': 'tailoring'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <record id="action_stage_shortages_painting" model="ir.actions.act_window">
+        <field name="name">نواقص المراحل — الدهانات</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="domain">[('buffer_rule_id', '!=', False), ('final_rule_id', '=', False), ('target_lane', '=', 'painting')]</field>
+        <field name="context">{'search_default_draft': 1, 'ntp_stage_shortages': 'painting'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <!-- Both shortage workspaces live inside the existing shortages app. -->
+    <record id="menu_need_to_produce_final" model="ir.ui.menu">
+        <field name="name">نواقص المنتج التام</field>
+        <field name="parent_id" ref="menu_need_to_produce"/>
+        <field name="action" ref="action_need_to_produce"/>
+        <field name="sequence">10</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+    <record id="menu_stage_shortages" model="ir.ui.menu">
+        <field name="name">نواقص المراحل</field>
+        <field name="parent_id" ref="menu_need_to_produce"/>
+        <field name="action" ref="action_stage_shortages_frame"/>
+        <field name="web_icon" eval="False"/>
+        <field name="sequence">20</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+</odoo>

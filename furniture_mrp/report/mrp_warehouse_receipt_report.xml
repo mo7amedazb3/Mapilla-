@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_furniture_mrp_warehouse_receipt" model="report.paperformat">
+        <field name="name">إذن مخزن A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">9</field>
+        <field name="margin_right">9</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">5</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="paperformat_furniture_mrp_aggregate_warehouse_receipt" model="report.paperformat">
+        <field name="name">إذن مخزن مجمّع A4 عريض</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">7</field>
+        <field name="margin_bottom">7</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">3</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_report_furniture_mrp_store_request" model="ir.actions.report">
+        <field name="name">إذن استلام خامات</field>
+        <field name="model">furniture.mrp.store.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_mrp_store_request_receipt</field>
+        <field name="report_file">furniture_mrp.report_furniture_mrp_store_request_receipt</field>
+        <field name="print_report_name">('Warehouse Receipt - %s' % (object.name or '')).replace('/', '-') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_store_request"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_furniture_mrp_warehouse_receipt"/>
+    </record>
+
+    <record id="action_report_furniture_mrp_advance_material_release" model="ir.actions.report">
+        <field name="name">إذن استلام خامات مجمّع</field>
+        <field name="model">furniture.mrp.advance.material.release</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_mrp_advance_material_release_receipt</field>
+        <field name="report_file">furniture_mrp.report_furniture_mrp_advance_material_release_receipt</field>
+        <field name="print_report_name">('Aggregate Warehouse Receipt - %s' % (object.name or '')).replace('/', '-') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_advance_material_release"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_furniture_mrp_aggregate_warehouse_receipt"/>
+    </record>
+
+    <record id="action_report_furniture_stock_receipt" model="ir.actions.report">
+        <field name="name">إذن استلام مخزني A4</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_stock_receipt</field>
+        <field name="report_file">furniture_mrp.report_furniture_stock_receipt</field>
+        <field name="print_report_name">('Warehouse Receipt - %s' % (object.name or '')).replace('/', '-') + '.pdf'</field>
+        <field name="paperformat_id" ref="paperformat_furniture_mrp_warehouse_receipt"/>
+    </record>
+</odoo>

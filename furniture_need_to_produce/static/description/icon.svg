@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>النواقص</title>
+  <path d="M14 28 52 10l38 18-38 20z" fill="#b6a2d0"/>
+  <path d="M14 28 52 48v55L14 83z" fill="#8b70a6"/>
+  <path d="m52 48 38-20v55l-38 20z" fill="#695080"/>
+  <path d="m38 17 38 19-12 6-38-19z" fill="#f6ca72"/>
+  <path d="m64 42 12-6v22l-12 6z" fill="#eaae46"/>
+  <path d="m23 60 19 10m-19 1 12 6" fill="none" stroke="#e8dff1" stroke-width="5" stroke-linecap="round"/>
+  <path d="m96 99 17 17" fill="none" stroke="#b57632" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="87" cy="87" r="25" fill="#ffc668"/>
+  <circle cx="87" cy="87" r="17" fill="#fff1d4"/>
+  <path d="M79 87h16" fill="none" stroke="#b57632" stroke-width="5" stroke-linecap="round"/>
+</svg>

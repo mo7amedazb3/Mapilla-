@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper format for landscape -->
+    <record id="paperformat_dynamic_report" model="report.paperformat">
+        <field name="name">Dynamic Report Landscape</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- The actual report action -->
+    <record id="action_report_dynamic_pdf" model="ir.actions.report">
+        <field name="name">Dynamic Accounting Report</field>
+        <field name="model">report.custom_accounting_pro.engine</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_accounting_pro.dynamic_report_pdf_template</field>
+        <field name="report_file">custom_accounting_pro.dynamic_report_pdf_template</field>
+        <field name="paperformat_id" ref="custom_accounting_pro.paperformat_dynamic_report"/>
+    </record>
+
+    <template id="dynamic_report_pdf_template">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <h2 class="text-center mb-4">
+                        <t t-if="report_type == 'gl'">General Ledger</t>
+                        <t t-elif="report_type == 'pl'">Profit &amp; Loss</t>
+                        <t t-elif="report_type == 'partner_ledger'">Partner Ledger</t>
+                        <t t-elif="report_type == 'trial_balance'">Trial Balance</t>
+                    </h2>
+                    
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr style="background-color: #f1f1f1;">
+                                <th t-if="report_type != 'partner_ledger'">Account Code</th>
+                                <th t-if="report_type == 'partner_ledger'">Partner</th>
+                                <th t-if="report_type != 'partner_ledger'">Account Name</th>
+                                <th class="text-end" t-if="report_type != 'pl'">Debit</th>
+                                <th class="text-end" t-if="report_type != 'pl'">Credit</th>
+                                <th class="text-end">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="data" t-as="acc">
+                                <tr style="font-weight: bold; background-color: #f8f9fa;">
+                                    <td t-if="report_type != 'partner_ledger'"><span t-esc="acc.get('code')"/></td>
+                                    <td t-if="report_type == 'partner_ledger'"><span t-esc="acc.get('name')"/></td>
+                                    <td t-if="report_type != 'partner_ledger'"><span t-esc="acc.get('name')"/></td>
+                                    <td class="text-end" t-if="report_type != 'pl'">
+                                        <span t-esc="'{0:,.2f}'.format(acc.get('debit', 0.0))"/>
+                                    </td>
+                                    <td class="text-end" t-if="report_type != 'pl'">
+                                        <span t-esc="'{0:,.2f}'.format(acc.get('credit', 0.0))"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="'{0:,.2f}'.format(acc.get('balance', 0.0))"/>
+                                    </td>
+                                </tr>
+                                <t t-if="acc.get('lines')">
+                                    <tr>
+                                        <td t-att-colspan="5 if report_type != 'pl' else 3" style="padding: 0;">
+                                            <table class="table table-sm" style="margin-bottom: 0; background-color: white;">
+                                                <thead>
+                                                    <tr style="font-size: 0.9em; color: #555;">
+                                                        <th style="width: 15%;">Date</th>
+                                                        <th>Label/Journal</th>
+                                                        <th class="text-end" style="width: 15%;">Debit</th>
+                                                        <th class="text-end" style="width: 15%;">Credit</th>
+                                                        <th class="text-end" style="width: 15%;">Balance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="acc.get('lines', [])" t-as="line">
+                                                        <tr style="font-size: 0.85em;">
+                                                            <td><span t-esc="line.get('date')"/></td>
+                                                            <td>
+                                                                <span t-esc="line.get('journal')"/> - <span t-esc="line.get('label')"/>
+                                                                <t t-if="line.get('partner') and report_type != 'partner_ledger'">
+                                                                    - <span t-esc="line.get('partner')"/>
+                                                                </t>
+                                                            </td>
+                                                            <td class="text-end"><span t-esc="'{0:,.2f}'.format(line.get('debit', 0.0))"/></td>
+                                                            <td class="text-end"><span t-esc="'{0:,.2f}'.format(line.get('credit', 0.0))"/></td>
+                                                            <td class="text-end"><span t-esc="'{0:,.2f}'.format(line.get('balance', 0.0))"/></td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

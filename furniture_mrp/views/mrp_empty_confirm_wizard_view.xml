@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_empty_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.empty.confirm.wizard.form</field>
+        <field name="model">furniture.mrp.empty.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="تأكيد أمر تشغيل فارغ"
+                  class="o_furniture_stage_transfer_wizard o_furniture_empty_confirm_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">تنبيه سريع</div>
+                        <h2>أمر التشغيل لسه فاضي من أصناف الإنتاج</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">⚠</div>
+                </div>
+                <group class="o_furniture_wizard_warning_card">
+                    <field name="production_id" invisible="1"/>
+                    <field name="warning_message" nolabel="1" readonly="1"
+                           class="o_furniture_wizard_warning_message"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_anyway" string="OK" type="object"
+                            class="btn-primary o_furniture_transfer_confirm"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

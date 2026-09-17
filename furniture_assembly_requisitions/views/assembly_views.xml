@@ -1,0 +1,89 @@
+<odoo>
+    <record id="priming_form_hall_stock" model="ir.ui.view">
+        <field name="name">priming.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.priming</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_priming_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات التي تم توريدها يدويًا من «طلب الاذونات» تُستهلك من رصيد صالة التقديم، وباقي خامات التقديم تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="painting_form_hall_stock" model="ir.ui.view">
+        <field name="name">painting.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.painting</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_painting_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات التي تم توريدها يدويًا من «طلب الاذونات» تُستهلك من رصيد الصالة، وباقي خامات تصنيع الدهانات تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="assembly_form_hall_stock" model="ir.ui.view">
+        <field name="name">assembly.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.carpentry</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_carpentry_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات التي تم توريدها يدويًا من «طلب الاذونات» تُستهلك من رصيد الصالة، وباقي خامات التجميع تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="bases_form_hall_stock" model="ir.ui.view">
+        <field name="name">bases.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.bases</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_bases_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات الموردة يدويًا تُستهلك من رصيد الصالة، وباقي خامات القواعد تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="finishing_form_hall_stock" model="ir.ui.view">
+        <field name="name">finishing.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.finishing</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_finishing_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات الموردة يدويًا تُستهلك من رصيد الصالة، وباقي خامات التجهيز تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="tailoring_form_hall_stock" model="ir.ui.view">
+        <field name="name">tailoring.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.tailoring</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_tailoring_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات الموردة يدويًا تُستهلك من رصيد الصالة، وباقي خامات التفصيل تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="upholstery_form_hall_stock" model="ir.ui.view">
+        <field name="name">upholstery.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.upholstery</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_upholstery_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات الموردة يدويًا تُستهلك من رصيد الصالة، وباقي خامات الكسوة تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="packaging_form_hall_stock" model="ir.ui.view">
+        <field name="name">packaging.form.shared.hall.stock</field>
+        <field name="model">furniture.mrp.packaging</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_packaging_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="after">
+                <div class="alert alert-info" role="status">الخامات الموردة يدويًا تُستهلك من رصيد منطقة التغليف، وباقي الخامات تظل ضمن طلب خامات المرحلة العادي.</div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

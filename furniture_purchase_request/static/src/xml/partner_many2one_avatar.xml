@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_purchase_request.PartnerMany2OneAvatarField">
+        <div t-ref="vendorIdentity"
+             class="o_furniture_vendor_identity d-flex align-items-center">
+            <span class="o_furniture_vendor_logo" aria-hidden="true">
+                <span t-if="!value" class="o_furniture_vendor_logo_empty">
+                    <i class="fa fa-building-o"/>
+                </span>
+                <img t-else=""
+                     t-attf-src="/web/image/{{relation}}/{{resId}}/avatar_128"
+                     t-att-alt="displayName"
+                     class="rounded-circle"/>
+            </span>
+            <t t-call="web.Many2OneField"/>
+        </div>
+    </t>
+</templates>

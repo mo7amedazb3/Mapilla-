@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const root = __dirname + '/../';
+const js = fs.readFileSync(root+'static/src/js/production_pipeline.js','utf8');
+const xml = fs.readFileSync(root+'static/src/xml/production_pipeline.xml','utf8');
+const css = fs.readFileSync(root+'static/src/css/production_pipeline.css','utf8');
+assert(js.includes('useFileViewer()'));
+assert(js.includes('"check_access_rights", ["write", false]'));
+assert(js.includes('8 * 1024 * 1024'));
+assert(js.includes('event.target.value = ""'));
+assert(js.includes('this.orm.write(this.props.resModel, [this.props.resId], {image_1920: data})'));
+assert(xml.includes('resModel="\'furniture.product.model\'"'));
+assert(xml.includes('resModel="\'product.product\'"'));
+assert(xml.includes('t-on-click.stop="preview"'));
+assert(xml.includes('photo.canWrite and !props.readonly'));
+assert(xml.includes('t-else=""><t t-set="artKind"'));
+assert(css.includes('object-fit:contain'));
+console.log('PASS workspace photo wiring, native ACL write, upload limits, illustration fallback, fixed-size contain images');

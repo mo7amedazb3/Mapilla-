@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_biometric_directory" model="report.paperformat">
+        <field name="name">دليل بصمات الموظفين — A4 أفقي</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">4</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_biometric_directory" model="ir.actions.report">
+        <field name="name">دليل بصمات الموظفين</field>
+        <field name="model">factory.biometric.identity</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">factory_biometric_attendance.report_biometric_directory</field>
+        <field name="report_file">factory_biometric_attendance.report_biometric_directory</field>
+        <field name="print_report_name">'دليل بصمات الموظفين.pdf'</field>
+        <field name="binding_model_id" ref="model_factory_biometric_identity"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_biometric_directory"/>
+    </record>
+
+    <template id="report_biometric_directory">
+        <t t-call="web.html_container">
+            <t t-if="docs">
+                <t t-set="o" t-value="docs[0]"/>
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: Arial, sans-serif; color: #173f45;">
+                        <div style="border-bottom: 3px solid #278b86; padding-bottom: 8px; margin-bottom: 14px;">
+                            <h2 style="margin: 0; color: #173f45;">دليل بصمات الموظفين</h2>
+                            <div style="margin-top: 5px; color: #55777a;">
+                                إجمالي الموظفين: <strong t-esc="len(docs)"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered" style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                            <thead style="background-color: #173f45; color: white;">
+                                <tr>
+                                    <th style="width: 4%; text-align: center;">#</th>
+                                    <th style="width: 8%; text-align: center;">PIN</th>
+                                    <th style="width: 19%;">الموظف</th>
+                                    <th style="width: 18%;">الاسم على البصمة</th>
+                                    <th style="width: 14%;">القسم</th>
+                                    <th style="width: 14%;">الوظيفة</th>
+                                    <th style="width: 13%;">الجهاز</th>
+                                    <th style="width: 10%; text-align: center;">حالة البصمة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="docs" t-as="identity"
+                                    t-att-style="'background-color: #f1f8f7;' if identity_index % 2 == 0 else 'background-color: white;'">
+                                    <td style="text-align: center;" t-esc="identity_index + 1"/>
+                                    <td style="text-align: center; font-weight: bold; color: #278b86;" t-esc="identity.device_user_id"/>
+                                    <td t-esc="identity.employee_id.name"/>
+                                    <td dir="ltr" style="text-align: left;" t-esc="identity.device_user_name or identity.employee_id.name"/>
+                                    <td t-esc="identity.department_id.name or '—'"/>
+                                    <td t-esc="identity.job_id.name or '—'"/>
+                                    <td t-esc="identity.device_id.name"/>
+                                    <td style="text-align: center;">
+                                        <span t-if="identity.enrollment_state == 'enrolled'" style="color: #168252; font-weight: bold;">مسجلة</span>
+                                        <span t-elif="identity.enrollment_state == 'requested'" style="color: #b7791f; font-weight: bold;">طلب تسجيل</span>
+                                        <span t-elif="identity.enrollment_state == 'unknown'">غير معروف</span>
+                                        <span t-else="">غير مسجلة</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top: 12px; padding: 8px; background-color: #edf6f5; border-right: 4px solid #278b86; font-size: 10px;">
+                            رقم PIN والاسم الظاهر على الجهاز هما بيانات الربط المستخدمة لمطابقة بصمات الحضور والانصراف مع الموظف داخل النظام.
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

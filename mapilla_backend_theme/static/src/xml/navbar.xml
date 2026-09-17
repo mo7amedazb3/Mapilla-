@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mapilla_backend_theme.NavBarBrand"
+       t-inherit="web.NavBar"
+       t-inherit-mode="extension">
+        <xpath expr="//t[@t-call='web.NavBar.AppsMenu']" position="after">
+            <a class="o_mapilla_nav_brand"
+               href="/odoo"
+               aria-label="Mapilla home"
+               title="Mapilla">
+                <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png"
+                     alt="Mapilla"/>
+            </a>
+        </xpath>
+    </t>
+    <t t-name="mapilla_backend_theme.AppsBarBrand"
+       t-inherit="muk_web_appsbar.AppsBar"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('mk_apps_sidebar_logo')]" position="replace">
+            <div class="mk_apps_sidebar_logo o_mapilla_sidebar_brand p-2">
+                <img class="img-fluid mx-auto"
+                     src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png"
+                     alt="Mapilla"/>
+            </div>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_simple_payroll_slip_factory"
+              inherit_id="simple_payroll_salary-2.report_simple_payroll_slip">
+        <xpath expr="//tr[@t-if='o.commission_amount &gt; 0']//span[normalize-space()='Commission']" position="replace">
+            <span style="font-size: 14px; font-weight: bold; color: #d35400;">Factory Bonus / Incentive</span>
+        </xpath>
+
+        <xpath expr="//tr[@t-if='o.delay_deduction &gt; 0']" position="after">
+            <tr t-if="o.factory_other_deduction_amount &gt; 0">
+                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                    <span style="font-size: 14px; font-weight: bold; color: #8e44ad;">Other Deductions</span>
+                </td>
+                <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #8e44ad;">
+                    - <span t-field="o.factory_other_deduction_amount" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                </td>
+            </tr>
+        </xpath>
+
+        <xpath expr="//div[normalize-space()='Actual Hours']/following-sibling::div[1]" position="after">
+            <div style="font-size: 10px; color: #31708f; margin-top: 3px;">
+                Paid leave: <t t-esc="'%.2f' % o.factory_paid_leave_hours"/> h ·
+                Overtime review: <t t-esc="'%.2f' % o.factory_overtime_hours"/> h
+            </div>
+        </xpath>
+    </template>
+</odoo>

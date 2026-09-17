@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Client Actions -->
+        <record id="action_dynamic_gl_report" model="ir.actions.client">
+            <field name="name">General Ledger</field>
+            <field name="tag">dynamic_accounting_report</field>
+            <field name="context">{'report_type': 'gl'}</field>
+        </record>
+
+        <record id="action_dynamic_pl_report" model="ir.actions.client">
+            <field name="name">Profit &amp; Loss</field>
+            <field name="tag">dynamic_accounting_report</field>
+            <field name="context">{'report_type': 'pl'}</field>
+        </record>
+
+        <!-- General Ledger Menu -->
+        <menuitem id="menu_dynamic_gl" 
+                  name="General Ledger" 
+                  parent="account.menu_finance_reports" 
+                  action="action_dynamic_gl_report"
+                  sequence="1"/>
+
+        <!-- Profit and Loss Menu -->
+        <menuitem id="menu_dynamic_pl" 
+                  name="Profit &amp; Loss" 
+                  parent="account.menu_finance_reports" 
+                  action="action_dynamic_pl_report"
+                  sequence="2"/>
+
+        <!-- Partner Ledger Menu -->
+        <record id="action_dynamic_partner_ledger" model="ir.actions.client">
+            <field name="name">Partner Ledger</field>
+            <field name="tag">dynamic_accounting_report</field>
+            <field name="context">{'report_type': 'partner_ledger'}</field>
+        </record>
+        
+        <menuitem id="menu_dynamic_partner_ledger" 
+                  name="Partner Ledger" 
+                  parent="account.menu_finance_reports" 
+                  action="action_dynamic_partner_ledger"
+                  sequence="3"/>
+
+        <!-- Trial Balance Menu -->
+        <record id="action_dynamic_trial_balance" model="ir.actions.client">
+            <field name="name">Trial Balance</field>
+            <field name="tag">dynamic_accounting_report</field>
+            <field name="context">{'report_type': 'trial_balance'}</field>
+        </record>
+        
+        <menuitem id="menu_dynamic_trial_balance" 
+                  name="Trial Balance" 
+                  parent="account.menu_finance_reports" 
+                  action="action_dynamic_trial_balance"
+                  sequence="4"/>
+    </data>
+</odoo>

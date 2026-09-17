@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_factory_payroll_slip_company" model="ir.rule">
+        <field name="name">Factory payroll company access</field>
+        <field name="model_id" ref="simple_payroll_salary-2.model_simple_payroll_slip"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('hr.group_hr_user'))]"/>
+    </record>
+
+    <record id="simple_payroll_salary-2.access_simple_payroll_slip_hr_user" model="ir.model.access">
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

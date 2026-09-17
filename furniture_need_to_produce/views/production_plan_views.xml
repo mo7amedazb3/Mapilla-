@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_need_to_produce_pipeline" model="ir.ui.view">
+        <field name="name">furniture.need.to.produce.pipeline</field>
+        <field name="model">furniture.need.to.produce</field>
+        <field name="arch" type="xml">
+            <kanban string="خطوط الإنتاج" js_class="need_produce_pipeline" create="false" delete="false"
+                    quick_create="false" records_draggable="false" default_order="furniture_model_id,product_id,id" limit="12">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="furniture_model_id"/>
+                <field name="state"/>
+                <field name="is_custom"/>
+                <field name="custom_bom_modified"/>
+                <field name="target_lane"/>
+                <field name="buffer_rule_id"/>
+                <field name="critical_path_hours"/>
+                <field name="critical_path_days"/>
+                <field name="unknown_incoming_wait"/>
+                <field name="route_graph"/>
+                <header>
+                    <button name="action_refresh" type="object" string="تحديث الاحتياجات" icon="fa-refresh"
+                            class="btn-secondary" display="always" groups="furniture_mrp.group_furniture_mrp_manager"/>
+                </header>
+                <templates>
+                    <t t-name="card">
+                        <article class="o_ntp_piece_pipeline">
+                            <section class="o_ntp_piece_eta o_ntp_piece_eta_top" aria-label="مدة تشغيل هذه القطعة">
+                                <field name="state" widget="need_produce_selector" groups="furniture_mrp.group_furniture_mrp_manager"/>
+                                <div class="o_ntp_piece_eta_title">
+                                    <i class="fa fa-clock-o" aria-hidden="true"/>
+                                    <span t-if="record.target_lane.raw_value === 'packaging'">الوقت التقديري حتى المنتج التام:</span>
+                                    <span t-else="">الوقت التقديري حتى اكتمال المرحلة:</span>
+                                </div>
+                                <div class="o_ntp_piece_eta_values">
+                                    <div class="o_ntp_piece_eta_metric"><strong><field name="critical_path_hours" widget="need_produce_compact_time"/></strong><span>ساعة تشغيل</span></div>
+                                    <span class="o_ntp_piece_eta_equals" aria-hidden="true">=</span>
+                                    <div class="o_ntp_piece_eta_metric"><strong><field name="critical_path_days" widget="need_produce_compact_time"/></strong><span>يوم</span></div>
+                                    <span t-if="record.unknown_incoming_wait.raw_value" class="o_ntp_piece_eta_lower_bound">على الأقل</span>
+                                </div>
+                                <div class="o_ntp_piece_actions o_ntp_piece_eta_tools">
+                                    <a type="open" class="btn btn-outline-secondary"><field name="name" widget="need_produce_details"/></a>
+                                    <span t-if="record.custom_bom_modified.raw_value" class="o_ntp_custom_badge" title="تم تعديل BoM — أوامر منفصلة"><i class="fa fa-sliders" aria-hidden="true"/> Custom</span>
+                                </div>
+                                <p t-if="record.unknown_incoming_wait.raw_value" class="o_ntp_piece_eta_note o_ntp_piece_wait"><i class="fa fa-hourglass-half" aria-hidden="true"/>مدة انتظار الأوامر القائمة غير محددة ولا تدخل في هذا التقدير.</p>
+                                <p t-else="" class="o_ntp_piece_eta_note">حسب مسار هذه القطعة؛ المخزون الجاهز لا يضيف وقت تصنيع.</p>
+                            </section>
+                            <field name="custom_partners" widget="need_produce_partners"/>
+                            <field name="route_graph" widget="need_produce_graph"/>
+                            <footer class="o_ntp_piece_footer">
+                                <span><i class="fa fa-clock-o" aria-hidden="true"/> ساعتان لكل عملية مؤقتًا · يوم العمل ١٠ ساعات</span>
+                                <span>المدة تراعي توازي المراحل، وليست موعد تسليم</span>
+                            </footer>
+                        </article>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_need_to_produce_list" model="ir.ui.view">
+        <field name="name">furniture.need.to.produce.list</field>
+        <field name="model">furniture.need.to.produce</field>
+        <field name="arch" type="xml">
+            <list string="النواقص" create="false" delete="false"
+                  js_class="furniture_need_to_produce_list"
+                  default_order="furniture_model_id,product_id,id"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'done'">
+                <header>
+                    <button name="action_refresh" type="object" string="تحديث الاحتياجات"
+                            icon="fa-refresh" class="btn-secondary" display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager"/>
+                </header>
+                <field name="product_id" string="الصنف / القطعة" widget="need_produce_product" options="{'no_open': True}"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge" options="{'no_open': True}"/>
+                <field name="name" string="القطعة" optional="hide"/>
+                <field name="custom_bom_modified" column_invisible="True"/>
+                <field name="is_custom" string="Custom" widget="need_produce_custom"/>
+                <field name="target_lane" string="الوجهة" optional="hide"/>
+                <field name="route_text" string="خط الإنتاج المطلوب" widget="need_produce_route" class="text-wrap"/>
+                <field name="critical_path_hours" string="الوقت التقديري" widget="need_produce_time" digits="[16,2]"/>
+                <field name="critical_path_days" string="أيام عمل" optional="hide" digits="[16,2]"/>
+                <field name="total_work_hours" string="إجمالي عمل المراحل" optional="hide" digits="[16,2]"/>
+                <field name="unknown_incoming_wait" string="ينتظر أمرًا قائمًا" optional="hide"/>
+                <field name="state" string="الحالة" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'approved'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="company_id" string="الشركة" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_need_to_produce_search" model="ir.ui.view">
+        <field name="name">furniture.need.to.produce.search</field>
+        <field name="model">furniture.need.to.produce</field>
+        <field name="arch" type="xml">
+            <search string="بحث احتياجات الإنتاج">
+                <field name="product_id" string="الصنف"/>
+                <field name="furniture_model_id" string="الموديل"/>
+                <field name="name" string="القطعة"/>
+                <field name="target_lane" string="الوجهة"/>
+                <field name="company_id" string="الشركة" groups="base.group_multi_company"/>
+                <separator/>
+                <filter name="draft" string="بانتظار الاعتماد" domain="[('state', '=', 'draft')]"/>
+                <filter name="approved" string="مخطط للإنتاج" domain="[('state', '=', 'approved')]"/>
+                <filter name="done" string="مكتمل" domain="[('state', '=', 'done')]"/>
+                <filter name="cancelled" string="ملغي" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter name="big_moon" string="بيج مون"
+                        domain="['|', '|', ('furniture_model_id.name', 'ilike', 'بيج مون'), ('furniture_model_id.name', 'ilike', 'بيچ مون'), ('furniture_model_id.name', 'ilike', 'big moon')]"/>
+                <separator/>
+                <filter name="waiting_existing" string="ينتظر أمرًا قائمًا"
+                        domain="[('unknown_incoming_wait', '=', True)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_model" string="الموديل" context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_product" string="الصنف" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_target" string="الوجهة" context="{'group_by': 'target_lane'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="الشركة" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_need_to_produce_stage_form" model="ir.ui.view">
+        <field name="name">furniture.need.to.produce.stage.form</field>
+        <field name="model">furniture.need.to.produce.stage</field>
+        <field name="arch" type="xml">
+            <form string="مراجعة خامات مرحلة القطعة" create="false" delete="false" class="o_ntp_stage_form">
+                <sheet>
+                    <field name="state" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="lane" string="المرحلة"/>
+                        <h1><field name="lane" readonly="1"/></h1>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                        تعديل الخامات هنا يخص هذه القطعة وهذه المرحلة فقط، ولا يغيّر ريسيبي الصنف الأصلية.
+                        راجع الكمية ووحدة القياس، ثم احفظ قبل اعتماد القطعة.
+                    </div>
+                    <div class="alert alert-secondary" role="alert" invisible="state == 'draft'">
+                        تم اعتماد هذه القطعة؛ المسار والخامات هنا للعرض فقط.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="piece_id" string="القطعة" readonly="1" options="{'no_open': True}"/>
+                            <field name="stage_code" string="العملية الأولى" readonly="1"/>
+                            <field name="company_id" string="الشركة" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="quantity" string="عدد القطع" readonly="1"/>
+                            <field name="estimated_hours" string="ساعات العمل المتوقعة" readonly="1" digits="[16,2]"/>
+                            <field name="estimated_days" readonly="1" digits="[16,2]"/>
+                            <field name="operation_timing" readonly="1"/>
+                            <field name="production_id" string="أمر التشغيل" readonly="1" invisible="not production_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="خامات هذه القطعة" name="piece_materials">
+                            <field name="material_ids" readonly="state != 'draft'"
+                                   context="{'default_stage_code': stage_code}">
+                                <list editable="bottom" string="الخامات">
+                                    <field name="stage_code" string="العملية"/>
+                                    <field name="product_id" string="الخامة"
+                                           options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                                    <field name="quantity" string="الكمية" digits="[16,3]"/>
+                                    <field name="uom_id" string="وحدة القياس"
+                                           options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                                    <field name="customized" string="معدّلة لهذه القطعة" readonly="1" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="المدخلات ومصدر البضاعة" name="piece_inputs">
+                            <div class="text-muted mb-3">
+                                المخزون الجاهز والأوامر القائمة تغطي احتياج القطعة ولا يُعاد تصنيعها.
+                                مصادر المدخلات تُراجع تلقائيًا عند الاعتماد.
+                            </div>
+                            <field name="input_ids" readonly="1">
+                                <list create="false" delete="false" string="مصادر المدخلات">
+                                    <field name="role" string="المكوّن"/>
+                                    <field name="kind" string="نوع المصدر" widget="badge"/>
+                                    <field name="quantity" string="الكمية" digits="[16,3]"/>
+                                    <field name="output_id" string="الرصيد الجاهز" optional="show" options="{'no_open': True}"/>
+                                    <field name="source_line_id" string="سطر أمر قائم" optional="show" options="{'no_open': True}"/>
+                                    <field name="source_stage_id" string="مرحلة سابقة في خط القطعة" optional="show" options="{'no_open': True}"/>
+                                    <field name="handoff_ids" string="التحويلات" widget="many2many_tags" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="حفظ الخامات" special="save" class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="إغلاق" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_need_to_produce_form" model="ir.ui.view">
+        <field name="name">furniture.need.to.produce.form</field>
+        <field name="model">furniture.need.to.produce</field>
+        <field name="arch" type="xml">
+            <form string="النواقص" create="false" delete="false" edit="false" class="o_ntp_form">
+                <header>
+                    <field name="custom_bom_modified" invisible="1"/>
+                    <button name="action_refresh" type="object" string="تحديث الاحتياجات" icon="fa-refresh"
+                            groups="furniture_mrp.group_furniture_mrp_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,done"/>
+                </header>
+                <sheet>
+                    <field name="is_custom" widget="need_produce_custom" readonly="1" nolabel="1" invisible="not custom_bom_modified"/>
+                    <field name="custom_partners" widget="need_produce_partners" readonly="1" nolabel="1" invisible="not custom_bom_modified"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_productions" type="object" class="oe_stat_button" icon="fa-cogs"
+                                invisible="production_count == 0">
+                            <field name="production_count" widget="statinfo" string="أوامر التشغيل"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="product_id" string="الصنف"/>
+                        <h1><field name="product_id" options="{'no_open': True}"/></h1>
+                        <h2><field name="furniture_model_id" options="{'no_open': True}"/></h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" string="القطعة"/>
+                            <field name="target_lane" string="الوجهة المطلوبة"/>
+                            <field name="company_id" string="الشركة" groups="base.group_multi_company"/>
+                            <field name="bom_id" string="الريسيبي الأصلية" options="{'no_open': True}"/>
+                        </group>
+                        <group string="الوقت التقديري">
+                            <field name="critical_path_hours" digits="[16,2]"/>
+                            <field name="critical_path_days" digits="[16,2]"/>
+                            <field name="total_work_hours" digits="[16,2]"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        التقدير المؤقت ساعتان لكل قطعة في كل عملية، ويوم العمل ١٠ ساعات.
+                        ساعات المسار تراعي توازي المراحل؛ وهي تقدير عمل وليست موعد تسليم من MPS.
+                    </div>
+                    <field name="unknown_incoming_wait" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not unknown_incoming_wait">
+                        هذه القطعة تعتمد على أمر قائم لم يُحدَّد وقت انتهائه؛ المدة المعروضة لا تشمل انتظار هذا الأمر.
+                    </div>
+                    <group string="خط إنتاج هذه القطعة">
+                        <field name="route_graph" nolabel="1" widget="need_produce_graph"/>
+                    </group>
+                    <notebook>
+                        <page string="المراحل والخامات" name="stages">
+                            <div class="text-muted mb-3" invisible="state != 'draft'">
+                                افتح «مراجعة الخامات» لكل مرحلة لتعديل خامات هذه القطعة قبل اعتمادها.
+                                المراحل المغطاة بمخزون جاهز لا تُنشأ لها أوامر جديدة.
+                            </div>
+                            <field name="stage_ids" readonly="1">
+                                <list create="false" delete="false" string="مراحل خط الإنتاج">
+                                    <field name="sequence" column_invisible="True"/>
+                                    <field name="lane" string="مرحلة الإنتاج"/>
+                                    <field name="quantity" string="الكمية" digits="[16,3]"/>
+                                    <field name="estimated_hours" string="ساعات العمل" digits="[16,2]"/>
+                                    <field name="estimated_days" string="أيام عمل" digits="[16,2]"/>
+                                    <field name="operation_timing" string="مدة كل عملية"/>
+                                    <field name="production_id" string="أمر التشغيل" optional="show"/>
+                                    <button name="action_open" type="object" string="مراجعة الخامات" icon="fa-list-alt"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="بيانات الاعتماد" name="approval">
+                            <group>
+                                <field name="approved_by" string="اعتمد بواسطة"/>
+                                <field name="approved_at" string="تاريخ الاعتماد"/>
+                                <field name="final_rule_id" string="احتياج المنتج التام" options="{'no_open': True}"/>
+                                <field name="buffer_rule_id" string="احتياج مخزون المرحلة" options="{'no_open': True}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_need_to_produce" model="ir.actions.act_window">
+        <field name="name">النواقص</field>
+        <field name="res_model">furniture.need.to.produce</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_need_to_produce_search"/>
+        <field name="context">{'search_default_draft': 1}</field>
+        <field name="domain">[('final_rule_id', '!=', False), ('buffer_rule_id', '=', False)]</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">راجع احتياج كل قطعة قبل بدء التصنيع</p>
+            <p>اضغط «تحديث الاحتياجات» لإعداد المسارات حسب Min/Max والمخزون والأوامر القائمة، ثم اختر الموديل وراجع خامات المراحل قبل Approve.</p>
+        </field>
+    </record>
+    <record id="action_need_to_produce_pipeline_view" model="ir.actions.act_window.view">
+        <field name="sequence">0</field>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_need_to_produce_pipeline"/>
+        <field name="act_window_id" ref="action_need_to_produce"/>
+    </record>
+    <record id="action_need_to_produce_list_view" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_need_to_produce_list"/>
+        <field name="act_window_id" ref="action_need_to_produce"/>
+    </record>
+    <record id="action_need_to_produce_form_view" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_need_to_produce_form"/>
+        <field name="act_window_id" ref="action_need_to_produce"/>
+    </record>
+    <!-- Promote the existing menu: keep its ID, action, records and permissions.
+         Explicit False also moves already-installed menus out of MRP II. -->
+    <record id="menu_need_to_produce" model="ir.ui.menu">
+        <field name="name">النواقص</field>
+        <field name="parent_id" eval="False"/>
+        <field name="action" ref="action_need_to_produce"/>
+        <field name="web_icon">furniture_need_to_produce,static/description/icon.svg</field>
+        <field name="sequence">52</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+
+    <record id="action_need_to_produce_bases_minmax" model="ir.actions.act_window">
+        <field name="name">Min/Max القواعد</field>
+        <field name="res_model">furniture.mrp.stage.replenishment.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="furniture_stage_replenishment.view_furniture_stage_replenishment_rule_search"/>
+        <field name="domain">[('stage_code', '=', 'bases'), ('active', '=', True)]</field>
+        <field name="context">{'default_stage_code': 'bases'}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">حدود مخزون القواعد المستقل</p>
+            <p>اضبط Min وMax للقواعد. احتياج التجهيز الإضافي يُحسب أيضًا عند مراجعة خط القطعة في النواقص.</p>
+        </field>
+    </record>
+    <record id="action_need_to_produce_bases_list_view" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="furniture_stage_replenishment.view_furniture_stage_replenishment_rule_list"/>
+        <field name="act_window_id" ref="action_need_to_produce_bases_minmax"/>
+    </record>
+    <record id="action_need_to_produce_bases_form_view" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="furniture_stage_replenishment.view_furniture_stage_replenishment_rule_form"/>
+        <field name="act_window_id" ref="action_need_to_produce_bases_minmax"/>
+    </record>
+    <!-- Bases are configured in the existing stage Min/Max dashboard. Keep
+         this old shortcut inactive on both fresh installs and upgrades. -->
+    <record id="menu_need_to_produce_bases_minmax" model="ir.ui.menu">
+        <field name="name">Min/Max القواعد</field>
+        <field name="parent_id" ref="furniture_mrp.menu_furniture_mrp_root"/>
+        <field name="action" ref="action_need_to_produce_bases_minmax"/>
+        <field name="sequence">20</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

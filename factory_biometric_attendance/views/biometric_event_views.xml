@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_biometric_event_search" model="ir.ui.view">
+        <field name="name">factory.biometric.event.search</field>
+        <field name="model">factory.biometric.event</field>
+        <field name="arch" type="xml">
+            <search string="سجل حركات البصمة">
+                <field name="employee_id"/>
+                <field name="device_user_id"/>
+                <field name="device_id"/>
+                <field name="punch_time"/>
+                <filter name="needs_review" string="تحتاج مراجعة" domain="[('state', 'in', ['pending_device', 'unmapped', 'error'])]"/>
+                <filter name="processed" string="تمت المعالجة" domain="[('state', '=', 'processed')]"/>
+                <filter name="ignored" string="محفوظة بدون تأثير" domain="[('state', '=', 'ignored')]"/>
+                <separator/>
+                <filter name="today" string="اليوم" domain="[('punch_time', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="تجميع">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_device" string="الجهاز" context="{'group_by': 'device_id'}"/>
+                    <filter name="group_employee" string="الموظف" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_day" string="اليوم" context="{'group_by': 'punch_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_biometric_event_list" model="ir.ui.view">
+        <field name="name">factory.biometric.event.list</field>
+        <field name="model">factory.biometric.event</field>
+        <field name="arch" type="xml">
+            <list string="سجل حركات البصمة" create="false" delete="false" edit="false" decoration-danger="state == 'error'" decoration-warning="state in ['pending_device', 'unmapped']" decoration-muted="state == 'ignored'" decoration-success="state == 'processed'">
+                <header>
+                    <button name="action_reprocess" type="object" string="إعادة معالجة المحدد" groups="hr_attendance.group_hr_attendance_manager"/>
+                </header>
+                <field name="punch_time"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="device_user_id"/>
+                <field name="device_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'processed'" decoration-danger="state == 'error'" decoration-warning="state in ['pending_device', 'unmapped']"/>
+                <field name="resolved_action" widget="badge" optional="show"/>
+                <field name="attendance_id" optional="show"/>
+                <field name="verify_mode" optional="hidden" groups="hr_attendance.group_hr_attendance_manager"/>
+                <field name="received_at" optional="hidden"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biometric_event_form" model="ir.ui.view">
+        <field name="name">factory.biometric.event.form</field>
+        <field name="model">factory.biometric.event</field>
+        <field name="arch" type="xml">
+            <form string="حركة بصمة" create="false" delete="false" edit="false">
+                <header>
+                    <button name="action_reprocess" string="إعادة المعالجة" type="object" class="btn-primary" invisible="state not in ['received', 'pending_device', 'unmapped', 'error']" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="employee_id" widget="many2one_avatar_employee" placeholder="رقم عامل غير مربوط"/></h1>
+                        <h3><field name="punch_time"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="device_user_id"/>
+                            <field name="identity_id"/>
+                            <field name="resolved_action"/>
+                            <field name="attendance_id"/>
+                        </group>
+                        <group>
+                            <field name="punch_time_local"/>
+                            <field name="status_code"/>
+                            <field name="verify_mode" groups="hr_attendance.group_hr_attendance_manager"/>
+                            <field name="work_code" groups="hr_attendance.group_hr_attendance_manager"/>
+                            <field name="received_at"/>
+                            <field name="source_stamp" groups="hr_attendance.group_hr_attendance_manager"/>
+                        </group>
+                    </group>
+                    <group string="ملاحظة المعالجة" invisible="not error_message">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                    <group string="السجل الخام" groups="hr_attendance.group_hr_attendance_manager">
+                        <field name="raw_line" nolabel="1"/>
+                        <field name="digest"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_biometric_event" model="ir.actions.act_window">
+        <field name="name">سجل حركات البصمة</field>
+        <field name="res_model">factory.biometric.event</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biometric_event_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,233 @@
+.o_field_need_produce_graph {
+    display: block !important;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.o_ntp_graph {
+    --ntp-graph-ink: #193e4a;
+    --ntp-graph-muted: #71858c;
+    --ntp-graph-stage: #7344b5;
+    --ntp-graph-stock: #16a34a;
+    --ntp-graph-incoming: #d18a0a;
+    min-width: 0;
+    max-width: 100%;
+    color: var(--ntp-graph-ink);
+    font-size: 13px;
+    text-align: right;
+}
+
+.o_ntp_graph_toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #dedbe9;
+    border-radius: 10px;
+    background: #faf9fc;
+    color: #575071;
+    font: inherit;
+    font-weight: 700;
+    text-align: start;
+    cursor: pointer;
+}
+.o_ntp_graph_toggle:hover { background: #f1eff7; border-color: #aaa2c8; }
+.o_ntp_graph_toggle:focus-visible { outline: 3px solid #8b85b3; outline-offset: 2px; }
+.o_ntp_graph_toggle_arrow { margin-inline-start: auto; font-size: 12px; }
+.o_ntp_graph_content:not([hidden]) { padding-top: 14px; }
+.o_ntp_graph_content[hidden] { display: none !important; }
+
+.o_ntp_graph_heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 4px 12px;
+}
+
+.o_ntp_graph_title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.o_ntp_graph_title > .fa { color: #458e97; }
+.o_ntp_graph_title > span { color: var(--ntp-graph-muted); font-size: 11px; font-weight: 400; }
+
+.o_ntp_graph_legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 11px; color: #5f566e; }
+.o_ntp_graph_legend > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.o_ntp_graph_dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.o_ntp_graph_dot_stage { background: var(--ntp-graph-stage); }
+.o_ntp_graph_dot_stock { background: var(--ntp-graph-stock); }
+.o_ntp_graph_dot_incoming { background: var(--ntp-graph-incoming); }
+
+.o_ntp_graph_scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #b9afca #f3eff8;
+    border: 1px solid #e4deed;
+    border-radius: 12px;
+    background-color: #fcfbfe;
+    background-image: radial-gradient(#e0d8ec 0.8px, transparent 0.8px);
+    background-size: 15px 15px;
+    cursor: default;
+}
+
+.o_ntp_graph_scroll:focus-visible { outline: 3px solid #9771c6; outline-offset: 3px; }
+.o_ntp_graph_canvas { position: relative; direction: ltr; margin-inline: auto; flex-shrink: 0; }
+.o_ntp_graph_edges { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.o_ntp_graph_edge { fill: none; stroke: var(--ntp-graph-stage); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.o_ntp_graph_edge_stock { stroke: var(--ntp-graph-stock); }
+.o_ntp_graph_edge_completion { stroke-dasharray: 3 3; stroke-width: 1.5; }
+.o_ntp_graph_completion_key { width: 16px; border-top: 2px dashed var(--ntp-graph-stage); }
+.o_ntp_graph_edge_incoming { stroke: var(--ntp-graph-incoming); stroke-dasharray: 5 4; }
+.o_ntp_graph_arrow_stage { fill: var(--ntp-graph-stage); }
+.o_ntp_graph_arrow_stock { fill: var(--ntp-graph-stock); }
+.o_ntp_graph_arrow_incoming { fill: var(--ntp-graph-incoming); }
+
+.o_ntp_graph_node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    direction: rtl;
+    padding: 3px 5px;
+    border: 1px solid #ddd8e9;
+    border-top: 3px solid var(--ntp-graph-stage);
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 3px 8px #29485609;
+    transition: border-color 140ms, box-shadow 140ms;
+    cursor: default;
+}
+
+.o_ntp_graph_node_stage { padding: 2px 5px; background: linear-gradient(155deg, #fcfaff, #f3eafb); border-color: #d4bde9; border-top-color: var(--ntp-graph-stage); box-shadow: 0 3px 9px #7344b511; }
+.o_ntp_graph_node_stage:hover { border-color: #a37bc9; box-shadow: 0 5px 14px #7344b51a; }
+.o_ntp_graph_node_stock { border-color: #bbf7d0; border-top-color: var(--ntp-graph-stock); background: #f0fdf4; }
+.o_ntp_graph_node_incoming { border-color: #efd094; border-top-color: var(--ntp-graph-incoming); background: #fff5df; }
+.o_ntp_graph_node_history { border-color: #efd094; border-top-color: var(--ntp-graph-incoming); background: #fff5df; }
+.o_ntp_graph_node.is-withdrawn { border-color: #a7dfb8; border-top-color: #16813c; background: #f0faf3; }
+.o_ntp_graph_withdrawn_check { position: absolute; left: 10px; top: 43px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #16813c; color: #fff; font-size: 27px; box-shadow: 0 2px 5px #16813c22; }
+.o_ntp_graph_node.is-withdrawn .o_ntp_graph_node_label,
+.o_ntp_graph_node.is-withdrawn .o_ntp_graph_node_meta { padding-inline-end: 40px; }
+.o_ntp_graph_node.is-withdrawn .o_ntp_graph_node_kind { color: #166534; font-size: 9px; }
+.o_ntp_graph_node.is-withdrawn .o_ntp_graph_node_icon { display: none; }
+.o_ntp_graph_node.is-withdrawn .o_ntp_graph_port { border-color: #16813c; }
+.o_ntp_graph_withdrawn_legend { color: #16813c; }
+.o_ntp_graph_withdrawn_legend > .fa { font-size: 15px; }
+.o_ntp_graph_node_history:not(.is-withdrawn) .o_ntp_graph_source_note { color: #854d0e; border-color: #fde68a; }
+.o_ntp_graph_node_top { display: flex; align-items: center; gap: 3px; min-height: 16px; }
+.o_ntp_graph_node_icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; flex: 0 0 16px; color: #62329b; background: #eaddf8; border-radius: 4px; font-size: 9px; }
+.o_ntp_graph_node_stock .o_ntp_graph_node_icon { color: #166534; background: #dcfce7; }
+.o_ntp_graph_node_incoming .o_ntp_graph_node_icon,
+.o_ntp_graph_node_history:not(.is-withdrawn) .o_ntp_graph_node_icon { color: #875309; background: #fae1a8; }
+.o_ntp_graph_node_incoming:not(.is-withdrawn) .o_ntp_graph_node_icon > .fa-hourglass-half {
+    display: inline-block;
+    font-size: 11px;
+    transform-origin: center;
+    animation: ntp-wait-hourglass 2.4s ease-in-out infinite;
+}
+@keyframes ntp-wait-hourglass {
+    0%, 60% { transform: rotate(0deg); }
+    85%, 100% { transform: rotate(180deg); }
+}
+.o_ntp_graph_node_kind { color: var(--ntp-graph-muted); font-size: 8.5px; line-height: 11px; white-space: nowrap; }
+.o_ntp_graph_node_history .o_ntp_graph_node_kind { white-space: normal; }
+.o_ntp_graph_node_stage .o_ntp_graph_node_kind { display: inline-flex; align-items: center; gap: 3px; color: #62329b; font-weight: 600; }
+.o_ntp_graph_node_stage .o_ntp_graph_node_kind::before { content: ""; width: 4px; height: 4px; flex: 0 0 4px; border-radius: 50%; background: var(--ntp-graph-stage); }
+.o_ntp_graph_node_stock .o_ntp_graph_node_kind { color: #166534; font-weight: 600; }
+.o_ntp_graph_node_incoming .o_ntp_graph_node_kind { color: #854d0e; font-weight: 600; }
+.o_ntp_graph_customized { color: #b98b31; font-size: 9px; margin-inline-start: auto; }
+.o_ntp_graph_customized_stage { position: absolute; top: 5px; left: 5px; }
+.o_ntp_graph_node:has(.o_ntp_graph_customized_stage) .o_ntp_graph_node_label { padding-inline-end: 12px; }
+.o_ntp_graph_node_label { display: block; margin-top: 1px; font-size: 16px; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #193e4a; }
+.o_ntp_graph_node_stage .o_ntp_graph_node_label { margin-top: 0; flex-shrink: 0; color: #4f277e; }
+.o_ntp_graph_node_incoming .o_ntp_graph_node_label,
+.o_ntp_graph_node_history:not(.is-withdrawn) .o_ntp_graph_node_label { color: #7b4a06; }
+.o_ntp_graph_node_meta { display: flex; justify-content: space-between; align-items: center; gap: 3px; min-height: 14px; color: #617a83; font-size: 9px; line-height: 14px; }
+.o_ntp_graph_node_meta > span { white-space: nowrap; }
+.o_ntp_graph_node_meta .fa { margin-inline-end: 3px; font-size: 10px; }
+.o_ntp_graph_node_meta b { color: #365b67; font-weight: 600; }
+.o_ntp_graph_node_meta > small { color: #8a9aa0; font-size: 9px; }
+.o_ntp_graph_node_stage .o_ntp_graph_node_meta,
+.o_ntp_graph_node_stage .o_ntp_graph_node_meta b,
+.o_ntp_graph_node_stage .o_ntp_graph_node_meta > small { color: #6d5485; }
+.o_ntp_graph_node_stage .o_ntp_graph_node_meta { min-height: 20px; }
+.o_ntp_graph_node_incoming .o_ntp_graph_node_meta { color: #8b621e; font-size: 9px; }
+
+.o_ntp_graph_bom {
+    /* Extend the native button over the whole card, including its border. */
+    position: absolute;
+    inset: -3px -1px -1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0 7px;
+    border: 0;
+    border-radius: inherit;
+    color: #5d2d91;
+    background: transparent;
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 140ms;
+}
+
+.o_ntp_graph_bom:hover { background: #7344b50a; }
+.o_ntp_graph_bom:focus-visible { outline: 3px solid #6b638d; outline-offset: 2px; }
+.o_ntp_graph_bom:disabled { background: #ffffff33; cursor: wait; }
+.o_ntp_graph_bom > .fa:first-child { font-size: 10px; }
+.o_ntp_graph_source_note { display: flex; align-items: center; gap: 4px; margin-top: auto; padding-top: 3px; border-top: 1px solid #bbf7d0; color: #166534; font-size: 9px; line-height: 15px; }
+.o_ntp_graph_node_incoming .o_ntp_graph_source_note { border-color: #fde68a; color: #854d0e; }
+.o_ntp_graph_source_note > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Waiting cards use the same two-line, 48px face as required operations.
+   The complete waiting state remains in the article's title/accessible label. */
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) { padding: 2px 5px; }
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) .o_ntp_graph_node_top { position: absolute; top: 3px; left: 5px; }
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) .o_ntp_graph_node_kind,
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) .o_ntp_graph_node_meta { display: none; }
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) .o_ntp_graph_node_label { margin-top: 0; padding-inline-end: 18px; flex-shrink: 0; }
+.o_ntp_graph_node:is(.o_ntp_graph_node_incoming, .o_ntp_graph_node_history):not(.is-withdrawn) .o_ntp_graph_source_note { min-width: 0; margin-top: 0; padding-top: 0; border-top: 0; line-height: 20px; font-size: 8.5px; }
+
+.o_ntp_graph_port { position: absolute; top: calc(50% - 3px); width: 6px; height: 6px; border: 1px solid var(--ntp-graph-stage); border-radius: 50%; background: #fff; }
+.o_ntp_graph_port_in { inset-inline-start: -4px; }
+.o_ntp_graph_port_out { inset-inline-end: -4px; }
+.o_ntp_graph_port_top { top: -4px; left: calc(50% - 3px); }
+.o_ntp_graph_port_bottom { top: auto; bottom: -4px; left: calc(50% - 3px); }
+.o_ntp_graph_scroll_hint { display: none; }
+.o_ntp_graph_node_stock .o_ntp_graph_port { border-color: var(--ntp-graph-stock); }
+.o_ntp_graph_node_incoming .o_ntp_graph_port { border-color: var(--ntp-graph-incoming); }
+
+.o_ntp_graph_footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 10px 4px 0; font-size: 11px; line-height: 1.6; color: var(--ntp-graph-muted); }
+.o_ntp_graph_footer .fa { margin-inline-end: 5px; }
+.o_ntp_graph_wait { color: #99772f; }
+.o_ntp_graph_empty { padding: 26px; border: 1px dashed #cadce1; border-radius: 10px; color: #7e939b; text-align: center; }
+.o_ntp_graph_empty .fa { margin-inline-end: 6px; }
+.o_ntp_graph_warning { margin-top: 10px; padding: 8px 12px; border-radius: 6px; background: #fff4dc; color: #967326; font-size: 12px; }
+
+@media (max-width: 767px) {
+    .o_ntp_graph_scroll_hint { display: flex; align-items: center; gap: 7px; padding: 9px 4px 0; color: #617a83; font-size: 11px; }
+    .o_ntp_graph_heading { align-items: flex-start; gap: 9px; }
+    .o_ntp_graph_title { flex-wrap: wrap; gap: 6px; font-size: 13px; }
+    .o_ntp_graph_legend { gap: 10px; }
+    .o_ntp_graph_footer { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_ntp_graph_node, .o_ntp_graph_bom { transition: none; }
+    .o_ntp_graph_node_incoming:not(.is-withdrawn) .o_ntp_graph_node_icon > .fa-hourglass-half { animation: none; }
+}

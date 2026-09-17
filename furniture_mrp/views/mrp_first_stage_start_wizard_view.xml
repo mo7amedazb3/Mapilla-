@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_first_stage_start_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.first.stage.start.wizard.form</field>
+        <field name="model">furniture.mrp.first.stage.start.wizard</field>
+        <field name="arch" type="xml">
+            <form string="بدء أول مرحلة من المخزن" class="o_furniture_stage_transfer_wizard o_furniture_first_stage_start_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">أصناف لسه ما بدأتش أول مرحلة</div>
+                        <h2>اختار الأصناف اللي هتبدأ أول مرة في مرحلة <field name="stage_label" nolabel="1" readonly="1" class="oe_inline"/>.</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">▶</div>
+                </div>
+                <group class="o_furniture_transfer_order">
+                    <field name="production_id"/>
+                    <field name="stage_code" invisible="1"/>
+                    <field name="stage_order_model" invisible="1"/>
+                    <field name="stage_order_res_id" invisible="1"/>
+                    <field name="stage_label" invisible="1"/>
+                    <field name="request_only" invisible="1"/>
+                </group>
+                <div class="o_furniture_transfer_card o_furniture_transfer_contents">
+                    <div class="o_furniture_transfer_card_title">الأصناف المتاحة للبدء من المخزن</div>
+                    <div class="o_furniture_transfer_contents_hint">
+                        الأصناف المختارة فقط هتسحب خامات هذه المرحلة من المخزن، وتقدر تقلل كمية البدء لو عايز تبدأ جزء من الصنف والباقي يفضل متسجل في أمر التشغيل.
+                    </div>
+                    <field name="line_ids" nolabel="1" readonly="0"
+                           class="o_furniture_standard_transfer_lines o_furniture_wizard_list">
+                        <list create="false" delete="false" editable="bottom">
+                            <field name="selected"/>
+                            <field name="production_line_id" invisible="1" column_invisible="1"/>
+                            <field name="technical_production_line_ids" invisible="1" column_invisible="1"/>
+                            <field name="product_id" invisible="1" column_invisible="1"/>
+                            <field name="product_display_label" string="الصنف" readonly="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   decoration-info="dimension_label"/>
+                            <field name="furniture_model_id" string="الموديل" readonly="1" widget="badge"
+                                   class="o_furniture_transfer_model_badge"/>
+                            <field name="product_qty" string="الكمية المطلوبة" readonly="1"/>
+                            <field name="qty_to_start" string="الكمية"/>
+                            <field name="stage_summary" string="مراحل الصنف" readonly="1" optional="show"/>
+                            <button name="action_view_requested_materials" type="object"
+                                    string="الخامات المطلوبة" icon="fa-list-alt"
+                                    class="btn-link o_furniture_wizard_material_button"/>
+                        </list>
+                    </field>
+                </div>
+                <footer>
+                    <button name="action_submit_store_request" string="إرسال طلب الإذن لأمين المخزن" type="object"
+                            class="btn-primary o_furniture_transfer_confirm" invisible="not request_only"/>
+                    <button name="action_start_selected_from_stock" string="ابدأ المختار من المخزن" type="object"
+                            class="btn-primary o_furniture_transfer_confirm" invisible="request_only"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

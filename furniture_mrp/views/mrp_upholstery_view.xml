@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_upholstery_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.upholstery.form</field>
+        <field name="model">furniture.mrp.upholstery</field>
+        <field name="arch" type="xml">
+            <form string="أمر كسوه">
+                <header>
+                    <button name="action_view_current_stage_products" string="👁️ عرض المنتجات الموجودة" type="object" class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_request_store_approval" string="📨 طلب إذن المخزن" type="object" class="btn-info o_furniture_store_request_button" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state not in ('none', 'started', 'rejected', 'cancelled')"/>
+                    <button name="action_open_store_request" string="⏳ الإذن بانتظار المخزن" type="object" class="btn-warning o_furniture_store_request_pending" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'pending'"/>
+                    <button name="action_open_advance_material_receipt" string="📥 استلام من المخزن" type="object" class="btn-warning o_furniture_material_receipt_button" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'awaiting_receipt'" groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_open_store_request" string="✅ الإذن معتمد" type="object" class="btn-success" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'approved'"/>
+                    <button name="action_start" string="▶️ بدء كسوه" type="object" class="btn-primary o_furniture_store_start_ready" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state != 'approved'"/>
+                    <button name="action_send_to_quality" string="🔍 إرسال للجودة" type="object" class="btn-warning" invisible="state != 'in_progress'"/>
+                    <button name="action_approve_quality" string="✅ قبول الجودة" type="object" class="btn-success" invisible="state != 'quality_check'"/>
+                    <button name="action_reject_quality" string="❌ رفض" type="object" class="btn-danger" invisible="state != 'quality_check'"/>
+                    <button name="action_transfer_finished_product" string="📦 تحويل للمخزن التام" type="object" class="btn-info o_furniture_finished_transfer_button" invisible="not production_can_transfer_finished_product"/>
+                    <field name="production_can_transfer_finished_product" invisible="1"/>
+                    <field name="can_start_stage_work" invisible="1"/>
+                    <field name="can_operate_stage_actions" invisible="1"/>
+                    <field name="store_request_id" invisible="1"/>
+                    <field name="store_request_state" invisible="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,in_progress,quality_check,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="بيانات الأمر">
+                            <field name="production_order_id" readonly="1"/>
+                            <field name="tailoring_order_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="not kit_piece_notes_summary">
+                        <strong>📝 ملاحظات القطع من تقسيمة الأطقم</strong>
+                        <field name="kit_piece_notes_summary" nolabel="1" readonly="1" widget="text"/>
+                    </div>
+                    <notebook>
+                        <page string="🛋️ تفاصيل كسوه" invisible="1">
+                            <group>
+                                <group string="القماش">
+                                    <field name="fabric_type"/>
+                                    <field name="fabric_color"/>
+                                    <field name="fabric_qty_m"/>
+                                </group>
+                                <group string="السفنجة">
+                                    <field name="foam_type"/>
+                                    <field name="foam_density"/>
+                                    <field name="foam_thickness_cm"/>
+                                    <field name="foam_qty_m3"/>
+                                </group>
+                            </group>
+                            <group string="مواد التشطيب">
+                                <field name="batting_qty_kg"/>
+                                <field name="staples_count"/>
+                                <field name="button_count"/>
+                                <field name="piping_meters"/>
+                                <field name="zipper_count"/>
+                            </group>
+                        </page>
+                        <page string="👷 العمالة والتكاليف">
+                            <group>
+                                <group string="الفريق">
+                                    <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','upholstery')]"/>
+                                    <field name="worker_user_ids" widget="many2many_tags" domain="[('share','=',False), ('employee_ids.furniture_mrp_role','=','worker'), ('employee_ids.furniture_mrp_worker_stage_ids.code','=','upholstery')]"/>
+                                </group>
+                                <group string="تكلفة العمالة">
+                                    <field name="expected_labor_hours"/>
+                                    <field name="waiting_labor_hours" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="waiting_labor_cost" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_hours" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="🔍 الجودة">
+                            <group>
+                                <field name="quality_inspector_id"/>
+                                <field name="quality_check" widget="radio"/>
+                                <field name="quality_notes"/>
+                            </group>
+                        </page>
+                        <page string="⏱ سجل الوقت" invisible="state not in ('quality_check', 'done')">
+                            <field name="worker_time_log_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="user_id"/>
+                                    <field name="start_datetime"/>
+                                    <field name="end_datetime"/>
+                                    <field name="duration_hours"/>
+                                    <field name="employee_id"/>
+                                    <field name="contract_id"/>
+                                    <field name="contract_wage"/>
+                                    <field name="hourly_rate"/>
+                                    <field name="labor_cost"/>
+                                    <field name="is_active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="📝 ملاحظات">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_upholstery_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.upholstery.list</field>
+        <field name="model">furniture.mrp.upholstery</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'" decoration-warning="state == 'quality_check'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="fabric_type"/>
+                <field name="fabric_color"/>
+                <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','upholstery')]"/>
+                <field name="expected_labor_hours"/>
+                <field name="waiting_labor_hours" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="waiting_labor_cost" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                <field name="labor_cost" invisible="state not in ('quality_check', 'done')"/>
+                <field name="quality_check"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'quality_check'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_upholstery" model="ir.actions.act_window">
+        <field name="name">كسوه</field>
+        <field name="res_model">furniture.mrp.upholstery</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

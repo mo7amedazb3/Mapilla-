@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.ApprovedTracking">
+        <div class="o_ntp_approved" dir="rtl" t-ref="workspace">
+            <div class="o_ntp_approved_workspace">
+                <header class="o_ntp_approved_header">
+                    <div class="o_ntp_approved_intro">
+                        <span class="o_ntp_approved_kicker"><i aria-hidden="true" class="fa fa-check-square-o"/> النواقص / الاعتمادات</span>
+                        <h1>متابعة المعتمد</h1>
+                        <p>من الاعتماد إلى اكتمال الإنتاج.<br/>اختَر الموديل لمتابعة قطعه وإدارة اعتماداته.</p>
+                    </div>
+                    <svg class="o_ntp_approved_illustration" viewBox="0 0 330 140" fill="none" aria-hidden="true">
+                        <path d="M32 80H90M235 80H296" stroke="#81b6bf" stroke-width="2" stroke-dasharray="4 5"/>
+                        <circle cx="30" cy="80" r="23" fill="#244c60"/><path d="m20 80 7 7 14-16" stroke="#91ddd0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="97" y="17" width="136" height="111" rx="20" fill="#23495e" stroke="#42677a"/>
+                        <rect x="117" y="45" width="95" height="40" rx="10" fill="#80b9b4"/>
+                        <path d="M164 47V79" stroke="#416f76" stroke-width="2"/>
+                        <rect x="108" y="72" width="113" height="25" rx="8" fill="#b1ddd2"/>
+                        <rect x="108" y="65" width="14" height="28" rx="6" fill="#d5eee7"/><rect x="207" y="65" width="14" height="28" rx="6" fill="#d5eee7"/>
+                        <path d="M121 97V104M209 97V104" stroke="#d5eee7" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="295" cy="80" r="23" fill="#244c60"/><path d="m283 76 12-7 12 7v13l-12 7-12-7Z M283 76l12 7 12-7M295 83v13" stroke="#91ddd0" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="244" cy="24" r="4" fill="#d6b681"/><circle cx="80" cy="116" r="3" fill="#91ddd0"/>
+                    </svg>
+                    <button class="btn o_ntp_approved_refresh" t-on-click="() => this.load()" t-att-disabled="state.loading || state.busy"><i aria-hidden="true" t-att-class="'fa fa-refresh ' + (state.loading ? 'fa-spin' : '')"/> تحديث</button>
+                </header>
+                <div class="o_ntp_approved_toolbar">
+                    <nav class="o_ntp_approved_tabs" role="tablist" aria-label="نوع الاعتماد">
+                        <button role="tab" aria-label="المنتج التام" t-att-aria-selected="state.scope === 'final'" t-att-class="{'is-active': state.scope === 'final'}" t-on-click="() => this.selectScope('final')" t-att-disabled="state.busy"><i aria-hidden="true" class="fa fa-cube"/> المنتج التام</button>
+                        <button role="tab" aria-label="المراحل" t-att-aria-selected="state.scope === 'stage'" t-att-class="{'is-active': state.scope === 'stage'}" t-on-click="() => this.selectScope('stage')" t-att-disabled="state.busy"><i aria-hidden="true" class="fa fa-cogs"/> المراحل</button>
+                    </nav>
+                    <span class="o_ntp_approved_total"><b t-esc="state.total"/> اعتماد ضمن نتائج البحث</span>
+                </div>
+                <div class="o_ntp_approved_overview" aria-label="حالات الاعتمادات المعروضة">
+                    <div t-foreach="summary" t-as="item" t-key="item.key" t-att-class="'o_ntp_approved_stat is-' + item.key">
+                        <span class="o_ntp_approved_stat_icon"><i aria-hidden="true" t-att-class="'fa fa-' + item.icon"/></span>
+                        <div><span t-esc="item.label"/><strong t-esc="state.loading ? '—' : item.count"/></div>
+                    </div>
+                </div>
+                <form class="o_ntp_approved_filters" t-on-submit.prevent="applyFilter">
+                    <div class="o_ntp_approved_search"><i aria-hidden="true" class="fa fa-search"/><input class="form-control" type="search" t-model="state.search" placeholder="ابحث بالموديل، الصنف أو رقم أمر الإنتاج…" aria-label="بحث في الاعتمادات" t-att-disabled="state.busy"/></div>
+                    <select class="form-select" aria-label="حالة التنفيذ" t-on-change="changeStatus" t-att-disabled="state.busy">
+                        <option value="all">كل حالات التنفيذ</option><option value="waiting">بانتظار التنفيذ</option><option value="running">جاري التنفيذ</option><option value="done">مكتمل</option><option value="attention">بحاجة إلى المراجعة</option>
+                    </select>
+                    <button class="btn btn-primary" type="submit" t-att-disabled="state.loading || state.busy">بحث</button>
+                    <span class="o_ntp_approved_page_hint">المؤشرات لكل نتائج البحث<t t-if="state.modelId !== null &amp;&amp; state.pages > 1"> · صفحة <t t-esc="state.page + 1"/> من <t t-esc="state.pages"/></t></span>
+                </form>
+                <div t-if="state.modelId !== null" class="o_ntp_approved_model_nav">
+                    <button class="btn" t-on-click="backToModels" t-att-disabled="state.busy"><i class="fa fa-arrow-right" aria-hidden="true"/> كل الموديلات</button>
+                    <span class="o_ntp_approved_nav_separator">/</span><strong t-esc="state.modelName"/><span>متابعة القطع وإدارة الاعتمادات</span>
+                </div>
+                <div t-if="state.error" class="alert alert-danger" role="alert"><t t-esc="state.error"/> <button class="btn btn-link" t-on-click="() => this.load()">إعادة المحاولة</button></div>
+                <div t-elif="state.loading" class="o_ntp_approved_empty" role="status"><i aria-hidden="true" class="fa fa-spinner fa-spin"/><h2>جارٍ تحميل الاعتمادات</h2><p>نجمع لك آخر حالات التنفيذ.</p></div>
+                <section t-elif="state.modelId === null &amp;&amp; state.models.length" class="o_ntp_approved_model_grid" aria-label="الموديلات المعتمدة" role="tabpanel">
+                    <button t-foreach="state.models" t-as="model" t-key="model.id" t-att-class="'o_ntp_approved_model_tile tone-' + (model.id % 4)" t-att-data-model-id="model.id" t-on-click="() => this.openModel(model)" t-att-disabled="state.busy" t-att-aria-label="'فتح موديل ' + model.name">
+                        <div class="o_ntp_approved_tile_top"><span class="o_ntp_approved_tile_illustration">
+                            <svg viewBox="0 0 120 80" fill="none" aria-hidden="true"><rect x="22" y="15" width="76" height="38" rx="10" fill="currentColor" opacity=".22"/><path d="M60 19v28" stroke="currentColor" opacity=".45" stroke-width="2"/><rect x="15" y="42" width="90" height="22" rx="7" fill="currentColor" opacity=".6"/><rect x="12" y="35" width="13" height="27" rx="6" fill="currentColor"/><rect x="95" y="35" width="13" height="27" rx="6" fill="currentColor"/><path d="M25 64v6M95 64v6" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+                        </span><span class="o_ntp_approved_tile_arrow"><i aria-hidden="true" class="fa fa-arrow-left"/></span></div>
+                        <h2 t-esc="model.name"/>
+                        <div class="o_ntp_approved_tile_meta"><span><b t-esc="model.count"/> اعتماد</span><span><b t-esc="model.quantity"/> قطعة</span></div>
+                        <div class="o_ntp_approved_tile_progress_label"><span>إنجاز المراحل</span><strong><t t-esc="model.progress"/>%</strong></div>
+                        <div class="o_ntp_approved_progress"><span t-att-style="'width:' + model.progress + '%'"/></div>
+                        <div class="o_ntp_approved_tile_statuses"><span t-if="model.waiting"><i class="fa fa-clock-o" aria-hidden="true"/> <t t-esc="model.waiting"/> في الانتظار</span><span t-if="model.running" class="is-running"><i class="fa fa-cogs" aria-hidden="true"/> <t t-esc="model.running"/> قيد التنفيذ</span><span t-if="model.done" class="is-done"><i class="fa fa-check-circle" aria-hidden="true"/> <t t-esc="model.done"/> مكتمل</span><span t-if="model.attention" class="is-attention"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> <t t-esc="model.attention"/> بحاجة إلى المراجعة</span></div>
+                        <span class="o_ntp_approved_tile_cta">فتح الموديل وإدارة الاعتمادات <i class="fa fa-angle-left" aria-hidden="true"/></span>
+                    </button>
+                </section>
+                <div t-elif="!state.cards.length" class="o_ntp_approved_empty"><i aria-hidden="true" class="fa fa-folder-open-o"/><h2>لا توجد اعتمادات مطابقة</h2><p>ستظهر الاعتمادات هنا بعد اعتماد القطع. جرّب أيضًا تغيير البحث أو حالة التنفيذ.</p></div>
+                <div t-else="" role="tabpanel">
+                    <section t-foreach="modelGroups" t-as="group" t-key="group.id" class="o_ntp_approved_model">
+                        <header class="o_ntp_approved_model_heading"><span class="o_ntp_approved_model_icon"><i aria-hidden="true" class="fa fa-cubes"/></span><h2 t-esc="group.name"/><span><t t-esc="group.cards.length"/> اعتماد <span class="o_ntp_approved_dot">·</span> <t t-esc="group.quantity"/> قطعة</span><div/></header>
+                        <div class="o_ntp_approved_cards">
+                            <article t-foreach="group.cards" t-as="card" t-key="card.id" class="o_ntp_approved_card" t-att-data-card-id="card.id">
+                                <div class="o_ntp_approved_card_heading">
+                                    <span class="o_ntp_approved_product_icon"><i aria-hidden="true" t-att-class="'fa fa-' + (state.scope === 'stage' ? 'cogs' : 'cube')"/></span>
+                                    <div class="o_ntp_approved_product"><h3 t-esc="card.product"/><div class="o_ntp_approved_metadata"><span><b t-esc="card.quantity"/> قطعة</span><span><b t-esc="card.order_count"/> أمر إنتاج</span><span t-if="state.scope === 'stage'" t-esc="card.target"/><span t-if="card.custom" class="o_ntp_approved_custom">خامات مخصصة</span></div></div>
+                                    <span t-att-class="'o_ntp_approved_badge is-' + card.status"><span/><t t-esc="labels[card.status]"/></span>
+                                </div>
+                                <div class="o_ntp_approved_progress_panel">
+                                    <div class="o_ntp_approved_progress_label"><span><i aria-hidden="true" class="fa fa-map-signs"/> <t t-esc="this.currentStage(card)"/></span><strong><t t-esc="card.progress"/><small>%</small></strong></div>
+                                    <div class="o_ntp_approved_progress" role="progressbar" t-att-aria-valuenow="card.progress" aria-valuemin="0" aria-valuemax="100" aria-label="تقدم التنفيذ"><span t-att-style="'width:' + card.progress + '%'"/></div>
+                                    <div t-if="card.material_shortage_summary" class="o_ntp_approved_material_alert"><i aria-hidden="true" class="fa fa-exclamation-triangle"/><div><strong>خامات غير متوفرة بالمخزن</strong><span t-esc="card.material_shortage_summary"/></div></div>
+                                    <div class="o_ntp_approved_steps">
+                                        <button t-foreach="this.timeline(card)" t-as="step" t-key="step.key" t-att-class="'o_ntp_approved_step is-' + step.state + (step.material_shortage ? ' has-material-shortage' : '')" t-on-click="() => this.openStage(step)" t-att-disabled="state.busy" t-att-title="step.label + ' · ' + (step.material_shortage ? 'خامات ناقصة: ' + step.material_shortage_summary : step.state_label) + ' · ' + step.production_name" t-att-aria-label="step.label + ': ' + (step.material_shortage ? 'خامات ناقصة' : step.state_label) + '، فتح ' + step.production_name">
+                                            <span class="o_ntp_approved_step_node"><i aria-hidden="true" t-att-class="'fa fa-' + this.stageIcon(step)"/></span><strong t-esc="step.label"/>
+                                        </button>
+                                    </div>
+                                    <div class="o_ntp_approved_track_caption"><span><b t-esc="card.completed_steps"/> من <t t-esc="card.total_steps"/> خطوة تنفيذ مكتملة</span><span>اضغط على المرحلة لفتح أوامرها <i aria-hidden="true" class="fa fa-angle-left"/></span></div>
+                                </div>
+                                <details class="o_ntp_approved_details"><summary><span><i aria-hidden="true" class="fa fa-list-ul"/> تفاصيل المراحل والاعتماد</span><i aria-hidden="true" class="fa fa-angle-down"/></summary>
+                                    <div class="o_ntp_approved_detail_body">
+                                        <div class="o_ntp_approved_detail_steps"><button t-foreach="card.steps" t-as="step" t-key="step.key" t-att-class="step.material_shortage ? 'has-material-shortage' : ''" t-on-click="() => this.openOrder(step.production_id)" t-att-disabled="state.busy"><strong t-esc="step.label"/><span><span t-att-class="'is-' + step.state" t-esc="step.state_label"/><em t-if="step.material_shortage"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> خامات ناقصة: <t t-esc="step.material_shortage_summary"/></em></span><small t-esc="step.production_name"/><i aria-hidden="true" class="fa fa-external-link"/></button></div>
+                                        <dl><div><dt>آخر اعتماد بواسطة</dt><dd t-esc="card.approved_by"/></div><div><dt>آخر تاريخ اعتماد</dt><dd t-esc="this.displayDate(card.approved_at)"/></div><div><dt>الشركة</dt><dd t-esc="card.company"/></div><div class="o_ntp_approved_piece_names"><dt>القطع المعتمدة</dt><dd t-esc="card.piece_names"/></div></dl>
+                                        <details t-if="card.quantity > 1" class="o_ntp_approved_piece_history"><summary>سجل اعتماد القطع</summary><dl><div t-foreach="card.approvals" t-as="approval" t-key="approval_index"><dt t-esc="approval.piece"/><dd><t t-esc="approval.approved_by"/> · <t t-esc="this.displayDate(approval.approved_at)"/></dd></div></dl></details>
+                                        <p t-if="card.quantity > 1"><i aria-hidden="true" class="fa fa-link"/> إلغاء الاعتماد يشمل جميع القطع وأوامر الإنتاج المجمّعة في هذا الكارت.</p>
+                                    </div>
+                                </details>
+                                <footer><button class="btn o_ntp_approved_orders" t-on-click="() => this.openOrders(card)" t-att-disabled="state.busy"><i aria-hidden="true" class="fa fa-th-list"/> أوامر الإنتاج <i aria-hidden="true" class="fa fa-angle-left"/></button><button class="btn o_ntp_approved_cancel" t-on-click="() => this.cancel(card)" t-att-disabled="state.busy || !card.can_cancel" t-att-title="card.cancel_reason"><i aria-hidden="true" class="fa fa-undo"/> إلغاء الاعتماد</button></footer>
+                                <p t-if="card.cancel_reason" class="o_ntp_approved_cancel_reason"><i aria-hidden="true" class="fa fa-info-circle"/> <t t-esc="card.cancel_reason"/></p>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+                <div t-if="state.modelId !== null &amp;&amp; state.pages > 1" class="o_ntp_approved_pager"><button class="btn btn-light" t-att-disabled="state.page === 0 || state.loading || state.busy" t-on-click="() => this.changePage(-1)">السابق</button><span><t t-esc="state.page + 1"/> / <t t-esc="state.pages"/></span><button class="btn btn-light" t-att-disabled="state.page + 1 >= state.pages || state.loading || state.busy" t-on-click="() => this.changePage(1)">التالي</button></div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_biometric" model="ir.ui.view">
+        <field name="name">hr.employee.form.biometric</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_biometric_identities" type="object" class="oe_stat_button" icon="fa-hand-pointer-o" groups="hr_attendance.group_hr_attendance_manager">
+                    <field name="biometric_identity_count" widget="statinfo" string="أجهزة البصمة"/>
+                </button>
+            </xpath>
+            <xpath expr="//group[@name='identification_group']" position="inside">
+                <field name="biometric_identity_ids" string="أرقام العامل على أجهزة البصمة" groups="hr_attendance.group_hr_attendance_manager" nolabel="1" colspan="2">
+                    <list editable="bottom">
+                        <field name="device_id"/>
+                        <field name="device_user_id" string="رقم الجهاز (تلقائي)" readonly="1" required="0"/>
+                        <field name="device_user_name" optional="hidden"/>
+                        <field name="enrollment_state" widget="badge"/>
+                        <field name="active"/>
+                    </list>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>

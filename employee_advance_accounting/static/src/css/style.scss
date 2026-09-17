@@ -1,0 +1,149 @@
+/* Calm Colors */
+.text-calm-primary {
+    color: #4A6984 !important; /* Deeper Soft Blue */
+}
+.text-calm-success {
+    color: #558B6E !important; /* Deeper Soft Green */
+}
+.text-calm-danger {
+    color: #B25D5D !important; /* Deeper Soft Rose/Red */
+}
+.text-calm-info {
+    color: #6088A6 !important; /* Deeper Soft Light Blue */
+}
+
+/* Form Sheet Custom Background */
+.o_form_view.o_employee_advance_accounting_form .o_form_sheet_bg {
+    background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%) !important;
+}
+.o_form_view.o_employee_advance_accounting_form .o_form_sheet {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Card Styling & Hover Animations */
+.bg-calm-light {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.bg-calm-light:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Badges styling */
+.o_list_view .badge.text-bg-success, .o_form_view .badge.text-bg-success {
+    background-color: #8cb89f !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(140, 184, 159, 0.3) !important;
+}
+.o_list_view .badge.text-bg-danger, .o_form_view .badge.text-bg-danger {
+    background-color: #d18e8e !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(209, 142, 142, 0.3) !important;
+}
+.o_list_view .badge.text-bg-warning, .o_form_view .badge.text-bg-warning {
+    background-color: #e8c687 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(232, 198, 135, 0.3) !important;
+}
+.o_list_view .badge.text-bg-info, .o_form_view .badge.text-bg-info {
+    background-color: #9cbce6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(156, 188, 230, 0.3) !important;
+}
+
+/* Progress bar animation */
+.o_progressbar .o_progress .o_progressbar_value {
+    background-color: #558B6E !important;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.o_progressbar:hover .o_progressbar_value {
+    filter: brightness(1.1);
+}
+
+/* Calm List Decorations */
+.o_list_view .text-success {
+    color: #558B6E !important;
+}
+.o_list_view .text-danger {
+    color: #B25D5D !important;
+}
+.o_list_view .text-warning {
+    color: #C19A5B !important;
+}
+.o_list_view .text-info {
+    color: #6088A6 !important;
+}
+
+/*
+ * Keep the entrance effect scoped and opacity-only.  A transform on an
+ * ancestor changes the containing block of Odoo's fixed autocomplete menu;
+ * when that transform animation ends, an open many2one menu jumps away from
+ * its input.
+ */
+.o_form_view.o_employee_advance_accounting_form {
+    animation: employeeAdvanceFadeIn 0.35s ease-out;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_payment_plan {
+    margin: 0.25rem 0 1.25rem;
+    overflow: hidden;
+    border-inline-start: 4px solid #6088a6 !important;
+    background: #fff !important;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_payment_plan_header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_payment_plan_header h5 {
+    margin: 0 0 0.25rem;
+    color: #466b87;
+    font-weight: 800;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_payment_plan_header p {
+    margin: 0;
+    color: #718391;
+    font-size: 0.82rem;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_payment_plan_count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: #eaf2f8;
+    color: #466b87;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_installment_pay {
+    min-width: 4.5rem;
+    padding: 0.32rem 0.8rem !important;
+    border: 1px solid #4f9270 !important;
+    border-radius: 999px !important;
+    background: #5b9f7b !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 5px rgba(79, 146, 112, 0.2);
+}
+
+.o_form_view.o_employee_advance_accounting_form .o_employee_advance_installment_pay:hover {
+    background: #477f63 !important;
+    border-color: #477f63 !important;
+}
+@keyframes employeeAdvanceFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

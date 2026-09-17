@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_fabric_work_type_list" model="ir.ui.view">
+        <field name="name">furniture.fabric.work.type.list</field>
+        <field name="model">furniture.fabric.work.type</field>
+        <field name="arch" type="xml">
+            <list string="أنواع القماش التشغيلية" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_fabric_work_type_form" model="ir.ui.view">
+        <field name="name">furniture.fabric.work.type.form</field>
+        <field name="model">furniture.fabric.work.type</field>
+        <field name="arch" type="xml">
+            <form string="نوع القماش التشغيلي">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_fabric_work_type" model="ir.actions.act_window">
+        <field name="name">أنواع القماش التشغيلية</field>
+        <field name="res_model">furniture.fabric.work.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_step_time_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.operation.output.step.time.list</field>
+        <field name="model">furniture.mrp.mps.operation.output</field>
+        <field name="arch" type="xml">
+            <list string="أزمنة خطوات كل صنف وموديل" editable="bottom"
+                  create="0" delete="0" multi_edit="1"
+                  decoration-danger="not operation_time_is_configured">
+                <field name="furniture_model_id" widget="badge" readonly="1"/>
+                <field name="product_id" string="الصنف" readonly="1"/>
+                <field name="stage" widget="badge" readonly="1"/>
+                <field name="operation_name" string="الخطوة" readonly="1"/>
+                <field name="fabric_type_id" optional="show" readonly="1"/>
+                <field name="piece_duration_hours" string="زمن القطعة (ساعة)"/>
+                <field name="effective_piece_duration_hours"
+                       string="الزمن المستخدم" readonly="1" optional="show"/>
+                <field name="operation_time_is_configured"
+                       widget="boolean_toggle" readonly="1" optional="show"/>
+                <field name="profile_id" readonly="1" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"
+                       readonly="1" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_step_time_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.operation.output.step.time.form</field>
+        <field name="model">furniture.mrp.mps.operation.output</field>
+        <field name="arch" type="xml">
+            <form string="زمن خطوة الصنف" create="0" delete="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="operation_name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="furniture_model_id" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="stage" readonly="1"/>
+                            <field name="fabric_type_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="piece_duration_hours"/>
+                            <field name="effective_piece_duration_hours" readonly="1"/>
+                            <field name="operation_time_is_configured" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        عدّل زمن تنفيذ قطعة كاملة واحدة فقط. يحفظ MPS الخطوات
+                        والمراحل القياسية، ولا يوزع أي جزء من القطعة على عامل آخر.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_step_time_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.operation.output.step.time.search</field>
+        <field name="model">furniture.mrp.mps.operation.output</field>
+        <field name="arch" type="xml">
+            <search string="أزمنة خطوات الأصناف والموديلات">
+                <field name="product_id"/>
+                <field name="furniture_model_id"/>
+                <field name="stage"/>
+                <field name="operation_name"/>
+                <field name="fabric_type_id"/>
+                <filter name="missing" string="أزمنة ناقصة"
+                        domain="[('operation_time_is_configured', '=', False)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_model" string="الموديل"
+                            context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_product" string="الصنف"
+                            context="{'group_by': 'product_id'}"/>
+                    <filter name="group_stage" string="المرحلة"
+                            context="{'group_by': 'stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_product_time_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.product.time.list</field>
+        <field name="model">furniture.mrp.mps.product.time</field>
+        <field name="arch" type="xml">
+            <list string="زمن القطعة لكل صنف ومرحلة" editable="bottom"
+                  create="0" delete="0" multi_edit="1"
+                  decoration-danger="not time_ready"
+                  decoration-info="uses_detailed_standard">
+                <field name="furniture_model_id" widget="badge" readonly="1"/>
+                <field name="source_product_id" string="الصنف" readonly="1"/>
+                <field name="product_id" string="الصنف القياسي" readonly="1" optional="hide"/>
+                <field name="stage" widget="badge" readonly="1"/>
+                <field name="piece_hours" string="زمن القطعة اليدوي"
+                       readonly="uses_detailed_standard"/>
+                <field name="detailed_piece_hours" readonly="1" optional="show"/>
+                <field name="time_source_label" readonly="1"/>
+                <field name="time_ready" widget="boolean_toggle" readonly="1"/>
+                <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                <field name="uses_detailed_standard" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_product_time_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.product.time.form</field>
+        <field name="model">furniture.mrp.mps.product.time</field>
+        <field name="arch" type="xml">
+            <form string="زمن القطعة في المرحلة" create="0" delete="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="source_product_id" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="furniture_model_id" readonly="1"/>
+                            <field name="stage" readonly="1"/>
+                            <field name="company_id" readonly="1"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="uses_detailed_standard" readonly="1"/>
+                            <field name="piece_hours" readonly="uses_detailed_standard"/>
+                            <field name="detailed_piece_hours" readonly="1"/>
+                            <field name="time_source_label" readonly="1"/>
+                            <field name="time_ready" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="uses_detailed_standard">
+                        اكتب زمن تنفيذ قطعة كاملة واحدة. النظام يوزع قطعًا كاملة فقط،
+                        ولا يقسم كرسيًا أو فوتيه بين عاملين.
+                    </div>
+                    <div class="alert alert-secondary" role="alert"
+                         invisible="not uses_detailed_standard">
+                        هذا الزمن محسوب تلقائيًا من خطوات البروفايل التفصيلي،
+                        ولذلك يُعدّل من شاشة معايير العمليات.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_product_time_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.product.time.search</field>
+        <field name="model">furniture.mrp.mps.product.time</field>
+        <field name="arch" type="xml">
+            <search string="أزمنة الأصناف بالمراحل">
+                <field name="source_product_id"/>
+                <field name="furniture_model_id"/>
+                <field name="stage"/>
+                <filter name="missing" string="أزمنة ناقصة"
+                        domain="[('time_ready', '=', False)]"/>
+                <filter name="manual" string="أزمنة قابلة للتعديل"
+                        domain="[('uses_detailed_standard', '=', False)]"/>
+                <filter name="detailed" string="من بروفايل تفصيلي"
+                        domain="[('uses_detailed_standard', '=', True)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_model" string="الموديل"
+                            context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_stage" string="المرحلة"
+                            context="{'group_by': 'stage'}"/>
+                    <filter name="group_product" string="الصنف"
+                            context="{'group_by': 'source_product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_product_times" model="ir.actions.act_window">
+        <field name="name">أزمنة خطوات كل صنف وموديل</field>
+        <field name="res_model">furniture.mrp.mps.operation.output</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_furniture_mrp_mps_step_time_list"/>
+        <field name="search_view_id" ref="view_furniture_mrp_mps_step_time_search"/>
+        <field name="domain">[('operation_id.active', '=', True), ('profile_id.active', '=', True)]</field>
+        <field name="context">{'search_default_group_model': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">الخطوات القياسية تُنشأ تلقائيًا لكل صنف وموديل له ريسيبي.</p>
+            <p>عدّل زمن القطعة فقط؛ أي خطوة زمنها ناقص توقف تكليفها بدل استخدام زمن وهمي.</p>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_profile_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.profile.list</field>
+        <field name="model">furniture.mrp.mps.profile</field>
+        <field name="arch" type="xml">
+            <list string="بروفايلات تشغيل MPS" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="furniture_model_id" widget="badge"/>
+                <field name="product_ids" widget="many2many_tags"/>
+                <field name="is_auto_product_profile" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_profile_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.profile.form</field>
+        <field name="model">furniture.mrp.mps.profile</field>
+        <field name="arch" type="xml">
+            <form string="بروفايل تشغيل MPS">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="furniture_model_id" options="{'no_create_edit': True}"/>
+                            <field name="product_ids" widget="many2many_tags"
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="is_auto_product_profile" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="معايير العمليات">
+                            <field name="operation_ids" context="{'default_profile_id': id}">
+                                <list string="معايير العمليات">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="stage" widget="badge"/>
+                                    <field name="fabric_type_id" optional="show"/>
+                                    <field name="duration_hours"/>
+                                    <field name="distribution_mode"/>
+                                    <field name="same_worker_key" optional="hide"/>
+                                    <field name="different_worker_key" optional="hide"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="تنبيهات الإعداد">
+                            <field name="notes" placeholder="أي بيانات زمنية ما زالت ناقصة..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_profiles" model="ir.actions.act_window">
+        <field name="name">بروفايلات ومعايير MPS</field>
+        <field name="res_model">furniture.mrp.mps.profile</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_auto_product_profile', '=', False)]</field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_operation_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.operation.list</field>
+        <field name="model">furniture.mrp.mps.operation</field>
+        <field name="arch" type="xml">
+            <list string="معايير عمليات MPS" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="profile_id"/>
+                <field name="name"/>
+                <field name="stage" widget="badge"/>
+                <field name="is_auto_product_standard" optional="show"/>
+                <field name="time_is_configured" optional="show"/>
+                <field name="fabric_type_id" optional="show"/>
+                <field name="duration_hours"/>
+                <field name="distribution_mode"/>
+                <field name="same_worker_key" optional="hide"/>
+                <field name="different_worker_key" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_operation_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.operation.form</field>
+        <field name="model">furniture.mrp.mps.operation</field>
+        <field name="arch" type="xml">
+            <form string="معيار عملية MPS">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="profile_id"/>
+                            <field name="code"/>
+                            <field name="stage"/>
+                            <field name="fabric_type_id"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="duration_hours"/>
+                            <field name="distribution_mode"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <group string="قيود توزيع العمال">
+                        <field name="same_worker_key"/>
+                        <field name="different_worker_key"/>
+                    </group>
+                    <notebook>
+                        <page string="ناتج الدفعة القياسية">
+                            <field name="output_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id" options="{'no_create_edit': True}"/>
+                                    <field name="quantity"/>
+                                    <field name="piece_duration_hours" optional="show"/>
+                                    <field name="effective_piece_duration_hours" readonly="1" optional="show"/>
+                                    <field name="product_uom_id" readonly="1"/>
+                                </list>
+                                <form string="زمن قطعة ناتج العملية">
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="product_id" options="{'no_create_edit': True}"/>
+                                                <field name="quantity"/>
+                                                <field name="product_uom_id" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="piece_duration_hours"/>
+                                                <field name="effective_piece_duration_hours" readonly="1"/>
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="التبعيات والتوازي">
+                            <field name="dependency_ids" widget="many2many_tags"
+                                   options="{'no_create_edit': True}"/>
+                            <div class="text-muted mt-2">
+                                العمليات بلا تبعية مشتركة يمكن جدولتها بالتوازي. تقويم العامل يمنع تداخل شغلين لنفس العامل.
+                            </div>
+                        </page>
+                        <page string="ملاحظات">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_operations" model="ir.actions.act_window">
+        <field name="name">معايير العمليات</field>
+        <field name="res_model">furniture.mrp.mps.operation</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_auto_product_standard', '=', False)]</field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_plan_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.plan.list</field>
+        <field name="model">furniture.mrp.mps.plan</field>
+        <field name="arch" type="xml">
+            <list string="خطط أوامر الإنتاج" create="0" delete="0"
+                  decoration-danger="blocked_line_count &gt; 0"
+                  decoration-warning="has_warnings and blocked_line_count == 0"
+                  decoration-success="state == 'approved' or state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="furniture_model_id" widget="badge"/>
+                <field name="planned_start"/>
+                <field name="planned_end"/>
+                <field name="total_labor_hours" sum="إجمالي الساعات"/>
+                <field name="employee_count"/>
+                <field name="blocked_line_count"/>
+                <field name="has_warnings" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'cancelled'"
+                       decoration-warning="state == 'planned'"
+                       decoration-info="state == 'in_progress'"
+                       decoration-success="state == 'approved' or state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_plan_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.plan.form</field>
+        <field name="model">furniture.mrp.mps.plan</field>
+        <field name="arch" type="xml">
+            <form string="خطة تشغيل MPS" create="0" delete="0">
+                <header>
+                    <button name="action_approve" string="اعتماد توزيع العمال" type="object"
+                            class="btn-primary"
+                            groups="furniture_mrp.group_furniture_mrp_manager"
+                            invisible="state not in ('planned', 'in_progress')"/>
+                    <button name="action_replan" string="إعادة جدولة غير المبدوء" type="object"
+                            groups="furniture_mrp.group_furniture_mrp_manager"
+                            invisible="state not in ('planned', 'approved', 'in_progress')"/>
+                    <button name="action_cancel" string="إلغاء الخطة" type="object"
+                            class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_manager"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="planned,approved,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_production" type="object"
+                                class="oe_stat_button" icon="fa-industry">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">أمر الإنتاج</span>
+                            </div>
+                        </button>
+                        <button name="action_view_assignments" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="employee_count" widget="statinfo" string="العمال"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="production_id" readonly="1"/>
+                            <field name="profile_id" readonly="1"/>
+                            <field name="furniture_model_id" readonly="1" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="planned_start" readonly="1"/>
+                            <field name="planned_end" readonly="1"/>
+                            <field name="total_labor_hours" readonly="1"/>
+                            <field name="blocked_line_count" readonly="1"/>
+                            <field name="has_warnings" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" invisible="not has_warnings">
+                        <strong>تنبيهات الجدولة</strong>
+                        <field name="warning_message" nolabel="1" readonly="1"/>
+                    </div>
+                    <notebook>
+                        <page string="عمليات أمر الإنتاج">
+                            <field name="line_ids" readonly="1">
+                                <list string="عمليات MPS" create="0" edit="0" delete="0"
+                                      decoration-danger="state == 'blocked'"
+                                      decoration-success="state == 'approved' or state == 'done'">
+                                    <field name="sequence" optional="hide"/>
+                                    <field name="stage" widget="badge"/>
+                                    <field name="name"/>
+                                    <field name="output_summary"/>
+                                    <field name="piece_count" optional="show"/>
+                                    <field name="atom_count" optional="show"/>
+                                    <field name="fabric_type_id" optional="show"/>
+                                    <field name="distribution_mode"/>
+                                    <field name="labor_hours" sum="إجمالي الساعات"/>
+                                    <field name="employee_ids" widget="many2many_tags"/>
+                                    <field name="planned_start"/>
+                                    <field name="planned_end"/>
+                                    <field name="warning_message" optional="show"/>
+                                    <field name="state" widget="badge"
+                                           decoration-danger="state == 'blocked'"
+                                           decoration-warning="state == 'proposed'"
+                                           decoration-success="state == 'approved' or state == 'done'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="جدول العمال">
+                            <field name="assignment_ids" readonly="1">
+                                <list string="جدول العمال" create="0" edit="0" delete="0">
+                                    <field name="employee_id"/>
+                                    <field name="stage" widget="badge"/>
+                                    <field name="operation_name"/>
+                                    <field name="output_summary"/>
+                                    <field name="piece_count" optional="show"/>
+                                    <field name="planned_atom_count" optional="show"/>
+                                    <field name="planned_hours" sum="إجمالي الساعات"/>
+                                    <field name="planned_start"/>
+                                    <field name="planned_end"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_plan_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.plan.search</field>
+        <field name="model">furniture.mrp.mps.plan</field>
+        <field name="arch" type="xml">
+            <search string="خطط MPS">
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="furniture_model_id"/>
+                <filter name="needs_attention" string="تحتاج تدخل"
+                        domain="[('blocked_line_count', '&gt;', 0)]"/>
+                <filter name="planned" string="مقترحة" domain="[('state', '=', 'planned')]"/>
+                <filter name="approved" string="معتمدة" domain="[('state', '=', 'approved')]"/>
+                <separator/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_model" string="الموديل" context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_start" string="تاريخ البداية" context="{'group_by': 'planned_start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_plans" model="ir.actions.act_window">
+        <field name="name">خطط أوامر الإنتاج</field>
+        <field name="res_model">furniture.mrp.mps.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_mps_plan_search"/>
+        <field name="context">{'search_default_planned': 1}</field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.list</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <list string="خطة المراحل والعمال" create="0" edit="0" delete="0"
+                  decoration-warning="state == 'proposed'"
+                  decoration-success="state == 'approved' or state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="employee_id"/>
+                <field name="production_id"/>
+                <field name="furniture_model_id" optional="show"/>
+                <field name="stage" widget="badge"/>
+                <field name="operation_name"/>
+                <field name="output_summary"/>
+                <field name="piece_count" optional="show"/>
+                <field name="planned_atom_count" optional="show"/>
+                <field name="planned_hours" sum="إجمالي الساعات"/>
+                <field name="planned_start"/>
+                <field name="planned_end"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'proposed'"
+                       decoration-info="state == 'in_progress'"
+                       decoration-success="state == 'approved' or state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="plan_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_kanban" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.kanban</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <kanban string="خطة المراحل والعمال" default_group_by="stage"
+                    create="0" edit="0" delete="0" quick_create="0"
+                    records_draggable="0" class="o_kanban_mobile">
+                <field name="operation_name"/>
+                <field name="output_summary"/>
+                <field name="piece_count"/>
+                <field name="planned_atom_count"/>
+                <field name="furniture_model_id"/>
+                <field name="production_id"/>
+                <field name="employee_id"/>
+                <field name="planned_hours"/>
+                <field name="planned_start"/>
+                <field name="planned_end"/>
+                <field name="state"/>
+                <field name="stage"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <strong class="text-truncate">
+                                <field name="operation_name"/>
+                            </strong>
+                            <field name="state" widget="badge"
+                                   decoration-warning="state == 'proposed'"
+                                   decoration-info="state == 'in_progress'"
+                                   decoration-success="state == 'approved' or state == 'done'"
+                                   decoration-muted="state == 'cancelled'"/>
+                        </div>
+                        <div class="fs-4 fw-bold text-primary mb-1">
+                            <i class="fa fa-cubes me-1" title="القطع الكاملة" aria-hidden="true"/>
+                            <field name="piece_count"/> قطعة كاملة
+                        </div>
+                        <div class="fw-semibold mb-2">
+                            <field name="output_summary"/>
+                        </div>
+                        <div class="text-muted small d-flex flex-column gap-1">
+                            <span>
+                                <i class="fa fa-object-group me-1" title="الموديل" aria-hidden="true"/>
+                                <field name="furniture_model_id"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-industry me-1" title="أمر الإنتاج" aria-hidden="true"/>
+                                <field name="production_id"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-user me-1" title="العامل" aria-hidden="true"/>
+                                <field name="employee_id"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-clock-o me-1" title="الفترة المخططة" aria-hidden="true"/>
+                                <field name="planned_start"/> — <field name="planned_end"/>
+                            </span>
+                            <span>
+                                <i class="fa fa-hourglass-half me-1" title="الزمن المخطط" aria-hidden="true"/>
+                                <field name="planned_hours"/> ساعة
+                                · <field name="planned_atom_count"/> دفعة قطع كاملة
+                            </span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.form</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <form string="تكليف عامل ضمن خطة المراحل والعمال" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="production_id"/>
+                            <field name="furniture_model_id"/>
+                            <field name="plan_id"/>
+                        </group>
+                        <group>
+                            <field name="stage"/>
+                            <field name="operation_name"/>
+                            <field name="output_summary"/>
+                            <field name="piece_count"/>
+                            <field name="planned_atom_count"/>
+                        </group>
+                    </group>
+                    <group string="الوقت المخطط">
+                        <field name="planned_hours"/>
+                        <field name="planned_start"/>
+                        <field name="planned_end"/>
+                        <field name="state" widget="badge"/>
+                    </group>
+                    <notebook>
+                        <page string="القطع الكاملة المسندة">
+                            <field name="output_line_ids" readonly="1">
+                                <list string="القطع الكاملة المسندة" create="0" edit="0" delete="0">
+                                    <field name="product_id"/>
+                                    <field name="quantity" sum="إجمالي القطع"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="piece_duration_hours"/>
+                                    <field name="planned_hours" sum="إجمالي الساعات"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_calendar" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.calendar</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <calendar string="خطة المراحل والعمال" date_start="planned_start"
+                      date_stop="planned_end" color="employee_id" mode="week"
+                      create="0" edit="0" delete="0" quick_create="0"
+                      event_open_popup="1">
+                <field name="employee_id"/>
+                <field name="production_id"/>
+                <field name="furniture_model_id"/>
+                <field name="stage"/>
+                <field name="operation_name"/>
+                <field name="output_summary"/>
+                <field name="piece_count"/>
+                <field name="planned_hours"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_pivot" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.pivot</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <pivot string="أحمال خطة المراحل والعمال">
+                <field name="employee_id" type="row"/>
+                <field name="stage" type="col"/>
+                <field name="piece_count" type="measure"/>
+                <field name="planned_atom_count" type="measure"/>
+                <field name="planned_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_mps_assignment_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.assignment.search</field>
+        <field name="model">furniture.mrp.mps.assignment</field>
+        <field name="arch" type="xml">
+            <search string="خطة المراحل والعمال">
+                <field name="employee_id"/>
+                <field name="production_id"/>
+                <field name="furniture_model_id"/>
+                <field name="stage"/>
+                <field name="operation_name"/>
+                <filter name="active_schedule" string="الشغل المفتوح"
+                        domain="[('state', 'in', ('proposed', 'approved', 'in_progress'))]"/>
+                <filter name="proposed" string="مقترح" domain="[('state', '=', 'proposed')]"/>
+                <filter name="approved" string="معتمد" domain="[('state', '=', 'approved')]"/>
+                <separator/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_employee" string="العامل" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_stage" string="المرحلة" context="{'group_by': 'stage'}"/>
+                    <filter name="group_model" string="الموديل" context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_production" string="أمر الإنتاج" context="{'group_by': 'production_id'}"/>
+                    <filter name="group_day" string="اليوم" context="{'group_by': 'planned_start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_schedule" model="ir.actions.act_window">
+        <field name="name">خطة المراحل والعمال</field>
+        <field name="res_model">furniture.mrp.mps.assignment</field>
+        <field name="view_mode">kanban,list,calendar,pivot,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_mps_assignment_search"/>
+        <field name="context">{'search_default_active_schedule': 1, 'search_default_group_stage': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">يتولد جدول العمال تلقائيًا عند تأكيد أمر إنتاج له بروفايل MPS.</p>
+            <p>التوزيع يحترم المرحلة والعقد والتقويم والضغط الحالي وتبعيات العمليات.</p>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_mps_dashboard_page" model="ir.actions.client">
+        <field name="name">📅 تخطيط المراحل والعمال</field>
+        <field name="tag">furniture_mrp_mps_dashboard_page</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

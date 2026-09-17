@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_payroll_payment_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.payroll.payment.wizard.form</field>
+        <field name="model">furniture.mrp.payroll.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="سداد أجور الفترة">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>سداد أجور الفترة</h1>
+                        <p class="text-muted">
+                            قسّم إجمالي صافي الأجور بين الصندوق والبنك ثم رحّل السداد.
+                        </p>
+                    </div>
+                    <group col="4">
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="accrual_move_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="payment_date"/>
+                        <field name="total_amount"/>
+                    </group>
+                    <separator string="توزيع السداد"/>
+                    <group col="4">
+                        <field name="cash_journal_id"/>
+                        <field name="cash_amount"/>
+                        <field name="bank_journal_id"/>
+                        <field name="bank_amount"/>
+                    </group>
+                    <div class="alert alert-success" role="status"
+                         invisible="difference_amount != 0">
+                        المبلغ موزّع بالكامل وجاهز للترحيل.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="difference_amount == 0">
+                        يجب أن يساوي مجموع النقدي والبنك إجمالي المستحق.
+                        الفرق: <field name="difference_amount" class="oe_inline"/>
+                    </div>
+                    <field name="currency_id" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_post_payment" type="object"
+                            string="ترحيل السداد" class="btn-primary"
+                            icon="fa-check-circle"
+                            invisible="difference_amount != 0"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

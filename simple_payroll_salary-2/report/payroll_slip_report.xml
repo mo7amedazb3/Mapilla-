@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_simple_payroll_slip" model="ir.actions.report">
+        <field name="name">Salary Slip</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">simple_payroll_salary-2.report_simple_payroll_slip</field>
+        <field name="report_file">simple_payroll_salary-2.report_simple_payroll_slip</field>
+        <field name="print_report_name">'Salary Slip - %s' % (object.employee_id.name)</field>
+        <field name="binding_model_id" ref="model_simple_payroll_slip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_simple_payroll_slip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: 'Helvetica', 'Arial', sans-serif; color: #2c3e50;">
+                        
+                        <!-- Header with Solid Background -->
+                        <div style="background-color: #1e3c72; border-radius: 10px; padding: 15px 25px; color: #ffffff; margin-bottom: 20px;">
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <h1 style="margin: 0; font-weight: bold; font-size: 32px; color: #ffffff;">SALARY SLIP</h1>
+                                    <div style="font-size: 14px; margin-top: 5px;">
+                                        PERIOD: <strong style="color: #f1c40f;"><span t-field="o.date_from"/></strong> to <strong style="color: #f1c40f;"><span t-field="o.date_to"/></strong>
+                                    </div>
+                                    <div style="font-size: 14px; margin-top: 2px;">
+                                        REF: <strong><span t-field="o.name"/></strong>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end text-right">
+                                    <div t-if="o.company_id.logo">
+                                        <span t-field="o.company_id.logo" t-options="{'widget': 'image', 'style': 'max-height: 60px; border-radius: 5px; background-color: #ffffff; padding: 3px;'}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employee Details -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div style="border-left: 4px solid #1e3c72; background-color: #f8f9fa; padding: 12px; border-radius: 0 5px 5px 0;">
+                                    <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; font-weight: bold;">Employee Info</p>
+                                    <h3 style="margin: 0 0 5px 0; color: #1e3c72; font-weight: bold; font-size: 18px;"><span t-field="o.employee_id.name"/></h3>
+                                    <p style="margin: 0; font-size: 13px;"><strong>Position:</strong> <span t-field="o.employee_id.job_id.name"/></p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border-left: 4px solid #00b09b; background-color: #f8f9fa; padding: 12px; border-radius: 0 5px 5px 0;">
+                                    <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; font-weight: bold;">Contract Info</p>
+                                    <p style="margin: 0 0 5px 0; font-size: 13px;"><strong>Company:</strong> <span t-field="o.company_id.name"/></p>
+                                    <p style="margin: 0; font-size: 13px;"><strong>Contract:</strong> <span t-field="o.contract_id.name"/></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Info -->
+                        <div style="margin-bottom: 20px;">
+                            <h5 style="color: #2c3e50; font-weight: bold; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-bottom: 15px; font-size: 16px;">
+                                Attendance Summary
+                            </h5>
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px;">
+                                        <div style="font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Expected Days</div>
+                                        <div style="font-size: 18px; font-weight: bold; color: #2c3e50;"><span t-field="o.expected_working_days"/></div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px;">
+                                        <div style="font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Hours / Day</div>
+                                        <div style="font-size: 18px; font-weight: bold; color: #2c3e50;"><span t-field="o.hours_per_day"/></div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px;">
+                                        <div style="font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px;">Expected Hours</div>
+                                        <div style="font-size: 18px; font-weight: bold; color: #2c3e50;"><span t-field="o.expected_hours"/></div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="background-color: #e8f4f8; border: 1px solid #bce8f1; border-radius: 5px; padding: 10px;">
+                                        <div style="font-size: 11px; color: #31708f; text-transform: uppercase; font-weight: bold; margin-bottom: 5px;">Actual Hours</div>
+                                        <div style="font-size: 18px; font-weight: bold; color: #31708f;">
+                                            <t t-esc="'%.2f' % o.attendance_hours"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Details -->
+                        <div style="margin-bottom: 15px;">
+                            <h5 style="color: #2c3e50; font-weight: bold; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-bottom: 10px; font-size: 16px;">
+                                Earnings &amp; Deductions
+                            </h5>
+                            <table class="table table-sm" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #f8f9fa; border-top: 1px solid #dee2e6; border-bottom: 2px solid #dee2e6; padding: 8px; font-size: 13px; color: #7f8c8d;">DESCRIPTION</th>
+                                        <th class="text-end text-right" style="background-color: #f8f9fa; border-top: 1px solid #dee2e6; border-bottom: 2px solid #dee2e6; padding: 8px; font-size: 13px; color: #7f8c8d; width: 30%;">AMOUNT</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                                            <span style="font-size: 14px; font-weight: bold; color: #2c3e50;">Base Salary</span>
+                                        </td>
+                                        <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #2c3e50;">
+                                            <span t-field="o.base_wage" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.contract_allowances > 0">
+                                        <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                                            <span style="font-size: 14px; font-weight: bold; color: #2980b9;">Allowances</span>
+                                        </td>
+                                        <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #2980b9;">
+                                            + <span t-field="o.contract_allowances" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.commission_amount > 0">
+                                        <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                                            <span style="font-size: 14px; font-weight: bold; color: #d35400;">Commission</span>
+                                        </td>
+                                        <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #d35400;">
+                                            + <span t-field="o.commission_amount" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.absence_deduction > 0">
+                                        <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                                            <span style="font-size: 14px; font-weight: bold; color: #c0392b;">Absence Deduction (<span t-field="o.absence_days"/> days)</span>
+                                        </td>
+                                        <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #c0392b;">
+                                            - <span t-field="o.absence_deduction" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="o.delay_deduction > 0">
+                                        <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">
+                                            <span style="font-size: 14px; font-weight: bold; color: #e67e22;">Delay Deduction (<span t-esc="'%.2f' % o.delay_hours"/> hours)</span>
+                                        </td>
+                                        <td class="text-end text-right" style="padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 14px; font-weight: bold; color: #e67e22;">
+                                            - <span t-field="o.delay_deduction" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- NET PAY -->
+                        <div class="row">
+                            <div class="col-6"></div>
+                            <div class="col-6">
+                                <div style="background-color: #27ae60; color: #ffffff; padding: 15px; border-radius: 8px;">
+                                    <div class="row align-items-center">
+                                        <div class="col-5">
+                                            <span style="font-size: 16px; font-weight: bold; text-transform: uppercase;">Net Pay</span>
+                                        </div>
+                                        <div class="col-7 text-end text-right">
+                                            <h3 style="margin: 0; font-size: 22px; font-weight: bold; color: #ffffff;">
+                                                <span t-field="o.net_salary" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="row" style="margin-top: 40px; page-break-inside: avoid;">
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #bdc3c7; width: 60%; margin: 0 auto; padding-top: 10px;">
+                                    <strong style="color: #2c3e50; font-size: 14px;">Employer Signature</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div style="border-top: 1px solid #bdc3c7; width: 60%; margin: 0 auto; padding-top: 10px;">
+                                    <strong style="color: #2c3e50; font-size: 14px;">Employee Signature</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

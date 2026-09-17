@@ -1,0 +1,282 @@
+/* MAPILLA inbox — scoped to the standalone WhatsApp page. */
+:root {
+    --mp-navy: #0c2a44;
+    --mp-ink: #19334a;
+    --mp-muted: #75838e;
+    --mp-green: #16846d;
+    --mp-mint: #e8f4ef;
+    --mp-line: #e8ecee;
+    --mp-paper: #fff;
+    --mp-canvas: #f5f6f3;
+}
+html { height: 100%; background: var(--mp-canvas); }
+body {
+    display: grid; grid-template-columns: 344px minmax(0, 1fr) 76px;
+    grid-template-rows: 76px minmax(0, 1fr); gap: 0;
+    height: 100vh; height: 100dvh; width: 100%; overflow: hidden;
+    background: var(--mp-canvas); color: var(--mp-ink);
+    font-family: 'Noto Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+button, input, select { font-family: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid #73bba6; outline-offset: 3px;
+}
+button { touch-action: manipulation; }
+::selection { background: #bfe1d5; color: var(--mp-navy); }
+.mapilla-topbar {
+    grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center;
+    gap: 24px; padding: 0 28px; background: var(--mp-navy); color: #fff; z-index: 40;
+    box-shadow: 0 3px 18px #0c2a4410;
+}
+.mapilla-brand {
+    display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+    width: 176px; padding-right: 24px; border-right: 1px solid #ffffff24;
+    color: #fff; text-decoration: none;
+}
+.mapilla-brand img { display: block; width: 152px; height: auto; object-fit: contain; }
+.mapilla-app-title { border-right: 1px solid #ffffff24; padding-right: 24px; display: flex; flex-direction: column; gap: 1px; }
+.mapilla-app-title > span { font-size: 14px; font-weight: 500; }
+.mapilla-app-title small { color: #91a9b8; font: 9px/1.6 'Inter', sans-serif; letter-spacing: 2px; }
+.mapilla-topbar-spacer { flex: 1; }
+.mapilla-connection { display: flex; align-items: center; gap: 8px; color: #d1dae1; font-size: 11px; white-space: nowrap; }
+.mapilla-connection i { width: 7px; height: 7px; border-radius: 50%; background: #d8ac68; }
+.mapilla-connection.connected i { background: #77cdb0; box-shadow: 0 0 0 4px #77cdb014; }
+.mapilla-topbar-link { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #ffffff24; border-radius: 10px; color: #d8e5ed; }
+.mapilla-topbar-link svg { width: 19px; height: 19px; }
+.mapilla-topbar-link:hover { background: #ffffff12; }
+.mapilla-back-link { color: #d8e5ed; font-size: 11px; text-decoration: none; display: flex; gap: 10px; align-items: center; }
+.mapilla-back-link span { font-size: 18px; color: #81cbb5; }
+#loader { background: #f5f6f3; gap: 24px; }
+.mapilla-loader-brand { color: var(--mp-navy); font: 800 36px 'Inter', sans-serif; letter-spacing: 2px; }
+.mapilla-loader-brand span { color: var(--mp-green); }
+#loader svg { width: 32px; height: 32px; fill: var(--mp-green); }
+#loader > span { color: var(--mp-muted); font-size: 13px; }
+
+/* Conversation list */
+.wa-sidebar { grid-column: 1; grid-row: 2; width: auto; min-width: 0; min-height: 0; background: #fff; border-left: 1px solid var(--mp-line); }
+.sidebar-header { padding: 26px 24px 16px; border: 0; background: transparent; }
+.sidebar-title { color: var(--mp-navy); font-size: 23px; font-weight: 700; letter-spacing: -.7px; }
+.mapilla-sidebar-caption { color: var(--mp-muted); font-size: 11px; margin-top: 2px; }
+.mapilla-count { display: grid; place-items: center; min-width: 35px; height: 30px; padding: 0 9px; border-radius: 9px; background: #eef2f5; color: #4d6476; font: 600 12px 'Inter', sans-serif; }
+.wa-instances-bar { background: #fff; padding: 0 24px 15px; border: 0; gap: 6px; min-height: 36px; }
+.instance-pill { font-size: 10px; padding: 4px 10px; border-radius: 7px; color: #6b7c88; background: #f5f6f7; }
+.instance-pill.active { color: #24745e; background: #edf6f1; border-color: #d7e9e0; }
+.status-ready { background: #29876b; box-shadow: none; }
+.wa-search-bar { position: relative; background: #fff; padding: 0 22px 17px; }
+.wa-search-bar svg { position: absolute; right: 37px; top: 14px; width: 17px; height: 17px; color: #8d9aa3; pointer-events: none; }
+.wa-search-bar input { height: 45px; border: 1px solid #e9edef; background: #f7f8f9; color: var(--mp-ink); font-size: 11px; border-radius: 11px; padding: 10px 40px 10px 12px; transition: border-color .18s, box-shadow .18s; }
+.wa-search-bar input:focus { border-color: #9dc7b8; box-shadow: 0 0 0 3px #16846d0a; }
+.wa-search-bar input::placeholder { color: #8a959d; }
+.mapilla-list-heading { display: flex; justify-content: space-between; padding: 0 25px 11px; font-size: 10px; color: #8c989f; }
+.mapilla-list-heading span:first-child { font-weight: 600; color: #476073; }
+.wa-contact-list { padding: 0 10px 12px; scrollbar-width: thin; scrollbar-color: #d6dedf transparent; }
+.wa-contact-list::-webkit-scrollbar-thumb, .wa-chat-history::-webkit-scrollbar-thumb { background: #cdd8d5; }
+.wa-contact-item { width: 100%; text-align: right; border: 1px solid transparent; border-radius: 12px; padding: 13px 12px; margin: 2px 0; background: transparent; color: inherit; min-height: 80px; gap: 0; }
+.wa-contact-item:hover { background: #f5f7f7; }
+.wa-contact-item.active { background: #edf5f2; border-color: #d9eae2; }
+.wa-contact-item.active::before { right: -1px; top: 21px; bottom: 21px; width: 3px; border-radius: 4px; background: #268c70; }
+.wa-avatar { width: 45px; height: 45px; border-radius: 15px; font-size: 17px; font-weight: 600; margin-left: 12px; background: #e6efed; color: #41726a; box-shadow: none; font-family: 'Inter', 'Noto Sans Arabic', sans-serif; }
+.wa-avatar img { border-radius: inherit !important; }
+.wa-avatar.color-1 { background: #f6e9e5; color: #a16a53; }
+.wa-avatar.color-2 { background: #ece9f4; color: #7b6b9b; }
+.wa-avatar.color-3 { background: #f5e8ed; color: #a1687f; }
+.wa-avatar.color-4 { background: #f6eddc; color: #a28046; }
+.wa-avatar.color-5 { background: #e5eef5; color: #5a7e9e; }
+.wa-avatar.color-6 { background: #e2f0e9; color: #48816e; }
+.wa-contact-top { gap: 8px; align-items: center; margin-bottom: 4px; }
+.wa-contact-name { font-size: 14px; line-height: 1.7; font-weight: 600; color: #273e50; max-width: none; flex: 1; }
+.wa-contact-time { color: #85919a; font: 10px/1.8 'Inter', sans-serif; direction: ltr; }
+.wa-contact-item.active .wa-contact-name { color: #1d624e; }
+.wa-contact-item.active .wa-contact-time { color: #558c79; }
+.wa-contact-bottom { font-size: 12px; line-height: 1.8; color: #7d8991; }
+.mapilla-sidebar-footer { padding: 14px 20px; border-top: 1px solid var(--mp-line); color: #8a969e; display: flex; align-items: center; gap: 6px; font-size: 9px; }
+.mapilla-sidebar-footer > span:last-child { margin-right: auto; font: 700 8px 'Inter', sans-serif; letter-spacing: 1px; color: #788996; }
+.mapilla-footer-dot { width: 5px; height: 5px; border-radius: 50%; background: #99aeb6; }
+.mapilla-no-results { display: grid; gap: 8px; text-align: center; padding: 42px 16px; color: var(--mp-muted); font-size: 12px; }
+.mapilla-no-results strong { color: var(--mp-ink); font-weight: 500; }
+
+/* A quiet canvas with the existing MAPILLA geometric pattern. */
+.wa-blank-state, .wa-chat-container { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; background-color: var(--mp-canvas); background-image: linear-gradient(#f5f6f3c9, #f5f6f3c9), url('/mapilla_backend_theme/static/src/img/mapilla_pattern.svg'); background-size: auto, 520px; }
+.wa-blank-state { gap: 17px; position: relative; background-image: radial-gradient(ellipse at center, #e7efea80 0, transparent 65%); }
+.mapilla-welcome-art { position: relative; width: 220px; height: 205px; display: grid; place-items: center; margin-bottom: 8px; }
+.mapilla-art-orbit { position: absolute; width: 200px; height: 200px; border: 1px solid #d9e3dd; border-radius: 50%; }
+.mapilla-art-orbit::after { content: ''; position: absolute; inset: 18px; border: 1px dashed #d9e3dd; border-radius: 50%; }
+.mapilla-art-card { width: 128px; height: 132px; display: grid; place-items: center; background: #fff; color: var(--mp-green); border-radius: 28px; border: 1px solid #e4ece6; transform: rotate(-8deg); box-shadow: 0 18px 40px #24493a0e; }
+.mapilla-art-card svg { width: 60px; height: 60px; transform: rotate(8deg); }
+.mapilla-art-check { position: absolute; left: 36px; bottom: 29px; display: grid; place-items: center; width: 34px; height: 34px; background: #2a8b70; color: white; border: 5px solid #f5f6f3; border-radius: 50%; font: 600 15px 'Inter', sans-serif; }
+.mapilla-eyebrow { font: 600 10px 'Inter', sans-serif; color: #89a092; letter-spacing: 2.6px; }
+.wa-blank-state h2 { font-size: 28px; line-height: 1.8; color: var(--mp-navy); font-weight: 600; letter-spacing: -.8px; }
+.wa-blank-state p { color: #83908e; font-size: 12px; line-height: 2.2; max-width: 420px; }
+.mapilla-welcome-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
+.mapilla-welcome-tags span { padding: 6px 13px; border: 1px solid #e1e7e3; background: #ffffff70; border-radius: 7px; color: #758980; font-size: 10px; }
+.wa-chat-container { position: relative; }
+.wa-chat-header { background: #ffffffed; min-height: 87px; padding: 15px 30px; border-bottom: 1px solid #e5eae6; gap: 0; }
+.wa-chat-header .wa-avatar { width: 44px; height: 44px; border-radius: 14px; font-size: 17px; }
+.wa-chat-header-name { color: var(--mp-navy); font-size: 15px; font-weight: 600; line-height: 1.6; }
+.wa-chat-header-sub { color: #8a979e; font: 11px/1.8 'Inter', sans-serif; direction: ltr; text-align: right; }
+.mapilla-chat-channel { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #67847b; padding: 5px 10px; border: 1px solid #e1ece7; border-radius: 6px; background: #f7faf8; }
+.mapilla-chat-channel span { width: 5px; height: 5px; background: #5caa8a; border-radius: 50%; }
+.mapilla-mobile-back { display: none; }
+.wa-chat-history { padding: 30px clamp(22px, 5vw, 85px); gap: 7px; scrollbar-width: thin; scrollbar-color: #cdd8d5 transparent; }
+.wa-message-row { margin-bottom: 1px; }
+.wa-bubble { max-width: min(76%, 590px); padding: 11px 15px 8px; border-radius: 16px; font-size: 14px; line-height: 1.95; box-shadow: 0 2px 4px #213a2f05; border: 1px solid #e3e8e3; }
+.wa-msg-in .wa-bubble { background: #fff; color: #354a51; border-top-right-radius: 5px; }
+.wa-msg-out .wa-bubble { background: #e2efe7; color: #244c40; border-color: #d4e5d8; border-top-left-radius: 5px; }
+.wa-msg-time { color: #95a69d; font: 9px/1.5 'Inter', sans-serif; margin-top: 5px; margin-right: 12px; direction: ltr; }
+.wa-msg-out .wa-msg-time { color: #7e9a8a; }
+.wa-bubble audio { max-width: 100%; width: 285px; height: 42px; border-radius: 22px; display: block; color-scheme: light; }
+.wa-bubble video { max-width: 100%; }
+.wa-bubble img { border-radius: 10px; }
+.wa-message-actions { opacity: 0; gap: 3px; }
+.wa-message-reply-btn, .wa-message-forward-btn { background: #fff; color: #7c9087; border: 1px solid #e3e9e5; width: 27px; height: 27px; font-size: 14px; box-shadow: none; }
+.wa-message-reply-btn:hover, .wa-message-forward-btn:hover { background: #e5f0e9; color: #24775d; }
+.wa-quoted-message { background: #ffffff6b; border-right-color: #65a88a; padding: 8px 10px; }
+.wa-quoted-sender { color: #37735a; font-size: 11px; }
+.wa-quoted-text { color: #7a8f82; font-size: 11px; }
+.wa-attachment-actions a { color: #27765b; background: #ffffff8c; }
+.wa-attachment-actions a:hover { color: #174d3a; background: #fff; }
+
+/* Composer */
+.wa-reply-box { margin: 10px 22px 20px; padding: 8px 12px; min-height: 64px; gap: 5px; border: 1px solid #e4eae5; border-radius: 16px; background: #fff; box-shadow: 0 6px 25px #223e2e06; }
+.wa-reply-box input { min-width: 0; padding: 12px 10px; color: var(--mp-ink); background: transparent; font-size: 12px; line-height: 1.8; border-radius: 5px; }
+.wa-reply-box input::placeholder { color: #a0aaa5; }
+.wa-reply-box:focus-within { border-color: #92bda9; box-shadow: 0 0 0 3px #16846d08; }
+.wa-reply-box input:focus-visible { outline: none; }
+.wa-send-btn, .wa-attach-btn, .wa-mic-btn, .wa-emoji-btn { width: 37px; height: 37px; border-radius: 11px; }
+.wa-attach-btn svg, .wa-mic-btn svg { fill: #91a098; width: 21px; height: 21px; }
+.wa-emoji-btn { color: #91a098; font-size: 25px; }
+.wa-send-btn { background: var(--mp-green); width: 43px; height: 43px; box-shadow: 0 3px 8px #16846d15; }
+.wa-send-btn svg, .wa-send-btn.ready svg, .wa-send-btn:hover svg { fill: #fff; width: 19px; height: 19px; transform: rotate(180deg); }
+.wa-send-btn:hover { background: #116e5a; }
+.wa-attach-btn:hover, .wa-mic-btn:hover, .wa-emoji-btn:hover { background: #eff5f1; }
+.wa-mic-btn { background: #e6f3ed; flex-shrink: 0; border: 1px solid #cfe4da; }
+.wa-mic-btn svg { fill: #16846d; }
+.wa-mic-btn.wa-mic-recording { background: #fde9e7; border-color: #e6b6b0; }
+.wa-mic-btn.wa-mic-recording svg { display: none; }
+.wa-mic-btn.wa-mic-recording::after { content: ''; width: 13px; height: 13px; border-radius: 3px; background: #c44c43; }
+.mapilla-cancel-recording { border: 0; background: transparent; color: #b3443c; cursor: pointer; padding: 5px; }
+.mapilla-voice-preview { display: flex; align-items: center; gap: 12px; margin: 0 22px; padding: 10px 14px; border: 1px solid #dbe7df; border-radius: 12px; background: #fff; color: #517568; font-size: 11px; }
+.mapilla-voice-preview audio { height: 40px; max-width: 100%; flex: 1; min-width: 0; }
+.mapilla-voice-preview button { background: none; border: 0; color: #b3443c; padding: 8px; cursor: pointer; }
+.mapilla-inline-media { max-width: 100%; }
+.mapilla-call-card { display: flex; align-items: center; gap: 12px; min-width: 180px; padding: 4px 2px 8px; }
+.mapilla-call-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #d0e5db; color: #26755b; font-size: 23px; }
+.mapilla-call-title { color: #254638; font-size: 14px; font-weight: 600; }
+.mapilla-call-title > span { color: #398467; margin-inline-start: 5px; }
+.mapilla-call-subtitle { font-size: 11px; color: #638276; margin-top: 4px; }
+.mapilla-media-placeholder { display: grid; place-items: center; width: 280px; max-width: 100%; height: 160px; border-radius: 10px; background: #dbe9e2; color: #527868; font-size: 36px; }
+.mapilla-media-status { color: #527868; font-size: 11px; padding: 4px 10px; }
+.mapilla-media-retry { border: 0; background: transparent; color: #24644d; cursor: pointer; font-size: 11px; padding: 4px 10px; text-decoration: underline; }
+.wa-reply-preview, .wa-file-preview { margin: 0 22px; padding: 10px 12px; border: 1px solid #e4eae5; border-radius: 12px; background: #fff; }
+.wa-reply-preview-content { background: #f0f6f2; border-right-color: #5a9e7e; }
+.wa-reply-preview-sender, .wa-file-preview span { color: #33765a; }
+.wa-reply-preview-text { color: #7a8f82; }
+.wa-recording-panel { background: #f1f6f3; color: var(--mp-ink); min-width: 0; }
+.wa-recording-status { color: #7b8e82; }
+.wa-recording-wave span { background: var(--mp-green); }
+.wa-emoji-picker { right: 26px; bottom: 96px; background: #fff; border: 1px solid #e1e7e4; box-shadow: 0 14px 45px #163e2d18; }
+.wa-picker-tabs { border-bottom-color: #e5ece7; }
+.wa-picker-tab { color: #86988a; }
+.wa-picker-tab.active { color: var(--mp-green); border-bottom-color: var(--mp-green); }
+.wa-picker-grid button:hover { background: #eff5f0; }
+.wa-sticker-grid button { background: #f5f8f5; }
+
+/* Compact tools rail expands only when a tool is selected. */
+.wa-tools-sidebar { grid-column: 3; grid-row: 2; width: auto; min-width: 0; max-width: none; min-height: 0; background: #fff; border-right: 1px solid var(--mp-line); }
+.wa-tools-buttons { background: #fff; display: flex; flex-direction: column; align-items: center; padding: 24px 12px; gap: 14px; border: 0; }
+.tool-btn { width: 44px; height: 44px; background: transparent; border-radius: 12px; position: relative; }
+.tool-btn svg { fill: #79918e; width: 21px; height: 21px; }
+.tool-btn:hover { background: #eef5f1; }
+.tool-btn.active { background: #e8f3ed; box-shadow: none; }
+.tool-btn.active svg { fill: #247b5f; }
+.wa-tools-empty { padding: 12px 0 24px; justify-content: flex-end; gap: 15px; }
+.mapilla-tools-monogram { font: 800 23px 'Inter', sans-serif !important; color: #bdc9c7 !important; letter-spacing: -1px; }
+.mapilla-tools-monogram span { color: #66a68b !important; font: inherit !important; }
+.mapilla-tools-hint { display: none; }
+body.mapilla-tools-open { grid-template-columns: 320px minmax(0, 1fr) 310px; }
+.mapilla-tools-open .wa-tools-buttons { flex-direction: row; justify-content: center; padding: 20px 12px; border-bottom: 1px solid var(--mp-line); }
+.wa-modal-content { background: #fff; }
+.wa-modal-header { border-bottom-color: var(--mp-line); padding: 20px; }
+.wa-modal-header h3 { color: var(--mp-navy); font-size: 14px; }
+.wa-modal-header button { color: #8da096; width: 30px; height: 30px; border-radius: 8px; }
+.wa-modal-header button:hover { background: #f2f5f3; }
+.wa-modal-body { padding: 22px; gap: 19px; }
+.wa-modal-body label { color: #7e9186; font-size: 11px; }
+.wa-modal-body input, .wa-modal-body select { background: #f7f9f7 !important; color: var(--mp-ink) !important; border: 1px solid #e1e8e2 !important; border-radius: 9px; font-size: 12px; min-width: 0; }
+.wa-modal-body input:focus, .wa-modal-body select:focus { outline: none; border-color: #80b59e !important; box-shadow: 0 0 0 3px #16846d0c; }
+.wa-modal-footer { border-top-color: var(--mp-line); padding: 18px 22px; }
+.wa-modal-footer button { background: var(--mp-green); font-size: 12px; border-radius: 9px; }
+.wa-modal-footer button:hover { background: #116e5a; }
+.wa-modal [style*="background: #2c2c2e"] { background: #f3f7f4 !important; }
+.wa-modal [style*="color: #fff"] { color: var(--mp-ink) !important; }
+.wa-modal [style*="color: #8e8e93"] { color: #7e9186 !important; }
+.wa-label-tag { font-size: 9px; padding: 1px 6px; border-radius: 4px; }
+.wa-forward-overlay { background: #0c2a4460; backdrop-filter: blur(5px); }
+.wa-forward-dialog { background: #fff; border: 1px solid #dce7df; border-radius: 18px; box-shadow: 0 25px 100px #0c2a4430; }
+.wa-forward-preview { background: #edf5ef; color: #688474; border-right-color: #4f9a78; }
+.wa-forward-search { background: #f6f8f6; border-color: #e2e9e3; color: var(--mp-ink); }
+.wa-forward-item { color: var(--mp-ink); }
+.wa-forward-item:hover, .wa-forward-item.selected { background: #edf5ef; box-shadow: none; }
+.wa-forward-item-mobile { color: #81958a; }
+
+@media (max-width: 1150px) {
+    body { grid-template-columns: 298px minmax(0, 1fr) 64px; }
+    .mapilla-topbar { padding: 0 22px; gap: 18px; }
+    .mapilla-brand { width: 154px; padding-right: 18px; }
+    .mapilla-brand img { width: 134px; }
+    .wa-contact-name { font-size: 13px; }
+    .wa-contact-item { padding: 12px 9px; }
+    .wa-chat-header { padding: 15px 22px; }
+    .wa-chat-history { padding: 22px 24px; }
+    body.mapilla-tools-open { grid-template-columns: 298px minmax(0, 1fr) 64px; }
+    .mapilla-tools-open .wa-tools-sidebar { position: fixed; top: 76px; bottom: 0; left: 0; width: 320px; max-width: 90vw; z-index: 45; box-shadow: 16px 0 70px #0c2a4426; }
+    .wa-tools-buttons { padding: 24px 8px; }
+    .wa-bubble { max-width: 85%; }
+}
+@media (max-width: 700px) {
+    body, body.mapilla-tools-open { grid-template-columns: minmax(0, 1fr); grid-template-rows: 64px minmax(0, 1fr); }
+    .mapilla-topbar { padding: 0 18px; gap: 12px; }
+    .mapilla-brand { width: 118px; padding-right: 12px; }
+    .mapilla-brand img { width: 106px; }
+    .mapilla-app-title, .mapilla-back-link { display: none; }
+    .mapilla-connection { font-size: 10px; }
+    .mapilla-topbar-link { width: 30px; height: 30px; border: 0; }
+    .wa-sidebar { grid-column: 1; border: 0; }
+    .wa-blank-state { display: none !important; }
+    .wa-chat-container { display: none !important; grid-column: 1; }
+    .wa-tools-sidebar { display: none; }
+    .mapilla-chat-open .wa-sidebar { display: none; }
+    .mapilla-chat-open .wa-chat-container { display: flex !important; }
+    .mapilla-chat-open .wa-tools-sidebar { display: flex; position: fixed; top: 134px; left: 8px; width: auto; border: 1px solid #e1e8e3; border-radius: 11px; background: #fffffff2; z-index: 12; box-shadow: 0 5px 20px #0c2a4408; }
+    .mapilla-chat-open .wa-tools-buttons { flex-direction: row; padding: 4px; gap: 3px; }
+    .mapilla-chat-open .wa-tools-details { display: none; }
+    .tool-btn { width: 33px; height: 33px; border-radius: 8px; }
+    .tool-btn svg { width: 17px; height: 17px; }
+    .mapilla-chat-open.mapilla-tools-open .wa-tools-sidebar { top: 64px; bottom: 0; left: 0; width: min(340px, 92vw); border-radius: 0; z-index: 45; }
+    .mapilla-chat-open.mapilla-tools-open .wa-tools-buttons { padding: 18px; gap: 14px; }
+    .mapilla-chat-open.mapilla-tools-open .wa-tools-details { display: flex; }
+    .wa-chat-header { padding: 12px 14px; min-height: 68px; }
+    .wa-chat-header .wa-avatar { width: 38px; height: 38px; border-radius: 12px; margin-left: 9px; }
+    .wa-chat-header-name { font-size: 13px; }
+    .mapilla-chat-channel { font-size: 9px; padding: 4px 7px; }
+    .mapilla-mobile-back { display: grid; place-items: center; width: 28px; height: 35px; background: none; color: var(--mp-navy); border: 0; font-size: 24px; margin-left: 6px; }
+    .wa-chat-history { padding: 58px 14px 16px; gap: 6px; }
+    .wa-bubble { max-width: 88%; padding: 9px 12px 7px; font-size: 14px; }
+    .wa-message-actions { opacity: .55; gap: 2px; margin: 0 3px; }
+    .wa-message-reply-btn, .wa-message-forward-btn { width: 23px; height: 23px; font-size: 12px; }
+    .wa-bubble audio { width: 230px; max-width: 100%; }
+    .wa-reply-box { margin: 6px 10px max(10px, env(safe-area-inset-bottom)); padding: 5px 7px; min-height: 58px; gap: 2px; border-radius: 14px; }
+    .wa-reply-box input { padding: 10px 5px; font-size: 16px; }
+    .wa-reply-box input::placeholder { font-size: 12px; }
+    .wa-send-btn, .wa-mic-btn, .wa-attach-btn, .wa-emoji-btn { width: 34px; height: 36px; }
+    .wa-emoji-picker { right: 12px; bottom: 80px; max-width: calc(100% - 24px); }
+    .wa-reply-preview, .wa-file-preview { margin: 0 10px; }
+    .mapilla-voice-preview { margin: 0 10px; gap: 6px; padding: 8px; }
+    .mapilla-voice-preview > span { display: none; }
+    .wa-recording-status { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_mrp.PayrollPeriodList.Buttons"
+       t-inherit="web.ListView.Buttons"
+       t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
+            <div class="o_furniture_payroll_period_controls" dir="rtl">
+                <button t-if="hasSelectedRecords"
+                        type="button"
+                        class="btn btn-success o_furniture_payroll_whatsapp"
+                        t-att-disabled="period.openingWhatsApp"
+                        t-on-click="openPayrollWhatsAppWizard">
+                    <i t-att-class="period.openingWhatsApp ? 'fa fa-spinner fa-spin' : 'fa fa-whatsapp'"/>
+                    <span t-esc="period.openingWhatsApp ? 'جارٍ التجهيز...' : 'Send via WhatsApp'"/>
+                </button>
+                <div class="o_furniture_payroll_basis_tabs"
+                     role="tablist"
+                     aria-label="نوع حساب أجر العامل">
+                    <button type="button"
+                            role="tab"
+                            t-att-aria-selected="payBasis.value === 'time'"
+                            t-att-class="'o_furniture_payroll_basis_tab ' + (payBasis.value === 'time' ? 'active' : '')"
+                            t-att-disabled="period.switching"
+                            t-on-click="() => this.onPayrollPayBasisChange('time')">
+                        <i class="fa fa-clock-o"/>
+                        <span>عمال بالوقت</span>
+                    </button>
+                    <button type="button"
+                            role="tab"
+                            t-att-aria-selected="payBasis.value === 'production'"
+                            t-att-class="'o_furniture_payroll_basis_tab ' + (payBasis.value === 'production' ? 'active' : '')"
+                            t-att-disabled="period.switching"
+                            t-on-click="() => this.onPayrollPayBasisChange('production')">
+                        <i class="fa fa-cubes"/>
+                        <span>عمال بالإنتاج</span>
+                    </button>
+                </div>
+                <label class="o_furniture_payroll_period_field">
+                    <span>من تاريخ</span>
+                    <input type="date"
+                           class="form-control"
+                           t-model="period.dateFrom"
+                           t-on-change="onPayrollPeriodChange"
+                           t-att-max="period.dateTo || period.today"/>
+                </label>
+                <span class="o_furniture_payroll_period_arrow" aria-hidden="true">
+                    <i class="fa fa-long-arrow-left"/>
+                </span>
+                <label class="o_furniture_payroll_period_field">
+                    <span>إلى تاريخ</span>
+                    <input type="date"
+                           class="form-control"
+                           t-model="period.dateTo"
+                           t-on-change="onPayrollPeriodChange"
+                           t-att-min="period.dateFrom"
+                           t-att-max="period.allowedDateTo"/>
+                </label>
+                <button type="button"
+                        class="btn btn-primary o_furniture_payroll_period_apply"
+                        t-att-disabled="!canUsePeriod"
+                        t-on-click="applyPayrollAccounting">
+                    <i t-att-class="period.posting ? 'fa fa-spinner fa-spin' : 'fa fa-check-circle'"/>
+                    <span t-esc="period.posting ? 'جارٍ ترحيل قيد الاستحقاق...' : 'تطبيق'"/>
+                </button>
+                <button type="button"
+                        class="btn btn-success o_furniture_payroll_payment"
+                        title="فتح شاشة توزيع سداد أجور الفترة"
+                        t-att-disabled="!canUsePeriod"
+                        t-on-click="openPayrollPayment">
+                    <i t-att-class="period.paying ? 'fa fa-spinner fa-spin' : 'fa fa-money'"/>
+                    <span t-esc="period.paying ? 'جارٍ فتح السداد...' : 'سداد الأجور'"/>
+                </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

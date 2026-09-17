@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_stage_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.transfer.wizard.form</field>
+        <field name="model">furniture.mrp.stage.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="تحويل المنتج بين المراحل" class="o_furniture_stage_transfer_wizard">
+                <div class="o_furniture_transfer_hero" invisible="view_only">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">تحويل المنتج شبه النهائي بين الأقسام</div>
+                        <h2>اختار المرحلة اللي خرج منها المنتج شبه النهائي والمرحلة اللي رايح لها</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">↪</div>
+                </div>
+                <div class="o_furniture_transfer_hero" invisible="not view_only">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">محتويات صالة المرحلة</div>
+                        <h2>منتجات أمر التشغيل الموجودة أو المخصصة للمرحلة</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">👁</div>
+                </div>
+                <group class="o_furniture_transfer_order">
+                    <field name="production_id"/>
+                    <field name="view_only" invisible="1"/>
+                    <field name="kit_grouping_active" invisible="1"/>
+                    <field name="has_editable_first_stage_images" invisible="1"/>
+                    <field name="available_move_ids" invisible="1"/>
+                    <field name="prepared_source_stage" invisible="1" force_save="1"/>
+                </group>
+                <div class="o_furniture_transfer_flow" invisible="view_only">
+                    <div class="o_furniture_transfer_card o_furniture_transfer_from">
+                        <div class="o_furniture_transfer_card_title">من مرحلة</div>
+                        <field name="source_stage" nolabel="1"/>
+                    </div>
+                    <div class="o_furniture_transfer_arrow">
+                        <span>➜</span>
+                    </div>
+                    <div class="o_furniture_transfer_card o_furniture_transfer_to">
+                        <div class="o_furniture_transfer_card_title">إلى مرحلة</div>
+                        <field name="target_stage" nolabel="1"/>
+                    </div>
+                </div>
+                <div class="o_furniture_transfer_card o_furniture_transfer_contents" invisible="not source_stage">
+                    <div class="o_furniture_transfer_card_title" invisible="view_only">محتويات المرحلة المصدر</div>
+                    <div class="o_furniture_transfer_card_title" invisible="not view_only">الأطقم والمنتجات الموجودة</div>
+                    <div class="o_furniture_transfer_contents_hint"
+                         invisible="view_only">
+                        اختار السطور اللي هتنقلها وعدّل الكمية لو محتاج، ولو فيه أكتر من صنف داخل المرحلة تقدر تنقلهم مع بعض.
+                    </div>
+                    <div class="o_furniture_transfer_contents_hint o_furniture_model_group_hint"
+                         invisible="not view_only">
+                        عرض فقط للقطع المحولة للصالة أو التي تبدأ تصنيعها مباشرة بهذه المرحلة، مجمعة بالأطقم مع الصور والخامات وبيانات المشتري والمستفيد.
+                    </div>
+                    <div class="alert alert-info mb-3" role="alert"
+                         invisible="not view_only or not has_editable_first_stage_images">
+                        لأن هذه أول مرحلة للمنتجات دي، تقدر تضغط على صورة القطعة وترفعها هنا، وبعدها اضغط «حفظ الصور».
+                    </div>
+                    <div class="alert alert-info mb-0" role="alert"
+                         invisible="not view_only or line_ids">
+                        لا توجد منتجات تابعة لأمر التشغيل هذا محولة أو مخصصة للمرحلة حاليًا.
+                    </div>
+                    <field name="source_content_summary" nolabel="1" readonly="1" widget="text"
+                           invisible="1"/>
+                    <field name="line_ids" nolabel="1"
+                           invisible="kit_grouping_active"
+                           readonly="view_only"
+                           class="o_furniture_standard_transfer_lines">
+                        <list editable="bottom" create="false" delete="false">
+                            <field name="selected" force_save="1"/>
+                            <field name="sequence" column_invisible="1"/>
+                            <field name="is_model_header" column_invisible="1"/>
+                            <field name="product_id" invisible="1"/>
+                            <field name="source_production_id" column_invisible="1" force_save="1"/>
+                            <field name="source_production_line_id" column_invisible="1" force_save="1"/>
+                            <field name="technical_source_production_line_ids" column_invisible="1" force_save="1"/>
+                            <field name="kit_group_token" column_invisible="1" force_save="1"/>
+                            <field name="kit_bom_id" column_invisible="1" force_save="1"/>
+                            <field name="kit_instance_number" column_invisible="1" force_save="1"/>
+                            <field name="kit_component_qty" column_invisible="1" force_save="1"/>
+                            <field name="product_display_label" string="الصنف" readonly="1"/>
+                            <field name="kit_piece_note" string="ملاحظات القطعة" readonly="1" optional="show"/>
+                            <field name="furniture_model_id" string="الموديل" readonly="1" widget="badge"
+                                   class="o_furniture_transfer_model_badge"/>
+                            <field name="buyer_partner_id" string="المشتري (الشركة)"
+                                   options="{'no_create_edit': True}" force_save="1"/>
+                            <field name="beneficiary_partner_id" string="المستفيد"
+                                   options="{'no_create_edit': True}" force_save="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   decoration-info="dimension_label"/>
+                            <field name="available_qty" string="الكمية المتاحة"/>
+                            <field name="qty_to_transfer" string="الكمية المنقولة"/>
+                            <field name="product_uom_id" string="الوحدة"/>
+                        </list>
+                    </field>
+                    <field name="line_ids" nolabel="1"
+                           invisible="not kit_grouping_active"
+                           readonly="view_only and not has_editable_first_stage_images"
+                           class="o_furniture_model_grouped_transfer_lines">
+                        <list editable="bottom" create="false" delete="false"
+                              decoration-bf="is_model_header"
+                              decoration-primary="is_model_header and kit_instance_number and kit_instance_number % 5 == 1"
+                              decoration-success="is_model_header and kit_instance_number and kit_instance_number % 5 == 2"
+                              decoration-warning="is_model_header and kit_instance_number and kit_instance_number % 5 == 3"
+                              decoration-danger="is_model_header and kit_instance_number and kit_instance_number % 5 == 4"
+                              decoration-info="is_model_header and (not kit_instance_number or kit_instance_number % 5 == 0)">
+                            <field name="sequence" column_invisible="1"/>
+                            <field name="is_model_header" column_invisible="1"/>
+                            <field name="model_group_label" column_invisible="1"/>
+                            <field name="kit_group_token" column_invisible="1" force_save="1"/>
+                            <field name="kit_bom_id" column_invisible="1" force_save="1"/>
+                            <field name="kit_instance_number" column_invisible="1" force_save="1"/>
+                            <field name="kit_component_qty" column_invisible="1" force_save="1"/>
+                            <field name="product_id" column_invisible="1"/>
+                            <field name="source_production_id" column_invisible="1" force_save="1"/>
+                            <field name="source_production_line_id" column_invisible="1" force_save="1"/>
+                            <field name="technical_source_production_line_ids" column_invisible="1" force_save="1"/>
+                            <field name="first_stage_image_editable" column_invisible="1" force_save="1"/>
+                            <field name="selected" string="نقل" invisible="is_model_header"
+                                   column_invisible="parent.view_only" force_save="1"/>
+                            <field name="product_display_label" string="الصنف" readonly="1"/>
+                            <field name="buyer_partner_id" string="المشتري (الشركة)"
+                                   readonly="parent.kit_grouping_active"
+                                   invisible="is_model_header and not kit_bom_id" force_save="1"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="beneficiary_partner_id" string="المستفيد"
+                                   readonly="parent.kit_grouping_active"
+                                   invisible="is_model_header and not kit_bom_id" force_save="1"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="furniture_model_id" column_invisible="1" readonly="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   invisible="is_model_header" decoration-info="dimension_label"/>
+                            <field name="batch_image_1920" string="صورة القطعة" widget="image"
+                                   options="{'size': [150, 112], 'img_class': 'object-fit-contain'}"
+                                   readonly="not first_stage_image_editable"
+                                   force_save="1"
+                                   invisible="is_model_header"/>
+                            <field name="kit_piece_note" string="ملاحظات القطعة" readonly="1"
+                                   invisible="is_model_header" optional="show"/>
+                            <field name="target_material_summary" string="خامات المرحلة" widget="html"
+                                   readonly="1" invisible="is_model_header"/>
+                            <field name="available_qty" string="المتاح" invisible="is_model_header"/>
+                            <field name="qty_to_transfer" string="الكمية المنقولة" invisible="is_model_header"
+                                   column_invisible="parent.view_only"/>
+                            <field name="product_uom_id" string="الوحدة" invisible="is_model_header"
+                                   readonly="parent.view_only"/>
+                        </list>
+                    </field>
+                </div>
+                <footer>
+                    <button name="action_transfer" string="تنفيذ التحويل" type="object"
+                            class="btn-primary o_furniture_transfer_confirm" invisible="view_only"/>
+                    <button name="action_save_first_stage_images" string="💾 حفظ الصور" type="object"
+                            class="btn-primary"
+                            invisible="not view_only or not has_editable_first_stage_images"/>
+                    <button string="إغلاق" special="cancel" class="btn-secondary" invisible="not view_only"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary" invisible="view_only"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_kit_planner_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.kit.planner.form</field>
+        <field name="model">furniture.mrp.stage.transfer.wizard</field>
+        <!-- This form is only opened explicitly from the production planner.
+             It must never become the default form for stage-viewer actions. -->
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form string="تقسيم الأطقم ومعاينة التفصيل والكسوة"
+                  class="o_furniture_stage_transfer_wizard o_furniture_kit_planner_wizard">
+                <field name="kit_planner_mode" invisible="1"/>
+                <field name="view_only" invisible="1"/>
+                <field name="source_stage" invisible="1" force_save="1"/>
+                <field name="target_stage" invisible="1" force_save="1"/>
+                <field name="prepared_source_stage" invisible="1" force_save="1"/>
+                <field name="kit_plan_stage" invisible="1" force_save="1"/>
+                <field name="available_move_ids" invisible="1"/>
+                <field name="kit_plan_preview_signature" invisible="1" force_save="1"/>
+                <field name="kit_plan_source_revision" invisible="1" force_save="1"/>
+                <field name="kit_plan_has_saved_groups" invisible="1"/>
+
+                <div class="o_furniture_transfer_hero o_furniture_kit_planner_hero">
+                    <div class="o_furniture_kit_planner_hero_copy">
+                        <div class="o_furniture_transfer_eyebrow">تقسيمة واحدة مشتركة</div>
+                        <h2>اختار الأطقم مرة واحدة للتفصيل والكسوة</h2>
+                        <div class="o_furniture_kit_planner_scope">
+                            <span class="o_furniture_kit_planner_scope_badge">
+                                <i class="fa fa-cut" title="التفصيل" aria-hidden="true"/>
+                                التفصيل
+                            </span>
+                            <span class="o_furniture_kit_planner_scope_join">+</span>
+                            <span class="o_furniture_kit_planner_scope_badge">
+                                <i class="fa fa-cube" title="الكسوة" aria-hidden="true"/>
+                                الكسوة
+                            </span>
+                            <span class="o_furniture_kit_planner_order_chip">
+                                أمر الإنتاج
+                                <field name="production_id" nolabel="1" readonly="1"
+                                       options="{'no_open': True}"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="o_furniture_transfer_icon">🧩</div>
+                </div>
+
+                <div class="alert alert-warning o_furniture_kit_plan_warning" role="alert"
+                     invisible="not kit_plan_warning">
+                    <strong>راجع البيانات قبل اختيار الأطقم</strong>
+                    <field name="kit_plan_warning" nolabel="1" readonly="1" widget="text"/>
+                </div>
+
+                <div class="o_furniture_transfer_card o_furniture_kit_plan_options">
+                    <div class="o_furniture_kit_plan_section_heading">
+                        <span class="o_furniture_kit_plan_step">1</span>
+                        <div>
+                            <strong>اختيار الأطقم</strong>
+                            <small>حدد العدد المطلوب من الأطقم التي يمكن تكوينها من أصناف أمر الإنتاج.</small>
+                        </div>
+                    </div>
+                    <div class="o_furniture_transfer_contents_hint o_furniture_model_group_hint">
+                        المتاح محسوب داخل نفس الموديل والمشتري والمستفيد. عند خلط أكثر من طقم، النظام يراجع إجمالي المكونات قبل الحفظ.
+                    </div>
+                    <div class="alert alert-info mb-3" role="alert"
+                         invisible="kit_plan_option_line_ids">
+                        لا توجد وصفات Kit قابلة للتكوين من الكميات الحالية. المنتجات ستظهر كمنتجات منفردة، وحدد الموديل أولًا لو كان ناقصًا.
+                    </div>
+                    <field name="kit_plan_option_line_ids" nolabel="1"
+                           class="o_furniture_kit_plan_option_lines">
+                        <list editable="bottom" create="false" delete="false">
+                            <field name="sequence" column_invisible="1"/>
+                            <field name="furniture_model_id" column_invisible="1"/>
+                            <field name="buyer_partner_id" column_invisible="1"/>
+                            <field name="beneficiary_partner_id" column_invisible="1"/>
+                            <field name="kit_bom_id" column_invisible="1"/>
+                            <field name="kit_display_name" string="الطقم" readonly="1"/>
+                            <field name="component_summary" string="مكونات الطقم" readonly="1"/>
+                            <field name="max_kit_qty" string="المتاح" readonly="1"/>
+                            <field name="requested_kit_qty" string="اختر العدد"/>
+                        </list>
+                    </field>
+                    <div class="o_furniture_kit_plan_refresh_row">
+                        <button name="action_refresh_kit_plan_preview"
+                                string="تطبيق الاختيارات وعرض التقسيمة ←"
+                                type="object"
+                                class="btn-primary o_furniture_kit_plan_refresh_button"/>
+                    </div>
+                </div>
+
+                <div class="o_furniture_kit_plan_summaries">
+                    <div class="o_furniture_transfer_card" invisible="not kit_plan_existing_summary">
+                        <div class="o_furniture_transfer_card_title">الأطقم المحفوظة حاليًا</div>
+                        <field name="kit_plan_existing_summary" nolabel="1" readonly="1" widget="text"/>
+                    </div>
+                    <div class="o_furniture_transfer_card">
+                        <div class="o_furniture_transfer_card_title">المنتجات المتبقية خارج الأطقم</div>
+                        <field name="kit_plan_remaining_summary" nolabel="1" readonly="1" widget="text"/>
+                    </div>
+                </div>
+
+                <div class="o_furniture_transfer_card o_furniture_transfer_contents o_furniture_kit_plan_preview">
+                    <div class="o_furniture_kit_plan_section_heading">
+                        <span class="o_furniture_kit_plan_step">2</span>
+                        <div>
+                            <strong>التقسيمة النهائية المشتركة</strong>
+                            <small>نفس الأطقم والقطع ستظهر لمشرفي التفصيل والكسوة.</small>
+                        </div>
+                    </div>
+                    <div class="o_furniture_transfer_contents_hint o_furniture_model_group_hint">
+                        كل عنوان ملون يمثل طقمًا فعليًا مستقلًا. الصورة والملاحظات تخص القطعة داخل أمر الإنتاج فقط.
+                    </div>
+                    <field name="source_content_summary" invisible="1"/>
+                    <field name="line_ids" nolabel="1"
+                           domain="[('kit_plan_stage_visible', '=', True)]"
+                           class="o_furniture_model_grouped_transfer_lines o_furniture_kit_plan_preview_lines">
+                        <list editable="bottom" create="false" delete="false"
+                              decoration-bf="is_model_header"
+                              decoration-primary="is_model_header and kit_instance_number and kit_instance_number % 5 == 1"
+                              decoration-success="is_model_header and kit_instance_number and kit_instance_number % 5 == 2"
+                              decoration-warning="is_model_header and kit_instance_number and kit_instance_number % 5 == 3"
+                              decoration-danger="is_model_header and kit_instance_number and kit_instance_number % 5 == 4"
+                              decoration-info="is_model_header and (not kit_instance_number or kit_instance_number % 5 == 0)">
+                            <field name="sequence" column_invisible="1"/>
+                            <field name="is_model_header" column_invisible="1"/>
+                            <field name="model_group_label" column_invisible="1"/>
+                            <field name="kit_group_token" column_invisible="1" force_save="1"/>
+                            <field name="kit_bom_id" column_invisible="1" force_save="1"/>
+                            <field name="kit_instance_number" column_invisible="1" force_save="1"/>
+                            <field name="product_id" column_invisible="1"/>
+                            <field name="source_production_id" column_invisible="1" force_save="1"/>
+                            <field name="source_production_line_id" column_invisible="1" force_save="1"/>
+                            <field name="first_stage_image_editable" column_invisible="1" force_save="1"/>
+                            <field name="kit_plan_stage_visible" column_invisible="1" force_save="1"/>
+                            <field name="selected" column_invisible="1" force_save="1"/>
+                            <field name="qty_to_transfer" column_invisible="1" force_save="1"/>
+                            <field name="product_display_label" string="الصنف" readonly="1"/>
+                            <field name="buyer_partner_id" string="المشتري (الشركة)" readonly="1"
+                                   invisible="is_model_header and not kit_bom_id" force_save="1"/>
+                            <field name="beneficiary_partner_id" string="المستفيد" readonly="1"
+                                   invisible="is_model_header and not kit_bom_id" force_save="1"/>
+                            <field name="furniture_model_id" column_invisible="1" readonly="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   invisible="is_model_header" decoration-info="dimension_label"/>
+                            <field name="kit_piece_note" string="ملاحظات القطعة"
+                                   placeholder="اكتب تعليمات التفصيل أو الكسوة لهذه القطعة..."
+                                   force_save="1" invisible="is_model_header"/>
+                            <field name="kit_component_qty" string="الكمية" readonly="1"
+                                   invisible="is_model_header" force_save="1"/>
+                            <field name="batch_image_1920" string="صورة القطعة" widget="image"
+                                   options="{'size': [48, 36], 'img_class': 'object-fit-contain'}"
+                                   force_save="1" invisible="is_model_header"/>
+                            <field name="product_uom_id" column_invisible="1" force_save="1"/>
+                        </list>
+                    </field>
+                </div>
+
+                <footer>
+                    <button name="action_apply_kit_plan"
+                            string="💾 حفظ التقسيمة والصور والملاحظات"
+                            type="object"
+                            class="btn-primary o_furniture_transfer_confirm"/>
+                    <button name="action_refresh_kit_plan_preview"
+                            string="تحديث المعاينة"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_reset_kit_plan"
+                            string="إلغاء التقسيمة المحفوظة"
+                            type="object"
+                            class="btn-danger"
+                            invisible="not kit_plan_has_saved_groups"
+                            confirm="سيتم فك هوية الأطقم المحفوظة وإرجاع القطع كمنتجات منفردة بدون حذف صور القطع. هل تريد المتابعة؟"/>
+                    <button string="إغلاق بدون حفظ" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

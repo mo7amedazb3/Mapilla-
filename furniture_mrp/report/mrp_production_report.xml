@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- تقرير أمر التشغيل الأسبوعي -->
+    <record id="action_report_furniture_mrp_production" model="ir.actions.report">
+        <field name="name">أمر التشغيل الأسبوعي</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_production_order_template</field>
+        <field name="report_file">furniture_mrp.report_production_order_template</field>
+        <field name="print_report_name">(object.name or 'أمر تشغيل أسبوعي') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_production"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+</odoo>

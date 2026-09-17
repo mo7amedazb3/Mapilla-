@@ -1,0 +1,58 @@
+<odoo>
+    <record id="assembly_request_company" model="ir.rule">
+        <field name="name">طلبات المراحل: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="assembly_request_own" model="ir.rule">
+        <field name="name">المشرف يرى طلباته فقط</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition"/>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        <field name="domain_force">[('requested_by_id', '=', user.id)]</field>
+    </record>
+    <record id="assembly_request_line_company" model="ir.rule">
+        <field name="name">سطور طلبات المراحل: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="assembly_request_line_own" model="ir.rule">
+        <field name="name">المشرف يرى سطور طلباته فقط</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition_line"/>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        <field name="domain_force">[('requisition_id.requested_by_id', '=', user.id)]</field>
+    </record>
+    <record id="assembly_request_line_store" model="ir.rule">
+        <field name="name">أمين المخزن يرى سطور الطلبات المرسلة</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition_line"/>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_storekeeper'))]"/>
+        <field name="domain_force">[('requisition_id.state', '!=', 'draft')]</field>
+    </record>
+    <record id="assembly_request_store" model="ir.rule">
+        <field name="name">أمين المخزن يرى الطلبات المرسلة</field>
+        <field name="model_id" ref="model_furniture_assembly_requisition"/>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_storekeeper'))]"/>
+        <field name="domain_force">[('state', '!=', 'draft')]</field>
+    </record>
+    <record id="assembly_config_company" model="ir.rule">
+        <field name="name">إعداد صالة التجميع لنفس الشركة</field>
+        <field name="model_id" ref="model_furniture_assembly_supply_config"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="assembly_supervisor_material_company" model="ir.rule">
+        <field name="name">خامات المشرفين: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_assembly_supervisor_material"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="assembly_weekly_report_company" model="ir.rule">
+        <field name="name">متابعة الاستهلاك: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_assembly_weekly_material_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+    <record id="assembly_weekly_report_line_company" model="ir.rule">
+        <field name="name">سطور متابعة الاستهلاك: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_assembly_weekly_material_report_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

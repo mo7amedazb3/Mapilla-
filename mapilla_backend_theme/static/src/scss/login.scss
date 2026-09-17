@@ -1,0 +1,240 @@
+:root {
+    --mapilla-login-oxford: #0c2a44;
+    --mapilla-login-timberwolf: #e0d8d1;
+    --mapilla-login-surface: #f7f5f2;
+    --mapilla-login-text: #2d2d2d;
+}
+
+html:has(body.mapilla_login_page),
+body.mapilla_login_page,
+body.mapilla_login_page #wrapwrap,
+body.mapilla_login_page main {
+    min-height: 100%;
+}
+
+body.mapilla_login_page {
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--mapilla-login-oxford);
+    color: var(--mapilla-login-text);
+}
+
+body.mapilla_login_page #wrapwrap,
+body.mapilla_login_page main {
+    display: block;
+}
+
+.mapilla_login_shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.34fr) minmax(420px, 0.66fr);
+    background: var(--mapilla-login-surface);
+}
+
+.mapilla_login_visual {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    isolation: isolate;
+    background-color: var(--mapilla-login-oxford);
+    background-image: linear-gradient(90deg, rgba(7, 24, 39, 0.26), rgba(7, 24, 39, 0.70)),
+        url("/mapilla_backend_theme/static/src/img/login_chair.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.mapilla_login_visual::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/mapilla_backend_theme/static/src/img/mapilla_pattern.svg");
+    background-position: right top;
+    background-size: 440px 440px;
+    content: "";
+    opacity: 0.22;
+}
+
+.mapilla_login_visual::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(12, 42, 68, 0.06) 20%, rgba(6, 20, 33, 0.76) 100%);
+    content: "";
+}
+
+.mapilla_login_visual_content {
+    position: absolute;
+    inset-inline: clamp(36px, 6vw, 100px);
+    bottom: clamp(44px, 8vh, 96px);
+    color: #ffffff;
+}
+
+.mapilla_login_visual_logo {
+    width: 48vw;
+    max-width: 350px;
+    margin-bottom: 26px;
+}
+
+.mapilla_login_tagline {
+    max-width: 650px;
+    margin: 0;
+    font-family: "Arial Narrow", "Avenir Next Condensed", "Roboto Condensed", sans-serif;
+    font-size: clamp(22px, 2.2vw, 42px);
+    font-weight: 700;
+    letter-spacing: 0.075em;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.mapilla_login_subline {
+    max-width: 540px;
+    margin: 15px 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+}
+
+.mapilla_login_panel {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 48px clamp(28px, 5vw, 78px);
+    background: var(--mapilla-login-surface);
+}
+
+.mapilla_login_card {
+    width: 100%;
+    max-width: 430px;
+    padding: clamp(30px, 4vw, 48px);
+    border: 1px solid var(--mapilla-login-timberwolf);
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 28px 70px rgba(12, 42, 68, 0.14);
+}
+
+.mapilla_login_logo {
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--mapilla-login-timberwolf);
+    text-align: center;
+}
+
+.mapilla_login_logo img {
+    display: inline-block;
+    width: 86%;
+    max-width: 260px;
+    height: auto;
+}
+
+.mapilla_login_intro {
+    margin: 24px 0 28px;
+    text-align: center;
+}
+
+.mapilla_login_intro strong {
+    display: block;
+    color: var(--mapilla-login-oxford);
+    font-size: 17px;
+    letter-spacing: 0.03em;
+}
+
+.mapilla_login_intro span {
+    display: block;
+    margin-top: 5px;
+    color: #6d7f8f;
+    font-size: 13px;
+}
+
+.mapilla_login_card .form-label,
+.mapilla_login_card .col-form-label {
+    color: var(--mapilla-login-oxford);
+    font-weight: 650;
+}
+
+.mapilla_login_card .form-control {
+    min-height: 44px;
+    border-color: var(--mapilla-login-timberwolf);
+    border-radius: 9px;
+    background: #fdfcfb;
+}
+
+.mapilla_login_card .form-control:focus {
+    border-color: #3d5569;
+    box-shadow: 0 0 0 3px rgba(12, 42, 68, 0.12);
+}
+
+.mapilla_login_card .btn-primary {
+    min-height: 44px;
+    border-color: var(--mapilla-login-oxford);
+    border-radius: 9px;
+    background: var(--mapilla-login-oxford);
+    box-shadow: 0 5px 14px rgba(12, 42, 68, 0.20);
+    font-weight: 700;
+}
+
+.mapilla_login_card .btn-primary:hover,
+.mapilla_login_card .btn-primary:focus {
+    border-color: #173c59;
+    background: #173c59;
+}
+
+.mapilla_login_card .btn-secondary {
+    border-color: var(--mapilla-login-timberwolf);
+    background: #f2efec;
+    color: var(--mapilla-login-oxford);
+}
+
+.mapilla_login_footer {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--mapilla-login-timberwolf);
+    color: #7a858d;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.mapilla_login_footer a {
+    color: var(--mapilla-login-oxford);
+}
+
+@media (max-width: 991.98px) {
+    .mapilla_login_shell {
+        grid-template-columns: 1fr;
+    }
+
+    .mapilla_login_visual {
+        display: none;
+    }
+
+    .mapilla_login_panel {
+        min-height: 100vh;
+        background-color: var(--mapilla-login-oxford);
+        background-image: linear-gradient(rgba(12, 42, 68, 0.93), rgba(12, 42, 68, 0.93)),
+            url("/mapilla_backend_theme/static/src/img/mapilla_pattern.svg");
+        background-size: auto, 360px 360px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .mapilla_login_panel {
+        align-items: stretch;
+        padding: 0;
+        background: #ffffff;
+    }
+
+    .mapilla_login_card {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+        max-width: none;
+        flex-direction: column;
+        justify-content: center;
+        padding: 32px 24px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}

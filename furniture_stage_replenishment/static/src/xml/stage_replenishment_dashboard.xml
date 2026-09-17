@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_stage_replenishment.StageReplenishmentDashboard" owl="1">
+        <div class="o_fsr_dashboard" dir="rtl">
+            <div class="o_fsr_shell">
+                <header class="o_fsr_header">
+                    <div class="o_fsr_heading">
+                        <div class="o_fsr_heading_icon" aria-hidden="true">
+                            <i class="fa fa-line-chart"/>
+                        </div>
+                        <div>
+                            <div class="o_fsr_eyebrow">تخطيط تشغيل المصنع</div>
+                            <h1>Min / Max مراحل الإنتاج</h1>
+                            <p>
+                                راقب كل صنف وموديل في كل مرحلة، واضبط الحدود ليُجهّز النظام
+                                أوامر التصنيع الناقصة كمسودات تنتظر التأكيد.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="o_fsr_header_actions">
+                        <button class="btn o_fsr_btn o_fsr_btn_ghost"
+                                t-on-click="loadData"
+                                t-att-disabled="state.isLoading"
+                                title="إعادة تحميل الأرقام">
+                            <i t-att-class="'fa ' + (state.isLoading ? 'fa-spinner fa-spin' : 'fa-refresh')"/>
+                            <span>تحديث الأرقام</span>
+                        </button>
+                        <button class="btn o_fsr_btn o_fsr_btn_ghost"
+                                t-on-click="() =&gt; this.openOrders()"
+                                title="فتح أوامر التصنيع التعويضية">
+                            <i class="fa fa-industry"/>
+                            <span>أوامر التعويض</span>
+                        </button>
+                        <button t-if="!isFinalStage" class="btn o_fsr_btn o_fsr_btn_ghost"
+                                t-on-click="openListView"
+                                title="فتح القائمة التقليدية">
+                            <i class="fa fa-list-alt"/>
+                            <span>عرض القائمة</span>
+                        </button>
+                        <button class="btn o_fsr_btn o_fsr_btn_primary"
+                                t-on-click="syncRules"
+                                t-att-disabled="state.isSyncing"
+                                title="مزامنة الأصناف والموديلات من الريسيبي">
+                            <i t-att-class="'fa ' + (state.isSyncing ? 'fa-spinner fa-spin' : 'fa-retweet')"/>
+                            <span>تحديث الريسيبي</span>
+                        </button>
+                    </div>
+                </header>
+
+                <section class="o_fsr_metrics" aria-label="ملخص Min Max للمراحل">
+                    <article class="o_fsr_metric o_fsr_metric_total">
+                        <span class="o_fsr_metric_icon"><i class="fa fa-cubes"/></span>
+                        <div>
+                            <span class="o_fsr_metric_label">كل البنود</span>
+                            <strong t-esc="state.summary.total_rules"/>
+                            <small>صنف × موديل × مرحلة</small>
+                        </div>
+                    </article>
+                    <article class="o_fsr_metric o_fsr_metric_need">
+                        <span class="o_fsr_metric_icon"><i class="fa fa-exclamation-triangle"/></span>
+                        <div>
+                            <span class="o_fsr_metric_label">تحتاج تصنيع</span>
+                            <strong t-esc="state.summary.need_production"/>
+                            <small>أقل من الحد الأدنى</small>
+                        </div>
+                    </article>
+                    <article class="o_fsr_metric o_fsr_metric_draft">
+                        <span class="o_fsr_metric_icon"><i class="fa fa-file-text-o"/></span>
+                        <div>
+                            <span class="o_fsr_metric_label">مسودات تعويض</span>
+                            <strong t-esc="state.summary.draft_orders"/>
+                            <small>في انتظار التأكيد</small>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="o_fsr_stage_section" aria-label="مراحل الإنتاج">
+                    <div class="o_fsr_stage_caption">
+                        <div>
+                            <span>المرحلة المعروضة</span>
+                            <strong t-esc="activeStageLabel"/>
+                        </div>
+                        <small>اسحب يمينًا ويسارًا لعرض باقي المراحل على الآيباد</small>
+                    </div>
+                    <nav class="o_fsr_stage_tabs" aria-label="اختيار المرحلة">
+                        <t t-foreach="state.stages" t-as="stage" t-key="stage.code">
+                            <button t-att-class="stageTabClass(stage.code)"
+                                    t-att-aria-pressed="state.activeStage === stage.code ? 'true' : 'false'"
+                                    t-att-disabled="isBusy"
+                                    t-on-click="() =&gt; this.setStage(stage.code)">
+                                <span class="o_fsr_stage_name" t-esc="stage.label"/>
+                                <span class="o_fsr_stage_numbers">
+                                    <b t-esc="stage.total"/>
+                                    <em t-if="stage.need" t-esc="stage.need"/>
+                                </span>
+                            </button>
+                        </t>
+                    </nav>
+                </section>
+
+                <section class="o_fsr_control_panel">
+                    <div class="o_fsr_filters">
+                        <label class="o_fsr_search">
+                            <i class="fa fa-search" aria-hidden="true"/>
+                            <input type="search"
+                                   placeholder="ابحث بالصنف أو الموديل أو الريسيبي..."
+                                   t-att-value="state.search"
+                                   t-on-input="updateSearch"/>
+                        </label>
+                        <label class="o_fsr_status_filter">
+                            <span>الحالة</span>
+                            <select t-att-value="state.status" t-on-change="setStatus">
+                                <option value="all">كل الحالات</option>
+                                <option value="to_produce">يحتاج تصنيع</option>
+                                <option value="draft">مسودة تغطي الاحتياج</option>
+                                <option value="incoming">قادم للمرحلة</option>
+                                <option value="working">داخل المرحلة</option>
+                                <option value="ok">المستوى سليم</option>
+                                <option value="disabled">غير مُعدّ</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="o_fsr_bulk_actions">
+                        <span class="o_fsr_selection_count">
+                            <i class="fa fa-check-square-o"/>
+                            محدد: <strong t-esc="selectedCount"/>
+                        </span>
+                        <button class="btn o_fsr_btn o_fsr_btn_secondary"
+                                t-on-click="runSelected"
+                                t-att-disabled="selectedCount === 0">
+                            <i class="fa fa-play"/>
+                            <span>تشغيل المحدد</span>
+                        </button>
+                        <button class="btn o_fsr_btn o_fsr_btn_primary"
+                                t-on-click="runAll"
+                                t-att-disabled="stageRunRows.length === 0 || state.isRunningAll">
+                            <i t-att-class="'fa ' + (state.isRunningAll ? 'fa-spinner fa-spin' : 'fa-bolt')"/>
+                            <span t-if="isFinalStage">تشغيل احتياجات المنتج التام</span>
+                            <span t-else="">تشغيل احتياجات المرحلة</span>
+                        </button>
+                    </div>
+                </section>
+
+                <t t-if="state.isLoading">
+                    <div class="o_fsr_loading">
+                        <span class="o_fsr_loader"/>
+                        <strong>جاري حساب أرصدة كل مرحلة...</strong>
+                        <small>يتم تجميع الموجود والقادم والمسودات لكل صنف وموديل.</small>
+                    </div>
+                </t>
+                <t t-else="">
+                    <section class="o_fsr_table_card">
+                        <div class="o_fsr_table_meta">
+                            <div>
+                                <strong t-esc="filteredRows.length"/>
+                                <span>بند ظاهر</span>
+                            </div>
+                            <p>
+                                <i class="fa fa-info-circle"/>
+                                رصيد المخزن هو المتاح في المرحلة، ولا يشمل الأوامر القادمة أو المسودات. عدّل Min وMax ثم اضغط حفظ في نفس الصف.
+                            </p>
+                        </div>
+                        <div class="o_fsr_table_wrap">
+                            <table class="table o_fsr_table o_fsr_model_table" aria-label="أرصدة الأصناف حسب الموديل">
+                                <thead>
+                                    <tr>
+                                        <th class="o_fsr_check_cell">
+                                            <input type="checkbox"
+                                                   aria-label="تحديد كل البنود الظاهرة المحتاجة تصنيع"
+                                                   t-att-checked="allVisibleSelected"
+                                                   t-att-disabled="visibleSelectableRows.length === 0"
+                                                   t-on-change="toggleVisibleRows"/>
+                                        </th>
+                                        <th class="o_fsr_product_col" scope="col">اسم الصنف</th>
+                                        <th class="o_fsr_number_col" scope="col">الرصيد في المخزن</th>
+                                        <th class="o_fsr_limit_col" scope="col"><bdi>Min</bdi></th>
+                                        <th class="o_fsr_limit_col" scope="col"><bdi>Max</bdi></th>
+                                        <th class="o_fsr_actions_col" scope="col">الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody t-foreach="modelGroups" t-as="group" t-key="group.key" class="o_fsr_model_group">
+                                    <tr class="o_fsr_model_heading">
+                                        <th colspan="6" scope="rowgroup">
+                                            <div class="o_fsr_model_title">
+                                                <i class="fa fa-cubes" aria-hidden="true"/>
+                                                <span class="o_fsr_model_caption">الموديل</span>
+                                                <strong dir="auto" t-esc="group.name"/>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    <t t-foreach="group.rows" t-as="row" t-key="row.id">
+                                        <tr t-att-class="'o_fsr_row o_fsr_row_' + row.status + (state.selectedIds[row.id] ? ' is-selected' : '')"
+                                            t-att-data-rule-id="row.id">
+                                            <td class="o_fsr_check_cell">
+                                                <input type="checkbox"
+                                                       t-att-aria-label="'تحديد ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                       t-att-checked="state.selectedIds[row.id]"
+                                                       t-att-disabled="!row.can_run"
+                                                       t-on-change="() =&gt; this.toggleRow(row)"/>
+                                            </td>
+                                            <td class="o_fsr_product_cell">
+                                                <strong t-esc="row.product"/>
+                                            </td>
+                                            <td t-att-class="qtyClass(row.current_qty) + ' o_fsr_stock_cell'">
+                                                <strong dir="ltr" t-esc="formatQty(row.current_qty)"/>
+                                                <small t-esc="row.unit"/>
+                                                <span t-if="state.activeStage === 'all'" class="o_fsr_stock_stage" t-esc="row.stage"/>
+                                            </td>
+                                            <td class="o_fsr_limit_cell">
+                                                <input type="number" dir="ltr" inputmode="decimal"
+                                                       min="0" step="1"
+                                                       t-att-aria-label="'Min — الحد الأدنى لـ ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                       t-att-value="row.minimum"
+                                                       t-att-disabled="state.savingRows[row.id]"
+                                                       t-on-input="(event) =&gt; this.setLimit(row, 'minimum', event)"/>
+                                            </td>
+                                            <td class="o_fsr_limit_cell">
+                                                <input type="number" dir="ltr" inputmode="decimal"
+                                                       min="0" step="1"
+                                                       t-att-aria-label="'Max — الحد الأقصى لـ ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                       t-att-value="row.maximum"
+                                                       t-att-disabled="state.savingRows[row.id]"
+                                                       t-on-input="(event) =&gt; this.setLimit(row, 'maximum', event)"/>
+                                            </td>
+                                            <td class="o_fsr_actions_cell">
+                                                <button t-if="state.dirtyRows[row.id]"
+                                                        class="btn o_fsr_row_btn o_fsr_row_btn_save"
+                                                        t-att-disabled="state.savingRows[row.id]"
+                                                        t-att-aria-label="'حفظ حدود ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                        t-on-click="() =&gt; this.saveLimits(row)">
+                                                    <i t-att-class="'fa ' + (state.savingRows[row.id] ? 'fa-spinner fa-spin' : 'fa-floppy-o')"/>
+                                                    <span>حفظ</span>
+                                                </button>
+                                                <button t-if="row.can_run"
+                                                        class="btn o_fsr_row_btn o_fsr_row_btn_run"
+                                                        t-att-aria-label="'تصنيع ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                        t-att-disabled="state.runningRows[row.id]"
+                                                        t-on-click="() =&gt; this.runRow(row)">
+                                                    <i t-att-class="'fa ' + (state.runningRows[row.id] ? 'fa-spinner fa-spin' : 'fa-play')"/>
+                                                    <span>تصنيع</span>
+                                                </button>
+                                                <button class="btn o_fsr_row_btn o_fsr_row_btn_orders"
+                                                        title="أوامر التعويض لهذا البند"
+                                                        t-att-aria-label="'أوامر ' + row.product + ' ' + row.model + ' — ' + row.stage"
+                                                        t-on-click="() =&gt; this.openOrders(row)">
+                                                    <i class="fa fa-industry"/>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tbody t-if="filteredRows.length === 0">
+                                    <tr t-if="filteredRows.length === 0">
+                                        <td colspan="6" class="o_fsr_empty">
+                                            <span class="o_fsr_empty_icon"><i class="fa fa-filter"/></span>
+                                            <strong>لا توجد بنود مطابقة</strong>
+                                            <small>غيّر المرحلة أو الحالة أو كلمة البحث.</small>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

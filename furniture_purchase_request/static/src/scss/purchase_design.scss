@@ -1,0 +1,267 @@
+// Keep purchase documents close to the Mapilla/Odoo visual language while
+// making the supplier easy to spot. The form class lives on .o_form_view.
+
+.o_form_view.o_furniture_purchase_design .o_form_renderer,
+.o_form_view.o_furniture_account_document_design:has(.o_furniture_vendor_bill_design_marker) .o_form_renderer {
+    --fpr-accent: var(--mapilla-oxford, #0c2a44);
+    --fpr-accent-soft: rgba(12, 42, 68, 0.055);
+    --fpr-accent-border: rgba(12, 42, 68, 0.18);
+    --fpr-border: var(--mapilla-border, #d9e0e6);
+    --fpr-heading: var(--mapilla-heading, #183247);
+    --fpr-muted: var(--mapilla-muted, #687786);
+
+    // Let the theme own the sheet and group layout. Extra cards here make the
+    // commercial form feel heavy and can change the intrinsic totals width.
+    .o_form_sheet {
+        border-top-color: var(--fpr-border);
+    }
+
+    .oe_title {
+        margin-bottom: 0.75rem;
+
+        h1 {
+            color: var(--fpr-heading);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+    }
+
+    label[for^="partner_id"] {
+        color: var(--fpr-accent);
+        font-weight: 750 !important;
+    }
+
+    .o_furniture_purchase_partner,
+    .o_furniture_vendor_bill_partner {
+        display: flex !important;
+        align-items: center;
+        width: 100%;
+        min-height: 3.15rem;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--fpr-accent-border);
+        border-inline-start: 4px solid var(--fpr-accent);
+        border-radius: 9px;
+        background: var(--fpr-accent-soft);
+        color: var(--fpr-heading);
+
+        .o_field_many2one_selection {
+            width: 100%;
+        }
+
+        &.o_furniture_vendor_identity,
+        .o_furniture_vendor_identity {
+            gap: 0.65rem;
+            width: 100%;
+            min-width: 0;
+
+            > .o_field_many2one_selection,
+            > .o_form_uri {
+                flex: 1 1 auto;
+                width: auto;
+                min-width: 0;
+            }
+        }
+
+        .o_furniture_vendor_logo {
+            display: inline-flex;
+            flex: 0 0 2.5rem;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            overflow: hidden;
+            border: 1px solid var(--fpr-accent-border);
+            border-radius: 50%;
+            background: #fff;
+
+            img,
+            .o_furniture_vendor_logo_empty {
+                width: 100%;
+                height: 100%;
+            }
+
+            img {
+                object-fit: cover;
+            }
+
+            .o_furniture_vendor_logo_empty {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--fpr-accent-soft);
+                color: var(--fpr-accent);
+                font-size: 1rem;
+            }
+        }
+
+        .o_input,
+        input,
+        a,
+        > span > span:first-child,
+        a > span:first-child {
+            color: var(--fpr-heading) !important;
+            font-size: 1.3rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25;
+        }
+
+        a > span:not(:first-child),
+        > span > span:not(:first-child),
+        .o_field_many2one_extra,
+        .o_field_many2one_extra span {
+            color: var(--fpr-muted) !important;
+            font-size: 0.78rem !important;
+            font-weight: 500 !important;
+        }
+
+        .o_input,
+        input {
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .o_external_button {
+            color: var(--fpr-accent);
+        }
+    }
+
+    // Do not clip the right edge of wide order lines or the totals footer.
+    .o_notebook {
+        overflow: visible !important;
+        margin-top: 0.75rem;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+
+        > .o_notebook_headers .nav-tabs,
+        > .nav-tabs {
+            gap: 0.25rem;
+            padding-inline: 0.25rem;
+            background: transparent;
+
+            .nav-link {
+                padding: 0.6rem 0.8rem;
+                border-radius: 6px 6px 0 0;
+                font-weight: 700;
+
+                &.active {
+                    border-bottom-color: var(--fpr-accent);
+                    color: var(--fpr-accent);
+                }
+            }
+        }
+    }
+
+    .o_furniture_purchase_lines,
+    .o_furniture_vendor_bill_lines {
+        .o_list_table {
+            thead > tr > th {
+                height: 2.65rem;
+                border-bottom: 1px solid var(--fpr-accent-border);
+                background: var(--fpr-accent-soft);
+                color: var(--fpr-heading);
+                font-size: 0.76rem;
+                font-weight: 800;
+            }
+
+            tbody > tr:not(.o_is_line_note):not(.o_is_line_section) > td {
+                padding-top: 0.6rem;
+                padding-bottom: 0.6rem;
+                border-bottom-color: var(--fpr-border);
+            }
+
+            tbody > tr:hover > td {
+                background: var(--fpr-accent-soft);
+            }
+        }
+    }
+
+    // Core sizes this grid from its content and aligns it to the end. Padding
+    // or a card border expands that intrinsic width and clips Amount/VAT/Total.
+    .o_furniture_purchase_totals,
+    .o_furniture_vendor_bill_totals {
+        box-sizing: border-box;
+        min-width: 0;
+        width: 28rem !important;
+        max-width: 100% !important;
+        margin-block-start: 0.75rem;
+        margin-inline-start: auto !important;
+        margin-inline-end: 0 !important;
+        padding: 0 !important;
+        border: 0;
+        border-top: 1px solid var(--fpr-border);
+        border-radius: 0;
+        background: transparent;
+        overflow: visible !important;
+
+        .o_field_widget,
+        .o_tax_total_label,
+        .o_tax_total_value {
+            color: var(--fpr-heading);
+            font-weight: 700;
+        }
+    }
+}
+
+.o_form_view.o_furniture_purchase_design .o_form_renderer {
+    .o_form_sheet.o_furniture_has_vendor_watermark {
+        position: relative;
+        isolation: isolate;
+
+        &::before {
+            position: absolute;
+            z-index: -1;
+            inset: 0.75rem;
+            background-image: var(--fpr-vendor-watermark-image);
+            background-repeat: no-repeat;
+            background-position: center 48%;
+            background-size: 42% auto;
+            content: "";
+            opacity: 0.1;
+            filter: saturate(0.85);
+            pointer-events: none;
+            user-select: none;
+        }
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_form_view.o_furniture_purchase_design .o_form_renderer,
+    .o_form_view.o_furniture_account_document_design:has(.o_furniture_vendor_bill_design_marker) .o_form_renderer {
+        .o_furniture_purchase_partner,
+        .o_furniture_vendor_bill_partner {
+            min-height: 2.9rem;
+            padding: 0.45rem 0.6rem;
+
+            .o_input,
+            input,
+            a,
+            > span > span:first-child,
+            a > span:first-child {
+                font-size: 1.12rem !important;
+            }
+
+            .o_furniture_vendor_logo {
+                flex-basis: 2.25rem;
+                width: 2.25rem;
+                height: 2.25rem;
+            }
+        }
+
+        .o_furniture_purchase_totals,
+        .o_furniture_vendor_bill_totals {
+            width: 100% !important;
+        }
+    }
+
+    .o_form_view.o_furniture_purchase_design .o_form_renderer {
+        .o_form_sheet.o_furniture_has_vendor_watermark::before {
+            inset: 0.5rem;
+            background-position: center 42%;
+            background-size: 72% auto;
+            opacity: 0.08;
+        }
+    }
+}

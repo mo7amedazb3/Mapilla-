@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="location_furniture_wip" model="stock.location">
+            <field name="name">WIP - تحت التشغيل</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_material_handover" model="stock.location">
+            <field name="name">عهدة خامات بانتظار استلام الإنتاج</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_priming" model="stock.location">
+            <field name="name">مخزن مرحلة التقديم</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_priming_wip" model="stock.location">
+            <field name="name">صالة تصنيع التقديم</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_painting" model="stock.location">
+            <field name="name">مخزن مرحلة تصنيع دهانات</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_painting_wip" model="stock.location">
+            <field name="name">صالة تصنيع دهانات</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_carpentry" model="stock.location">
+            <field name="name">مخزن مرحلة تجميع</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_carpentry_wip" model="stock.location">
+            <field name="name">صالة تصنيع تجميع</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_bases" model="stock.location">
+            <field name="name">مخزن مرحلة القواعد</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_bases_wip" model="stock.location">
+            <field name="name">صالة تصنيع القواعد</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_upholstery" model="stock.location">
+            <field name="name">مخزن مرحلة كسوه</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_upholstery_wip" model="stock.location">
+            <field name="name">صالة تصنيع كسوه</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_finishing" model="stock.location">
+            <field name="name">مخزن مرحلة تجهيز</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_finishing_wip" model="stock.location">
+            <field name="name">صالة تصنيع تجهيز</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_tailoring" model="stock.location">
+            <field name="name">مخزن مرحلة تفصيل</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_tailoring_wip" model="stock.location">
+            <field name="name">صالة تصنيع تفصيل</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_sewing" model="stock.location">
+            <field name="name">مخزن مرحلة الخياطة (مؤرشف)</field>
+            <field name="usage">internal</field>
+            <field name="active" eval="False"/>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_sewing_wip" model="stock.location">
+            <field name="name">صالة تصنيع الخياطة (مؤرشفة)</field>
+            <field name="usage">internal</field>
+            <field name="active" eval="False"/>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_stage_packaging" model="stock.location">
+            <field name="name">مخزن/منطقة التغليف</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+
+        <record id="location_finished_goods" model="stock.location">
+            <field name="name">بضاعة تم إنتاجها</field>
+            <field name="usage">internal</field>
+            <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').view_location_id.id"/>
+        </record>
+    </data>
+
+    <function model="furniture.mrp.production" name="_setup_stage_location_hierarchy"/>
+</odoo>

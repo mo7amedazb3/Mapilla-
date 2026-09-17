@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_simple_payroll_slip_list" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.list</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="base_wage"/>
+                <field name="contract_allowances"/>
+                <field name="attendance_hours"/>
+                <field name="attendance_deduction"/>
+                <field name="commission_amount"/>
+                <field name="net_salary"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_search" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.search</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state','=','draft')]"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Paid" name="filter_paid" domain="[('state','=','paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="State" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_form" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.form</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="%(simple_payroll_salary-2.action_report_simple_payroll_slip)d" type="action" 
+                            string="Print Slip" class="btn-primary" invisible="state == 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_paid" type="object" string="Mark Paid" class="btn-success"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft" class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state == 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,paid,cancel"/>
+                </header>
+
+                <sheet>
+                    <widget name="web_ribbon" title="Paid" bg_color="text-bg-success" invisible="state != 'paid'"/>
+                    <widget name="web_ribbon" title="Confirmed" bg_color="text-bg-info" invisible="state != 'confirmed'"/>
+                    <div class="oe_title mb-4">
+                        <h1 class="payroll-header-title">
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="contract_id"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+
+                    <div class="mt-4 mb-4">
+                        <h2 class="payroll-section-title">Attendance Insights</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0" style="border-radius: 15px; background: #f8f9fa;">
+                                    <div class="card-body">
+                                        <group>
+                                            <field name="expected_working_days"/>
+                                            <field name="hours_per_day"/>
+                                            <field name="expected_hours" readonly="1" class="fw-bold"/>
+                                        </group>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0" style="border-radius: 15px; background: #fff5f5;">
+                                    <div class="card-body">
+                                        <group>
+                                            <field name="attendance_hours" readonly="1" class="fw-bold text-primary"/>
+                                            <field name="absence_days" readonly="1" invisible="absence_days == 0"/>
+                                            <field name="absence_deduction" readonly="1" widget="monetary" class="text-danger" invisible="absence_deduction == 0"/>
+                                            <field name="delay_hours" readonly="1" invisible="delay_hours == 0"/>
+                                            <field name="delay_deduction" readonly="1" widget="monetary" class="text-danger" invisible="delay_deduction == 0"/>
+                                            <field name="attendance_deduction" readonly="1" widget="monetary" class="fw-bold text-danger" string="Total Deduction"/>
+                                        </group>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h2 class="payroll-section-title">Salary Breakdown</h2>
+                        <div class="row g-4">
+                            <div class="col-md-3">
+                                <div class="card text-center payroll-card base-wage hover-animate">
+                                    <div class="card-body py-4">
+                                        <h5 class="card-title text-muted fw-bold mb-3">Base Salary</h5>
+                                        <div class="payroll-stat-value text-primary">
+                                            <field name="base_wage" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center payroll-card allowances hover-animate">
+                                    <div class="card-body py-4">
+                                        <h5 class="card-title text-muted fw-bold mb-3">Allowances</h5>
+                                        <div class="payroll-stat-value text-info">
+                                            <field name="contract_allowances" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center payroll-card commission hover-animate">
+                                    <div class="card-body py-4">
+                                        <h5 class="card-title text-muted fw-bold mb-3">Commission</h5>
+                                        <div class="payroll-stat-value text-warning">
+                                            <field name="commission_amount" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center payroll-card net-salary hover-animate">
+                                    <div class="card-body py-4">
+                                        <h5 class="card-title text-success fw-bold mb-3">Net Salary</h5>
+                                        <div class="payroll-stat-value net">
+                                            <field name="net_salary" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_simple_payroll_slip" model="ir.actions.act_window">
+        <field name="name">Salary Slips</field>
+        <field name="res_model">simple.payroll.slip</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_simple_payroll_slip_search"/>
+    </record>
+</odoo>

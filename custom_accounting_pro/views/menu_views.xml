@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Rename main Invoicing menu to Accounting -->
+        <record id="account.menu_finance" model="ir.ui.menu">
+            <field name="name">Accounting</field>
+        </record>
+
+        <!-- Ensure the Dashboard is the first menu item -->
+        <menuitem id="menu_custom_accounting_dashboard" 
+                  name="Dashboard" 
+                  parent="account.menu_finance" 
+                  sequence="1"
+                  action="account.open_account_journal_dashboard_kanban"/>
+    </data>
+</odoo>

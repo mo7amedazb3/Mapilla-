@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_furniture_mrp_stage_cost_details" model="ir.actions.report">
+        <field name="name">تقرير تكلفة المرحلة</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_mrp_stage_cost_details</field>
+        <field name="report_file">furniture_mrp.report_furniture_mrp_stage_cost_details</field>
+        <field name="print_report_name">('Stage Cost - %s' % (object.name or '')).replace('/', '-') + '.pdf'</field>
+        <field name="paperformat_id" ref="paperformat_furniture_mrp_cost_report"/>
+    </record>
+</odoo>

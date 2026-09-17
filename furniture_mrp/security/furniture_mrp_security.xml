@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ══════════════════════════════════════════════════════════════════
+             مجموعات الأمان لمصنع الأثاث
+        ══════════════════════════════════════════════════════════════════ -->
+        <record id="module_category_furniture_mrp" model="ir.module.category">
+            <field name="name">إدارة إنتاج الأثاث</field>
+            <field name="description">نظام إدارة الإنتاج لمصنع الأثاث الخشبي</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <!-- مجموعة: موظف مطابقة التجهيز والكسوة وإتمام المنتج -->
+        <record id="group_furniture_mrp_completion_operator" model="res.groups">
+            <field name="name">موظف إتمام المنتج</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مطابقة رصيد التجهيز مع رصيد الكسوة والتفصيل وحجزهما وإتمام المنتج النهائي.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة: مدير المصنع -->
+        <record id="group_furniture_mrp_manager" model="res.groups">
+            <field name="name">مدير المصنع</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات كاملة على جميع أقسام المصنع</field>
+            <field name="implied_ids" eval="[
+                (4, ref('base.group_user')),
+                (4, ref('group_furniture_mrp_completion_operator')),
+                (4, ref('hr.group_hr_user')),
+                (4, ref('hr_contract.group_hr_contract_manager')),
+                (4, ref('hr_attendance.group_hr_attendance_manager')),
+                (4, ref('stock.group_stock_user'))
+            ]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- مجموعة: مشرف الإنتاج -->
+        <record id="group_furniture_mrp_supervisor" model="res.groups">
+            <field name="name">مشرف الإنتاج</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات الإشراف على أوامر الإنتاج وتتبعها</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعات مشرفي المراحل: نقاط ربط مستقرة للصلاحيات التفصيلية -->
+        <record id="group_furniture_mrp_supervisor_priming" model="res.groups">
+            <field name="name">مشرف مرحلة التقديم</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف التقديم؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_painting" model="res.groups">
+            <field name="name">مشرف مرحلة تصنيع الدهانات</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف تصنيع الدهانات؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_carpentry" model="res.groups">
+            <field name="name">مشرف مرحلة التجميع</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف التجميع؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_bases" model="res.groups">
+            <field name="name">مشرف مرحلة القواعد</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف القواعد؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_finishing" model="res.groups">
+            <field name="name">مشرف مرحلة التجهيز</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف التجهيز؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_tailoring" model="res.groups">
+            <field name="name">مشرف مرحلة التفصيل</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف التفصيل؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_sewing" model="res.groups">
+            <field name="name">مشرف مرحلة الخياطة</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف الخياطة؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_upholstery" model="res.groups">
+            <field name="name">مشرف مرحلة الكسوة</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف الكسوة؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="group_furniture_mrp_supervisor_packaging" model="res.groups">
+            <field name="name">مشرف مرحلة التغليف</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">مجموعة مشرف التغليف؛ تُربط بها صلاحيات المرحلة بالكود.</field>
+            <field name="implied_ids" eval="[(4, ref('group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <!-- مجموعة: أمين المخزن -->
+        <record id="group_furniture_mrp_storekeeper" model="res.groups">
+            <field name="name">أمين المخزن</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">اعتماد طلبات صرف خامات مراحل الإنتاج قبل خروجها من المخزن</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('stock.group_stock_user'))]"/>
+        </record>
+
+        <!-- سجل الموديل الجديد: جدول الأصناف داخل MPS -->
+        <record id="model_furniture_mrp_mps_line" model="ir.model">
+            <field name="name">سطر جدول الإنتاج الرئيسي (MPS)</field>
+            <field name="model">furniture.mrp.mps.line</field>
+            <field name="state">base</field>
+        </record>
+
+        <!-- سجل الموديل الجديد: سطور الأصناف داخل أمر التشغيل الأسبوعي -->
+        <record id="model_furniture_mrp_production_line" model="ir.model">
+            <field name="name">سطر صنف داخل أمر التشغيل الأسبوعي</field>
+            <field name="model">furniture.mrp.production.line</field>
+            <field name="state">base</field>
+        </record>
+
+        <!-- كل مستخدم يرى سجلات المراحل التابعة لشركاته النشطة فقط. -->
+        <record id="rule_furniture_mrp_priming_company" model="ir.rule">
+            <field name="name">مرحلة التقديم: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_priming"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_painting_company" model="ir.rule">
+            <field name="name">مرحلة تصنيع الدهانات: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_painting"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_carpentry_company" model="ir.rule">
+            <field name="name">مرحلة التجميع: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_carpentry"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_bases_company" model="ir.rule">
+            <field name="name">مرحلة القواعد: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_bases"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_finishing_company" model="ir.rule">
+            <field name="name">مرحلة التجهيز: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_finishing"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_tailoring_company" model="ir.rule">
+            <field name="name">مرحلة التفصيل: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_tailoring"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_sewing_company" model="ir.rule">
+            <field name="name">مرحلة الخياطة: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_sewing"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_upholstery_company" model="ir.rule">
+            <field name="name">مرحلة الكسوة: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_upholstery"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_packaging_company" model="ir.rule">
+            <field name="name">مرحلة التغليف: شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_packaging"/>
+            <field name="domain_force">[('production_order_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!--
+            أذونات الصرف المجمعة تحتوي بيانات كل المراحل. امنع مستخدم Odoo
+            الداخلي من تعدادها مباشرة عبر ORM، ثم افتح الرأس للمدير/المخزن
+            فقط، وافتح سطر المرحلة وخاماته لمشرف نفس المرحلة والشركة فقط.
+
+            قواعد المجموعات في Odoo تُجمع بـ OR؛ لذلك قاعدة المنع العامة
+            تعمل كـ default-deny، وقواعد الأدوار التالية هي الاستثناءات
+            الصريحة. المستخدم المشرف على أكثر من مرحلة يرى اتحاد مراحله.
+        -->
+        <record id="rule_advance_material_release_internal_deny" model="ir.rule">
+            <field name="name">إذن الصرف المجمع: منع داخلي افتراضي</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release"/>
+            <field name="domain_force">[('id', '=', 0)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_manager_company" model="ir.rule">
+            <field name="name">إذن الصرف المجمع: شركات مدير المصنع</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_manager'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_storekeeper_company" model="ir.rule">
+            <field name="name">إذن الصرف المجمع: شركات أمين المخزن</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_storekeeper'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_internal_deny" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: منع داخلي افتراضي</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('id', '=', 0)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_manager_company" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: شركات مدير المصنع</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_manager'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_storekeeper_company" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: شركات أمين المخزن</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_storekeeper'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_priming" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف التقديم</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'priming')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_priming'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_painting" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف تصنيع الدهانات</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'painting')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_painting'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_carpentry" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف التجميع</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'carpentry')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_carpentry'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_bases" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف القواعد</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'bases')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_bases'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_finishing" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف التجهيز</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'finishing')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_finishing'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_tailoring" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف التفصيل</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'tailoring')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_tailoring'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_sewing" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف الخياطة</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'sewing')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_sewing'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_upholstery" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف الكسوة</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'upholstery')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_upholstery'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_stage_supervisor_packaging" model="ir.rule">
+            <field name="name">مرحلة إذن الصرف: مشرف التغليف</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_stage"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'packaging')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_packaging'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_internal_deny" model="ir.rule">
+            <field name="name">خامة إذن الصرف: منع داخلي افتراضي</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('id', '=', 0)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_manager_company" model="ir.rule">
+            <field name="name">خامة إذن الصرف: شركات مدير المصنع</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_manager'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_storekeeper_company" model="ir.rule">
+            <field name="name">خامة إذن الصرف: شركات أمين المخزن</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_storekeeper'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_priming" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف التقديم</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'priming')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_priming'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_painting" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف تصنيع الدهانات</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'painting')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_painting'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_carpentry" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف التجميع</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'carpentry')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_carpentry'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_bases" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف القواعد</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'bases')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_bases'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_finishing" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف التجهيز</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'finishing')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_finishing'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_tailoring" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف التفصيل</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'tailoring')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_tailoring'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_sewing" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف الخياطة</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'sewing')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_sewing'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_upholstery" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف الكسوة</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'upholstery')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_upholstery'))]"/>
+        </record>
+
+        <record id="rule_advance_material_release_line_supervisor_packaging" model="ir.rule">
+            <field name="name">خامة إذن الصرف: مشرف التغليف</field>
+            <field name="model_id" ref="model_furniture_mrp_advance_material_release_line"/>
+            <field name="domain_force">[('production_id.company_id', 'in', company_ids), ('stage_code', '=', 'packaging')]</field>
+            <field name="groups" eval="[(4, ref('group_furniture_mrp_supervisor_packaging'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_material_reservation_company" model="ir.rule">
+            <field name="name">حجوزات خامات شركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_material_reservation"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_legacy_mps_company" model="ir.rule">
+            <field name="name">طلبات عجز MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_legacy_mps_line_company" model="ir.rule">
+            <field name="name">سطور طلبات عجز MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_line"/>
+            <field name="domain_force">[('mps_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_legacy_mps_capacity_company" model="ir.rule">
+            <field name="name">طاقة طلبات عجز MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_capacity"/>
+            <field name="domain_force">[('mps_id.company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_profile_company" model="ir.rule">
+            <field name="name">بروفايلات MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_profile"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_operation_company" model="ir.rule">
+            <field name="name">معايير عمليات MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_operation"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_product_time_company" model="ir.rule">
+            <field name="name">أزمنة أصناف MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_product_time"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager')), (4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_operation_output_company" model="ir.rule">
+            <field name="name">نواتج عمليات MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_operation_output"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_plan_company" model="ir.rule">
+            <field name="name">خطط MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_plan"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager')), (4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_plan_worker" model="ir.rule">
+            <field name="name">العامل يرى خطط MPS المسندة له</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_plan"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), ('assignment_ids.employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_work_company" model="ir.rule">
+            <field name="name">أعمال MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_work"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager')), (4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_work_worker" model="ir.rule">
+            <field name="name">العامل يرى عمليات MPS المسندة له</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_work"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), ('assignment_ids.employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_assignment_company" model="ir.rule">
+            <field name="name">توزيعات MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_assignment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager')), (4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_assignment_worker" model="ir.rule">
+            <field name="name">العامل يرى توزيعات MPS الخاصة به</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_assignment"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), ('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_assignment_output_company" model="ir.rule">
+            <field name="name">قطع تكليفات MPS لشركات المستخدم</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_assignment_output"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager')), (4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+        </record>
+
+        <record id="rule_furniture_mrp_mps_assignment_output_worker" model="ir.rule">
+            <field name="name">العامل يرى قطع تكليفات MPS الخاصة به</field>
+            <field name="model_id" ref="model_furniture_mrp_mps_assignment_output"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), ('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة: موظف تجميع -->
+        <record id="group_furniture_carpentry_user" model="res.groups">
+            <field name="name">موظف تجميع</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات قسم تجميع فقط</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة: موظف السفنجة -->
+        <record id="group_furniture_foam_user" model="res.groups">
+            <field name="name">موظف السفنجة</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات قسم السفنجة فقط</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة: موظف تفصيل -->
+        <record id="group_furniture_sewing_user" model="res.groups">
+            <field name="name">موظف تفصيل</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات قسم تفصيل فقط</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة: موظف كسوه -->
+        <record id="group_furniture_upholstery_user" model="res.groups">
+            <field name="name">موظف كسوه</field>
+            <field name="category_id" ref="module_category_furniture_mrp"/>
+            <field name="comment">صلاحيات قسم كسوه فقط</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+    </data>
+</odoo>

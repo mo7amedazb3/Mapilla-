@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Idempotent: keeps module-managed groups aligned after install/upgrade. -->
+    <function model="hr.employee"
+              name="_sync_all_furniture_mrp_supervisor_groups"/>
+</odoo>

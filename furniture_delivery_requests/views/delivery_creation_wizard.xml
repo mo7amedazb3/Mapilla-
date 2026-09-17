@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_delivery_creation_wizard" model="ir.ui.view">
+        <field name="name">furniture.delivery.creation.wizard.form</field>
+        <field name="model">furniture.delivery.creation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إنشاء طلب تسليم جديد" class="o_furniture_stage_transfer_wizard o_furniture_batch_product_wizard o_delivery_creation_wizard o_delivery_inline_creation">
+                <section class="mp_creation_banner" dir="rtl"><div><span class="mp_creation_eyebrow">من المصنع إلى العميل</span><h2>جهّز تفاصيل طلب التسليم</h2><p>حدّد المشتري والمستهلك وموعد التسليم، ثم اختار الموديل والمنتجات والكميات.</p></div><img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/></section>
+                <field name="model_drafts" invisible="1"/><field name="model_draft_key" invisible="1"/><field name="company_id" invisible="1"/><field name="has_custom_specs" invisible="1"/>
+                <field name="order_id" invisible="1"/>
+                <field name="original_model_id" invisible="1"/>
+                <field name="order_write_date" invisible="1"/>
+                <field name="available_model_ids" invisible="1"/>
+                <field name="available_product_ids" invisible="1"/>
+                <div class="o_furniture_line_customer_strip">
+                    <div class="o_furniture_line_customer_field"><label for="buyer_partner_id"/><field name="buyer_partner_id" nolabel="1" context="{'default_is_company': True}"/></div>
+                    <div class="o_furniture_line_customer_field"><label for="beneficiary_partner_id"/><field name="beneficiary_partner_id" nolabel="1"/></div>
+                    <div class="o_furniture_line_customer_field"><label for="delivery_date"/><field name="delivery_date" nolabel="1"/></div>
+                    <div class="o_furniture_line_customer_field o_delivery_customer_mode" invisible="not buyer_partner_id or not has_custom_specs"><label for="specification_mode"/><field name="specification_mode" widget="furniture_touch_selection" nolabel="1"/><small>Standard يحمّل اختيارات المشتري المحفوظة، وCustom يبدأ بالريسيبي العادي؛ ويمكن تعديل التفاصيل لهذا الطلب.</small></div>
+                </div>
+                <div class="o_furniture_line_quick_choices o_furniture_batch_product_choices">
+                    <field name="model_id" nolabel="1" class="o_furniture_quick_cards_field" widget="furniture_quick_card_selector" domain="[('id', 'in', available_model_ids)]" options="{'no_create': True, 'no_create_edit': True, 'quick_limit': 4, 'always_show_more': True, 'card_title': 'الموديل', 'card_subtitle': 'اختار الموديل المطلوب تسليمه', 'card_icon': 'fa-cube', 'card_variant': 'model', 'order_by': 'sequence, name, id'}"/>
+                    <field name="selected_product_ids" invisible="1"/>
+                </div>
+                <field name="line_ids" nolabel="1" widget="delivery_creation_overview" class="o_furniture_batch_product_lines"><list editable="bottom" create="0" delete="0"><field name="source_line_id" column_invisible="1" force_save="1"/><field name="product_id" readonly="1" force_save="1"/><field name="quantity" widget="furniture_compact_quantity"/>
+                            <field name="dimensions_expanded" widget="delivery_specifications_button" string="التفاصيل"/><field name="fabric_summary" widget="delivery_material_summary" string="القماش والكسوة" readonly="1"/><field name="takawe_summary" widget="delivery_material_summary" string="التكاوي" readonly="1"/><field name="upholstery_data" string="عدد التكاوي" widget="delivery_takawe_counts"/><field name="width_cm" widget="furniture_compact_quantity" column_invisible="1"/>
+                            <field name="dimension_label" column_invisible="1"/><field name="depth_cm" widget="furniture_compact_quantity" column_invisible="1"/>
+                            <field name="height_cm" widget="furniture_compact_quantity" column_invisible="1"/>
+</list></field>
+                <footer><button name="action_create_delivery" type="object" string="إنشاء طلب التسليم" class="btn-primary" invisible="order_id"/><button name="action_create_delivery" type="object" string="حفظ التعديلات" class="btn-primary" invisible="not order_id"/><button string="إلغاء" special="cancel" class="btn-secondary"/></footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_delivery_creation_wizard" model="ir.actions.act_window"><field name="name">إنشاء طلب تسليم جديد</field><field name="res_model">furniture.delivery.creation.wizard</field><field name="view_mode">form</field><field name="view_id" ref="view_delivery_creation_wizard"/><field name="target">new</field></record>
+    <record id="view_delivery_list_creation" model="ir.ui.view"><field name="name">delivery.list.creation.popup</field><field name="model">furniture.mrp.future.order</field><field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_future_order_list"/><field name="arch" type="xml"><xpath expr="//list" position="attributes"><attribute name="js_class">delivery_creation_list</attribute></xpath></field></record>
+    <record id="view_delivery_form_creation" model="ir.ui.view"><field name="name">delivery.form.creation.popup</field><field name="model">furniture.mrp.future.order</field><field name="inherit_id" ref="view_delivery_request_mapilla_design"/><field name="arch" type="xml"><xpath expr="//form" position="attributes"><attribute name="js_class">delivery_creation_form</attribute></xpath></field></record>
+</odoo>

@@ -1,0 +1,74 @@
+/* global_kanban_hover_animation/static/src/css/kanban_hover.css */
+
+/* =====================================================
+   KANBAN CARDS — Safe to use transform here
+   (Odoo portals teleport dropdowns to <body>, so
+   kanban transform does NOT break dropdown positions)
+   ===================================================== */
+.o_kanban_record,
+.oe_kanban_global_click,
+.o_kanban_record_has_image_fill {
+    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+        box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform, box-shadow;
+    border-radius: 10px !important;
+}
+
+.o_kanban_record:hover,
+.oe_kanban_global_click:hover,
+.o_kanban_record_has_image_fill:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* =====================================================
+   LIST VIEW ROWS — NO transform/position/z-index here!
+   
+   Using transform + position:relative + z-index together
+   on list rows creates a new CSS stacking context, which
+   causes dropdowns (many2one, date pickers, etc.) to
+   appear in wrong positions or disappear entirely.
+   
+   Instead: we achieve a "premium row highlight" using
+   only box-shadow + border-left + background — same feel,
+   zero side effects.
+   ===================================================== */
+.o_list_view .o_data_row {
+    transition: background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        border-left 0.15s ease;
+    border-left: 3px solid transparent;
+}
+
+.o_list_view .o_data_row:hover {
+    background-color: #f9f9ff !important;
+    box-shadow: 0 2px 12px rgba(80, 100, 200, 0.10),
+        0 1px 4px rgba(0, 0, 0, 0.06) !important;
+    border-left: 3px solid #7c6eea;
+    /* ✅ NO transform, NO position, NO z-index */
+}
+
+/* =====================================================
+   GLOBAL SYSTEM ROUNDING
+   ===================================================== */
+.btn,
+.o_input,
+.modal-content,
+.o_form_view .oe_button_box,
+.o_form_view .o_notebook .nav-tabs .nav-link,
+.o_form_view .o_notebook .tab-content,
+.dropdown-menu,
+.o_cp_searchview {
+    border-radius: 8px !important;
+}
+
+/* =====================================================
+   DASHBOARD IMAGE COVER ZOOM
+   ===================================================== */
+.o_kanban_image_full_cover {
+    transition: transform 0.4s ease-in-out;
+}
+
+.oe_kanban_global_click:hover .o_kanban_image_full_cover img {
+    transform: scale(1.05);
+}

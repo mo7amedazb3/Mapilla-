@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.MinmaxWorkspace"
+       t-inherit="furniture_stage_replenishment.StageReplenishmentDashboard"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_fsr_dashboard')]" position="attributes">
+            <attribute name="class" add="o_ntp_minmax" separator=" "/>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_eyebrow')]" position="replace">
+            <div class="o_fsr_eyebrow">تخطيط الإنتاج <span aria-hidden="true">/</span> حدود المخزون</div>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_heading')]//h1" position="replace">
+            <h1>مراحل الإنتاج <bdi>Min / Max</bdi></h1>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_heading')]//p" position="replace">
+            <p>اضبط حدود كل مرحلة، وراجع مسار القطع وخاماتها في <bdi>النواقص</bdi> قبل الموافقة.</p>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_header_actions')]" position="inside">
+            <button class="btn o_fsr_btn o_ntp_open_needs" t-on-click="openNeedToProduce">
+                <span>مراجعة الاحتياجات</span><i class="fa fa-arrow-left" aria-hidden="true"/>
+            </button>
+        </xpath>
+        <xpath expr="//article[hasclass('o_fsr_metric_need')]//small" position="replace">
+            <small>بنود تحتاج استكمال الرصيد</small>
+        </xpath>
+        <xpath expr="//article[hasclass('o_fsr_metric_draft')]//span[hasclass('o_fsr_metric_label')]" position="replace">
+            <span class="o_fsr_metric_label">أوامر تصنيع مسودة</span>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_stage_caption')]//small" position="replace">
+            <small>اختر مرحلة لعرض أرصدتها وحدودها</small>
+        </xpath>
+        <xpath expr="//t[@t-foreach='state.stages']" position="attributes">
+            <attribute name="t-foreach">ntpDisplayStages</attribute>
+        </xpath>
+        <xpath expr="//input[@type='search']" position="attributes">
+            <attribute name="aria-label">البحث بالصنف أو الموديل أو الريسيبي</attribute>
+        </xpath>
+        <xpath expr="//label[hasclass('o_fsr_status_filter')]" position="before">
+            <label class="o_ntp_model_filter">
+                <span>الموديل</span>
+                <select aria-label="فلتر الموديل" t-att-value="state.ntpModel" t-on-change="setNtpModel">
+                    <option value="">كل الموديلات</option>
+                    <t t-foreach="ntpModelOptions" t-as="model" t-key="model">
+                        <option t-att-value="model" t-esc="model"/>
+                    </t>
+                </select>
+            </label>
+        </xpath>
+        <xpath expr="//button[@t-on-click='runSelected']/span" position="replace">
+            <span>تجهيز احتياجات المحدد</span>
+        </xpath>
+        <xpath expr="//button[@t-on-click='runAll']/span[@t-if]" position="replace">
+            <span t-if="isFinalStage">تجهيز احتياجات المنتج التام</span>
+        </xpath>
+        <xpath expr="//button[@t-on-click='runAll']/span[@t-else]" position="replace">
+            <span t-else="">تجهيز احتياجات المرحلة</span>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_table_meta')]/p" position="replace">
+            <p><i class="fa fa-info-circle" aria-hidden="true"/>رصيد المخزن هو المتاح في المرحلة، ولا يشمل الأوامر القادمة أو المسودات. عدّل Min وMax ثم اضغط حفظ في نفس الصف.</p>
+        </xpath>
+        <xpath expr="//td[hasclass('o_fsr_empty')]/small" position="replace">
+            <small>غيّر الموديل أو المرحلة أو الحالة أو كلمة البحث.</small>
+        </xpath>
+        <xpath expr="//div[hasclass('o_fsr_table_wrap')]" position="attributes">
+            <attribute name="tabindex">0</attribute>
+            <attribute name="role">region</attribute>
+            <attribute name="aria-label">أرصدة الأصناف مجمعة حسب الموديل</attribute>
+        </xpath>
+    </t>
+    <t t-name="furniture_need_to_produce.FinalMinmaxModelFilter"
+       t-inherit="furniture_stage_replenishment.FinalReplenishmentDashboard"
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_ffr_dashboard')]" position="attributes">
+            <attribute name="class" add="o_ntp_final_minmax" separator=" "/>
+        </xpath>
+        <xpath expr="//input[@type='search']" position="attributes">
+            <attribute name="aria-label">البحث بالصنف أو الموديل</attribute>
+        </xpath>
+        <xpath expr="//select[@t-on-change='setStatus']" position="before">
+            <label class="o_ntp_final_model_filter">
+                <span>الموديل</span>
+                <select aria-label="فلتر موديلات المنتج النهائي" t-on-change="setNtpFinalModel">
+                    <option value="" t-att-selected="!state.ntpFinalModel">كل الموديلات</option>
+                    <t t-foreach="ntpFinalModelOptions" t-as="model" t-key="model">
+                        <option t-att-value="model" t-att-selected="state.ntpFinalModel === model" t-esc="model"/>
+                    </t>
+                </select>
+                <button t-if="state.ntpFinalModel" type="button" class="o_ntp_final_model_clear"
+                        title="إلغاء فلتر الموديل" aria-label="إلغاء فلتر الموديل" t-on-click="clearNtpFinalModel">
+                    <i class="fa fa-times" aria-hidden="true"/>
+                </button>
+            </label>
+        </xpath>
+        <xpath expr="//select[@t-on-change='setStatus']" position="attributes">
+            <attribute name="aria-label">فلتر حالة المنتج النهائي</attribute>
+        </xpath>
+        <xpath expr="//section[hasclass('o_ffr_filters')]" position="after">
+            <div t-if="!state.loading" class="o_ntp_final_filter_count" role="status" aria-live="polite">
+                المعروض <strong t-esc="filteredRows.length"/> من <t t-esc="state.rows.length"/> صنف
+                <small>التصفية للعرض فقط؛ تشغيل الاحتياجات يشمل كل الأصناف.</small>
+            </div>
+        </xpath>
+    </t>
+</templates>

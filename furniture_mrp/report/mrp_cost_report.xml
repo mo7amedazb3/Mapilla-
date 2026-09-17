@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_furniture_mrp_cost_report" model="report.paperformat">
+        <field name="name">تقرير تكاليف إنتاج أفقي</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">6</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_report_furniture_mrp_cost_details" model="ir.actions.report">
+        <field name="name">تقرير التكاليف الشامل</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_mrp_cost_details</field>
+        <field name="report_file">furniture_mrp.report_furniture_mrp_cost_details</field>
+        <field name="print_report_name">('Cost Report - %s' % (object.name or '')).replace('/', '-') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_production"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_furniture_mrp_cost_report"/>
+    </record>
+</odoo>

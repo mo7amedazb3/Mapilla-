@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_spa_material_cost" model="ir.ui.view">
+        <field name="name">account.move.form.spa.material.cost</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='quantity']" position="after">
+                <field name="spa_bom_id"
+                       string="Service BoM"
+                       optional="hide"
+                       column_invisible="parent.move_type != 'out_invoice'"/>
+                <field name="spa_material_cost"
+                       string="Material Cost"
+                       widget="monetary"
+                       optional="show"
+                       column_invisible="parent.move_type != 'out_invoice'"/>
+                <field name="spa_material_consumed"
+                       string="Materials Consumed"
+                       optional="show"
+                       column_invisible="parent.move_type != 'out_invoice'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

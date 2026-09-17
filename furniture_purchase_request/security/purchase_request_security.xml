@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_furniture_purchase_request_company" model="ir.rule">
+        <field name="name">طلبات شراء مخازن شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_purchase_request"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_furniture_purchase_request_line_company" model="ir.rule">
+        <field name="name">خامات طلبات شراء مخازن شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_purchase_request_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_furniture_purchase_request_storekeeper_own" model="ir.rule">
+        <field name="name">أمين المخزن يرى طلباته فقط</field>
+        <field name="model_id" ref="model_furniture_purchase_request"/>
+        <field name="domain_force">[('requested_by_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_storekeeper'))]"/>
+    </record>
+
+    <record id="rule_furniture_purchase_request_line_storekeeper_own" model="ir.rule">
+        <field name="name">أمين المخزن يرى خامات طلباته فقط</field>
+        <field name="model_id" ref="model_furniture_purchase_request_line"/>
+        <field name="domain_force">[('request_id.requested_by_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_storekeeper'))]"/>
+    </record>
+</odoo>
+

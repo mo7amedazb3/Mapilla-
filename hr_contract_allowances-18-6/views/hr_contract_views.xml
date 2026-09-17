@@ -1,0 +1,29 @@
+<odoo>
+  <data>
+    <record id="hr_contract_view_form_inherit_allowances" model="ir.ui.view">
+      <field name="name">hr.contract.form.allowances</field>
+      <field name="model">hr.contract</field>
+      <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//group[@name='salary']" position="inside">
+            <div colspan="2" class="mt-4 p-3 rounded-4 shadow-sm border" style="background: linear-gradient(145deg, #ffffff, #f4f8ff); border-color: #cce0ff !important;">
+                <h5 class="fw-bolder mb-3" style="color: #005bb5;"><i class="fa fa-gift me-2 text-warning"></i> Monthly Allowances</h5>
+                <group class="mt-0 pt-0">
+                    <field name="food_allowance" string="🍔 Food Allowance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="transfer_allowance" string="🚗 Transfer Allowance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="commission_allowance" string="📈 Commission" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="other_allowance" string="✨ Other Allowances" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+                <hr style="border-color: #005bb5; opacity: 0.15;" class="my-3"/>
+                <div class="d-flex justify-content-between align-items-center mt-2 px-3 py-2 rounded-3" style="background-color: rgba(25, 135, 84, 0.08); border: 1px solid rgba(25, 135, 84, 0.2);">
+                    <h5 class="mb-0 fw-bold text-success"><i class="fa fa-money me-2"></i> Total Compensation</h5>
+                    <div>
+                        <field name="total_compensation" nolabel="1" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}" class="fs-4 fw-bolder text-success m-0"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

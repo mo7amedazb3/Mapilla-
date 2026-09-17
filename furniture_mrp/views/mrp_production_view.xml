@@ -1,0 +1,915 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Dedicated read-only popup for a production item.  Split Kit orders use a
+        computed summary relation, so without this view Odoo falls back to the
+        technical auto-generated form (mail activities, followers, etc.).
+    -->
+    <record id="view_furniture_mrp_production_line_summary_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.line.summary.form</field>
+        <field name="model">furniture.mrp.production.line</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <form string="تفاصيل صنف أمر التشغيل" create="0" edit="0" delete="0"
+                  class="o_furniture_production_line_summary_form">
+                <sheet class="o_furniture_production_line_summary_sheet">
+                    <div class="o_furniture_line_summary_hero">
+                        <div>
+                            <span>تفاصيل الصنف داخل أمر التشغيل</span>
+                            <h2>بيانات القطعة ومتابعة مراحلها</h2>
+                        </div>
+                        <i class="fa fa-cubes" title="الصنف"/>
+                    </div>
+                    <group class="o_furniture_line_summary_cards">
+                        <group string="بيانات الصنف">
+                            <field name="production_id" options="{'no_open': True}"/>
+                            <field name="product_id" options="{'no_open': True}"/>
+                            <field name="sale_kit_product_id" string="طقم البيع"
+                                   options="{'no_open': True}"
+                                   invisible="not sale_kit_product_id"/>
+                            <field name="furniture_order_model_id" options="{'no_open': True}"/>
+                            <field name="kit_order_summary_qty" string="الكمية"
+                                   options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                        </group>
+                        <group string="بيانات العميل">
+                            <field name="buyer_partner_id" options="{'no_open': True}"/>
+                            <field name="beneficiary_partner_id" options="{'no_open': True}"/>
+                            <field name="kit_piece_note" invisible="not kit_piece_note"/>
+                        </group>
+                        <group string="المقاس الفعلي">
+                            <field name="width_cm"/>
+                            <field name="depth_cm"/>
+                            <field name="height_cm"/>
+                        </group>
+                        <group string="مسار التشغيل">
+                            <field name="stage_summary"/>
+                            <field name="stage_count"/>
+                        </group>
+                    </group>
+                    <field name="stage_progress_html" nolabel="1" readonly="1"
+                           class="o_furniture_line_progress_html"/>
+                </sheet>
+                <footer>
+                    <button string="إغلاق" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Form View - أمر التشغيل الأسبوعي -->
+    <record id="view_furniture_mrp_production_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.form</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="arch" type="xml">
+            <form string="أمر التشغيل الأسبوعي" class="o_furniture_production_form">
+                <header>
+                    <button name="action_confirm" string="✅ تأكيد الأمر" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_view_mps_schedule" string="📅 جدول العمال MPS" type="object"
+                            class="btn-info"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="mps_schedule_plan_count == 0"/>
+                    <button name="action_open_stage_warning_wizard"
+                            string="⚠️ تحذير لمشرف مرحلة"
+                            type="object"
+                            class="btn-warning"
+                            groups="furniture_mrp.group_furniture_mrp_manager"
+                            invisible="not id or state in ('done', 'cancelled')"/>
+                    <button name="action_accept_handoff_transfer"
+                            string="✅ قبول تحويل المرحلة"
+                            type="object"
+                            class="btn-success o_furniture_accept_handoff_button"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="not handoff_transfer_pending or not handoff_can_current_user_accept"/>
+                    <button name="action_check_materials" string="🔍 فحص المواد" type="object" class="btn-warning"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_release_material_reservations" string="🔓 فك حجز الخامات" type="object"
+                            class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="not has_active_material_reservation"/>
+                    <button name="action_open_advance_material_wizard" string="📦 طلب خامات عدة مراحل" type="object"
+                            class="btn-info o_furniture_advance_material_button"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="state not in ('confirmed', 'in_production') or not has_uncovered_advance_material_stages"/>
+                    <button name="action_consume_materials" string="📦 سحب المواد للـ WIP" type="object" class="btn-info" invisible="1"/>
+                    <button name="action_open_start_stage_selector" string="🚀 اختيار مرحلة البداية" type="object"
+                            class="btn-primary"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                            invisible="state not in ('confirmed', 'in_production') or not can_choose_start_stage"/>
+                    <!-- Kept as an invisible compatibility anchor for databases
+                         that still store inherited views targeting this node. -->
+                    <button name="action_open_stage_transfer_wizard" string="🔁 تحويل بين الأقسام" type="object"
+                            class="btn-secondary o_furniture_stage_transfer_button"
+                            invisible="1"/>
+                    <button name="action_mark_done" string="🏁 إغلاق أمر الأسبوع" type="object" class="btn-success" invisible="not can_mark_done"/>
+                    <button name="action_transfer_finished_product" string="📦 تحويل للمخزن التام" type="object" class="btn-info o_furniture_finished_transfer_button" invisible="not can_transfer_finished_product"/>
+                    <button name="action_cancel" string="إلغاء" type="object" class="btn-danger" invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset_to_draft" string="↩️ إعادة للمسودة" type="object" invisible="state not in ('cancelled', 'confirmed')"/>
+                    <field name="can_mark_done" invisible="1"/>
+                    <field name="can_transfer_finished_product" invisible="1"/>
+                    <field name="has_uncovered_advance_material_stages" invisible="1"/>
+                    <field name="finished_transfer_done" invisible="1"/>
+                    <field name="use_priming" invisible="1"/>
+                    <field name="use_painting" invisible="1"/>
+                    <field name="use_carpentry" invisible="1"/>
+                    <field name="use_bases" invisible="1"/>
+                    <field name="use_finishing" invisible="1"/>
+                    <field name="use_tailoring" invisible="1"/>
+                    <field name="use_upholstery" invisible="1"/>
+                    <field name="use_packaging" invisible="1"/>
+                    <field name="can_start_priming" invisible="1"/>
+                    <field name="can_start_painting" invisible="1"/>
+                    <field name="can_start_carpentry" invisible="1"/>
+                    <field name="can_start_bases" invisible="1"/>
+                    <field name="can_start_finishing" invisible="1"/>
+                    <field name="can_start_tailoring" invisible="1"/>
+                    <field name="can_start_upholstery" invisible="1"/>
+                    <field name="can_start_packaging" invisible="1"/>
+                    <field name="can_choose_start_stage" invisible="1"/>
+                    <field name="production_line_count" invisible="1"/>
+                    <field name="kit_plan_locked" invisible="1"/>
+                    <field name="kit_plan_editable" invisible="1"/>
+                    <field name="kit_order_has_split_lines" invisible="1"/>
+                    <field name="missing_vendor_purchase_order_id" invisible="1"/>
+                    <field name="mps_schedule_plan_count" invisible="1"/>
+                    <field name="has_active_material_reservation" invisible="1"/>
+                    <field name="handoff_transfer_pending" invisible="1"/>
+                    <field name="handoff_can_current_user_accept" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,in_production,done"/>
+                </header>
+                <sheet class="o_furniture_production_sheet">
+                    <div class="o_furniture_stage_strip" name="furniture_stage_strip">
+                        <button name="action_view_priming" type="object" class="btn o_furniture_stage_chip" invisible="not use_priming or not priming_order_id">
+                            <i class="fa fa-paint-brush"/>
+                            <span class="o_furniture_stage_chip_text">التقديم</span>
+                            <span class="o_furniture_stage_chip_state"><field name="priming_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_painting" type="object" class="btn o_furniture_stage_chip" invisible="not use_painting or not painting_order_id">
+                            <i class="fa fa-tint"/>
+                            <span class="o_furniture_stage_chip_text">تصنيع دهانات</span>
+                            <span class="o_furniture_stage_chip_state"><field name="painting_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_carpentry" type="object" class="btn o_furniture_stage_chip" invisible="not use_carpentry or not carpentry_order_id">
+                            <i class="fa fa-tree"/>
+                            <span class="o_furniture_stage_chip_text">تجميع</span>
+                            <span class="o_furniture_stage_chip_state"><field name="carpentry_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_bases" type="object" class="btn o_furniture_stage_chip" invisible="not use_bases or not bases_order_id">
+                            <i class="fa fa-th-large"/>
+                            <span class="o_furniture_stage_chip_text">القواعد</span>
+                            <span class="o_furniture_stage_chip_state"><field name="bases_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_finishing" type="object" class="btn o_furniture_stage_chip" invisible="not use_finishing or not finishing_order_id">
+                            <i class="fa fa-wrench"/>
+                            <span class="o_furniture_stage_chip_text">تجهيز</span>
+                            <span class="o_furniture_stage_chip_state"><field name="finishing_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_tailoring" type="object" class="btn o_furniture_stage_chip" invisible="not use_tailoring or not tailoring_order_id">
+                            <i class="fa fa-cut"/>
+                            <span class="o_furniture_stage_chip_text">تفصيل</span>
+                            <span class="o_furniture_stage_chip_state"><field name="tailoring_display_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_upholstery" type="object" class="btn o_furniture_stage_chip" invisible="not use_upholstery or not upholstery_order_id">
+                            <span class="o_furniture_stage_emoji">🛋</span>
+                            <span class="o_furniture_stage_chip_text">كسوه</span>
+                            <span class="o_furniture_stage_chip_state"><field name="upholstery_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_packaging" type="object" class="btn o_furniture_stage_chip" invisible="not use_packaging or not packaging_order_id">
+                            <i class="fa fa-archive"/>
+                            <span class="o_furniture_stage_chip_text">التغليف</span>
+                            <span class="o_furniture_stage_chip_state"><field name="packaging_state" nolabel="1"/></span>
+                        </button>
+                        <button name="action_view_purchases" type="object" class="btn o_furniture_stage_chip o_furniture_purchase_chip" invisible="purchase_count == 0">
+                            <i class="fa fa-shopping-cart"/>
+                            <span class="o_furniture_stage_chip_text">طلبات شراء</span>
+                            <span class="o_furniture_stage_chip_state"><field name="purchase_count" nolabel="1"/></span>
+                        </button>
+                    </div>
+                    <div class="oe_title o_furniture_production_hero">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <div class="o_furniture_header_summary">
+                            <span class="o_furniture_header_label">الأصناف:</span>
+                            <field name="header_product_summary" readonly="1" nolabel="1" class="o_furniture_multiline_summary"/>
+                        </div>
+                        <div class="o_furniture_header_summary">
+                            <span class="o_furniture_header_label">الأقسام والمراحل:</span>
+                            <field name="header_stage_summary" readonly="1" nolabel="1"/>
+                        </div>
+                    </div>
+                    <group string="💰 التكاليف" invisible="state not in ('done', 'in_production')" class="o_furniture_cost_card">
+                        <group>
+                            <field name="material_cost" readonly="1"/>
+                            <field name="labor_cost" readonly="1"/>
+                            <field name="overhead_cost" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_cost" readonly="1" class="fw-bold"/>
+                            <field name="cost_per_unit" readonly="1" class="fw-bold"/>
+                            <field name="analytic_account_id"/>
+                        </group>
+                    </group>
+                    <group invisible="not delivery_set_notes"><field name="delivery_set_notes" readonly="1"/></group>
+                    <notebook class="o_furniture_tabs">
+                        <page string="🧾 أصناف أمر التشغيل" class="o_furniture_tab_page o_furniture_materials_page">
+                            <div class="o_furniture_products_workbench_header">
+                                <div class="o_furniture_order_model_hero">
+                                    <span class="o_furniture_order_model_hero_label">
+                                        <i class="fa fa-cube" aria-hidden="true"/>
+                                        الموديل
+                                    </span>
+                                    <field name="furniture_order_model_id" nolabel="1"
+                                           class="o_furniture_order_model_hero_value"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                </div>
+                                <div class="o_furniture_products_workbench_actions">
+                                    <button name="action_open_tailoring_material_setup"
+                                            string="الأقمشة والتكاوي"
+                                            icon="fa-list-alt"
+                                            type="object"
+                                            class="btn o_furniture_tailoring_materials_button"
+                                            groups="furniture_mrp.group_furniture_mrp_manager"
+                                            invisible="not kit_plan_editable"/>
+                                    <button name="action_open_product_batch_wizard"
+                                            string="➕ إضافة منتجات"
+                                            type="object"
+                                            class="btn-primary o_furniture_batch_add_button"
+                                            invisible="kit_order_has_split_lines or state in ('done', 'cancelled')"/>
+                                </div>
+                            </div>
+                            <div class="o_furniture_order_planning_strip">
+                                <div class="o_furniture_order_planning_field">
+                                    <span class="o_form_label">تاريخ البدء المخطط</span>
+                                    <field name="date_planned_start" nolabel="1" required="1"/>
+                                </div>
+                                <div class="o_furniture_order_planning_field">
+                                    <span class="o_form_label">تاريخ الانتهاء المخطط</span>
+                                    <field name="date_planned_finish" nolabel="1" required="1"/>
+                                </div>
+                            </div>
+                            <div class="o_furniture_order_common_strip">
+                                <div class="o_furniture_order_common_field">
+                                    <span class="o_form_label">المشتري (الشركة)</span>
+                                    <field name="buyer_partner_id" nolabel="1"
+                                           context="{'default_is_company': True}"/>
+                                </div>
+                                <div class="o_furniture_order_common_field">
+                                    <span class="o_form_label">المستفيد</span>
+                                    <field name="beneficiary_partner_id" nolabel="1"/>
+                                </div>
+                            </div>
+                            <div class="o_furniture_products_table_shell">
+                                <div class="o_furniture_products_table_heading">
+                                    <span class="o_furniture_products_table_heading_icon" aria-hidden="true">
+                                        <i class="fa fa-cubes"/>
+                                    </span>
+                                    <span class="o_furniture_products_table_heading_copy">
+                                        <strong>أصناف أمر الإنتاج</strong>
+                                        <small>اضغط على الصنف لعرض تفاصيله، أو على BoM لمراجعة خاماته.</small>
+                                    </span>
+                                </div>
+                            <field name="production_line_ids"
+                                   class="o_furniture_production_lines"
+                                   invisible="kit_order_has_split_lines">
+                                <list string="ملخص أصناف أمر التشغيل" create="0" edit="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" domain="[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False)]"
+                                           context="{'furniture_source_production_id': parent.id, 'furniture_source_production_line_id': id}"
+                                           options="{'no_create_edit': True}" string="المنتج النهائي"/>
+                                    <button name="action_open_bom_popup" string="BoM"
+                                            type="object"
+                                            class="btn btn-outline-primary o_furniture_line_bom_button"/>
+                                    <field name="sale_kit_product_id" string="طقم البيع" optional="show"/>
+                                    <field name="furniture_order_model_id" column_invisible="1"/>
+                                    <field name="bom_id" domain="[('furniture_product_id', '=', product_id), ('furniture_model_id', '=', furniture_order_model_id), ('type', '=', 'normal')]"
+                                           options="{'no_create_edit': True}" optional="hide"/>
+                                    <field name="product_qty" string="الكمية"
+                                           options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                                    <field name="product_uom_id" readonly="1" optional="hide"/>
+                                    <field name="dimension_label" string="المقاس" widget="badge"
+                                           class="o_furniture_dimension_badge"
+                                           decoration-info="dimension_label"/>
+                                    <field name="width_cm" optional="hide"/>
+                                    <field name="depth_cm" optional="hide"/>
+                                    <field name="height_cm" optional="hide"/>
+                                    <field name="dimension_factor" string="معامل القياس" readonly="1" optional="show"
+                                           options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                                    <field name="stage_count" readonly="1" optional="hide"/>
+                                    <field name="stage_summary" readonly="1"/>
+                                    <field name="material_cost" readonly="1"/>
+                                </list>
+                                <form string="تفاصيل صنف أمر التشغيل" class="o_furniture_production_line_form">
+                                    <header>
+                                        <button name="action_view_stage_progress" type="object"
+                                                string="متابعة مراحل القطعة" class="btn-primary"/>
+                                    </header>
+                                    <sheet>
+                                        <div class="o_furniture_line_quick_choices">
+                                            <field name="furniture_order_model_id" invisible="1" force_save="1"/>
+                                            <field name="product_id"
+                                                   nolabel="1"
+                                                   class="o_furniture_quick_cards_field"
+                                                   widget="furniture_quick_card_selector"
+                                                   domain="[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False)]"
+                                                   context="{'furniture_source_production_id': production_id, 'furniture_source_production_line_id': id}"
+                                                   options="{'no_create': True, 'no_create_edit': True, 'quick_names': ['كنبة كبيرة', 'كنبة صغيرة', 'فوتيه', 'شازلونج'], 'quick_limit': 4, 'card_title': 'المنتج النهائي', 'card_subtitle': 'اختار الصنف مباشرة، أو اضغط More لعرض باقي المنتجات النهائية', 'card_icon': 'fa-cubes', 'card_variant': 'product', 'order_by': 'name, id'}"/>
+                                        </div>
+
+                                        <field name="buyer_partner_id" invisible="1" force_save="1"/>
+                                        <field name="beneficiary_partner_id" invisible="1" force_save="1"/>
+
+                                        <group class="o_furniture_line_compact_details">
+                                            <group string="بيانات التشغيل">
+                                                <field name="production_id" readonly="1" invisible="not production_id"/>
+                                                <field name="sale_kit_product_id" string="طقم البيع" readonly="1"
+                                                       invisible="not sale_kit_product_id"/>
+                                                <field name="product_qty"
+                                                       options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                                                <field name="furniture_classification_label" widget="badge"
+                                                       class="o_furniture_classification_badge"
+                                                       invisible="not furniture_classification_label"/>
+                                            </group>
+                                            <group string="المقاس الفعلي">
+                                                <field name="width_cm"/>
+                                                <field name="depth_cm"/>
+                                                <field name="height_cm"/>
+                                            </group>
+                                        </group>
+                                        <field name="stage_progress_html" nolabel="1" readonly="1"
+                                               class="o_furniture_line_progress_html"/>
+                                        <!--
+                                            The stage plan is owned by the exact product/model recipe.
+                                            Keep the technical fields in the inline form so onchange values
+                                            are saved, but do not offer a second manual stage selector here.
+                                        -->
+                                        <field name="stage_selection_initialized" invisible="1" force_save="1"/>
+                                        <field name="use_priming" invisible="1" force_save="1"/>
+                                        <field name="use_painting" invisible="1" force_save="1"/>
+                                        <field name="use_carpentry" invisible="1" force_save="1"/>
+                                        <field name="use_bases" invisible="1" force_save="1"/>
+                                        <field name="use_finishing" invisible="1" force_save="1"/>
+                                        <field name="use_tailoring" invisible="1" force_save="1"/>
+                                        <field name="use_upholstery" invisible="1" force_save="1"/>
+                                        <field name="use_packaging" invisible="1" force_save="1"/>
+                                    </sheet>
+                                </form>
+                            </field>
+                            <field name="kit_order_summary_line_ids"
+                                   class="o_furniture_production_lines"
+                                   readonly="1"
+                                   context="{'form_view_ref': 'furniture_mrp.view_furniture_mrp_production_line_summary_form'}"
+                                   invisible="not kit_order_has_split_lines">
+                                <list string="ملخص أصناف أمر التشغيل" create="0" edit="0" delete="0">
+                                    <field name="sequence" column_invisible="1"/>
+                                    <field name="product_id" string="المنتج النهائي"/>
+                                    <button name="action_open_bom_popup" string="BoM"
+                                            type="object"
+                                            class="btn btn-outline-primary o_furniture_line_bom_button"/>
+                                    <field name="sale_kit_product_id" string="طقم البيع" optional="show"/>
+                                    <field name="furniture_order_model_id" column_invisible="1"/>
+                                    <field name="bom_id" optional="hide"/>
+                                    <field name="kit_order_summary_qty" string="الكمية"
+                                           options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                                    <field name="product_uom_id" readonly="1" optional="hide"/>
+                                    <field name="dimension_label" string="المقاس" widget="badge"
+                                           class="o_furniture_dimension_badge"
+                                           decoration-info="dimension_label"/>
+                                    <field name="width_cm" optional="hide"/>
+                                    <field name="depth_cm" optional="hide"/>
+                                    <field name="height_cm" optional="hide"/>
+                                    <field name="dimension_factor" string="معامل القياس" readonly="1" optional="show"
+                                           options="{'minDigits': 1, 'min_display_digits': 1}"/>
+                                    <field name="stage_count" readonly="1" optional="hide"/>
+                                    <field name="stage_summary" readonly="1"/>
+                                    <field name="kit_order_summary_material_cost"
+                                           string="إجمالي الخامات المعتمدة"
+                                           readonly="1"/>
+                                </list>
+                            </field>
+                            </div>
+                        </page>
+                        <page string="📊 تقدم المراحل" name="stage_progress"
+                              class="o_furniture_tab_page o_furniture_progress_page">
+                            <group>
+                                <group string="ملخص المراحل">
+                                    <field name="stage_completion_summary" readonly="1"/>
+                                    <field name="stage_current_stage" readonly="1"/>
+                                </group>
+                                <group string="المراحل المكتملة والمتبقية">
+                                    <field name="stage_completed_stages" readonly="1"/>
+                                    <field name="stage_pending_stages" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="مواقع المخزون">
+                                    <label for="location_src_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_src_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_src_id'}"/>
+                                    </div>
+                                    <label for="location_priming_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_priming_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_priming_wip_id'}"/>
+                                    </div>
+                                    <label for="location_priming_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_priming_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_priming_id'}"/>
+                                    </div>
+                                    <label for="location_painting_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_painting_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_painting_wip_id'}"/>
+                                    </div>
+                                    <label for="location_painting_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_painting_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_painting_id'}"/>
+                                    </div>
+                                    <label for="location_carpentry_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_carpentry_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_carpentry_wip_id'}"/>
+                                    </div>
+                                    <label for="location_carpentry_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_carpentry_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_carpentry_id'}"/>
+                                    </div>
+                                    <label for="location_bases_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_bases_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_bases_wip_id'}"/>
+                                    </div>
+                                    <label for="location_bases_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_bases_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_bases_id'}"/>
+                                    </div>
+                                    <label for="location_finishing_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_finishing_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_finishing_wip_id'}"/>
+                                    </div>
+                                    <label for="location_finishing_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_finishing_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_finishing_id'}"/>
+                                    </div>
+                                    <label for="location_tailoring_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_tailoring_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_tailoring_wip_id'}"/>
+                                    </div>
+                                    <label for="location_tailoring_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_tailoring_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_tailoring_id'}"/>
+                                    </div>
+                                    <label for="location_upholstery_wip_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_upholstery_wip_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_upholstery_wip_id'}"/>
+                                    </div>
+                                    <label for="location_packaging_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_packaging_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_packaging_id'}"/>
+                                    </div>
+                                    <label for="location_dest_id"/>
+                                    <div class="o_furniture_location_row">
+                                        <field name="location_dest_id" nolabel="1" options="{'no_open': True}"/>
+                                        <button name="action_view_location_products" type="object" icon="fa-arrow-circle-right" class="o_furniture_location_products_button" title="عرض منتجات المخزن" context="{'location_field': 'location_dest_id'}"/>
+                                    </div>
+                                </group>
+                                <group string="توفر المواد">
+                                    <field name="material_availability" widget="badge"
+                                           decoration-success="material_availability == 'available'"
+                                           decoration-warning="material_availability == 'partial'"
+                                           decoration-danger="material_availability == 'unavailable'"/>
+                                    <field name="material_reservation_state" widget="badge"
+                                           decoration-success="material_reservation_state == 'full'"
+                                           decoration-warning="material_reservation_state == 'partial'"/>
+                                    <field name="material_reserved_qty" invisible="material_reservation_state == 'none'"/>
+                                    <field name="material_shortage_qty" invisible="material_reservation_state == 'none'"/>
+                                    <field name="materials_checked_at" invisible="material_reservation_state == 'none'"/>
+                                    <field name="materials_checked_by_id" invisible="material_reservation_state == 'none'" options="{'no_open': True}"/>
+                                    <button name="action_open_missing_vendor_purchase_order"
+                                            type="object"
+                                            string="🛒 فتح طلب الشراء بدون مورد"
+                                            class="btn-primary"
+                                            invisible="not missing_vendor_purchase_order_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="🏭 مكونات الإنتاج (BoM)" name="production_material_components">
+                            <group class="o_furniture_info_card">
+                                <field name="material_display_line_id"
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
+                                <div class="text-muted">
+                                    اختار الصنف لعرض ريسيبيه وخاماته فقط، موزعة على مراحل التصنيع بالكميات المحسوبة لهذا الصنف.
+                                </div>
+                            </group>
+                            <notebook class="o_furniture_stage_materials">
+                                <page string="1. التقديم" invisible="not use_priming">
+                                    <field name="priming_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="2. تصنيع دهانات" invisible="not use_painting">
+                                    <field name="painting_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="3. تجميع" invisible="not use_carpentry">
+                                    <field name="carpentry_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="4. القواعد" invisible="not use_bases">
+                                    <field name="bases_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/><field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/><field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/><field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/><field name="availability" widget="badge" decoration-success="availability == 'ok'" decoration-warning="availability == 'partial'" decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="5. تجهيز" invisible="not use_finishing">
+                                    <field name="finishing_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="6. تفصيل" invisible="not use_tailoring">
+                                    <field name="tailoring_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="7. كسوه" invisible="not use_upholstery">
+                                    <field name="upholstery_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                                <page string="8. التغليف" invisible="not use_packaging">
+                                    <field name="packaging_material_line_ids" readonly="1">
+                                        <list create="false" edit="false" delete="false">
+                                            <field name="product_id"/>
+                                            <field name="production_line_id" readonly="1" optional="show"/>
+                                            <field name="product_uom_id"/>
+                                            <field name="qty_needed"/>
+                                            <field name="purchase_unit_cost" readonly="1" optional="show"/>
+                                            <field name="material_cost" readonly="1" optional="show"/>
+                                            <field name="qty_available" optional="show"/>
+                                            <field name="availability" widget="badge"
+                                                   decoration-success="availability == 'ok'"
+                                                   decoration-warning="availability == 'partial'"
+                                                   decoration-danger="availability == 'missing'"/>
+                                        </list>
+                                    </field>
+                                </page>
+                            </notebook>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!--
+        Keep the production lines as the first working area on the order.  The
+        large order-number hero duplicated the breadcrumb/header information,
+        while the stage-progress page duplicated the stage cards and the
+        per-product progress drill-down.  Move the main notebook into the
+        hero's former position and remove that redundant progress tab.
+    -->
+    <record id="view_furniture_mrp_production_form_compact_work_area" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.form.compact.work.area</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="view_furniture_mrp_production_form"/>
+        <field name="priority">95</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' o_furniture_production_hero ')]"
+                   position="replace"/>
+            <xpath expr="//page[@name='stage_progress']" position="replace"/>
+            <xpath expr="//page[@name='production_material_components']" position="replace"/>
+            <xpath expr="//div[@name='furniture_stage_strip']" position="after">
+                <xpath expr="//notebook[contains(concat(' ', normalize-space(@class), ' '), ' o_furniture_tabs ')]"
+                       position="move"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_furniture_mrp_production_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.list</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="arch" type="xml">
+            <list string="أوامر التشغيل الأسبوعية" decoration-success="state == 'done'" decoration-danger="state == 'cancelled'" decoration-warning="state == 'confirmed'">
+                <header>
+                    <button name="%(action_furniture_mrp_material_check_batch_wizard)d"
+                            string="🔍 فحص المواد المجمع"
+                            type="action"
+                            class="btn-warning o_furniture_batch_material_check_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="%(action_furniture_mrp_advance_material_batch_wizard)d"
+                            string="📦 إذن خامات لأوامر متعددة"
+                            type="action"
+                            class="btn-primary o_furniture_batch_material_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="%(action_furniture_mrp_advance_material_batch_receipt_wizard)d"
+                            string="📥 استلام من المخزن"
+                            type="action"
+                            class="btn-primary o_furniture_batch_material_button o_furniture_batch_receipt_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                </header>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="product_dimension_label" string="المقاس" widget="badge"
+                       class="o_furniture_dimension_badge" optional="show"
+                       decoration-info="product_dimension_label"/>
+                <field name="production_line_count" optional="show"/>
+                <field name="buyer_partner_ids" string="المشترون" widget="many2many_tags" optional="show"/>
+                <field name="beneficiary_partner_ids" string="المستفيدون" widget="many2many_tags" optional="show"/>
+                <field name="product_qty"/>
+                <field name="bom_id"/>
+                <field name="responsible_id"/>
+                <field name="date_planned_start"/>
+                <field name="date_planned_finish"/>
+                <field name="material_availability" widget="badge" optional="show"
+                       decoration-success="material_availability == 'available'"
+                       decoration-warning="material_availability == 'partial'"
+                       decoration-danger="material_availability in ('unavailable', 'none')"/>
+                <field name="total_cost" optional="show"/>
+                <field name="cost_per_unit" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'cancelled'"
+                       decoration-info="state == 'in_production'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_furniture_mrp_production_kanban" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.kanban</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false"
+                    class="o_furniture_production_kanban">
+                <header>
+                    <button name="%(action_furniture_mrp_material_check_batch_wizard)d"
+                            string="🔍 فحص المواد المجمع"
+                            type="action"
+                            class="btn-warning o_furniture_batch_material_check_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="%(action_furniture_mrp_advance_material_batch_wizard)d"
+                            string="📦 إذن خامات لأوامر متعددة"
+                            type="action"
+                            class="btn-primary o_furniture_batch_material_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="%(action_furniture_mrp_advance_material_batch_receipt_wizard)d"
+                            string="📥 استلام من المخزن"
+                            type="action"
+                            class="btn-primary o_furniture_batch_material_button o_furniture_batch_receipt_button"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                </header>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="production_line_count"/>
+                <field name="header_product_summary"/>
+                <field name="header_stage_summary"/>
+                <field name="stage_current_stage"/>
+                <field name="stage_completion_summary"/>
+                <field name="progress"/>
+                <field name="material_availability"/>
+                <field name="priority"/>
+                <field name="responsible_id"/>
+                <field name="date_planned_start"/>
+                <field name="date_planned_finish"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click o_furniture_production_card o_furniture_state--#{record.state.raw_value}">
+                            <div class="o_furniture_production_card_header">
+                                <div class="o_furniture_production_card_heading">
+                                    <span class="o_furniture_production_eyebrow">أمر تشغيل أسبوعي</span>
+                                    <strong class="o_furniture_order_number"><field name="name"/></strong>
+                                </div>
+                                <t t-if="record.state.raw_value == 'draft'">
+                                    <span class="o_furniture_state_badge o_furniture_state_badge--draft">
+                                        <i class="fa fa-pencil me-1"/>مسودة
+                                    </span>
+                                </t>
+                                <t t-elif="record.state.raw_value == 'confirmed'">
+                                    <span class="o_furniture_state_badge o_furniture_state_badge--confirmed">
+                                        <i class="fa fa-check-circle me-1"/>جاهز للإنتاج
+                                    </span>
+                                </t>
+                                <t t-elif="record.state.raw_value == 'done'">
+                                    <span class="o_furniture_state_badge o_furniture_state_badge--done">
+                                        <i class="fa fa-flag-checkered me-1"/>منتهي
+                                    </span>
+                                </t>
+                                <t t-elif="record.state.raw_value == 'cancelled'">
+                                    <span class="o_furniture_state_badge o_furniture_state_badge--cancelled">
+                                        <i class="fa fa-ban me-1"/>ملغي
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="o_furniture_state_badge o_furniture_state_badge--active">
+                                        <i class="fa fa-cogs me-1"/><field name="state"/>
+                                    </span>
+                                </t>
+                            </div>
+
+                            <div class="o_furniture_production_card_body">
+                                <div class="o_furniture_kanban_section o_furniture_kanban_products">
+                                    <div class="o_furniture_kanban_section_label">
+                                        <i class="fa fa-cubes"/> الأصناف
+                                    </div>
+                                    <div class="o_furniture_kanban_products_value">
+                                        <t t-if="record.header_product_summary.raw_value">
+                                            <field name="header_product_summary"/>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="product_id"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+                                <div class="o_furniture_kanban_metrics">
+                                    <span class="o_furniture_metric_chip">
+                                        <i class="fa fa-list-ul"/>
+                                        <field name="production_line_count"/> أصناف
+                                    </span>
+                                    <span class="o_furniture_metric_chip">
+                                        <i class="fa fa-hashtag"/>
+                                        الكمية <field name="product_qty"/>
+                                    </span>
+                                    <t t-if="record.material_availability.raw_value == 'available'">
+                                        <span class="o_furniture_metric_chip o_furniture_material--available">
+                                            <i class="fa fa-check"/> الخامات متاحة
+                                        </span>
+                                    </t>
+                                    <t t-elif="record.material_availability.raw_value == 'partial'">
+                                        <span class="o_furniture_metric_chip o_furniture_material--partial">
+                                            <i class="fa fa-exclamation-triangle"/> متاحة جزئيًا
+                                        </span>
+                                    </t>
+                                    <t t-elif="record.material_availability.raw_value == 'unavailable'">
+                                        <span class="o_furniture_metric_chip o_furniture_material--unavailable">
+                                            <i class="fa fa-times"/> الخامات غير متاحة
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="o_furniture_metric_chip o_furniture_material--unchecked">
+                                            <i class="fa fa-question"/> لم تُفحص الخامات
+                                        </span>
+                                    </t>
+                                </div>
+
+                            </div>
+
+                            <div class="o_furniture_production_card_footer">
+                                <div class="o_furniture_kanban_schedule">
+                                    <t t-if="record.date_planned_start.raw_value">
+                                        <span title="تاريخ البدء المخطط">
+                                            <i class="fa fa-calendar-o"/>
+                                            <field name="date_planned_start" widget="date"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="o_furniture_kanban_no_date">
+                                            <i class="fa fa-calendar-o"/> بدون موعد مخطط
+                                        </span>
+                                    </t>
+                                </div>
+                                <div class="o_furniture_kanban_owner">
+                                    <span><field name="responsible_id"/></span>
+                                    <field name="responsible_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_furniture_mrp_production" model="ir.actions.act_window">
+        <field name="name">أوامر التشغيل الأسبوعية</field>
+        <field name="res_model">furniture.mrp.production</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- Search Filter -->
+    <record id="view_furniture_mrp_production_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.search</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="رقم الأمر"/>
+                <field name="product_id" string="المنتج المخطط"/>
+                <field name="buyer_partner_ids" string="المشتري"/>
+                <field name="beneficiary_partner_ids" string="المستفيد"/>
+                <filter name="not_done" string="جاري" domain="[('state', 'not in', ('done', 'cancelled'))]"/>
+                <filter name="draft" string="مسودة" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="منتهي" domain="[('state', '=', 'done')]"/>
+                <filter name="confirmed" string="مؤكد - بانتظار المواد" domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <group expand="0" string="تجميع بـ">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_product" string="المنتج المخطط" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_responsible" string="المسؤول" context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

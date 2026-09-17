@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_attendance_overtime.OvertimeApproval">
+        <div class="o_factory_overtime_page" dir="rtl">
+            <header class="o_factory_overtime_hero">
+                <div class="o_overtime_brand">
+                    <div class="o_overtime_hero_icon"><i class="fa fa-clock-o"/></div>
+                    <div><span>HUMAN RESOURCES</span><h1>اعتماد الإضافي</h1><p>راجع وقت الانصراف واعتمد الساعات المستحقة قبل دخولها في المرتب.</p></div>
+                </div>
+                <ArabicAttendanceDatePicker value="state.selectedDate" today="state.data.today"
+                    serverTime="state.data.server_time" onChange.bind="onCalendarDateChanged"/>
+            </header>
+
+            <main class="o_factory_overtime_body">
+                <section class="o_overtime_toolbar">
+                    <label class="o_overtime_search"><i class="fa fa-search"/><input type="search" placeholder="ابحث باسم العامل أو القسم…" t-model="state.query"/></label>
+                    <button type="button" class="o_overtime_refresh" t-on-click="load" t-att-disabled="state.loading || state.savingId"><i t-att-class="state.loading ? 'fa fa-refresh fa-spin' : 'fa fa-refresh'"/> تحديث</button>
+                </section>
+
+                <section class="o_overtime_stats">
+                    <button t-att-class="state.selectedStatus === 'all' ? 'o_overtime_stat active all' : 'o_overtime_stat all'" t-on-click="() => this.selectStatus('all')"><i class="fa fa-users"/><span><small>كل الحالات</small><strong t-esc="state.data.counts.all"/></span></button>
+                    <button t-att-class="'o_overtime_stat lunch ' + (state.selectedStatus === 'lunch' ? 'active' : '')" t-on-click="() => this.selectStatus('lunch')"><i class="fa fa-cutlery"/><span><small>إضافي الغداء</small><strong t-esc="state.data.counts.lunch || 0"/></span></button>
+                    <button t-att-class="state.selectedStatus === 'pending' ? 'o_overtime_stat active pending' : 'o_overtime_stat pending'" t-on-click="() => this.selectStatus('pending')"><i class="fa fa-hourglass-half"/><span><small>بحاجة للاعتماد</small><strong t-esc="state.data.counts.pending"/></span></button>
+                    <button t-att-class="state.selectedStatus === 'approved' ? 'o_overtime_stat active approved' : 'o_overtime_stat approved'" t-on-click="() => this.selectStatus('approved')"><i class="fa fa-check-circle"/><span><small>معتمد</small><strong t-esc="state.data.counts.approved"/></span></button>
+                    <button t-att-class="state.selectedStatus === 'rejected' ? 'o_overtime_stat active rejected' : 'o_overtime_stat rejected'" t-on-click="() => this.selectStatus('rejected')"><i class="fa fa-times-circle"/><span><small>مرفوض</small><strong t-esc="state.data.counts.rejected"/></span></button>
+                </section>
+
+                <div t-if="state.error" class="alert alert-danger" role="alert" t-esc="state.error"/>
+                <section class="o_overtime_review_card">
+                    <div class="o_overtime_card_title">
+                        <div><span>OVERTIME APPROVAL</span><h2>طلبات إضافي يوم <t t-esc="state.data.date_label"/></h2><p t-if="state.selectedStatus !== 'lunch'">الزيادة تعوّض تأخير الصبح أولًا؛ يظهر للاعتماد المتبقي الذي يزيد عن 20 دقيقة.</p></div>
+                        <strong><i class="fa fa-users"/> <t t-esc="filteredRows.length"/> عامل</strong>
+                    </div>
+                    <div t-if="!state.loading &amp;&amp; filteredRows.length" class="o_overtime_bulk_bar">
+                        <label class="o_overtime_select_all">
+                            <input type="checkbox" t-att-checked="allFilteredSelected"
+                                t-on-change="(ev) => this.toggleAllFiltered(ev.target.checked)"
+                                t-att-disabled="state.savingId || !selectableRows.length"/>
+                            <span>تحديد كل العمال الظاهرين</span>
+                        </label>
+                        <strong><t t-esc="selectedRows.length"/> محدد</strong>
+                        <div class="o_overtime_bulk_actions">
+                            <button type="button" class="approve" t-on-click="() => this.confirmBulkDecision('approve')"
+                                t-att-disabled="state.savingId || !selectedRows.length"><i class="fa fa-check"/> اعتماد المحددين</button>
+                            <button type="button" class="reject" t-on-click="() => this.confirmBulkDecision('reject')"
+                                t-att-disabled="state.savingId || !selectedRows.length"><i class="fa fa-times"/> رفض المحددين</button>
+                        </div>
+                    </div>
+                    <div t-if="state.loading" class="o_overtime_empty"><i class="fa fa-circle-o-notch fa-spin"/><h3>جاري تحميل الإضافي…</h3></div>
+                    <div t-elif="!filteredRows.length" class="o_overtime_empty"><i class="fa fa-check-circle-o"/><h3>لا توجد حالات مطابقة</h3><p>غيّر اليوم أو حالة العرض أو كلمة البحث.</p></div>
+                    <div t-else="" class="o_overtime_rows">
+                        <article t-foreach="filteredRows" t-as="row" t-key="rowKey(row)" t-att-class="'o_overtime_employee state-' + row.state + ' kind-' + (row.kind || 'normal') + (row.is_open ? ' is-open' : '') + (isSelected(row) ? ' is-selected' : '')">
+                            <div class="o_overtime_identity">
+                                <label t-if="row.state === 'pending'" class="o_overtime_row_select" t-att-title="row.is_open ? 'متاح بعد تسجيل الانصراف' : 'تحديد ' + row.employee_name">
+                                    <input type="checkbox" t-att-checked="isSelected(row)"
+                                        t-on-change="(ev) => this.toggleRow(row, ev.target.checked)"
+                                        t-att-disabled="state.savingId || row.is_open"
+                                        t-att-aria-label="'تحديد ' + row.employee_name"/>
+                                </label>
+                                <span t-else="" class="o_overtime_row_select_spacer" aria-hidden="true"/>
+                                <img t-att-src="row.avatar" t-att-alt="row.employee_name"/>
+                                <div><strong t-esc="row.employee_name"/><small t-esc="row.department"/></div>
+                                <span t-att-class="'o_overtime_badge ' + row.state"><i t-att-class="row.state === 'approved' ? 'fa fa-check' : (row.state === 'rejected' ? 'fa fa-times' : 'fa fa-hourglass-half')"/><t t-esc="row.is_open ? 'مازال حاضرًا' : statusLabel(row.state)"/></span>
+                            </div>
+                            <div class="o_overtime_timeline">
+                                <div class="o_overtime_time_point checkin"><i class="fa fa-sign-in"/><span>الحضور</span><strong dir="ltr" t-esc="row.check_in"/></div><i class="fa fa-long-arrow-left"/>
+                                <div class="o_overtime_time_point shift-end"><i class="fa fa-flag-o"/><span>نهاية الشيفت</span><strong dir="ltr" t-esc="row.scheduled_checkout"/></div><i class="fa fa-long-arrow-left"/>
+                                <div class="o_overtime_time_point actual"><i class="fa fa-sign-out"/><span>الانصراف الفعلي</span><strong dir="ltr" t-esc="row.detected_checkout"/></div>
+                            </div>
+                            <div class="o_overtime_result">
+                                <span class="o_overtime_source"><i t-att-class="sourceIcon(row.source)"/> <t t-esc="row.source_label"/></span>
+                                <div class="proposed"><small t-esc="row.kind === 'lunch' ? 'إضافي الغداء — ثابت' : 'الإضافي بعد تعويض التأخير'"/><strong t-esc="row.overtime_label"/></div>
+                                <div t-if="row.state === 'approved' and row.approved_minutes !== row.overtime_minutes" class="approved"><small>المعتمد</small><strong t-esc="row.approved_label"/></div>
+                            </div>
+                            <div class="o_overtime_actions">
+                                <span class="o_overtime_decision_label">قرار الإضافي</span>
+                                <t t-if="row.is_open"><span class="o_overtime_wait"><i class="fa fa-clock-o"/> متاح بعد تسجيل الانصراف</span></t>
+                                <t t-elif="row.state === 'pending'">
+                                    <button class="approve" t-on-click="() => this.confirmDecision(row, 'approve')" t-att-disabled="state.savingId"><i class="fa fa-check"/> اعتماد الوقت</button>
+                                    <button t-if="row.kind !== 'lunch'" class="manual" t-on-click="() => this.openManual(row)" t-att-disabled="state.savingId"><i class="fa fa-pencil"/> وقت يدوي</button>
+                                    <button class="reject" t-on-click="() => this.confirmDecision(row, 'reject')" t-att-disabled="state.savingId"><i class="fa fa-times"/> رفض</button>
+                                </t>
+                                <button type="button" t-else="" t-att-class="'o_overtime_final_decision ' + row.state"
+                                    t-on-click="() => this.confirmChangeDecision(row)" t-att-disabled="state.savingId"
+                                    t-att-title="row.state === 'approved' ? 'اضغط لتغيير القرار إلى مرفوض' : 'اضغط لتغيير القرار إلى معتمد'">
+                                    <i t-att-class="row.state === 'approved' ? 'fa fa-check-circle' : 'fa fa-times-circle'"/>
+                                    <t t-esc="row.state === 'approved' ? 'تم الاعتماد' : 'تم الرفض'"/>
+                                    <i class="fa fa-exchange o_overtime_change_icon"/>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </main>
+
+            <div t-if="state.manual.open" class="o_factory_attendance_dashboard" style="min-height: 0; background: none; overflow: visible;">
+                <div class="o_factory_dialog_backdrop" t-on-click.self="closeManual">
+                    <section class="o_factory_dialog" role="dialog" aria-modal="true" aria-label="تسجيل وقت انصراف يدوي">
+                        <header><div><span>MANUAL CHECK-OUT</span><h3>تسجيل وقت انصراف يدوي</h3><p t-esc="state.manual.row.employee_name"/></div><button type="button" t-on-click="closeManual" t-att-disabled="state.savingId" aria-label="إغلاق"><i class="fa fa-times"/></button></header>
+                        <div class="o_factory_dialog_body">
+                            <div class="o_manual_field">
+                                <span>يوم الانصراف</span>
+                                <ArabicAttendanceDatePicker compact="true" value="state.manual.date" today="state.data.today" serverTime="''"
+                                    caption="'اختر تاريخ الانصراف'" disabled="!!state.savingId" onChange.bind="onManualDate"/>
+                            </div>
+                            <div class="o_manual_field">
+                                <span>الانصراف المسجل حاليًا</span>
+                                <div class="o_factory_security_hint"><strong dir="ltr" t-esc="state.manual.row.detected_checkout_full"/></div>
+                            </div>
+                            <ManualAttendanceDateTime caption="'وقت الانصراف'" value="state.manual.checkout" defaultDate="state.manual.date"
+                                disabled="!!state.savingId" onChange.bind="onManualTime"/>
+                            <p class="o_factory_security_hint"><i class="fa fa-shield"/> يُعاد حساب صافي الإضافي بعد تعويض التأخير عند الحفظ. التوقيت: <bdi t-esc="state.manual.row.timezone"/>.</p>
+                            <div t-if="state.manual.error" class="alert alert-danger" t-esc="state.manual.error"/>
+                        </div>
+                        <footer>
+                            <button class="btn o_factory_dialog_confirm" t-on-click="approveManual" t-att-disabled="state.savingId || !state.manual.checkout"><i class="fa fa-check"/> حفظ واعتماد الإضافي</button>
+                            <button class="btn btn-outline-secondary" t-on-click="closeManual" t-att-disabled="state.savingId">إلغاء</button>
+                        </footer>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

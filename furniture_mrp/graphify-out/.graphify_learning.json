@@ -1,0 +1,463 @@
+{
+  "generated_at": "2026-08-31T22:24:38.763668+00:00",
+  "nodes": {
+    "models_hr_attendance_hrattendance": {
+      "code_fingerprint": "bb22981bfde3f1a3908f4272a97aa680b1a50d9820553257ab37a9f7a183403c",
+      "label": "HrAttendance",
+      "last": "2026-08-31T20:58:40.896975+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 0.998621645,
+      "source_file": "models/hr_attendance.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_hr_employee_compensation_furnituremrpemployeepayreport": {
+      "code_fingerprint": "77f9999d5b49045972b2c87ea576cf27c9297146cf275bbdf6cb2897d3d39c3a",
+      "label": "FurnitureMrpEmployeePayReport",
+      "last": "2026-08-31T22:24:38.429041+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T22:24:38.429041+00:00",
+          "outcome": "useful",
+          "q": "العمال من 10 إلى 6، 6 أيام والجمعة إجازة، سماح التأخير 15 دقيقة ثم خصم التأخير كاملًا، وإنشاء عقود للموظفين بلا عقد، وإضافة Payroll داخل Attendance بفترة وبدلات وخصومات وPDF."
+        },
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 1.998621555,
+      "source_file": "models/hr_employee_compensation.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_hr_employee_compensation_furnituremrpmpsassignmentcompensation": {
+      "code_fingerprint": "77f9999d5b49045972b2c87ea576cf27c9297146cf275bbdf6cb2897d3d39c3a",
+      "label": "FurnitureMrpMPSAssignmentCompensation",
+      "last": "2026-08-31T22:24:38.429041+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T22:24:38.429041+00:00",
+          "outcome": "useful",
+          "q": "العمال من 10 إلى 6، 6 أيام والجمعة إجازة، سماح التأخير 15 دقيقة ثم خصم التأخير كاملًا، وإنشاء عقود للموظفين بلا عقد، وإضافة Payroll داخل Attendance بفترة وبدلات وخصومات وPDF."
+        },
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 1.998621555,
+      "source_file": "models/hr_employee_compensation.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_hr_employee_compensation_hrcontractcompensation": {
+      "code_fingerprint": "77f9999d5b49045972b2c87ea576cf27c9297146cf275bbdf6cb2897d3d39c3a",
+      "label": "HrContractCompensation",
+      "last": "2026-08-31T22:24:38.429041+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T22:24:38.429041+00:00",
+          "outcome": "useful",
+          "q": "العمال من 10 إلى 6، 6 أيام والجمعة إجازة، سماح التأخير 15 دقيقة ثم خصم التأخير كاملًا، وإنشاء عقود للموظفين بلا عقد، وإضافة Payroll داخل Attendance بفترة وبدلات وخصومات وPDF."
+        },
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 1.998621555,
+      "source_file": "models/hr_employee_compensation.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_hr_employee_compensation_hremployeecompensation": {
+      "code_fingerprint": "77f9999d5b49045972b2c87ea576cf27c9297146cf275bbdf6cb2897d3d39c3a",
+      "label": "HrEmployeeCompensation",
+      "last": "2026-08-31T22:24:38.429041+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T22:24:38.429041+00:00",
+          "outcome": "useful",
+          "q": "العمال من 10 إلى 6، 6 أيام والجمعة إجازة، سماح التأخير 15 دقيقة ثم خصم التأخير كاملًا، وإنشاء عقود للموظفين بلا عقد، وإضافة Payroll داخل Attendance بفترة وبدلات وخصومات وPDF."
+        },
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 1.998621555,
+      "source_file": "models/hr_employee_compensation.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_hr_employee_furnituremrpemployeestage": {
+      "code_fingerprint": "8e41458d6b760f4f21e5d03ee436d63dbc7836ee6b69812310a4ed1a3bc3dfbb",
+      "label": "FurnitureMrpEmployeeStage",
+      "last": "2026-08-31T18:14:11.810441+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T18:14:11.810441+00:00",
+          "outcome": "useful",
+          "q": "قولي كدة مشرفين المراحل"
+        }
+      ],
+      "score": 0.995989587,
+      "source_file": "models/hr_employee.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_hr_employee_hremployee": {
+      "code_fingerprint": "8e41458d6b760f4f21e5d03ee436d63dbc7836ee6b69812310a4ed1a3bc3dfbb",
+      "label": "HrEmployee",
+      "last": "2026-08-31T18:14:11.810441+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T18:14:11.810441+00:00",
+          "outcome": "useful",
+          "q": "قولي كدة مشرفين المراحل"
+        }
+      ],
+      "score": 0.995989587,
+      "source_file": "models/hr_employee.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_advance_material_release_furnituremrpadvancematerialrelease": {
+      "code_fingerprint": "e05c12a68a6683d7932105e3ce6f1d5334d73eb88a2756d61c52b4508f813964",
+      "label": "FurnitureMrpAdvanceMaterialRelease",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        },
+        {
+          "date": "2026-08-31T19:16:55.545094+00:00",
+          "outcome": "useful",
+          "q": "عملت قبول الجودة في التقديم جالي الايرور دة مع اني طالب الخامات من الاول للمرحلة"
+        }
+      ],
+      "score": 1.996085469,
+      "source_file": "models/mrp_advance_material_release.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_mrp_advance_material_release_furnituremrpadvancematerialrelease_validate_stage_request": {
+      "code_fingerprint": "e05c12a68a6683d7932105e3ce6f1d5334d73eb88a2756d61c52b4508f813964",
+      "label": "._validate_stage_request()",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        }
+      ],
+      "score": 0.999092924,
+      "source_file": "models/mrp_advance_material_release.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_advance_material_release_furnituremrpproductionadvancematerialrelease": {
+      "code_fingerprint": "e05c12a68a6683d7932105e3ce6f1d5334d73eb88a2756d61c52b4508f813964",
+      "label": "FurnitureMrpProductionAdvanceMaterialRelease",
+      "last": "2026-08-04T19:41:35.408282+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-04T19:41:35.408282+00:00",
+          "outcome": "useful",
+          "q": "في مشكلة تانية لاحظتها مراحل زي القواعد والخيلطة علي الرغم اني مسلم الخامات كلها كاملة عن طريق الزرار ال برا وحددت الخياطة ولقواعد بردو دخلت لقيت مكتوب طلب الاذن من المخزن وروحت لامين المخزن اعتمدت الاذن ورجعت ضغطت استلام في المخزن وبدأت المرحلة وكمان فيه مراحل نبيظهرش فيها زرار امر الانتاج ولا لوحة التحكم زي الباقي متشالين منهم مش عارف ليه يعني الزرارين دول كانو بيرجعوني لامر التصنيع نفسه او لوحة التحكم برا لكن متشالين منهم اما حوار الاستلام دة غالبا لان المرحلتين دول اتعملوا بعد الزرار واتاكد بردو ان حوار المخزن دة مش موجود فاي مراحل تانية ولا حوار الزرارين بردو"
+        }
+      ],
+      "score": 0.534486553,
+      "source_file": "models/mrp_advance_material_release.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_advance_material_release_furnituremrpproductionadvancematerialrelease_advance_material_stage_for_execution": {
+      "code_fingerprint": "e05c12a68a6683d7932105e3ce6f1d5334d73eb88a2756d61c52b4508f813964",
+      "label": "._advance_material_stage_for_execution()",
+      "last": "2026-08-04T19:41:35.408282+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-04T19:41:35.408282+00:00",
+          "outcome": "useful",
+          "q": "في مشكلة تانية لاحظتها مراحل زي القواعد والخيلطة علي الرغم اني مسلم الخامات كلها كاملة عن طريق الزرار ال برا وحددت الخياطة ولقواعد بردو دخلت لقيت مكتوب طلب الاذن من المخزن وروحت لامين المخزن اعتمدت الاذن ورجعت ضغطت استلام في المخزن وبدأت المرحلة وكمان فيه مراحل نبيظهرش فيها زرار امر الانتاج ولا لوحة التحكم زي الباقي متشالين منهم مش عارف ليه يعني الزرارين دول كانو بيرجعوني لامر التصنيع نفسه او لوحة التحكم برا لكن متشالين منهم اما حوار الاستلام دة غالبا لان المرحلتين دول اتعملوا بعد الزرار واتاكد بردو ان حوار المخزن دة مش موجود فاي مراحل تانية ولا حوار الزرارين بردو"
+        }
+      ],
+      "score": 0.534486553,
+      "source_file": "models/mrp_advance_material_release.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_lane_handoff_furnituremrpproductionlanehandoff": {
+      "code_fingerprint": "fc27cc8f17a053bb271756c02ce5abbf2faf90db16879ef6b1936c7b2c076851",
+      "label": "FurnitureMrpProductionLaneHandoff",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        },
+        {
+          "date": "2026-08-31T20:09:50.738804+00:00",
+          "outcome": "corrected",
+          "q": "يسطا هو ازاي لما دخلت علي مشرف التقديم التجميع لقيت الاصناف اتنقلت لوحدها من التقديم للتجميع منغير اشعار ولا اوافق عليها ولا اي حاجة وكمان هنا انا ضغطت طلب الخامات للشازلونج لقيت بقيت الزراير بتاعت الكنبة الكبيرة والفوتيه اتحولت لبدء المرحلة مع انه مبعتش طلب غير للشازلونج ب"
+        }
+      ],
+      "score": 0.001253469,
+      "source_file": "models/mrp_lane_handoff.py",
+      "status": "contested",
+      "uses": 1,
+      "verdict": "useful"
+    },
+    "models_mrp_lane_handoff_furnituremrpproductionlanehandoff_action_accept_handoff_transfer": {
+      "code_fingerprint": "fc27cc8f17a053bb271756c02ce5abbf2faf90db16879ef6b1936c7b2c076851",
+      "label": ".action_accept_handoff_transfer()",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        }
+      ],
+      "score": 0.999092924,
+      "source_file": "models/mrp_lane_handoff.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_mps_line": {
+      "code_fingerprint": "42392d0f25334e6f6cb7be18862f669cc243dfa6b6739ba51d8c7561fc25ef6c",
+      "label": "mrp_mps_line.py",
+      "last": "2026-08-19T15:12:10.222492+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-19T15:12:10.222492+00:00",
+          "outcome": "useful",
+          "q": "مرحلة التقديم العامل الواحد يقدر في مدة زمنية قيمتها 27 ساعة ينتج 9 كنبات و 9 شازلونج مع العلم ان مدة الدوام 10 ساعات انا هبعتلك طقم من الاطقم بكل مراحله بالمدة الزمنية وعدد العمال وقولي ازاي اربط ال mps بال mrp علي السيستم"
+        },
+        {
+          "date": "2026-08-19T14:52:36.858861+00:00",
+          "outcome": "useful",
+          "q": "بص كل صنف انا هديك محتاج ايه فكل مرحلة بحيث يكون معروف الكنبة مثلا محتاجة ساعتين تقديم و3 تجميع و4 تصنيع دهانات وانت اول ما اكد امر الانتاج هتشوف العمال والضغط عليهم واوتوماتيك هتطلع جدول ليهم للعمال في ال MPS يعني يكون مربوط بامر الانتاج نفسه فاهمني؟"
+        }
+      ],
+      "score": 1.504999141,
+      "source_file": "models/mrp_mps_line.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "models_mrp_mps_schedule_furnituremrpmpsplan": {
+      "code_fingerprint": "3d4a49fdad9c3ca511f173a28b6b77db5ef411b421d29d6564099f0db61315b9",
+      "label": "FurnitureMrpMPSPlan",
+      "last": "2026-08-31T20:58:40.896975+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T20:58:40.896975+00:00",
+          "outcome": "useful",
+          "q": "طيب انا عندي في عمال بيشتغلوا بس مش بيقبضوا الراتب بالوقت بيشتغلوا الراتب بالقطعة يعني بيبقي الراتب بتاعهم بالقطعة لو خلص مثلا قطعة بياخد 100 طيب لو الاسبوع دة خلص 10 قطع يبقي حسابه الف ودة لو غاب او اتاخر كدة كدة الراتب بتاعه مش بيتإثر بس انا عايز يظهر للعمال دول تقرير ليهم كدة يبين هو غاب قد ايه او اتاخر قد ايه علي مدار الشهر وكمان كل الحاجات العقود ال عالسيستم هنا شهرية لا انا عايزها تبقي اسبوعية لانهم بيقبضوا بالاسبوع يعني اقسم الراتب علي 4 واحسب كل واحد حسابه كام وكمان عايزك كل موظف في ال employees ما اخش عالكرات بتاعه او العقد يعني بتاعه يبقي فيه اوبشن التعديل هو بيقبض بالوقت ولا بالانتاج فاهمني يبقي حاجة زي سويتش او فيلد اختار منه حتي"
+        }
+      ],
+      "score": 0.998621645,
+      "source_file": "models/mrp_mps_schedule.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_production_order_furnituremrpbomstage": {
+      "code_fingerprint": "b0df3f72a4c6fb855c17892bfeba9f0eb945f7d981eb609b3f4871f794813cef",
+      "label": "FurnitureMrpBomStage",
+      "last": "2026-08-19T15:12:10.222492+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-19T15:12:10.222492+00:00",
+          "outcome": "useful",
+          "q": "مرحلة التقديم العامل الواحد يقدر في مدة زمنية قيمتها 27 ساعة ينتج 9 كنبات و 9 شازلونج مع العلم ان مدة الدوام 10 ساعات انا هبعتلك طقم من الاطقم بكل مراحله بالمدة الزمنية وعدد العمال وقولي ازاي اربط ال mps بال mrp علي السيستم"
+        }
+      ],
+      "score": 0.752617629,
+      "source_file": "models/mrp_production_order.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_production_order_furnituremrpproductionorder": {
+      "code_fingerprint": "b0df3f72a4c6fb855c17892bfeba9f0eb945f7d981eb609b3f4871f794813cef",
+      "label": "FurnitureMrpProductionOrder",
+      "last": "2026-08-31T20:09:50.738804+00:00",
+      "neg": 5,
+      "provenance": [
+        {
+          "date": "2026-08-31T20:09:50.738804+00:00",
+          "outcome": "corrected",
+          "q": "يسطا هو ازاي لما دخلت علي مشرف التقديم التجميع لقيت الاصناف اتنقلت لوحدها من التقديم للتجميع منغير اشعار ولا اوافق عليها ولا اي حاجة وكمان هنا انا ضغطت طلب الخامات للشازلونج لقيت بقيت الزراير بتاعت الكنبة الكبيرة والفوتيه اتحولت لبدء المرحلة مع انه مبعتش طلب غير للشازلونج ب"
+        },
+        {
+          "date": "2026-08-31T19:16:55.545094+00:00",
+          "outcome": "useful",
+          "q": "عملت قبول الجودة في التقديم جالي الايرور دة مع اني طالب الخامات من الاول للمرحلة"
+        },
+        {
+          "date": "2026-08-22T01:20:20.356015+00:00",
+          "outcome": "useful",
+          "q": "كنت انا عامل تعديلة في التفصيل والكسوة ان دول المرحلتين الوحيدتين ال مش هحتاج عشان اعملهم يكون الصنف نفسه في صالة المرحلة يعني ممكن ابداهم يسحبو خاماتهم وبعدين يبدأو علي طول مش لازم احول الصنف نفسه ليهم فاهمني؟"
+        },
+        {
+          "date": "2026-08-19T15:12:10.222492+00:00",
+          "outcome": "useful",
+          "q": "مرحلة التقديم العامل الواحد يقدر في مدة زمنية قيمتها 27 ساعة ينتج 9 كنبات و 9 شازلونج مع العلم ان مدة الدوام 10 ساعات انا هبعتلك طقم من الاطقم بكل مراحله بالمدة الزمنية وعدد العمال وقولي ازاي اربط ال mps بال mrp علي السيستم"
+        },
+        {
+          "date": "2026-08-19T14:52:36.858861+00:00",
+          "outcome": "useful",
+          "q": "بص كل صنف انا هديك محتاج ايه فكل مرحلة بحيث يكون معروف الكنبة مثلا محتاجة ساعتين تقديم و3 تجميع و4 تصنيع دهانات وانت اول ما اكد امر الانتاج هتشوف العمال والضغط عليهم واوتوماتيك هتطلع جدول ليهم للعمال في ال MPS يعني يكون مربوط بامر الانتاج نفسه فاهمني؟"
+        }
+      ],
+      "score": 3.212921161,
+      "source_file": "models/mrp_production_order.py",
+      "status": "contested",
+      "uses": 11,
+      "verdict": "useful"
+    },
+    "models_mrp_production_order_furnituremrpproductionorder_move_stage_work_to_stock": {
+      "code_fingerprint": "b0df3f72a4c6fb855c17892bfeba9f0eb945f7d981eb609b3f4871f794813cef",
+      "label": "._move_stage_work_to_stock()",
+      "last": "2026-08-31T19:16:55.545094+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T19:16:55.545094+00:00",
+          "outcome": "useful",
+          "q": "عملت قبول الجودة في التقديم جالي الايرور دة مع اني طالب الخامات من الاول للمرحلة"
+        }
+      ],
+      "score": 0.996992545,
+      "source_file": "models/mrp_production_order.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_production_order_furnituremrpstagetransferwizard_prepare_kit_grouped_transfer_lines": {
+      "code_fingerprint": "b0df3f72a4c6fb855c17892bfeba9f0eb945f7d981eb609b3f4871f794813cef",
+      "label": "._prepare_kit_grouped_transfer_lines()",
+      "last": "2026-07-19T18:31:58.917366+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-19T18:31:58.917366+00:00",
+          "outcome": "useful",
+          "q": "Can cost_origin_line_id support a consolidated production-order display without changing Kit worker and quality behavior?"
+        }
+      ],
+      "score": 0.368894689,
+      "source_file": "models/mrp_production_order.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "models_mrp_stage_product_batch_furnituremrpstageproductbatch": {
+      "code_fingerprint": "67644be5a56d1833f49fd6d9bba83c978911587e58b97286279e088b631537d8",
+      "label": "FurnitureMrpStageProductBatch",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        },
+        {
+          "date": "2026-08-31T20:09:50.738804+00:00",
+          "outcome": "corrected",
+          "q": "يسطا هو ازاي لما دخلت علي مشرف التقديم التجميع لقيت الاصناف اتنقلت لوحدها من التقديم للتجميع منغير اشعار ولا اوافق عليها ولا اي حاجة وكمان هنا انا ضغطت طلب الخامات للشازلونج لقيت بقيت الزراير بتاعت الكنبة الكبيرة والفوتيه اتحولت لبدء المرحلة مع انه مبعتش طلب غير للشازلونج ب"
+        }
+      ],
+      "score": 0.001253469,
+      "source_file": "models/mrp_stage_product_batch.py",
+      "status": "contested",
+      "uses": 1,
+      "verdict": "useful"
+    },
+    "models_mrp_stage_transfer_handoff_furnituremrpstagetransferhandoff": {
+      "code_fingerprint": "d711d8b0a27787a488d9be3dfece63b6781e81e6f67cf45756063a4ec885841a",
+      "label": "FurnitureMrpStageTransferHandoff",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        },
+        {
+          "date": "2026-08-31T20:09:50.738804+00:00",
+          "outcome": "corrected",
+          "q": "يسطا هو ازاي لما دخلت علي مشرف التقديم التجميع لقيت الاصناف اتنقلت لوحدها من التقديم للتجميع منغير اشعار ولا اوافق عليها ولا اي حاجة وكمان هنا انا ضغطت طلب الخامات للشازلونج لقيت بقيت الزراير بتاعت الكنبة الكبيرة والفوتيه اتحولت لبدء المرحلة مع انه مبعتش طلب غير للشازلونج ب"
+        }
+      ],
+      "score": 0.001253469,
+      "source_file": "models/mrp_stage_transfer_handoff.py",
+      "status": "contested",
+      "uses": 1,
+      "verdict": "useful"
+    },
+    "models_mrp_store_request_furnituremrpstorerequest": {
+      "code_fingerprint": "d8d627669343c6e4e4fe62be7b70246f1f87ad021700588a9c73c9d2a3cdd8f9",
+      "label": "FurnitureMrpStoreRequest",
+      "last": "2026-08-04T13:35:32.383340+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-04T13:35:32.383340+00:00",
+          "outcome": "useful",
+          "q": "يسطا انا عملت اذن استلام لشوية مراحل في امر التصنيع دة MRP/2026/01121 جيت اضغط علسي زرار استلام من المخزن الموجود برا في الداشبورد بيقولي لا توجد حاليًا أذونات خامات مجمعة مصروفة من المخزن وبانتظار استلام الإنتاج مع ان امين المخزن قبل اذن المخزن عادي"
+        }
+      ],
+      "score": 0.531356551,
+      "source_file": "models/mrp_store_request.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "static_src_js_mrp_stage_dashboard_furnituremrpstagedashboardpage": {
+      "code_fingerprint": "bbb6f5b0e9c5eecb2e1a3af0429b5875da8787af0f60f00c9fd41c070eb44d87",
+      "label": "FurnitureMrpStageDashboardPage",
+      "last": "2026-08-31T21:28:05.243312+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T21:28:05.243312+00:00",
+          "outcome": "useful",
+          "q": "انا عايزك تزودلي زرار عشان لو قفل النوتيفيكيشن يعرف يقبل التحويل وكمان ايه الايرور دة"
+        }
+      ],
+      "score": 0.999092924,
+      "source_file": "static/src/js/mrp_stage_dashboard.js",
+      "status": "tentative",
+      "uses": 1
+    },
+    "tests_test_mps_schedule_testfurnituremrpmpsschedule": {
+      "code_fingerprint": "31b6e23497022394208957c196fd0dd29d563c2026cb0d4b6def0ae2a126b62a",
+      "label": "TestFurnitureMrpMPSSchedule",
+      "last": "2026-08-31T18:30:56.603860+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-31T18:30:56.603860+00:00",
+          "outcome": "useful",
+          "q": "يسطا انا عايزك توقف ال mps هنا لمدة اسبوع خليه يشتغل لكل المراحل ساعتين بس الكلام دة لمدة اسبوع بس بعد كدة يشتغل علي ال mps عادي"
+        }
+      ],
+      "score": 0.996257245,
+      "source_file": "tests/test_mps_schedule.py",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}

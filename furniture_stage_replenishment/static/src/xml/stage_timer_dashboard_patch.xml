@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_stage_replenishment.StageTimerDashboardPatch"
+       t-inherit="furniture_mrp.StageDashboardPage"
+       t-inherit-mode="extension">
+
+        <xpath expr="//span[hasclass('o_furniture_stage_dashboard__product_batch_actions')]" position="inside">
+            <span t-if="batch.timer"
+                  t-att-class="stageTimerClass(batch.timer)">
+                <small t-esc="stageTimerCaption(batch.timer)"/>
+                <strong t-esc="stageTimerValue(batch.timer)"/>
+                <em>
+                    <t t-esc="formatNumber(batch.timer.planned_hours)"/> ساعة مخططة
+                </em>
+            </span>
+            <span t-elif="batch.state === 'in_progress' || batch.started_at || batch.elapsed_seconds"
+                  class="o_furniture_stage_dashboard__product_batch_timer is-replenishment-timer"
+                  t-att-class="{'is-running': batch.state === 'in_progress'}">
+                <small>
+                    <t t-if="batch.finished_at">مدة المرحلة</t>
+                    <t t-else="">وقت التشغيل</t>
+                </small>
+                <strong t-esc="formatBatchElapsed(batch)"/>
+            </span>
+            <button t-if="batch.timer &amp;&amp; batch.timer.can_pause"
+                    type="button" class="btn btn-outline-warning is-timer"
+                    t-att-disabled="stageDashboard.busyBatchToken"
+                    t-on-click="() => this.pauseProductBatchTimer(batch)">
+                <i class="fa fa-pause"/> إيقاف الوقت
+            </button>
+            <button t-if="batch.timer &amp;&amp; batch.timer.can_resume"
+                    type="button" class="btn btn-outline-success is-timer"
+                    t-att-disabled="stageDashboard.busyBatchToken"
+                    t-on-click="() => this.resumeProductBatchTimer(batch)">
+                <i class="fa fa-play"/> استكمال الوقت
+            </button>
+        </xpath>
+
+        <xpath expr="//span[hasclass('o_furniture_order_supervisor_order__actions')]" position="before">
+            <span t-if="order.timer" t-att-class="stageTimerClass(order.timer)">
+                <small t-esc="stageTimerCaption(order.timer)"/>
+                <strong t-esc="stageTimerValue(order.timer)"/>
+                <em><t t-esc="formatNumber(order.timer.planned_hours)"/> ساعة مخططة</em>
+            </span>
+        </xpath>
+
+        <xpath expr="//span[hasclass('o_furniture_order_supervisor_order__actions')]" position="inside">
+            <button t-if="order.timer &amp;&amp; order.timer.can_pause"
+                    type="button" class="btn btn-outline-warning is-timer"
+                    t-att-disabled="stageDashboard.busyOrderActionKey"
+                    t-on-click="() => this.pauseOrderTimer(order)">
+                <i class="fa fa-pause"/> إيقاف الوقت
+            </button>
+            <button t-if="order.timer &amp;&amp; order.timer.can_resume"
+                    type="button" class="btn btn-outline-success is-timer"
+                    t-att-disabled="stageDashboard.busyOrderActionKey"
+                    t-on-click="() => this.resumeOrderTimer(order)">
+                <i class="fa fa-play"/> استكمال الوقت
+            </button>
+        </xpath>
+
+        <xpath expr="//span[hasclass('o_furniture_stage_dashboard__product_group_order_route')]" position="after">
+            <span t-if="contributor.order.timer"
+                  t-att-class="stageTimerClass(contributor.order.timer)">
+                <small t-esc="stageTimerCaption(contributor.order.timer)"/>
+                <strong t-esc="stageTimerValue(contributor.order.timer)"/>
+                <span class="o_furniture_stage_timer__buttons">
+                    <button t-if="contributor.order.timer.can_pause"
+                            type="button" class="btn btn-outline-warning"
+                            t-on-click="() => this.pauseOrderTimer(contributor.order)">
+                        <i class="fa fa-pause"/>
+                    </button>
+                    <button t-if="contributor.order.timer.can_resume"
+                            type="button" class="btn btn-outline-success"
+                            t-on-click="() => this.resumeOrderTimer(contributor.order)">
+                        <i class="fa fa-play"/>
+                    </button>
+                </span>
+            </span>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_spa_service_department_user,spa.service.department user,model_spa_service_department,base.group_user,1,0,0,0
+access_spa_service_department_account,spa.service.department accountant,model_spa_service_department,account.group_account_user,1,1,1,1
+access_mrp_bom_costing_account,MRP BoM costing accountant,mrp.model_mrp_bom,account.group_account_user,1,1,1,1
+access_mrp_bom_line_costing_account,MRP BoM line costing accountant,mrp.model_mrp_bom_line,account.group_account_user,1,1,1,1
+access_spa_costing_period_user,spa.costing.period user,model_spa_costing_period,base.group_user,0,0,0,0
+access_spa_costing_period_account,spa.costing.period accountant,model_spa_costing_period,account.group_account_user,1,1,1,1
+access_spa_costing_department_cost_user,spa.costing.department.cost user,model_spa_costing_department_cost,base.group_user,0,0,0,0
+access_spa_costing_department_cost_account,spa.costing.department.cost accountant,model_spa_costing_department_cost,account.group_account_user,1,1,1,1
+access_spa_costing_result_user,spa.costing.result user,model_spa_costing_result,base.group_user,0,0,0,0
+access_spa_costing_result_account,spa.costing.result accountant,model_spa_costing_result,account.group_account_user,1,1,1,1

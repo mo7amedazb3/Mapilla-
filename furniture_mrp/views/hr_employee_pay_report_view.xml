@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_employee_pay_report_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.employee.pay.report.form</field>
+        <field name="model">furniture.mrp.employee.pay.report</field>
+        <field name="arch" type="xml">
+            <form string="كشف الأجر الأسبوعي والحضور الشهري" create="0" delete="0">
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group string="الموظف وفترة الأجر">
+                            <field name="employee_id"/>
+                            <field name="pay_basis" widget="radio"/>
+                            <field name="week_start"/>
+                            <field name="week_end"/>
+                        </group>
+                        <group string="فترة متابعة الحضور">
+                            <field name="month_start"/>
+                            <field name="month_end"/>
+                            <button name="action_refresh"
+                                    type="object"
+                                    string="تحديث الكشف"
+                                    icon="fa-refresh"
+                                    class="btn-primary"/>
+                        </group>
+                    </group>
+
+                    <separator string="استحقاق الأسبوع"/>
+                    <group>
+                        <group invisible="pay_basis != 'time'">
+                            <field name="fixed_weekly_wage"/>
+                        </group>
+                        <group invisible="pay_basis != 'production'">
+                            <field name="piece_rate"/>
+                            <field name="completed_piece_qty"/>
+                        </group>
+                        <group>
+                            <field name="weekly_pay" class="oe_inline"/>
+                        </group>
+                        <group string="العمل الإضافي">
+                            <field name="week_overtime_hours"/>
+                            <field name="overtime_multiplier"/>
+                            <field name="regular_hour_rate"/>
+                            <field name="overtime_hour_rate"/>
+                            <field name="overtime_amount"/>
+                            <field name="weekly_total_with_overtime"
+                                   class="oe_inline"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert"
+                         invisible="pay_basis != 'production'">
+                        الغياب والتأخير بيانات متابعة فقط ولا يغيران استحقاق عامل الإنتاج.
+                    </div>
+
+                    <separator string="ملخص حضور الفترة"/>
+                    <group>
+                        <group>
+                            <field name="scheduled_days"/>
+                            <field name="attendance_days"/>
+                            <field name="absence_days"/>
+                        </group>
+                        <group>
+                            <field name="late_days"/>
+                            <field name="late_hours"/>
+                            <field name="worked_hours"/>
+                            <field name="attendance_overtime_hours"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="تفاصيل إنتاج الأسبوع"
+                              invisible="pay_basis != 'production'">
+                            <field name="production_line_ids" nolabel="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="completed_at"/>
+                                    <field name="stage"/>
+                                    <field name="operation_name"/>
+                                    <field name="output_summary"/>
+                                    <field name="piece_count" sum="الإجمالي"/>
+                                    <field name="piece_rate"/>
+                                    <field name="amount" sum="الإجمالي"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="تفاصيل الحضور والتأخير">
+                            <field name="attendance_line_ids" nolabel="1">
+                                <list create="0" edit="0" delete="0"
+                                      decoration-danger="status == 'absent'"
+                                      decoration-warning="late_hours &gt; 0">
+                                    <field name="date"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'present'"
+                                           decoration-danger="status == 'absent'"/>
+                                    <field name="scheduled_hours" sum="الإجمالي"/>
+                                    <field name="worked_hours" sum="الإجمالي"/>
+                                    <field name="late_hours" sum="الإجمالي"/>
+                                    <field name="overtime_hours" sum="الإجمالي"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="إغلاق" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

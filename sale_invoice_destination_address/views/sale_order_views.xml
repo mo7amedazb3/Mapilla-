@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_form_destination_address" model="ir.ui.view">
+        <field name="name">sale.order.form.destination.address</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='partner_details']/field[@name='partner_shipping_id']" position="after">
+                <field name="destination_address_id"
+                       string="العنوان"
+                       placeholder="اختر أو أنشئ عنوانًا"
+                       domain="[('company_id', '=', company_id)]"
+                       options="{'no_create_edit': False}"
+                       readonly="state == 'cancel' or locked"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

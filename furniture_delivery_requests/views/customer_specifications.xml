@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_delivery_customer_editor" model="ir.ui.view"><field name="name">furniture.delivery.customer.editor.form</field><field name="model">furniture.delivery.customer.editor</field><field name="arch" type="xml"><form string="اختيارات تسليم المشتري" class="o_furniture_stage_transfer_wizard o_furniture_batch_product_wizard o_delivery_creation_wizard o_company_model_editor">
+                            <header invisible="not context.get('company_standards_page')"><button name="action_save" type="object" string="حفظ الاختيارات" class="btn-primary"/><button name="action_back_to_buyer" type="object" string="رجوع"/></header><field name="available_model_ids" invisible="1"/><field name="current_key" invisible="1"/><field name="draft_data" invisible="1"/><field name="initial_data" invisible="1"/><field name="partner_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="available_product_ids" invisible="1"/>
+                            <section class="mp_creation_banner" dir="rtl"><div><span class="mp_creation_eyebrow">تخصيصات المشتري</span><h2>اختيارات المشتري لكل صنف</h2><p>تنقّل بين الأصناف والموديلات؛ تظل اختيارات كل صنف محفوظة في النافذة حتى تضغط حفظ الاختيارات.</p></div><img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/></section>
+                            <div class="o_furniture_line_quick_choices o_furniture_batch_product_choices">
+                                <field name="model_id" nolabel="1" widget="furniture_quick_card_selector" options="{'no_create': True, 'quick_limit': 4, 'always_show_more': True, 'card_title': 'الموديل', 'card_icon': 'fa-cube', 'card_variant': 'model', 'order_by': 'sequence, name, id'}" domain="[('id', 'in', available_model_ids)]"/>
+                                <field name="product_id" invisible="1"/>
+                            </div>
+                            <field name="draft_data" widget="company_model_overview" nolabel="1" invisible="not model_id"/>
+                            <field name="dimensions_expanded" invisible="1"/>
+                            <field name="upholstery_data" invisible="1"/>
+                            <field name="width_cm" invisible="1"/>
+                            <field name="depth_cm" invisible="1"/>
+                            <field name="height_cm" invisible="1"/>
+                        <footer invisible="context.get('company_standards_page')"><button name="action_save" type="object" string="حفظ الاختيارات" class="btn-primary"/><button string="إلغاء" special="cancel" class="btn-secondary"/></footer></form>
+                    </field></record><record id="view_delivery_buyers_list" model="ir.ui.view">
+        <field name="name">res.partner.delivery.buyers.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="استاندرد شركات" create="0">
+                <field name="name" string="الشركة"/>
+                <field name="phone"/>
+                <field name="mobile" optional="hide"/>
+                <field name="email"/>
+                <field name="city" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_delivery_buyers_kanban" model="ir.ui.view">
+        <field name="name">res.partner.delivery.buyers.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_company_directory" create="0" quick_create="0" records_draggable="0" default_order="name">
+                <field name="name"/><field name="phone"/><field name="email"/><field name="city"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="o_company_directory_card" dir="rtl">
+                            <div class="o_company_directory_top">
+                                <span class="o_company_directory_icon"><i class="fa fa-building-o" aria-hidden="true"/></span>
+                                <span class="o_company_directory_badge">استاندرد الشركة</span>
+                            </div>
+                            <strong class="o_company_directory_name"><field name="name"/></strong>
+                            <div class="o_company_directory_contacts">
+                                <span t-if="record.phone.raw_value"><i class="fa fa-phone" aria-hidden="true"/><field name="phone"/></span>
+                                <span t-if="record.email.raw_value"><i class="fa fa-envelope-o" aria-hidden="true"/><field name="email"/></span>
+                                <span t-if="record.city.raw_value"><i class="fa fa-map-marker" aria-hidden="true"/><field name="city"/></span>
+                            </div>
+                            <div class="o_company_directory_open"><span>الموديلات واختيارات الأقمشة</span><span class="o_company_directory_arrow"><i class="fa fa-angle-left" aria-hidden="true"/></span></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_delivery_customer_summary" model="ir.ui.view">
+        <field name="name">furniture.delivery.customer.spec.summary</field>
+        <field name="model">furniture.delivery.customer.spec</field>
+        <field name="arch" type="xml">
+            <list string="تخصيصات المشتري" create="0" edit="0" delete="0" expand="1" class="o_delivery_customer_summary" default_order="model_id, product_id">
+                <field name="model_id" string="الموديل"/>
+                <field name="product_id" string="الصنف"/>
+                <field name="fabric_summary" widget="delivery_material_summary" string="القماش والكسوة"/>
+                <field name="takawe_summary" widget="delivery_material_summary" string="التكاوي"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_delivery_buyer_form" model="ir.ui.view">
+        <field name="name">res.partner.delivery.buyer.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <form string="الشركة" class="o_company_standards_form" js_class="company_standards_form">
+                <sheet>
+                    <field name="is_company" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name" string="الشركة"/>
+                        <h1><field name="name" placeholder="اسم الشركة" required="1" readonly="1"/></h1>
+                    </div>
+                    <div class="mt-4">
+                        <field name="delivery_custom_ids" nolabel="1" readonly="1" widget="company_standard_models"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_delivery_buyers" model="ir.actions.act_window">
+        <field name="name">استاندرد شركات</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_id" ref="view_delivery_buyers_kanban"/>
+        <field name="domain">[('is_delivery_standard_company', '=', True), ('is_company', '=', True)]</field>
+        <field name="context">{'default_is_company': True, 'default_is_delivery_standard_company': True}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد شركات لعرضها</p>
+            <p>افتح بطاقة الشركة لعرض الموديلات وضبط اختيارات الأقمشة والتكاوي.</p>
+        </field>
+    </record>
+    <record id="action_delivery_buyers_kanban_view" model="ir.actions.act_window.view">
+        <field name="sequence">0</field><field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_delivery_buyers_kanban"/>
+        <field name="act_window_id" ref="action_delivery_buyers"/>
+    </record>
+    <record id="action_delivery_buyers_list_view" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_delivery_buyers_list"/>
+        <field name="act_window_id" ref="action_delivery_buyers"/>
+    </record>
+    <record id="action_delivery_buyers_form_view" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_delivery_buyer_form"/>
+        <field name="act_window_id" ref="action_delivery_buyers"/>
+    </record>
+    <menuitem id="menu_company_standards_root" name="استاندرد شركات" sequence="52" action="action_delivery_buyers"
+              web_icon="furniture_delivery_requests,static/description/icon.svg"
+              groups="base.group_system"/>
+    <menuitem id="menu_delivery_buyers" name="استاندرد شركات" sequence="10" parent="menu_company_standards_root" action="action_delivery_buyers" groups="base.group_system"/>
+    <record id="menu_delivery_buyers" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <record id="view_partner_delivery_customizations" model="ir.ui.view">
+        <field name="name">res.partner.delivery.customizations</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="delivery_customizations" string="تسليمات" groups="base.group_system">
+                    <group>
+                        <field name="is_delivery_standard_company" widget="boolean_toggle"/>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        فعّل السويتش لإضافة جهة الاتصال كشركة داخل تطبيق استاندرد شركات. عند التفعيل تتحول جهة الاتصال إلى شركة تلقائيًا.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="rule_delivery_customer_specs_company" model="ir.rule">
+        <field name="name">تخصيصات التسليم حسب الشركة</field>
+        <field name="model_id" ref="model_furniture_delivery_customer_spec"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_simple_payroll_root" name="Payroll" parent="hr.menu_hr_root" sequence="60" groups="hr.group_hr_user"/>
+
+
+    <menuitem id="menu_simple_payroll_slips" name="Salary Slips"
+              parent="menu_simple_payroll_root" action="action_simple_payroll_slip" sequence="20"
+              groups="hr.group_hr_user"/>
+
+    <menuitem id="menu_simple_payroll_summary" name="Payroll Summary"
+              parent="menu_simple_payroll_root" action="action_simple_payroll_reports" sequence="30"
+              groups="hr.group_hr_user"/>
+</odoo>

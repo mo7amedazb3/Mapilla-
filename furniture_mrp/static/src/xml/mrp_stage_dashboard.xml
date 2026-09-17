@@ -1,0 +1,1196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Primary inheritance is intentional: it changes only the Kanban view
+        carrying js_class="furniture_mrp_stage_dashboard".  The standard
+        Renderer, header buttons and record behavior remain untouched.
+    -->
+    <t t-name="furniture_mrp.StageDashboardKanbanView"
+       t-inherit="web.KanbanView"
+       t-inherit-mode="primary">
+        <xpath expr="//div[@t-ref='root']" position="attributes">
+            <attribute name="class">o_furniture_stage_dashboard_view</attribute>
+        </xpath>
+
+        <!-- The main order dashboard stays intentionally free of search chrome. -->
+        <xpath expr="//t[@t-set-slot='layout-actions']" position="replace">
+            <t t-set-slot="layout-actions"/>
+        </xpath>
+        <xpath expr="//t[@t-set-slot='control-panel-navigation-additional']" position="replace">
+            <t t-set-slot="control-panel-navigation-additional"/>
+        </xpath>
+
+        <!--
+            Keep the production-order dashboard clean.  Stage analytics open
+            from a client button beside the existing batch-material action.
+        -->
+        <xpath expr="//t[@t-set-slot='control-panel-always-buttons']" position="inside">
+            <button t-if="props.showButtons"
+                    type="button"
+                    class="btn btn-secondary o_furniture_stage_analytics_button"
+                    t-on-click="() => this.openStageDashboard()"
+                    title="عرض متابعة وإحصائيات مراحل المصنع">
+                <i class="fa fa-industry" aria-hidden="true"/>
+                <span>المراحل</span>
+            </button>
+        </xpath>
+    </t>
+
+    <t t-name="furniture_mrp.StageDashboardPage">
+        <div class="o_furniture_stage_dashboard_page o_furniture_stage_dashboard_view">
+            <header class="o_furniture_stage_dashboard_page__header" dir="rtl">
+                <div class="o_furniture_stage_dashboard_page__heading">
+                    <span class="o_furniture_stage_dashboard_page__icon" aria-hidden="true">
+                        <i class="fa fa-industry"/>
+                    </span>
+                    <span>
+                        <strong>لوحة تحكم المصنع</strong>
+                        <small t-if="isBatchSupervisorMode">تشغيل أصناف مرحلتك كدفعات مجمعة</small>
+                        <small t-elif="isOrderWorkflowSupervisorMode">تشغيل أوامر مرحلتك ومتابعة خاماتها</small>
+                        <small t-else="">قائمة مستقلة لمتابعة أوامر كل مرحلة وتفاصيل أصنافها</small>
+                    </span>
+                </div>
+                <div t-if="permissions.isManager" class="o_furniture_stage_dashboard__date_filter is-header">
+                    <label class="o_furniture_stage_dashboard__date_field"
+                           t-att-class="{'o_stage_visibility_expired': visibilityDateExpired}">
+                        <span>تاريخ إظهار أوامر الإنتاج</span>
+                        <input type="date" t-att-value="stageDashboard.dateTo"
+                               t-att-disabled="stageDashboard.loading"
+                               t-on-change="(event) => this.onDateToChange(event)"/>
+                    </label>
+                    <button type="button" class="btn btn-primary o_furniture_stage_dashboard__date_apply"
+                            t-att-disabled="stageDashboard.loading" t-on-click="() => this.applyDateFilter()">
+                        <span>تطبيق</span>
+                    </button>
+                </div>
+                <div class="o_furniture_stage_dashboard_page__actions">
+                    <button t-if="!isBatchSupervisorMode and !isOrderWorkflowSupervisorMode and permissions.isManager"
+                            type="button"
+                            class="btn btn-warning o_furniture_stage_dashboard_page__action is-future-orders"
+                            t-on-click="() => this.openFutureDeliveryOrders()">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"/>
+                        <span>طلبات التسليم القادمة</span>
+                    </button>
+                    <button t-if="permissions.canCreateProduction"
+                            type="button"
+                            class="btn btn-primary o_furniture_stage_dashboard_page__action is-new"
+                            t-on-click="() => this.createProductionOrder()">
+                        <i class="fa fa-plus" aria-hidden="true"/>
+                        <span>New</span>
+                    </button>
+                    <button t-if="!isBatchSupervisorMode and !isOrderWorkflowSupervisorMode and permissions.canManageMaterials"
+                            type="button"
+                            class="btn btn-secondary o_furniture_stage_dashboard_page__action is-material-check"
+                            t-on-click="() => this.openBatchMaterialCheckWizard()">
+                        <i class="fa fa-search" aria-hidden="true"/>
+                        <span>فحص المواد المجمع</span>
+                    </button>
+                    <button t-if="!isBatchSupervisorMode and !isOrderWorkflowSupervisorMode and permissions.canManageMaterials"
+                            type="button"
+                            class="btn btn-primary o_furniture_stage_dashboard_page__action is-batch-material"
+                            t-on-click="() => this.openBatchMaterialWizard()">
+                        <i class="fa fa-cubes" aria-hidden="true"/>
+                        <span>إذن خامات لأوامر متعددة</span>
+                    </button>
+                </div>
+            </header>
+            <main class="o_furniture_stage_dashboard_page__body">
+                <t t-call="furniture_mrp.StageDashboardPanel"/>
+            </main>
+        </div>
+    </t>
+
+    <t t-name="furniture_mrp.StageDashboardPanel">
+        <div class="o_furniture_stage_dashboard_workspace"
+             t-att-class="{
+                'is-loading': stageDashboard.loading,
+                'has-error': stageDashboard.error,
+             }"
+             dir="rtl">
+            <!-- Stage navigation lives in its own compact surface. -->
+            <section class="o_furniture_stage_navigation"
+                     aria-label="التنقل بين مراحل التصنيع">
+                <div class="o_furniture_stage_dashboard__heading">
+                    <div class="o_furniture_stage_dashboard__title">
+                        <span class="o_furniture_stage_dashboard__title_icon" aria-hidden="true">
+                            <i class="fa fa-random"/>
+                        </span>
+                        <span>
+                            <strong>مراحل المصنع</strong>
+                            <small>اختار المرحلة لعرض شغلها وإحصائياتها</small>
+                        </span>
+                    </div>
+                    <div class="o_furniture_stage_dashboard__heading_actions">
+                        <button type="button"
+                                class="o_furniture_stage_dashboard__refresh"
+                                t-att-disabled="stageDashboard.loading"
+                                t-on-click="() => this.refreshDashboard()"
+                                title="تحديث بيانات المراحل"
+                                aria-label="تحديث بيانات المراحل">
+                            <i class="fa fa-refresh" t-att-class="{'fa-spin': stageDashboard.loading}"/>
+                        </button>
+                    </div>
+                </div>
+
+                <nav class="o_furniture_stage_dashboard__stages"
+                     aria-label="مراحل التصنيع">
+                    <button t-foreach="stageOptions"
+                            t-as="stage"
+                            t-key="stage.code"
+                            type="button"
+                            class="o_furniture_stage_dashboard__stage"
+                            t-att-class="{
+                                'is-selected': stage.code === selectedStageCode,
+                                'is-pending': stage.code === stageDashboard.pendingStageCode,
+                            }"
+                            t-att-style="stageProgressStyle(stage)"
+                            t-att-title="stage.label"
+                            t-att-aria-pressed="stage.code === selectedStageCode ? 'true' : 'false'"
+                            t-att-disabled="stageDashboard.loading"
+                            t-on-click="() => this.selectStage(stage.code)">
+                        <span class="o_furniture_stage_dashboard__stage_icon" aria-hidden="true">
+                            <span t-if="stage.iconText" t-esc="stage.iconText"/>
+                            <i t-else="" t-att-class="stage.iconClass"/>
+                        </span>
+                        <span class="o_furniture_stage_dashboard__stage_copy">
+                            <strong t-esc="stage.label"/>
+                            <small t-if="!isBatchSupervisorMode">
+                                <t t-esc="formatNumber(stage.order_count)"/> أمر
+                            </small>
+                            <small t-else="">مرحلتك</small>
+                        </span>
+                        <span t-if="!isBatchSupervisorMode"
+                              class="o_furniture_stage_dashboard__stage_percentage">
+                            <t t-esc="formatNumber(stage.progress)"/>%
+                        </span>
+                        <span t-if="!isBatchSupervisorMode"
+                              class="o_furniture_stage_dashboard__stage_track" aria-hidden="true">
+                            <span/>
+                        </span>
+                        <span t-if="!isBatchSupervisorMode"
+                              class="o_furniture_stage_dashboard__stage_check" aria-hidden="true">
+                            <i class="fa fa-check"/>
+                        </span>
+                    </button>
+                </nav>
+            </section>
+
+            <!-- The selected stage's analytics are intentionally separate. -->
+            <section class="o_furniture_stage_dashboard"
+                     t-att-class="{'is-order-supervisor-mode': isOrderWorkflowSupervisorMode}"
+                     aria-label="ملخص المرحلة المختارة">
+                <div class="o_furniture_stage_dashboard__heading">
+                <div class="o_furniture_stage_dashboard__title">
+                    <span class="o_furniture_stage_dashboard__title_icon" aria-hidden="true">
+                        <i class="fa fa-industry"/>
+                    </span>
+                    <span>
+                        <strong>
+                            ملخص مرحلة <t t-if="selectedStage" t-esc="selectedStage.label"/>
+                        </strong>
+                        <small t-if="isBatchSupervisorMode">كل صنف ظاهر كدفعة واحدة مستقلة</small>
+                        <small t-elif="isOrderWorkflowSupervisorMode">حدد أمرًا أو أكثر، والمؤشرات هتتحسب من اختيارك فورًا</small>
+                        <small t-else="">اضغط على أي مؤشر لعرض أوامر الإنتاج المكوِّنة له</small>
+                    </span>
+                </div>
+                <div class="o_furniture_stage_dashboard__heading_actions">
+                    <span class="o_furniture_stage_dashboard__current" t-if="selectedStage">
+                        <i t-att-class="selectedStage.iconClass" aria-hidden="true"/>
+                        <span t-esc="selectedStage.label"/>
+                    </span>
+                </div>
+            </div>
+
+            <div class="o_furniture_stage_dashboard__status"
+                 role="status"
+                 aria-live="polite">
+                <div t-if="stageDashboard.error" class="o_furniture_stage_dashboard__message is-error">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                    <span t-esc="stageDashboard.error"/>
+                </div>
+                <div t-elif="stageDashboard.loading" class="o_furniture_stage_dashboard__message is-loading">
+                    <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"/>
+                    <span t-if="isBatchSupervisorMode">جاري تحميل أصناف المرحلة…</span>
+                    <span t-else="">جاري تحميل أوامر المرحلة…</span>
+                </div>
+            </div>
+
+            <section t-if="stageDashboard.hasPayload and pendingHandoffs.length"
+                     class="o_furniture_stage_dashboard__handoffs"
+                     aria-label="التحويلات المعلقة في انتظار قبول المشرف">
+                <header>
+                    <span>
+                        <i class="fa fa-exchange" aria-hidden="true"/>
+                        <strong>تحويلات بانتظار قبولك</strong>
+                    </span>
+                    <small>
+                        التنبيه ممكن يتقفل، لكن التحويل يفضل هنا لحد ما تقبله.
+                    </small>
+                </header>
+                <article t-foreach="pendingHandoffs"
+                         t-as="handoff"
+                         t-key="handoff.key">
+                    <span class="o_furniture_stage_dashboard__handoff_copy">
+                        <strong t-esc="handoff.title"/>
+                        <small t-esc="handoff.message"/>
+                    </span>
+                    <button type="button"
+                            class="btn btn-warning"
+                            t-att-disabled="stageDashboard.busyHandoffKey || !handoff.quality_ready"
+                            title="جودة الكسوة تُقبل يدويًا قبل إدخالها إلى صالة التغليف"
+                            t-on-click="() => this.acceptPendingHandoff(handoff)">
+                        <i t-att-class="stageDashboard.busyHandoffKey === handoff.key ? 'fa fa-spinner fa-spin' : 'fa fa-check-circle'"
+                           aria-hidden="true"/>
+                        <span>
+                            <t t-if="stageDashboard.busyHandoffKey === handoff.key">جاري القبول...</t>
+                            <t t-else="">قبول التحويل</t>
+                        </span>
+                    </button>
+                    <div t-if="handoff.quality_rows.length" class="o_furniture_incoming_quality">
+                        <strong>فحص جودة الكسوة قبل استلام التغليف</strong>
+                        <div t-foreach="handoff.quality_rows" t-as="row" t-key="row.key" class="o_furniture_manual_quality">
+                            <span><t t-esc="row.product_name"/> — <t t-esc="formatNumber(row.quantity)"/> وحدة</span>
+                            <span t-att-class="'o_furniture_quality_state is-' + row.state" t-esc="qualityStateLabel(row.state)"/>
+                            <button type="button" class="btn btn-outline-success" t-att-disabled="stageDashboard.busyHandoffKey || row.state === 'pass'" t-on-click="() => this.reviewHandoffQuality(handoff, row, 'pass')">قبول الجودة</button>
+                            <button type="button" class="btn btn-outline-danger" t-att-disabled="stageDashboard.busyHandoffKey || row.state === 'reject'" t-on-click="() => this.reviewHandoffQuality(handoff, row, 'reject')">رفض الجودة</button>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <t t-if="stageDashboard.hasPayload and selectedStage">
+                <t t-if="isBatchSupervisorMode">
+                    <section class="o_furniture_supervisor_dashboard"
+                             t-att-class="{'is-compact-batches': ['priming', 'painting', 'carpentry', 'bases', 'finishing'].includes(selectedStageCode)}"
+                             aria-label="تشغيل أصناف المرحلة">
+                        <div class="o_furniture_stage_dashboard__metrics is-supervisor-batch">
+                            <div class="o_furniture_stage_dashboard__metric is-planned is-active is-supervisor-batch">
+                                <span class="o_furniture_stage_dashboard__metric_icon" aria-hidden="true">
+                                    <i class="fa fa-calendar-check-o"/>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__metric_copy">
+                                    <small>الكمية المخططة</small>
+                                    <strong t-esc="formatNumber(selectedStage.planned_qty)"/>
+                                </span>
+                            </div>
+                        </div>
+
+                        <section class="o_furniture_stage_dashboard__details is-planned is-supervisor-batch"
+                                 aria-live="polite">
+                            <header class="o_furniture_stage_dashboard__details_header">
+                                <span class="o_furniture_stage_dashboard__details_icon" aria-hidden="true">
+                                    <i t-att-class="selectedStage.iconClass"/>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__details_title">
+                                    <small>تشغيل مرحلة <t t-esc="selectedStage.label"/></small>
+                                    <strong>دفعات الأصناف</strong>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__details_total">
+                                    <t t-esc="formatNumber(selectedStage.planned_qty)"/> وحدة
+                                </span>
+                                <span class="o_furniture_stage_dashboard__batch_bulk_actions">
+                                    <span t-if="hasSelectedRequestMaterialBatches"
+                                          class="o_furniture_stage_dashboard__batch_selected_count">
+                                        تم تحديد <t t-esc="selectedRequestMaterialBatches.length"/>
+                                    </span>
+                                    <button type="button"
+                                            class="btn btn-primary o_furniture_stage_dashboard__batch_request_selected"
+                                            t-att-disabled="!hasSelectedRequestMaterialBatches || stageDashboard.busyBatchToken"
+                                            t-on-click="requestSelectedProductBatchMaterials">
+                                        <i t-att-class="stageDashboard.busyBatchToken === '__bulk_material_request__' ? 'fa fa-spinner fa-spin' : 'fa fa-cubes'"
+                                           aria-hidden="true"/>
+                                        <span>طلب الخامات</span>
+                                    </button>
+                                </span>
+                            </header>
+
+                            <div t-if="supervisorProductBatches.length"
+                                 class="o_furniture_stage_dashboard__product_groups">
+                                <article t-foreach="supervisorProductBatches"
+                                         t-as="batch"
+                                         t-key="batch.batch_token"
+                                         t-att-class="'o_furniture_stage_dashboard__product_group is-supervisor-batch ' + (isProductBatchSelected(batch.batch_token) ? 'is-selected ' : '') + (batch.modelStart ? 'is-model-start ' : '') + (batch.toneClass || '') + ' is-state-' + (batch.stateClass || 'remaining')">
+                                    <div class="o_furniture_stage_dashboard__product_group_summary is-supervisor-batch">
+                                        <label class="o_furniture_stage_dashboard__product_batch_selector"
+                                               t-att-title="batch.can_request_materials ? 'تحديد الصنف لطلب الخامات' : 'طلب الخامات غير متاح لهذا الصنف حاليًا'"
+                                               t-on-click.stop="() => {}">
+                                            <input type="checkbox"
+                                                   t-att-checked="isProductBatchSelected(batch.batch_token)"
+                                                   t-att-disabled="!batch.can_request_materials || stageDashboard.busyBatchToken"
+                                                   t-on-change="(event) => this.toggleProductBatchSelection(batch, event)"
+                                                   t-att-aria-label="'تحديد ' + (batch.product.product_name || 'الصنف') + ' لطلب الخامات'"/>
+                                            <span aria-hidden="true"/>
+                                        </label>
+                                        <span class="o_furniture_stage_dashboard__product_group_identity">
+                                            <span class="o_furniture_stage_dashboard__product_group_identity_line">
+                                                <span class="o_furniture_stage_dashboard__product_group_model">
+                                                    <small>الموديل</small>
+                                                    <strong t-esc="batch.product.model_name || 'بدون موديل'"/>
+                                                </span>
+                                                <span class="o_furniture_stage_dashboard__product_group_product">
+                                                    <small>الصنف</small>
+                                                    <strong t-esc="batch.product.product_name || 'صنف غير مسجل'"/>
+                                                </span>
+                                                <em t-if="batch.product.dimension_label"
+                                                    class="o_furniture_stage_dashboard__product_group_dimension">
+                                                    المقاس: <t t-esc="batch.product.dimension_label"/> سم
+                                                </em>
+                                            </span>
+<span t-if="batch.delivery_notes &amp;&amp; batch.delivery_notes.length" class="o_delivery_set_supervisor_notes">
+                                                <span t-foreach="batch.delivery_notes" t-as="note" t-key="note.id"><b>ملاحظات: </b><small t-if="batch.delivery_notes.length &gt; 1" t-esc="note.reference"/> <span t-esc="note.text"/></span>
+                                            </span>
+                                        </span>
+
+                                        <span class="o_furniture_stage_dashboard__product_group_quantities is-supervisor-single">
+                                            <span t-att-class="'is-' + batch.stateClass">
+                                                <small t-esc="batch.state_label"/>
+                                                <strong t-esc="batch.quantityLabel"/>
+                                            </span>
+                                        </span>
+
+                                        <span class="o_furniture_stage_dashboard__product_batch_actions">
+                                            <span t-if="batch.timer"
+                                                  t-att-class="stageTimerClass(batch.timer)">
+                                                <small t-esc="stageTimerCaption(batch.timer)"/>
+                                                <strong t-esc="stageTimerValue(batch.timer)"/>
+                                                <em>
+                                                    <t t-esc="formatNumber(batch.timer.planned_hours)"/> ساعة مخططة
+                                                </em>
+                                            </span>
+                                            <span t-elif="batch.state === 'in_progress' || batch.started_at || batch.elapsed_seconds"
+                                                  class="o_furniture_stage_dashboard__product_batch_timer"
+                                                  t-att-class="{'is-running': batch.state === 'in_progress'}">
+                                                <small>
+                                                    <t t-if="batch.finished_at">مدة المرحلة</t>
+                                                    <t t-else="">وقت التشغيل</t>
+                                                </small>
+                                                <strong t-esc="formatBatchElapsed(batch)"/>
+                                            </span>
+                                            <button t-if="batch.can_request_materials"
+                                                    type="button"
+                                                    class="btn btn-primary is-request-materials"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.requestProductBatchMaterials(batch)">
+                                                <i t-att-class="isProductBatchBusy(batch.batch_token) ? 'fa fa-spinner fa-spin' : 'fa fa-cubes'"
+                                                   aria-hidden="true"/>
+                                                <span>طلب الخامات</span>
+                                            </button>
+                                            <button t-if="batch.can_receive_materials"
+                                                    type="button"
+                                                    class="btn btn-warning is-receive-materials"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.receiveProductBatchMaterials(batch)">
+                                                <i t-att-class="isProductBatchBusy(batch.batch_token) ? 'fa fa-spinner fa-spin' : 'fa fa-download'"
+                                                   aria-hidden="true"/>
+                                                <span>استلام في صالة المرحلة</span>
+                                            </button>
+                                            <button t-if="batch.can_start"
+                                                    type="button"
+                                                    class="btn btn-primary is-start"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.startProductBatch(batch)">
+                                                <i t-att-class="isProductBatchBusy(batch.batch_token) ? 'fa fa-spinner fa-spin' : 'fa fa-play'"
+                                                   aria-hidden="true"/>
+                                                <span>بدء المرحلة</span>
+                                            </button>
+                                            <span t-if="batch.can_review_quality" class="o_furniture_manual_quality">
+                                                <span t-att-class="'o_furniture_quality_state is-' + batch.manual_quality_state" t-esc="qualityStateLabel(batch.manual_quality_state)"/>
+                                                <button type="button" class="btn btn-outline-success" t-att-disabled="stageDashboard.busyBatchToken || batch.manual_quality_state === 'pass'" t-on-click="() => this.reviewProductBatchQuality(batch, 'pass')">قبول الجودة</button>
+                                                <button type="button" class="btn btn-outline-danger" t-att-disabled="stageDashboard.busyBatchToken || batch.manual_quality_state === 'reject'" t-on-click="() => this.reviewProductBatchQuality(batch, 'reject')">رفض الجودة</button>
+                                            </span>
+                                            <button t-if="batch.can_finish"
+                                                    type="button"
+                                                    class="btn btn-danger is-finish"
+                                                    t-att-disabled="stageDashboard.busyBatchToken || !batch.quality_ready"
+                                                    title="اقبل جودة الصنف أولًا، ثم أنهِ المرحلة يدويًا"
+                                                    t-on-click="() => this.finishProductBatch(batch)">
+                                                <i t-att-class="isProductBatchBusy(batch.batch_token) ? 'fa fa-spinner fa-spin' : 'fa fa-stop'"
+                                                   aria-hidden="true"/>
+                                                <span>إنهاء المرحلة</span>
+                                            </button>
+                                            <button t-if="batch.can_open_bom"
+                                                    type="button"
+                                                    class="btn btn-secondary is-bom"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.openProductBatchBom(batch)">
+                                                <i class="fa fa-book" aria-hidden="true"/>
+                                                <span>عرض BoM</span>
+                                            </button>
+                                            <button t-if="canSendProductionWarning"
+                                                    type="button"
+                                                    class="btn btn-outline-warning is-production-warning"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.openProductBatchWarning(batch)">
+                                                <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                                                <span>تحذيرات الإنتاج</span>
+                                            </button>
+                                            <button t-if="batch.timer &amp;&amp; batch.timer.can_pause"
+                                                    type="button"
+                                                    class="btn btn-outline-warning is-timer"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.pauseProductBatchTimer(batch)">
+                                                <i class="fa fa-pause"/> إيقاف الوقت
+                                            </button>
+                                            <button t-if="batch.timer &amp;&amp; batch.timer.can_resume"
+                                                    type="button"
+                                                    class="btn btn-outline-success is-timer"
+                                                    t-att-disabled="stageDashboard.busyBatchToken"
+                                                    t-on-click="() => this.resumeProductBatchTimer(batch)">
+                                                <i class="fa fa-play"/> استكمال الوقت
+                                            </button>
+                                        </span>
+                                    </div>
+                                </article>
+                            </div>
+                            <div t-else="" class="o_furniture_stage_dashboard__details_empty">
+                                لا توجد أصناف لها كمية مخططة في هذه المرحلة حاليًا.
+                            </div>
+                        </section>
+                    </section>
+                </t>
+                <t t-elif="isOrderWorkflowSupervisorMode">
+                    <t t-call="furniture_mrp.StageDashboardOrderSupervisor"/>
+                </t>
+                <t t-else="">
+                <div class="o_furniture_stage_dashboard__metrics">
+                    <button t-foreach="summaryMetrics"
+                            t-as="metric"
+                            t-key="metric.key"
+                            type="button"
+                            class="o_furniture_stage_dashboard__metric"
+                            t-att-class="'is-' + metric.tone + (stageDashboard.selectedMetricKey === metric.key ? ' is-active' : '')"
+                            t-att-disabled="stageDashboard.loading || metric.value &lt;= 0"
+                            t-att-aria-expanded="stageDashboard.selectedMetricKey === metric.key ? 'true' : 'false'"
+                            t-att-aria-label="'عرض تفاصيل ' + metric.label"
+                            t-on-click="() => this.toggleMetricDetails(metric.key)">
+                        <span class="o_furniture_stage_dashboard__metric_icon" aria-hidden="true">
+                            <i t-att-class="metric.icon"/>
+                        </span>
+                        <span class="o_furniture_stage_dashboard__metric_copy">
+                            <small t-esc="metric.label"/>
+                            <strong t-esc="formatNumber(metric.value)"/>
+                        </span>
+                        <span class="o_furniture_stage_dashboard__metric_hint" aria-hidden="true">
+                            <i class="fa fa-chevron-left"/>
+                        </span>
+                    </button>
+                </div>
+
+                <section t-if="selectedMetric"
+                         class="o_furniture_stage_dashboard__details"
+                         t-att-class="'is-' + selectedMetric.tone"
+                         aria-live="polite">
+                    <header class="o_furniture_stage_dashboard__details_header">
+                        <span class="o_furniture_stage_dashboard__details_icon" aria-hidden="true">
+                            <i t-att-class="selectedMetric.icon"/>
+                        </span>
+                        <span class="o_furniture_stage_dashboard__details_title">
+                            <small>تفاصيل <t t-esc="selectedStage.label"/></small>
+                            <strong t-esc="selectedMetric.label"/>
+                        </span>
+                        <span class="o_furniture_stage_dashboard__details_total"
+                              t-esc="metricDetailTotalLabel"/>
+                        <button type="button"
+                                class="o_furniture_stage_dashboard__details_close"
+                                t-on-click="() => this.closeMetricDetails()"
+                                title="إغلاق التفاصيل"
+                                aria-label="إغلاق التفاصيل">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </header>
+
+                    <div t-if="metricWorkingBreakdown"
+                        class="o_furniture_stage_dashboard__working_summary">
+                        <span class="is-total">
+                            <small>إجمالي المخطط للمرحلة</small>
+                            <strong t-esc="metricWorkingBreakdown.currentLabel"/>
+                        </span>
+                        <span class="is-working">
+                            <small>قيد التشغيل الآن</small>
+                            <strong t-esc="metricWorkingBreakdown.workingLabel"/>
+                        </span>
+                        <span class="is-not-working"
+                              title="الكمية المؤكدة التي لم يُضغط لها بدء العمل بعد">
+                            <small>متبقي لم يبدأ</small>
+                            <strong t-esc="metricWorkingBreakdown.notWorkingLabel"/>
+                        </span>
+                    </div>
+
+                    <div t-if="isOrderMetric and metricDetailRows.length"
+                         class="o_furniture_stage_dashboard__details_rows">
+                        <t t-foreach="metricDetailRows"
+                           t-as="row"
+                           t-key="row.order.id">
+                            <t t-call="furniture_mrp.StageDashboardOrderCard">
+                                <t t-set="order" t-value="{...row.order, toneClass: row.toneClass}"/>
+                            </t>
+                            <span t-if="!row_last"
+                                  class="o_furniture_stage_dashboard__order_separator"
+                                  aria-hidden="true"/>
+                        </t>
+                    </div>
+                    <div t-elif="metricProductRows.length"
+                         class="o_furniture_stage_dashboard__product_groups">
+                        <details t-foreach="metricProductRows"
+                                 t-as="row"
+                                 t-key="row.key"
+                                 t-att-class="'o_furniture_stage_dashboard__product_group ' + (row.modelStart ? 'is-model-start ' : '') + (row.toneClass || '')">
+                            <summary class="o_furniture_stage_dashboard__product_group_summary">
+                                <span class="o_furniture_stage_dashboard__product_group_identity">
+                                    <small>الموديل</small>
+                                    <span class="o_furniture_stage_dashboard__product_group_identity_line">
+                                        <span class="o_furniture_stage_dashboard__product_group_model">
+                                            <strong t-esc="row.product.model_name || 'بدون موديل'"/>
+                                        </span>
+                                        <span class="o_furniture_stage_dashboard__product_group_product">
+                                            <small>الصنف</small>
+                                            <strong t-esc="row.product.product_name || 'صنف غير مسجل'"/>
+                                        </span>
+                                        <em t-if="row.product.dimension_label"
+                                            class="o_furniture_stage_dashboard__product_group_dimension">
+                                            المقاس: <t t-esc="row.product.dimension_label"/> سم
+                                        </em>
+                                    </span>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__product_group_customers">
+                                    <span>
+                                        <small>المشتري</small>
+                                        <strong t-esc="row.buyerSummary"/>
+                                    </span>
+                                    <span>
+                                        <small>المستفيد</small>
+                                        <strong t-esc="row.beneficiarySummary"/>
+                                    </span>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__product_group_quantities">
+                                    <span class="is-working">
+                                        <small>قيد التشغيل</small>
+                                        <strong t-esc="formatProductQuantity(row.working_qty, row.product)"/>
+                                    </span>
+                                    <span class="is-completed">
+                                        <small>القطع المكتملة</small>
+                                        <strong t-esc="formatProductQuantity(row.completed_qty, row.product)"/>
+                                    </span>
+                                    <span class="is-remaining">
+                                        <small>المتبقي</small>
+                                        <strong t-esc="formatProductQuantity(row.remaining_qty, row.product)"/>
+                                    </span>
+                                </span>
+                                <span class="o_furniture_stage_dashboard__product_group_expand">
+                                    تفاصيل الأوامر <i class="fa fa-chevron-down"/>
+                                </span>
+                            </summary>
+                            <div class="o_furniture_stage_dashboard__product_group_orders">
+                                <article t-foreach="row.contributors"
+                                         t-as="contributor"
+                                         t-key="contributor.order.id"
+                                         class="o_furniture_stage_dashboard__product_group_order">
+                                    <span class="o_furniture_stage_dashboard__product_group_order_ref">
+                                        <small>مرجع أمر الإنتاج</small>
+                                        <strong t-esc="contributor.order.name"/>
+                                        <em t-esc="contributor.order.state_label || '—'"/>
+                                    </span>
+                                    <span class="o_furniture_stage_dashboard__product_group_order_team">
+                                        <small>المسؤول / رئيس القسم</small>
+                                        <strong>
+                                            <t t-esc="contributor.order.responsible_name || '—'"/>
+                                            <t t-if="contributor.order.foreman_name">
+                                                · <t t-esc="contributor.order.foreman_name"/>
+                                            </t>
+                                        </strong>
+                                        <em t-if="contributor.order.worker_names.length">
+                                            العمال: <t t-esc="contributor.order.worker_names.join('، ')"/>
+                                        </em>
+                                    </span>
+                                    <span class="o_furniture_stage_dashboard__product_group_order_customer">
+                                        <small>المشتري / المستفيد</small>
+                                        <strong>
+                                            <t t-esc="contributor.buyerNames.join('، ') || '—'"/>
+                                            <t> / </t>
+                                            <t t-esc="contributor.beneficiaryNames.join('، ') || '—'"/>
+                                        </strong>
+                                        <em t-if="contributor.kitNames.length">
+                                            الطقم: <t t-esc="contributor.kitNames.join('، ')"/>
+                                        </em>
+                                    </span>
+                                    <span class="o_furniture_stage_dashboard__product_group_order_route">
+                                        <small>المسار</small>
+                                        <strong t-esc="contributor.routeSummaries.join('، ') || contributor.order.stage_label || '—'"/>
+                                        <em>
+                                            <t t-esc="formatDateTime(contributor.order.stage_date_start)"/>
+                                            <t> — </t>
+                                            <t t-esc="formatDateTime(contributor.order.date_planned_finish)"/>
+                                        </em>
+                                    </span>
+                                    <span t-if="contributor.order.timer"
+                                          t-att-class="stageTimerClass(contributor.order.timer)">
+                                        <small t-esc="stageTimerCaption(contributor.order.timer)"/>
+                                        <strong t-esc="stageTimerValue(contributor.order.timer)"/>
+                                        <span class="o_furniture_stage_timer__buttons">
+                                            <button t-if="contributor.order.timer.can_pause"
+                                                    type="button"
+                                                    class="btn btn-outline-warning"
+                                                    t-on-click="() => this.pauseOrderTimer(contributor.order)">
+                                                <i class="fa fa-pause"/>
+                                            </button>
+                                            <button t-if="contributor.order.timer.can_resume"
+                                                    type="button"
+                                                    class="btn btn-outline-success"
+                                                    t-on-click="() => this.resumeOrderTimer(contributor.order)">
+                                                <i class="fa fa-play"/>
+                                            </button>
+                                        </span>
+                                    </span>
+                                    <span class="o_furniture_stage_dashboard__product_group_order_value">
+                                        <small t-esc="selectedMetric.label"/>
+                                        <strong t-esc="contributor.contributionLabel"/>
+                                    </span>
+                                    <button type="button"
+                                            class="o_furniture_stage_dashboard__product_group_order_open"
+                                            t-on-click="() => this.openProductionOrder(contributor.order.id)">
+                                        فتح الأمر <i class="fa fa-external-link"/>
+                                    </button>
+                                </article>
+                            </div>
+                        </details>
+                    </div>
+                    <div t-else="" class="o_furniture_stage_dashboard__details_empty">
+                        لا توجد أصناف داخلة في هذا المؤشر حاليًا.
+                    </div>
+                </section>
+
+                <div class="o_furniture_stage_dashboard__progress">
+                    <div class="o_furniture_stage_dashboard__progress_heading">
+                        <span>
+                            تقدم مرحلة <strong t-esc="selectedStage.label"/>
+                        </span>
+                        <strong class="o_furniture_stage_dashboard__progress_value">
+                            <t t-esc="formatNumber(selectedStage.progress)"/>%
+                        </strong>
+                    </div>
+                    <div class="o_furniture_stage_dashboard__segments"
+                         role="img"
+                         t-att-aria-label="'نسبة تقدم مرحلة ' + selectedStage.label + ' ' + formatNumber(selectedStage.progress) + '%'">
+                        <span t-foreach="progressSegments"
+                              t-as="segment"
+                              t-key="segment.key"
+                              class="o_furniture_stage_dashboard__segment"
+                              t-att-class="'is-' + segment.tone"
+                              t-att-style="segment.style"
+                              t-att-title="segment.label + ': ' + formatNumber(segment.value)"/>
+                    </div>
+                    <div class="o_furniture_stage_dashboard__legend">
+                        <span t-foreach="progressSegments"
+                              t-as="segment"
+                              t-key="segment.key"
+                              t-att-class="'is-' + segment.tone">
+                            <i aria-hidden="true"/>
+                            <span t-esc="segment.label"/>
+                            <strong t-esc="formatNumber(segment.value)"/>
+                        </span>
+                    </div>
+                </div>
+                </t>
+
+                <div t-if="!isBatchSupervisorMode and !isOrderWorkflowSupervisorMode and !stageDashboard.loading and !stageDashboard.orderIds.length"
+                     class="o_furniture_stage_dashboard__empty"
+                     role="status">
+                    <i t-att-class="selectedStage.iconClass" aria-hidden="true"/>
+                    <strong>لا توجد أوامر مؤكدة مخططة لهذه المرحلة</strong>
+                    <small>اختر مرحلة أخرى أو أكّد أمر إنتاج يحتوي على هذه المرحلة.</small>
+                </div>
+            </t>
+            </section>
+            <t t-call="furniture_mrp.StageDashboardOrderImage"/>
+        </div>
+    </t>
+
+    <t t-name="furniture_mrp.StageDashboardOrderSupervisor">
+        <section class="o_furniture_order_supervisor_dashboard"
+                 aria-label="أوامر تشغيل المرحلة">
+            <div t-if="orderSupervisorOrders.length"
+                 class="o_furniture_order_supervisor_orders">
+                <t t-foreach="orderSupervisorOrders" t-as="order" t-key="order.id">
+                    <t t-call="furniture_mrp.StageDashboardOrderCard"/>
+                </t>
+            </div>
+            <div t-else="" class="o_furniture_order_supervisor_dashboard__empty">
+                <i t-att-class="selectedStage.iconClass" aria-hidden="true"/>
+                <strong>لا توجد أوامر مؤكدة في هذه المرحلة حاليًا</strong>
+            </div>
+        </section>
+
+    </t>
+
+    <t t-name="furniture_mrp.StageDashboardOrderCard">
+        <details t-att-class="'o_furniture_order_supervisor_order ' + (order.modelStart ? 'is-model-start ' : '') + (order.toneClass || '') + (showOrderTextileDetails ? ' is-textile-order-card' : '') + (isOrderWorkflowSupervisorMode ? (isSupervisorOrderSelected(order.id) ? ' is-selected' : '') : ' is-admin-order-card')">
+            <summary class="o_furniture_order_compact_summary">
+                <span class="o_furniture_order_compact_model"><small t-esc="order.textile_kit ? 'طقم كامل' : (order.textile_loose ? 'قطع منفردة' : 'الموديل')"/><strong t-esc="order.model_name || 'بدون موديل'"/></span>
+                <span><small>المشتري</small><strong t-esc="order.buyer_summary || '—'"/></span>
+                <span><small t-esc="showOrderTextileDetails ? 'المستهلك' : 'المستفيد'"/><strong t-esc="order.beneficiary_summary || '—'"/></span>
+                <span t-if="order.timer" class="o_furniture_order_compact_timer">
+                    <small t-esc="selectedStageCode === 'upholstery' ? 'وقت الكسوة' : stageTimerCaption(order.timer)"/>
+                    <strong dir="ltr" t-esc="stageTimerValue(order.timer)"/>
+                </span>
+                <span t-elif="order.textile_kit" class="o_furniture_order_compact_timer"><small>الوقت المخطط للطقم</small><strong><t t-esc="formatNumber(order.kit_planned_hours)"/> ساعة</strong></span>
+                <span t-elif="selectedStageCode === 'upholstery'" class="o_furniture_order_compact_timer"><small>وقت الكسوة</small><strong>لم يبدأ</strong></span>
+                <span class="o_furniture_order_compact_hint"><small class="is-closed">عرض التفاصيل</small><small class="is-open">إخفاء التفاصيل</small><i class="fa fa-chevron-down" aria-hidden="true"/></span>
+            </summary>
+            <div t-if="order.delivery_notes &amp;&amp; order.delivery_notes.length" class="o_delivery_set_supervisor_notes">
+                <div t-foreach="order.delivery_notes" t-as="note" t-key="note.id"><b>ملاحظات: </b><span t-esc="note.text"/></div>
+            </div>
+            <header class="o_furniture_order_supervisor_order__header">
+                <label t-if="isOrderWorkflowSupervisorMode &amp;&amp; !showOrderTextileDetails" class="o_furniture_order_supervisor_order__select"
+                       t-att-title="isSupervisorOrderSelected(order.id) ? 'إلغاء تحديد الأمر' : 'تحديد الأمر لحساب المؤشرات'">
+                    <input type="checkbox"
+                           t-att-checked="isSupervisorOrderSelected(order.id)"
+                           t-on-change="() => this.toggleSupervisorOrderSelection(order.id)"/>
+                    <span aria-hidden="true">
+                        <i class="fa fa-check"/>
+                    </span>
+                    <strong>تحديد</strong>
+                </label>
+
+                <span t-if="!showOrderTextileDetails" class="o_furniture_order_supervisor_order__identity">
+                        <small>أمر الإنتاج</small>
+                        <strong t-esc="order.name"/>
+                        <span class="o_furniture_order_supervisor_order__customers">
+                            <em>
+                                المشتري: <t t-esc="order.buyer_summary || '—'"/>
+                            </em>
+                            <em>
+                                المستفيد: <t t-esc="order.beneficiary_summary || '—'"/>
+                            </em>
+                        </span>
+                </span>
+
+                <span class="o_furniture_order_supervisor_order__stage_overview">
+                    <span t-if="showOrderTextileDetails &amp;&amp; !order.textile_kit &amp;&amp; !order.textile_loose" class="o_furniture_textile_order_parties">
+                        <span class="o_furniture_textile_order_party is-reference">
+                            <span class="o_furniture_textile_order_reference">
+                                <small>أمر الإنتاج</small>
+                                <b dir="auto" t-esc="order.name"/>
+                            </span>
+                        </span>
+                    </span>
+                    <span t-if="order.model_name &amp;&amp; !showOrderTextileDetails"
+                          class="o_furniture_order_supervisor_order__model"
+                          t-att-title="order.model_name">
+                        <small>الموديل</small>
+                        <strong t-esc="order.model_name"/>
+                    </span>
+                    <span class="o_furniture_order_supervisor_order__status"
+                          t-att-class="'is-' + order.operational_state"
+                          t-att-title="order.material_shortage_details || order.operational_state_label">
+                        <i aria-hidden="true"/>
+                        <span>
+                            <small>حالة المرحلة</small>
+                            <strong t-esc="order.operational_state_label"/>
+                        </span>
+                    </span>
+                </span>
+
+                <button t-if="order.has_order_image"
+                        type="button"
+                        class="o_furniture_order_supervisor_order__image"
+                        t-on-click="() => this.openOrderImage(order)"
+                        title="اضغط لتكبير صورة أمر الإنتاج"
+                        t-att-aria-label="'تكبير صورة ' + order.name">
+                    <img t-att-src="order.order_image_url"
+                         loading="lazy"
+                         decoding="async"
+                         t-att-alt="'صورة ' + order.name"/>
+                    <span aria-hidden="true">
+                        <i class="fa fa-search-plus"/>
+                    </span>
+                </button>
+                <span t-else=""
+                      class="o_furniture_order_supervisor_order__image is-empty"
+                      title="لا توجد صورة مضافة لأمر الإنتاج">
+                    <i class="fa fa-picture-o" aria-hidden="true"/>
+                    <small>بدون صورة</small>
+                </span>
+
+                <span t-if="order.timer" t-att-class="stageTimerClass(order.timer)">
+                    <small t-esc="stageTimerCaption(order.timer)"/>
+                    <strong t-esc="stageTimerValue(order.timer)"/>
+                    <em><t t-esc="formatNumber(order.timer.planned_hours)"/> ساعة مخططة</em>
+                </span>
+
+                <span class="o_furniture_order_supervisor_order__actions">
+                    <button t-if="!isOrderWorkflowSupervisorMode &amp;&amp; !order.textile_kit" type="button"
+                            class="btn btn-secondary is-open-order"
+                            t-on-click="() => this.openProductionOrder(order.id)">
+                        <i class="fa fa-external-link" aria-hidden="true"/> فتح الأمر
+                    </button>
+                    <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (order.can_request_materials || order.can_receive_materials)"
+                            type="button"
+                            t-att-class="'btn is-materials ' + (order.can_receive_materials ? 'btn-warning is-receive-materials' : 'btn-primary')"
+                            t-att-disabled="stageDashboard.busyOrderActionKey"
+                            t-on-click="() => this.requestOrderStageMaterials(order)">
+                        <i t-att-class="isOrderSupervisorActionBusy(order.id, 'materials') ? 'fa fa-spinner fa-spin' : (order.can_receive_materials ? 'fa fa-download' : 'fa fa-cubes')"
+                           aria-hidden="true"/>
+                        <span t-if="order.can_receive_materials">استلام من المخزن</span>
+                        <span t-else="">طلب خامات المرحلة</span>
+                    </button>
+                    <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (order.can_start_stage)"
+                            type="button"
+                            class="btn btn-success is-start"
+                            t-att-disabled="stageDashboard.busyOrderActionKey"
+                            t-on-click="() => this.startOrderAllProducts(order)">
+                        <i t-att-class="isOrderSupervisorActionBusy(order.id, 'start-all') ? 'fa fa-spinner fa-spin' : 'fa fa-play'"
+                           aria-hidden="true"/>
+                        <span>بدء المرحلة</span>
+                    </button>
+                    <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (order.can_finish_stage)"
+                            type="button"
+                            class="btn btn-danger is-finish"
+                            t-att-disabled="stageDashboard.busyOrderActionKey || !order.quality_ready"
+                            title="اقبل جودة كل صنف أولًا، ثم أنهِ المرحلة يدويًا"
+                            t-on-click="() => this.finishOrderStage(order)">
+                        <i t-att-class="isOrderSupervisorActionBusy(order.id, 'finish') ? 'fa fa-spinner fa-spin' : 'fa fa-stop'"
+                           aria-hidden="true"/>
+                        <span>إنهاء المرحلة</span>
+                    </button>
+                    <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (order.timer &amp;&amp; order.timer.can_pause)"
+                            type="button"
+                            class="btn btn-outline-warning is-timer"
+                            t-att-disabled="stageDashboard.busyOrderActionKey"
+                            t-on-click="() => this.pauseOrderTimer(order)">
+                        <i class="fa fa-pause"/> إيقاف الوقت
+                    </button>
+                    <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (order.timer &amp;&amp; order.timer.can_resume)"
+                            type="button"
+                            class="btn btn-outline-success is-timer"
+                            t-att-disabled="stageDashboard.busyOrderActionKey"
+                            t-on-click="() => this.resumeOrderTimer(order)">
+                        <i class="fa fa-play"/> استكمال الوقت
+                    </button>
+                </span>
+            </header>
+
+            <div t-if="!isOrderWorkflowSupervisorMode" class="o_furniture_admin_order_dates">
+                <span><small>بدء المرحلة</small><strong t-esc="formatDateTime(order.stage_date_start)"/></span>
+                <span><small>انتهاء المرحلة</small><strong t-esc="formatDateTime(order.stage_date_finish)"/></span>
+            </div>
+            <div t-if="order.product_lines.length"
+                 class="o_furniture_order_supervisor_order__products">
+                <article t-foreach="order.product_lines"
+                         t-as="product"
+                         t-key="product.production_line_id || (product.product_id + '-' + (product.model_id || 0) + '-' + (product.dimension_label || '') + '-' + product_index)"
+                         class="o_furniture_order_supervisor_order__product"
+                         t-att-class="{'is-compact-product': !showOrderTextileDetails}">
+                    <span class="o_furniture_order_supervisor_order__product_name">
+                        <small>الصنف</small>
+                        <strong t-esc="product.product_name || 'صنف غير مسجل'"/>
+                        <em t-if="showOrderTextileDetails &amp;&amp; isOrderWorkflowSupervisorMode" class="o_furniture_textile_product_quantity"
+                            t-esc="formatProductQuantity(product.planned_qty, product)"/>
+                        <em t-if="product.dimension_label">
+                            المقاس: <t t-esc="product.dimension_label"/> سم
+                        </em>
+                        <em t-if="!isOrderWorkflowSupervisorMode &amp;&amp; product.kit_name">الطقم: <t t-esc="product.kit_name"/></em>
+                        <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (product.can_open_bom)"
+                                type="button"
+                                class="o_furniture_order_supervisor_order__bom"
+                                t-att-disabled="stageDashboard.busyOrderActionKey"
+                                t-on-click="() => this.openOrderProductBom(order, product)">
+                            <i t-att-class="isOrderSupervisorActionBusy(order.id, 'bom-' + product.production_line_id) ? 'fa fa-spinner fa-spin' : 'fa fa-book'"
+                               aria-hidden="true"/>
+                            <span>عرض BoM</span>
+                        </button>
+                        <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; (product.can_start_stage)"
+                                type="button"
+                                class="o_furniture_order_supervisor_order__product_start"
+                                t-att-disabled="stageDashboard.busyOrderActionKey"
+                                t-on-click="() => this.startOrderProductStage(order, product)">
+                            <i t-att-class="isOrderSupervisorActionBusy(order.id, 'start-product-' + product.production_line_id) ? 'fa fa-spinner fa-spin' : 'fa fa-play'"
+                               aria-hidden="true"/>
+                            <span>بدء المرحلة لهذا الصنف</span>
+                        </button>
+                        <button t-if="isOrderWorkflowSupervisorMode &amp;&amp; canSendProductionWarning"
+                                type="button"
+                                class="o_furniture_order_supervisor_order__production_warning"
+                                t-att-disabled="stageDashboard.busyOrderActionKey"
+                                t-on-click="() => this.openOrderProductWarning(order, product)">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                            <span>تحذيرات الإنتاج</span>
+                        </button>
+                        <span t-if="isOrderWorkflowSupervisorMode &amp;&amp; (product.can_review_quality)" class="o_furniture_manual_quality">
+                            <span t-att-class="'o_furniture_quality_state is-' + product.manual_quality_state" t-esc="qualityStateLabel(product.manual_quality_state)"/>
+                            <button type="button" class="btn btn-outline-success" t-att-disabled="stageDashboard.busyOrderActionKey || product.manual_quality_state === 'pass'" t-on-click="() => this.reviewOrderProductQuality(order, product, 'pass')">قبول الجودة</button>
+                            <button type="button" class="btn btn-outline-danger" t-att-disabled="stageDashboard.busyOrderActionKey || product.manual_quality_state === 'reject'" t-on-click="() => this.reviewOrderProductQuality(order, product, 'reject')">رفض الجودة</button>
+                        </span>
+                    </span>
+
+                    <span t-if="showOrderTextileDetails" class="o_furniture_order_supervisor_order__fabric">
+                        <small>القماش</small>
+                        <span t-if="product.fabric_items.length"
+                              class="o_furniture_order_supervisor_order__material_items">
+                            <span t-foreach="product.fabric_items"
+                                  t-as="item"
+                                  t-key="item.key">
+                                <strong t-esc="item.label"/>
+                                <em t-if="item.quantityLabel" t-esc="item.quantityLabel"/>
+                            </span>
+                        </span>
+                        <strong t-elif="product.fabric_summary" t-esc="product.fabric_summary"/>
+                        <strong t-else="" class="is-empty">—</strong>
+                    </span>
+
+                    <span t-if="showOrderTextileDetails" class="o_furniture_order_supervisor_order__takawe">
+                        <small>التكاوي</small>
+                        <span t-if="product.takawe_items.length"
+                              class="o_furniture_order_supervisor_order__material_items">
+                            <span t-foreach="product.takawe_items"
+                                  t-as="item"
+                                  t-key="item.key">
+                                <strong t-esc="item.label"/>
+                                <em t-if="item.quantityLabel" t-esc="item.quantityLabel"/>
+                                <em t-if="item.pieceSize" class="is-size">
+                                    مقاس <t t-esc="item.pieceSize"/>
+                                </em>
+                            </span>
+                        </span>
+                        <strong t-elif="product.takawe_summary" t-esc="product.takawe_summary"/>
+                        <strong t-else="" class="is-empty">—</strong>
+                    </span>
+
+                    <span t-if="showOrderTextileDetails" class="o_furniture_order_supervisor_order__notes">
+                        <small>الملاحظات</small>
+                        <strong t-esc="product.notes || '—'"
+                                t-att-class="{'is-empty': !product.notes}"/>
+                    </span>
+                    <div t-if="!isOrderWorkflowSupervisorMode" class="o_furniture_admin_order_quantities">
+                        <span t-att-class="'o_furniture_admin_order_quantity is-' + product.quantity_status.state"
+                              t-att-title="product.material_shortage_details || product.quantity_status.label">
+                            <small t-esc="product.quantity_status.label"/>
+                            <strong t-esc="formatProductQuantity(product.quantity_status.quantity, product)"/>
+                        </span>
+                    </div>
+                </article>
+            </div>
+            <div t-else="" class="o_furniture_order_supervisor_order__empty">
+                لا توجد أصناف مسجلة داخل هذا الأمر.
+            </div>
+        </details>
+    </t>
+
+    <t t-name="furniture_mrp.StageDashboardOrderImage">
+        <div t-if="stageDashboard.imagePreviewUrl"
+             class="o_furniture_order_supervisor_image_lightbox"
+             role="dialog"
+             aria-modal="true"
+             t-att-aria-label="stageDashboard.imagePreviewTitle">
+            <button type="button"
+                    class="o_furniture_order_supervisor_image_lightbox__backdrop"
+                    t-on-click="() => this.closeOrderImage()"
+                    aria-label="إغلاق الصورة"/>
+            <figure>
+                <button type="button"
+                        class="o_furniture_order_supervisor_image_lightbox__close"
+                        t-on-click="() => this.closeOrderImage()"
+                        aria-label="إغلاق الصورة">
+                    <i class="fa fa-times" aria-hidden="true"/>
+                </button>
+                <img t-att-src="stageDashboard.imagePreviewUrl"
+                     t-att-alt="stageDashboard.imagePreviewTitle"/>
+                <figcaption t-esc="stageDashboard.imagePreviewTitle"/>
+            </figure>
+        </div>
+    </t>
+
+    <t t-name="furniture_mrp.MPSDashboardPage">
+        <main class="o_furniture_mps_dashboard" dir="rtl">
+            <header class="o_furniture_mps_dashboard__header">
+                <div class="o_furniture_mps_dashboard__title">
+                    <span class="o_furniture_mps_dashboard__title_icon" aria-hidden="true">
+                        <i class="fa fa-calendar-check-o"/>
+                    </span>
+                    <span>
+                        <strong>تخطيط المراحل والعمال</strong>
+                        <small>كل عامل يرى تكليفاته، والمشرف يرى فريقه حسب صلاحيات النظام</small>
+                    </span>
+                </div>
+                <div class="o_furniture_mps_dashboard__actions">
+                    <button type="button"
+                            class="btn btn-light o_furniture_mps_dashboard__button"
+                            t-att-disabled="dashboard.loading"
+                            t-on-click="() => this.refresh()">
+                        <i class="fa fa-refresh" t-att-class="{'fa-spin': dashboard.loading}"/>
+                        <span>تحديث</span>
+                    </button>
+                    <t t-if="permissions.isManager">
+                        <button type="button"
+                                class="btn btn-outline-primary o_furniture_mps_dashboard__button"
+                                t-on-click="() => this.openPlans()">
+                            <i class="fa fa-clipboard"/>
+                            <span>خطط الأوامر</span>
+                        </button>
+                        <button type="button"
+                                class="btn btn-primary o_furniture_mps_dashboard__button is-settings"
+                                t-on-click="() => this.openTimings()">
+                            <i class="fa fa-clock-o"/>
+                            <span>إعداد الأزمنة</span>
+                        </button>
+                    </t>
+                </div>
+            </header>
+
+            <div class="o_furniture_mps_dashboard__body">
+                <section class="o_furniture_mps_dashboard__summary" aria-label="ملخص خطة العمال">
+                    <article class="o_furniture_mps_dashboard__metric is-workers">
+                        <i class="fa fa-users" aria-hidden="true"/>
+                        <span>
+                            <small>العمال الظاهرون</small>
+                            <strong t-esc="formatQuantity(dashboard.workers.length)"/>
+                        </span>
+                    </article>
+                    <article class="o_furniture_mps_dashboard__metric is-assignments">
+                        <i class="fa fa-tasks" aria-hidden="true"/>
+                        <span>
+                            <small>التكليفات المفتوحة</small>
+                            <strong t-esc="formatQuantity(dashboard.assignmentCount)"/>
+                        </span>
+                    </article>
+                    <article class="o_furniture_mps_dashboard__metric is-pieces">
+                        <i class="fa fa-cubes" aria-hidden="true"/>
+                        <span>
+                            <small>قطع كاملة</small>
+                            <strong t-esc="formatQuantity(dashboard.pieceCount)"/>
+                        </span>
+                    </article>
+                    <article class="o_furniture_mps_dashboard__metric is-hours">
+                        <i class="fa fa-hourglass-half" aria-hidden="true"/>
+                        <span>
+                            <small>ساعات مخططة</small>
+                            <strong><t t-esc="formatHours(dashboard.plannedHours)"/> ساعة</strong>
+                        </span>
+                    </article>
+                </section>
+
+                <section t-if="dashboard.loading and !dashboard.workers.length"
+                         class="o_furniture_mps_dashboard__status"
+                         aria-live="polite">
+                    <i class="fa fa-spinner fa-spin" aria-hidden="true"/>
+                    <strong>جارٍ تجهيز خطة العمال…</strong>
+                </section>
+                <section t-elif="dashboard.error"
+                         class="o_furniture_mps_dashboard__status is-error"
+                         aria-live="assertive">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                    <strong t-esc="dashboard.error"/>
+                    <button type="button" class="btn btn-outline-danger" t-on-click="() => this.refresh()">
+                        المحاولة مرة أخرى
+                    </button>
+                </section>
+                <section t-elif="!dashboard.workers.length"
+                         class="o_furniture_mps_dashboard__status is-empty">
+                    <i class="fa fa-check-circle" aria-hidden="true"/>
+                    <strong>لا توجد تكليفات مفتوحة حاليًا</strong>
+                    <small>ستظهر هنا تلقائيًا بعد إنشاء خطة MPS وتوزيع القطع الكاملة.</small>
+                </section>
+                <div t-else="" class="o_furniture_mps_dashboard__workers" aria-live="polite">
+                    <section t-foreach="dashboard.workers"
+                             t-as="worker"
+                             t-key="worker.key"
+                             class="o_furniture_mps_dashboard__worker">
+                        <header class="o_furniture_mps_dashboard__worker_header">
+                            <div class="o_furniture_mps_dashboard__worker_identity">
+                                <span class="o_furniture_mps_dashboard__avatar" aria-hidden="true">
+                                    <i class="fa fa-user"/>
+                                </span>
+                                <span>
+                                    <small>العامل</small>
+                                    <strong t-esc="worker.name"/>
+                                </span>
+                            </div>
+                            <div class="o_furniture_mps_dashboard__stage_chips">
+                                <span t-foreach="worker.stages"
+                                      t-as="stage"
+                                      t-key="stage.code"
+                                      class="o_furniture_mps_dashboard__stage_chip"
+                                      t-att-class="stage.className"
+                                      t-esc="stage.label"/>
+                            </div>
+                            <div class="o_furniture_mps_dashboard__worker_totals">
+                                <span>
+                                    <small>تكليف</small>
+                                    <strong t-esc="formatQuantity(worker.assignments.length)"/>
+                                </span>
+                                <span>
+                                    <small>قطع كاملة</small>
+                                    <strong t-esc="formatQuantity(worker.pieceCount)"/>
+                                </span>
+                                <span>
+                                    <small>ساعات</small>
+                                    <strong t-esc="formatHours(worker.plannedHours)"/>
+                                </span>
+                            </div>
+                        </header>
+
+                        <div class="o_furniture_mps_dashboard__assignment_grid">
+                            <article t-foreach="worker.assignments"
+                                     t-as="assignment"
+                                     t-key="assignment.id"
+                                     class="o_furniture_mps_dashboard__assignment">
+                                <header class="o_furniture_mps_dashboard__assignment_header">
+                                    <span class="o_furniture_mps_dashboard__stage_chip"
+                                          t-att-class="assignment.stageClass"
+                                          t-esc="assignment.stageLabel"/>
+                                    <span class="o_furniture_mps_dashboard__state"
+                                          t-att-class="assignment.stateClass">
+                                        <i class="fa fa-circle" aria-hidden="true"/>
+                                        <t t-esc="assignment.stateLabel"/>
+                                    </span>
+                                </header>
+
+                                <div class="o_furniture_mps_dashboard__assignment_main">
+                                    <div class="o_furniture_mps_dashboard__piece_count">
+                                        <strong t-esc="formatQuantity(assignment.pieceCount)"/>
+                                        <span>قطعة كاملة</span>
+                                    </div>
+                                    <div class="o_furniture_mps_dashboard__assignment_copy">
+                                        <strong t-esc="assignment.operationName"/>
+                                        <small t-if="assignment.modelName" t-esc="assignment.modelName"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_furniture_mps_dashboard__products">
+                                    <span t-foreach="assignment.outputLines"
+                                          t-as="output"
+                                          t-key="output.id"
+                                          class="o_furniture_mps_dashboard__product">
+                                        <strong t-esc="output.productName"/>
+                                        <em><t t-esc="formatQuantity(output.quantity)"/> قطعة</em>
+                                        <small><t t-esc="formatHours(output.pieceHours)"/> س/قطعة</small>
+                                    </span>
+                                    <span t-if="!assignment.outputLines.length"
+                                          class="o_furniture_mps_dashboard__product is-summary"
+                                          t-esc="assignment.outputSummary || '—'"/>
+                                </div>
+
+                                <footer class="o_furniture_mps_dashboard__assignment_footer">
+                                    <span class="o_furniture_mps_dashboard__order">
+                                        <i class="fa fa-industry" aria-hidden="true"/>
+                                        <t t-esc="assignment.productionName"/>
+                                    </span>
+                                    <span class="o_furniture_mps_dashboard__hours">
+                                        <i class="fa fa-clock-o" aria-hidden="true"/>
+                                        <strong><t t-esc="formatHours(assignment.plannedHours)"/> ساعة</strong>
+                                    </span>
+                                    <span class="o_furniture_mps_dashboard__time_range">
+                                        <time t-esc="formatDateTime(assignment.plannedStart)"/>
+                                        <i class="fa fa-long-arrow-left" aria-hidden="true"/>
+                                        <time t-esc="formatDateTime(assignment.plannedEnd)"/>
+                                    </span>
+                                </footer>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </t>
+
+</templates>

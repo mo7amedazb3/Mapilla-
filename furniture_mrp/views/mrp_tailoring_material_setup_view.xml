@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_tailoring_setup_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.setup.wizard.form</field>
+        <field name="model">furniture.mrp.tailoring.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="تقسيمة التفصيل والكسوة" create="0" edit="1" delete="0"
+                  js_class="furniture_tailoring_setup_inline_form"
+                  class="o_furniture_tailoring_setup_form">
+                <sheet class="o_furniture_tailoring_setup_sheet">
+                    <field name="production_id" invisible="1"/>
+                    <field name="view_only" invisible="1"/>
+                    <field name="viewer_stage" invisible="1"/>
+                    <field name="active_editor_mode" invisible="1"/>
+                    <field name="active_production_line_id" invisible="1"/>
+                    <field name="active_material_kind" invisible="1"/>
+                    <field name="active_source_revision" invisible="1"/>
+                    <field name="active_source_product_id" invisible="1"/>
+                    <field name="active_source_bom_id" invisible="1"/>
+                    <field name="active_source_product_qty" invisible="1"/>
+                    <field name="active_source_stage_signature" invisible="1"/>
+                    <field name="has_order_image" invisible="1"/>
+                    <field name="order_image_cache_token" invisible="1"/>
+
+                    <div class="o_furniture_tailoring_order_header">
+                        <div class="o_furniture_tailoring_order_image"
+                             invisible="view_only">
+                            <field name="order_image_128"
+                                   widget="furniture_order_image_upload"
+                                   readonly="1"
+                                   options="{'accepted_file_extensions': 'image/jpeg,image/png'}"/>
+                        </div>
+                        <div class="o_furniture_tailoring_order_image"
+                             invisible="not view_only">
+                            <field name="order_image_128"
+                                   widget="furniture_order_image_preview"
+                                   readonly="1"
+                                   invisible="not has_order_image"/>
+                            <div class="o_furniture_tailoring_setup_image_placeholder is-readonly"
+                                 invisible="has_order_image"
+                                 title="لا توجد صورة محفوظة للطقم">
+                                <i class="fa fa-camera" aria-hidden="true"/>
+                            </div>
+                        </div>
+                        <div class="o_furniture_tailoring_order_identity">
+                            <span>الموديل</span>
+                            <strong>
+                                <field name="model_id" nolabel="1" readonly="1"
+                                       options="{'no_open': True}"/>
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_tailoring_setup_meta">
+                        <div class="o_furniture_tailoring_setup_chip">
+                            <span class="o_furniture_tailoring_setup_chip_label">أمر الإنتاج</span>
+                            <strong>
+                                <field name="order_name" nolabel="1" readonly="1"/>
+                            </strong>
+                        </div>
+                        <div class="o_furniture_tailoring_setup_chip">
+                            <span class="o_furniture_tailoring_setup_chip_label">المشتري</span>
+                            <strong>
+                                <field name="buyer_partner_id" nolabel="1" readonly="1"
+                                       options="{'no_open': True}"/>
+                            </strong>
+                        </div>
+                        <div class="o_furniture_tailoring_setup_chip">
+                            <span class="o_furniture_tailoring_setup_chip_label">المستفيد</span>
+                            <strong>
+                                <field name="beneficiary_partner_id" nolabel="1" readonly="1"
+                                       options="{'no_open': True}"/>
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_tailoring_setup_list_heading">
+                        <div>
+                            <strong>الأصناف</strong>
+                            <span>كل سطر يخص صنفًا واحدًا داخل أمر الإنتاج.</span>
+                        </div>
+                        <span class="o_furniture_tailoring_setup_hint"
+                              invisible="view_only">
+                            <i class="fa fa-plus-circle" aria-hidden="true"/>
+                            اضغط على نوع الخامة لإضافتها
+                        </span>
+                        <span class="o_furniture_tailoring_setup_hint is-readonly"
+                              invisible="not view_only">
+                            <i class="fa fa-lock" aria-hidden="true"/>
+                            التقسيمة محفوظة وغير قابلة للتعديل من المرحلة
+                        </span>
+                    </div>
+
+                    <field name="line_ids" nolabel="1" mode="kanban" readonly="1"
+                           class="o_furniture_tailoring_setup_lines">
+                        <kanban create="0" edit="0" delete="0" can_open="0"
+                                quick_create="0" records_draggable="0"
+                                class="o_furniture_tailoring_setup_kanban">
+                            <field name="production_line_id"/>
+                            <field name="product_id"/>
+                            <field name="product_qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="fabric_summary"/>
+                            <field name="takawe_summary"/>
+                            <field name="piece_note"/>
+                            <field name="is_active_editor"/>
+                            <field name="view_only"/>
+                            <templates>
+                                <t t-name="card">
+                                    <article t-attf-class="o_furniture_tailoring_setup_row #{record.is_active_editor.raw_value ? 'is-active-editor' : ''}">
+                                        <div class="o_furniture_tailoring_setup_notes">
+                                            <t t-if="record.view_only.raw_value">
+                                                <div class="o_furniture_tailoring_note_readonly">
+                                                    <i class="fa fa-sticky-note-o" aria-hidden="true"/>
+                                                    <span t-if="record.piece_note.raw_value">
+                                                        <field name="piece_note"/>
+                                                    </span>
+                                                    <span t-else="" class="is-empty">لا توجد ملاحظات</span>
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <field name="piece_note"
+                                                       widget="furniture_piece_note_input"
+                                                       readonly="1"/>
+                                            </t>
+                                        </div>
+
+                                        <div class="o_furniture_tailoring_setup_material_cell is-takawe">
+                                            <button name="action_open_takawe_editor"
+                                                    string="+ تكاوي"
+                                                    title="إضافة تكاوي"
+                                                    type="object"
+                                                    t-if="!record.view_only.raw_value"
+                                                    class="btn o_furniture_tailoring_material_button is-takawe">
+                                                <span t-if="!record.takawe_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_button_title">
+                                                    <i class="fa fa-plus" title="إضافة تكاوي" aria-hidden="true"/>
+                                                    تكاوي
+                                                </span>
+                                                <span t-if="record.takawe_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_summary">
+                                                    <field name="takawe_summary"/>
+                                                </span>
+                                                <span t-else="" class="o_furniture_tailoring_material_empty">
+                                                    أضف النوع والكمية والمقاس
+                                                </span>
+                                            </button>
+                                            <div t-if="record.view_only.raw_value"
+                                                 class="o_furniture_tailoring_material_button is-takawe is-readonly">
+                                                <span t-if="!record.takawe_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_button_title">
+                                                    <i class="fa fa-check" title="تكاوي محفوظة" aria-hidden="true"/>
+                                                    تكاوي
+                                                </span>
+                                                <span t-if="record.takawe_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_summary">
+                                                    <field name="takawe_summary"/>
+                                                </span>
+                                                <span t-else="" class="o_furniture_tailoring_material_empty">
+                                                    غير محدد
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="o_furniture_tailoring_setup_material_cell is-fabric">
+                                            <button name="action_open_fabric_editor"
+                                                    string="+ قماش"
+                                                    title="إضافة قماش"
+                                                    type="object"
+                                                    t-if="!record.view_only.raw_value"
+                                                    class="btn o_furniture_tailoring_material_button is-fabric">
+                                                <span t-if="!record.fabric_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_button_title">
+                                                    <i class="fa fa-plus" title="إضافة قماش" aria-hidden="true"/>
+                                                    قماش
+                                                </span>
+                                                <span t-if="record.fabric_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_summary">
+                                                    <field name="fabric_summary"/>
+                                                </span>
+                                                <span t-else="" class="o_furniture_tailoring_material_empty">
+                                                    أضف النوع والكمية
+                                                </span>
+                                            </button>
+                                            <div t-if="record.view_only.raw_value"
+                                                 class="o_furniture_tailoring_material_button is-fabric is-readonly">
+                                                <span t-if="!record.fabric_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_button_title">
+                                                    <i class="fa fa-check" title="قماش محفوظ" aria-hidden="true"/>
+                                                    قماش
+                                                </span>
+                                                <span t-if="record.fabric_summary.raw_value"
+                                                      class="o_furniture_tailoring_material_summary">
+                                                    <field name="fabric_summary"/>
+                                                </span>
+                                                <span t-else="" class="o_furniture_tailoring_material_empty">
+                                                    غير محدد
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="o_furniture_tailoring_setup_product">
+                                            <strong class="o_furniture_tailoring_setup_product_name">
+                                                <field name="product_id" options="{'no_open': True}"/>
+                                            </strong>
+                                            <div class="o_furniture_tailoring_setup_product_details">
+                                                <span class="o_furniture_tailoring_setup_qty">
+                                                    <field name="product_qty"/>
+                                                    <field name="product_uom_id"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+
+                </sheet>
+                <footer>
+                    <button string="تم" special="cancel" class="btn-primary"
+                            invisible="view_only"/>
+                    <button string="إغلاق" special="cancel" class="btn-primary"
+                            invisible="not view_only"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_tailoring_material_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.material.wizard.form</field>
+        <field name="model">furniture.mrp.tailoring.material.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إضافة خامات الصنف" create="0" delete="0"
+                  class="o_furniture_tailoring_material_editor_form">
+                <sheet class="o_furniture_tailoring_material_editor_sheet">
+                    <field name="setup_wizard_id" invisible="1"/>
+                    <field name="production_line_id" invisible="1"/>
+                    <field name="material_kind" invisible="1"/>
+
+                    <div class="o_furniture_tailoring_material_editor_header">
+                        <div class="o_furniture_tailoring_material_editor_title">
+                            <span>إضافة</span>
+                            <strong><field name="material_kind_label" nolabel="1" readonly="1"/></strong>
+                        </div>
+                        <div class="o_furniture_tailoring_material_editor_context">
+                            <span class="is-product">
+                                <small>الصنف</small>
+                                <strong>
+                                    <field name="product_id" nolabel="1" readonly="1"
+                                           options="{'no_open': True}"/>
+                                </strong>
+                            </span>
+                            <span class="is-model">
+                                <small>الموديل</small>
+                                <strong>
+                                    <field name="model_id" nolabel="1" readonly="1"
+                                           options="{'no_open': True}"/>
+                                </strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_tailoring_material_editor_help"
+                         invisible="material_kind != 'fabric'">
+                        <i class="fa fa-info-circle" aria-hidden="true"/>
+                        اختار نوع القماش فقط؛ كل الخامات المصنفة قماش أو تكاوي متاحة، وعدد الأمتار ثابت تلقائيًا من ريسيبي الصنف.
+                    </div>
+                    <div class="o_furniture_tailoring_material_editor_help"
+                         invisible="material_kind == 'fabric'">
+                        <i class="fa fa-info-circle" aria-hidden="true"/>
+                        كل الخامات المصنفة قماش أو تكاوي متاحة؛ اختار تكوي أو أكثر، واكتب الكمية وحدد مقاسًا مستقلًا لكل تكوي.
+                    </div>
+
+                    <field name="selected_material_product_ids"
+                           nolabel="1"
+                           invisible="material_kind != 'fabric'"
+                           class="o_furniture_quick_cards_field o_furniture_tailoring_material_choices"
+                           widget="furniture_multi_card_selector"
+                           domain="[('furniture_is_finished_product', '=', False), ('is_storable', '=', True), ('furniture_tailoring_material_kind', 'in', ['fabric', 'takawe'])]"
+                           options="{'no_create': True, 'no_create_edit': True, 'quick_limit': 8, 'single_selection': True, 'card_title': 'اختار نوع القماش', 'card_subtitle': 'اختار بطاقة واحدة؛ المتر ثابت من الريسيبي', 'card_icon': 'fa-hand-pointer-o', 'card_variant': 'material', 'order_by': 'name, id'}"/>
+                    <field name="selected_material_product_ids"
+                           nolabel="1"
+                           invisible="material_kind == 'fabric'"
+                           class="o_furniture_quick_cards_field o_furniture_tailoring_material_choices"
+                           widget="furniture_multi_card_selector"
+                           domain="[('furniture_is_finished_product', '=', False), ('is_storable', '=', True), ('furniture_tailoring_material_kind', 'in', ['fabric', 'takawe'])]"
+                           options="{'no_create': True, 'no_create_edit': True, 'quick_limit': 8, 'card_title': 'اختار نوع الخامة', 'card_subtitle': 'اضغط على بطاقة أو أكثر؛ والكمية ستظهر بالأسفل', 'card_icon': 'fa-hand-pointer-o', 'card_variant': 'material', 'order_by': 'name, id'}"/>
+
+                    <div class="o_furniture_tailoring_selected_materials_heading"
+                         invisible="not selected_material_product_ids or material_kind != 'fabric'">
+                        <strong>كمية الريسيبي</strong>
+                        <span>عدد الأمتار ثابت؛ غيّر نوع القماش فقط.</span>
+                    </div>
+                    <div class="o_furniture_tailoring_selected_materials_heading"
+                         invisible="not selected_material_product_ids or material_kind == 'fabric'">
+                        <strong>الكميات والمقاسات المختارة</strong>
+                        <span>اكتب عدد الأمتار وحدد المقاس لكل تكوي.</span>
+                    </div>
+                    <field name="line_ids" nolabel="1"
+                           invisible="not selected_material_product_ids"
+                           class="o_furniture_tailoring_material_editor_lines">
+                        <list editable="bottom" create="0" edit="1" delete="0"
+                              string="الخامات">
+                            <field name="sequence" column_invisible="True"/>
+                            <field name="product_id" string="الخامة" readonly="1" force_save="1"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="qty" string="الكمية بالمتر"
+                                   readonly="parent.material_kind == 'fabric'"
+                                   force_save="1"/>
+                            <field name="uom_category_id" column_invisible="True"/>
+                            <field name="product_uom_id" string="وحدة القياس"
+                                   readonly="1" force_save="1"
+                                   options="{'no_open': True, 'no_create': True, 'no_create_edit': True}"/>
+                            <field name="piece_size" string="مقاس التكاوي"
+                                   widget="furniture_touch_selection" force_save="1"
+                                   required="parent.material_kind == 'takawe'"
+                                   column_invisible="parent.material_kind != 'takawe'"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_apply" string="حفظ الخامات" type="object"
+                            class="btn-primary o_furniture_tailoring_material_apply_button"/>
+                    <button string="إلغاء" special="cancel" close="1"
+                            class="btn-secondary o_furniture_tailoring_material_cancel_button"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_tailoring_image_preview_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.tailoring.image.preview.form</field>
+        <field name="model">furniture.mrp.tailoring.image.preview</field>
+        <field name="arch" type="xml">
+            <form string="صورة الصنف" create="0" edit="0" delete="0"
+                  class="o_furniture_tailoring_image_preview_form">
+                <sheet class="o_furniture_tailoring_image_preview_sheet">
+                    <div class="o_furniture_tailoring_image_preview_header">
+                        <div>
+                            <span>الصنف</span>
+                            <strong><field name="product_label" nolabel="1" readonly="1"/></strong>
+                        </div>
+                        <div>
+                            <span>الموديل</span>
+                            <strong><field name="model_label" nolabel="1" readonly="1"/></strong>
+                        </div>
+                        <div class="o_furniture_tailoring_image_source">
+                            <i class="fa fa-camera" title="مصدر الصورة" aria-hidden="true"/>
+                            <field name="image_source_label" nolabel="1" readonly="1"/>
+                        </div>
+                    </div>
+                    <div class="o_furniture_tailoring_image_preview_frame">
+                        <field name="image_1920" nolabel="1" widget="image" readonly="1"
+                               options="{'size': [0, 620], 'img_class': 'object-fit-contain'}"/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_back_to_setup" string="رجوع للتقسيمة"
+                            type="object" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

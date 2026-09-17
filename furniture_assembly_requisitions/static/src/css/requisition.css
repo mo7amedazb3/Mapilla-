@@ -1,0 +1,1032 @@
+/* Mapilla stage-permits workspace. Presentation only: workflow and permissions
+ * remain owned by the underlying Odoo models. */
+.o_mapilla_permit_form {
+    --permit-navy: var(--mapilla-heading, #0c2a44);
+    --permit-navy-soft: var(--mapilla-oxford-500, #3d5569);
+    --permit-stone: var(--mapilla-timberwolf, #e0d8d1);
+    --permit-border: var(--mapilla-border, #e0d8d1);
+    --permit-surface: var(--mapilla-surface, #fff);
+    --permit-soft: var(--mapilla-inset, #f8f6f3);
+    --permit-page: var(--mapilla-page, #f7f5f2);
+    --permit-muted: var(--mapilla-muted, #6d7f8f);
+    --permit-shadow: var(--mapilla-shadow-sm, 0 2px 8px rgba(12, 42, 68, .08));
+    color: var(--mapilla-text, #2d2d2d);
+    direction: rtl;
+}
+
+.o_form_view.o_mapilla_permit_form .o_form_sheet_bg {
+    background: radial-gradient(circle at 92% 2%, rgba(12, 42, 68, .045), transparent 28%), var(--permit-page);
+}
+
+.o_form_view.o_mapilla_permit_form .o_mapilla_permit_sheet {
+    width: calc(100% - 32px);
+    max-width: 1500px;
+    margin: 16px auto;
+    padding: 20px;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.o_form_view.o_mapilla_permit_form .o_form_statusbar {
+    margin: 10px 16px 0;
+    padding: 7px 10px;
+    border: 1px solid var(--permit-border);
+    border-radius: 12px;
+    background: var(--permit-surface);
+    box-shadow: 0 3px 12px rgba(12, 42, 68, .04);
+}
+
+.o_form_view.o_mapilla_permit_form .o_form_statusbar .btn {
+    min-height: 38px;
+    border-radius: 9px;
+    font-weight: 700;
+}
+
+.o_assembly_request_hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    min-height: 148px;
+    margin: 0 0 14px;
+    padding: 24px 28px;
+    overflow: hidden;
+    border: 1px solid #ffffff20;
+    border-bottom: 4px solid var(--permit-stone);
+    border-radius: 20px;
+    color: #fff;
+    background: var(--mapilla-hero, linear-gradient(115deg, #0c2a44, #18364e 62%, #3d5569));
+    box-shadow: 0 12px 28px rgba(12, 42, 68, .14);
+    animation: o-permit-enter .28s ease-out;
+}
+
+/* The global theme contains a compatibility adapter for the former lavender
+ * permit hero. This more specific rule opts the redesigned workspace into the
+ * current Oxford/stone identity regardless of asset ordering. */
+.o_form_view.o_mapilla_permit_form .o_assembly_request_hero {
+    border-color: #ffffff20 !important;
+    border-bottom-color: var(--permit-stone) !important;
+    color: #fff !important;
+    background: var(--mapilla-hero, linear-gradient(115deg, #0c2a44, #18364e 62%, #3d5569)) !important;
+}
+
+.o_assembly_request_hero::after {
+    position: absolute;
+    inset-inline-end: -38px;
+    bottom: -74px;
+    width: 230px;
+    height: 230px;
+    border: 1px solid #ffffff12;
+    border-radius: 50%;
+    box-shadow: 0 0 0 34px #ffffff08, 0 0 0 68px #ffffff05;
+    content: "";
+    pointer-events: none;
+}
+
+.o_mapilla_permit_hero_icon {
+    z-index: 1;
+    display: grid;
+    width: 62px;
+    height: 62px;
+    place-items: center;
+    border: 1px solid #ffffff38;
+    border-radius: 18px;
+    color: #0c2a44;
+    background: var(--permit-stone);
+    box-shadow: inset 0 1px 0 #ffffff85, 0 7px 18px #06182740;
+    font-size: 27px;
+}
+
+.o_mapilla_permit_hero_copy,
+.o_mapilla_permit_reference {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.o_mapilla_permit_eyebrow {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--mapilla-on-hero, #e0d8d1);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+}
+
+.o_assembly_request_hero h1 {
+    margin: 0;
+    color: #fff !important;
+    font-size: 29px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.o_assembly_request_hero p {
+    margin: 5px 0 0;
+    color: #e6edf2;
+    font-size: 13px;
+}
+
+.o_mapilla_permit_reference {
+    min-width: 185px;
+    padding: 12px 16px;
+    border: 1px solid #ffffff26;
+    border-radius: 14px;
+    background: #ffffff0f;
+    backdrop-filter: blur(3px);
+}
+
+.o_mapilla_permit_reference > span {
+    display: block;
+    margin-bottom: 4px;
+    color: #d8e1e8;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.o_mapilla_permit_reference h2,
+.o_mapilla_permit_reference h2 .o_field_widget {
+    margin: 0;
+    color: #fff !important;
+    font-size: 21px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.o_mapilla_permit_form .alert.alert-info {
+    margin: 0 0 14px;
+    padding: 12px 16px;
+    border: 1px solid #cfdde7;
+    border-inline-start: 4px solid var(--permit-navy-soft);
+    border-radius: 11px;
+    color: #38536a;
+    background: #f1f6f9;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.o_mapilla_permit_sheet > .o_widget_factory_context_help {
+    display: flex;
+    justify-content: flex-end;
+    margin: -4px 0 10px;
+}
+
+.o_mapilla_permit_flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.o_mapilla_permit_flow > span {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    border: 1px solid var(--permit-border);
+    border-radius: 11px;
+    color: var(--permit-muted);
+    background: var(--permit-surface);
+    box-shadow: 0 2px 6px rgba(12, 42, 68, .035);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.o_mapilla_permit_flow i {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    place-items: center;
+    border-radius: 8px;
+    color: var(--permit-navy);
+    background: #eaf0f4;
+}
+
+.o_mapilla_permit_meta_grid,
+.o_mapilla_weekly_overview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.o_mapilla_permit_card,
+.o_mapilla_permit_table_card {
+    min-width: 0;
+    border: 1px solid var(--permit-border);
+    border-radius: 15px;
+    background: var(--permit-surface);
+    box-shadow: var(--permit-shadow);
+}
+
+.o_mapilla_permit_card { padding: 16px 18px 12px; }
+
+.o_mapilla_permit_card_title,
+.o_mapilla_permit_section_heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.o_mapilla_permit_card_title {
+    margin-bottom: 10px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid #eeeae6;
+}
+
+.o_mapilla_permit_card_title > i,
+.o_mapilla_permit_section_icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    place-items: center;
+    border-radius: 10px;
+    color: var(--permit-navy);
+    background: #ece9e5;
+    font-size: 15px;
+}
+
+.o_mapilla_permit_card_title strong,
+.o_mapilla_permit_section_heading strong {
+    display: block;
+    color: var(--permit-navy);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.o_mapilla_permit_card_title small,
+.o_mapilla_permit_section_heading small {
+    display: block;
+    margin-top: 2px;
+    color: var(--permit-muted);
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.o_mapilla_permit_group { margin: 0 !important; }
+.o_mapilla_permit_group .o_form_label { color: #607381; font-size: 11px; font-weight: 650; }
+.o_mapilla_permit_group .o_field_widget { color: var(--permit-navy); font-weight: 650; }
+.o_mapilla_permit_group .o_input {
+    min-height: 35px;
+    padding-inline: 9px;
+    border-color: var(--permit-border);
+    background: var(--permit-soft);
+}
+
+.o_mapilla_permit_table_card {
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.o_mapilla_permit_section_heading {
+    min-height: 67px;
+    padding: 13px 17px;
+    border-bottom: 1px solid var(--permit-border);
+    background: linear-gradient(110deg, var(--permit-surface), var(--permit-soft));
+}
+
+.o_mapilla_permit_lines,
+.o_mapilla_permit_lines .o_list_renderer {
+    min-width: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.o_mapilla_permit_lines .o_list_renderer { overflow-x: auto; }
+
+.o_mapilla_permit_lines table.o_list_table {
+    width: 100% !important;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+.o_mapilla_permit_lines table.o_list_table thead th {
+    height: 42px;
+    padding: 10px 13px !important;
+    border-bottom: 1px solid var(--permit-border) !important;
+    color: var(--permit-navy) !important;
+    background: #efede9 !important;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: right;
+}
+
+.o_mapilla_permit_lines table.o_list_table tbody td {
+    height: 55px;
+    padding: 9px 13px !important;
+    border-bottom: 1px solid #eeeae6 !important;
+    color: #425a6c;
+    vertical-align: middle;
+}
+
+.o_mapilla_permit_lines table.o_list_table tbody tr:nth-child(even) td { background: #fbfaf8; }
+.o_mapilla_permit_lines table.o_list_table tbody tr:hover td { background: #eef3f6 !important; }
+
+.o_mapilla_permit_lines td[name="product_id"],
+.o_mapilla_permit_lines td[name="product_id"] .o_field_widget {
+    color: var(--permit-navy);
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.o_mapilla_permit_lines th[data-name="product_id"] { width: 54% !important; }
+.o_mapilla_permit_lines th[data-name="requested_qty"] { width: 23% !important; }
+.o_mapilla_permit_lines th[data-name="product_uom_id"] { width: 23% !important; }
+
+.o_mapilla_permit_lines th[data-name="product_id"],
+.o_mapilla_permit_lines td[name="product_id"],
+.o_mapilla_permit_lines th[data-name="product_uom_id"],
+.o_mapilla_permit_lines td[name="product_uom_id"] {
+    direction: rtl;
+    text-align: right !important;
+}
+
+.o_mapilla_permit_lines th[data-name="requested_qty"],
+.o_mapilla_permit_lines td[name="requested_qty"] {
+    text-align: center !important;
+}
+
+.o_mapilla_permit_lines td[name="requested_qty"] input {
+    width: min(150px, 100%);
+    min-height: 37px;
+    padding: 7px 10px;
+    border: 1px solid #c7d2db;
+    border-radius: 9px;
+    color: var(--permit-navy);
+    background: #fff;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    text-align: center;
+}
+
+.o_mapilla_permit_moves .o_mapilla_permit_section_icon { color: #315f52; background: #e5f0eb; }
+
+/* Supervisor material policy. */
+.o_mapilla_policy_hero { grid-template-columns: 68px minmax(0, 1fr); min-height: 132px; }
+.o_mapilla_policy_identity { margin-bottom: 14px; }
+.o_mapilla_policy_products { padding-bottom: 18px; }
+
+.o_mapilla_policy_products .o_field_many2many_tags {
+    display: flex;
+    min-height: 72px;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--permit-border);
+    border-radius: 11px;
+    background: var(--permit-soft);
+}
+
+.o_mapilla_policy_products .o_tag {
+    min-height: 31px;
+    padding: 5px 10px !important;
+    border: 1px solid #ccd9e2;
+    border-radius: 8px;
+    color: var(--permit-navy) !important;
+    background: #eaf0f4 !important;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Thursday inventory. */
+.o_mapilla_weekly_inventory_form .o_mapilla_stage_notebook {
+    --notebook-margin-x: 0px;
+    --notebook-padding-x: 0px;
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_lines,
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_lines .o_list_renderer {
+    --ListRenderer-margin-x: 0px !important;
+    width: 100% !important;
+    max-width: 100%;
+    margin: 0 !important;
+}
+
+.o_mapilla_weekly_hero .o_mapilla_permit_hero_icon { color: #4a4b42; background: #e7dfcc; }
+.o_mapilla_weekly_overview { grid-template-columns: minmax(300px, .85fr) minmax(0, 1.65fr); }
+
+.o_mapilla_weekly_metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.o_mapilla_weekly_metric {
+    display: flex;
+    min-width: 0;
+    min-height: 130px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px 10px;
+    border: 1px solid var(--permit-border);
+    border-radius: 15px;
+    color: var(--permit-navy);
+    background: var(--permit-surface);
+    box-shadow: var(--permit-shadow);
+    text-align: center;
+}
+
+.o_mapilla_weekly_metric > i {
+    display: grid;
+    width: 35px;
+    height: 35px;
+    place-items: center;
+    border-radius: 10px;
+    color: var(--permit-navy);
+    background: #eaf0f4;
+}
+
+.o_mapilla_weekly_metric > span { color: var(--permit-muted); font-size: 11px; font-weight: 700; }
+.o_mapilla_weekly_metric strong,
+.o_mapilla_weekly_metric strong .o_field_widget {
+    color: inherit;
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.o_mapilla_weekly_metric.is-counted { border-color: #bfdccd; color: #29664f; background: #f2f9f5; }
+.o_mapilla_weekly_metric.is-counted > i { color: #29664f; background: #deefe6; }
+.o_mapilla_weekly_metric.is-variance { border-color: #e3d2ad; color: #8a611e; background: #fffaf0; }
+.o_mapilla_weekly_metric.is-variance > i { color: #8a611e; background: #f7eacb; }
+
+.o_mapilla_weekly_lines table.o_list_table {
+    direction: rtl !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+}
+
+.o_mapilla_weekly_lines th[data-name],
+.o_mapilla_weekly_lines td[name] {
+    min-width: 0 !important;
+}
+
+.o_mapilla_weekly_lines th[data-name="product_id"],
+.o_mapilla_weekly_lines td[name="product_id"] {
+    width: 50% !important;
+}
+
+.o_mapilla_weekly_lines th[data-name="recipe_used_qty"],
+.o_mapilla_weekly_lines td[name="recipe_used_qty"],
+.o_mapilla_weekly_lines th[data-name="received_qty"],
+.o_mapilla_weekly_lines td[name="received_qty"] {
+    width: 25% !important;
+}
+
+.o_mapilla_weekly_lines table.o_list_table thead th,
+.o_mapilla_weekly_lines table.o_list_table thead th .o_column_title,
+.o_mapilla_weekly_lines table.o_list_table thead th .text-truncate {
+    overflow: visible !important;
+    text-align: center !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_lines th[data-name="product_id"] {
+    text-align: right !important;
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_lines th[data-name="product_id"] .text-truncate {
+    text-align: right !important;
+}
+
+.o_mapilla_weekly_lines th[data-name="product_id"] > div {
+    justify-content: flex-start !important;
+}
+
+.o_mapilla_weekly_lines th[data-name="recipe_used_qty"] > div,
+.o_mapilla_weekly_lines th[data-name="received_qty"] > div {
+    justify-content: center !important;
+}
+
+.o_mapilla_weekly_lines table.o_list_table tfoot td {
+    text-align: center !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_mapilla_weekly_lines td[name="product_id"],
+.o_mapilla_weekly_lines td[name="product_id"] .o_field_widget {
+    overflow: hidden;
+    direction: rtl;
+    text-align: right !important;
+    text-overflow: clip;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+}
+
+.o_mapilla_weekly_lines td[name="recipe_used_qty"],
+.o_mapilla_weekly_lines td[name="received_qty"] {
+    direction: ltr;
+    color: var(--permit-navy) !important;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    text-align: center !important;
+}
+
+.o_mapilla_weekly_lines td[name="actual_qty"] input {
+    min-width: 84px;
+    border: 1px solid #c7d2db;
+    border-radius: 8px;
+    background: #fff;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* Compact weekly layout: one summary strip and one stage-tab workspace. */
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    min-height: 106px;
+    margin-bottom: 10px;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 7px 18px rgba(12, 42, 68, .11);
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero .o_mapilla_permit_hero_icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 21px;
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero h1 { font-size: 23px; }
+.o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero p { margin-top: 2px; font-size: 11px; }
+.o_mapilla_weekly_inventory_form .o_mapilla_permit_reference { min-width: 170px; padding: 8px 12px; }
+.o_mapilla_weekly_inventory_form .alert.alert-info { margin-bottom: 10px; padding-block: 8px; font-size: 11px; }
+
+.o_mapilla_weekly_summary_bar {
+    display: flex;
+    min-height: 66px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--permit-border);
+    border-radius: 12px;
+    background: var(--permit-surface);
+    box-shadow: 0 2px 7px rgba(12, 42, 68, .04);
+}
+
+.o_mapilla_weekly_dates,
+.o_mapilla_weekly_inline_metrics {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.o_mapilla_weekly_dates > i {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border-radius: 9px;
+    color: var(--permit-navy);
+    background: #ece9e5;
+}
+
+.o_mapilla_weekly_dates > div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-inline-end: 10px;
+    border-inline-end: 1px solid var(--permit-border);
+    white-space: nowrap;
+}
+
+.o_mapilla_weekly_dates > div > span {
+    color: var(--permit-muted);
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.o_mapilla_weekly_dates .o_field_widget {
+    color: var(--permit-navy);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.o_mapilla_weekly_inline_metrics > span {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 9px;
+    border: 1px solid #d9e1e7;
+    border-radius: 9px;
+    color: #526b7c;
+    background: #f4f7f9;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.o_mapilla_weekly_inline_metrics > span.is-counted { border-color: #c7dfd3; color: #29664f; background: #f2f9f5; }
+.o_mapilla_weekly_inline_metrics > span.is-variance { border-color: #e3d2ad; color: #8a611e; background: #fffaf0; }
+.o_mapilla_weekly_inline_metrics strong,
+.o_mapilla_weekly_inline_metrics strong .o_field_widget {
+    color: inherit;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+}
+
+.o_mapilla_stage_instruction {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    border: 1px solid #d8e3ea;
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+    color: #506b7d;
+    background: #f1f6f9;
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.o_mapilla_stage_notebook {
+    --notebook-margin-x: 0px;
+    --notebook-padding-x: 0px;
+    container-type: inline-size;
+    margin: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--permit-border);
+    border-radius: 0 0 14px 14px;
+    background: var(--permit-surface);
+    box-shadow: var(--permit-shadow);
+}
+
+.o_mapilla_stage_notebook .o_notebook_headers {
+    margin: 0 !important;
+    padding: 18px !important;
+    overflow: visible !important;
+    border-bottom: 1px solid var(--permit-border);
+    background: var(--permit-soft);
+}
+
+.o_mapilla_stage_notebook .nav-tabs {
+    display: grid !important;
+    direction: rtl !important;
+    grid-template-columns: repeat(8, minmax(0, 140px));
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    gap: 12px;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+.o_mapilla_stage_notebook .nav-item {
+    width: auto !important;
+    min-width: 0;
+    margin: 0 !important;
+}
+
+.o_mapilla_stage_notebook .nav-link {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 10px 14px;
+    overflow: hidden;
+    border: 1px solid #d9e0e5 !important;
+    border-radius: 28px !important;
+    color: #28485f !important;
+    background: #fff !important;
+    box-shadow: 0 2px 5px rgba(12, 42, 68, .04);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.45;
+    text-align: center;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    transition: transform 220ms cubic-bezier(.2, .75, .25, 1),
+        border-color 180ms ease, box-shadow 220ms ease, background-color 180ms ease;
+}
+
+.o_mapilla_stage_notebook .nav-link > * {
+    max-width: 100%;
+    overflow: hidden;
+    color: inherit;
+    text-align: center;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+}
+
+.o_mapilla_weekly_inventory_form .o_mapilla_stage_notebook .nav-link {
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+.o_mapilla_stage_notebook .nav-link::before {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    color: var(--permit-navy);
+    background: #eaf0f4;
+    font-family: FontAwesome;
+    font-size: 18px;
+    font-weight: 400;
+    flex: 0 0 42px;
+    transition: transform 180ms ease;
+}
+
+.o_mapilla_stage_notebook .nav-item:nth-child(1) .nav-link::before { content: "\f0e3"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(2) .nav-link::before { content: "\f1fc"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(3) .nav-link::before { content: "\f1b3"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(4) .nav-link::before { content: "\f0f7"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(5) .nav-link::before { content: "\f0ad"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(6) .nav-link::before { content: "\f0c4"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(7) .nav-link::before { content: "\f247"; }
+.o_mapilla_stage_notebook .nav-item:nth-child(8) .nav-link::before { content: "\f187"; }
+
+.o_mapilla_stage_notebook .nav-link::after {
+    position: absolute;
+    inset-block-start: 9px;
+    inset-inline-end: 9px;
+    display: grid;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--permit-navy);
+    background: #e7dfcc;
+    content: "\f00c";
+    font-family: FontAwesome;
+    font-size: 9px;
+    opacity: 0;
+    transform: scale(.65);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.o_mapilla_stage_notebook .nav-link:hover {
+    transform: translateY(-2px);
+    border-color: #aebfca !important;
+    color: var(--permit-navy) !important;
+    background: #fff !important;
+    box-shadow: 0 6px 14px rgba(12, 42, 68, .09);
+}
+
+.o_mapilla_stage_notebook .nav-link:hover::before {
+    transform: scale(1.04);
+}
+
+.o_mapilla_stage_notebook .nav-link:focus-visible {
+    outline: 3px solid #9db5c6 !important;
+    outline-offset: 3px;
+}
+
+.o_mapilla_stage_notebook .nav-link.active {
+    transform: none;
+    border-color: var(--permit-navy) !important;
+    color: #fff !important;
+    background: linear-gradient(145deg, #0c2a44, #24465c) !important;
+    box-shadow: 0 5px 12px rgba(12, 42, 68, .16);
+}
+
+.o_mapilla_stage_notebook .nav-link.active::before {
+    color: #e7dfcc;
+    -webkit-text-fill-color: #e7dfcc;
+    background: #ffffff1f;
+}
+
+.o_mapilla_stage_notebook .nav-link.active::after {
+    -webkit-text-fill-color: #0c2a44;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Mapilla's global notebook rule is loaded after addon styles and intentionally
+ * forces active tabs to Oxford text. These tabs use an Oxford filled state, so
+ * lock the label (including Owl's inner text wrapper) to white. */
+body.o_web_client .o_form_view.o_mapilla_weekly_inventory_form
+    .o_mapilla_stage_notebook .nav-link,
+body.o_web_client .o_form_view.o_mapilla_weekly_inventory_form
+    .o_mapilla_stage_notebook .nav-link > * {
+    color: #28485f !important;
+    -webkit-text-fill-color: #28485f !important;
+}
+
+body.o_web_client .o_form_view.o_mapilla_weekly_inventory_form
+    .o_mapilla_stage_notebook .nav-link.active,
+body.o_web_client .o_form_view.o_mapilla_weekly_inventory_form
+    .o_mapilla_stage_notebook .nav-link.active > * {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .12);
+}
+
+.o_mapilla_stage_notebook .tab-content,
+.o_mapilla_stage_notebook .tab-pane { padding: 0 !important; }
+
+.o_mapilla_stage_notebook .tab-pane.active {
+    animation: o-stage-panel-enter 220ms ease-out;
+}
+
+.o_mapilla_stage_notebook .o_field_x2many { margin: 0; }
+.o_mapilla_stage_notebook .o_mapilla_weekly_lines table.o_list_table { border-top: 0; }
+
+/* Standalone list views. The class may sit on the table or its renderer. */
+.o_list_table.o_mapilla_permit_list,
+.o_mapilla_permit_list .o_list_table { border-collapse: separate; border-spacing: 0; }
+
+.o_list_table.o_mapilla_permit_list thead th,
+.o_mapilla_permit_list .o_list_table thead th {
+    height: 46px;
+    padding: 11px 13px !important;
+    border-bottom: 2px solid #c6b58d !important;
+    color: var(--mapilla-heading, #0c2a44) !important;
+    background: #eaf0f4 !important;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.o_list_table.o_mapilla_permit_list tbody td,
+.o_mapilla_permit_list .o_list_table tbody td {
+    height: 58px;
+    padding: 10px 13px !important;
+    border-bottom-color: #e7e2dd !important;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.o_list_table.o_mapilla_permit_list tbody td .o_field_widget,
+.o_mapilla_permit_list .o_list_table tbody td .o_field_widget {
+    font-weight: inherit;
+}
+
+.o_list_table.o_mapilla_permit_list tbody tr:nth-child(even) td,
+.o_mapilla_permit_list .o_list_table tbody tr:nth-child(even) td { background: #faf9f7; }
+
+.o_list_table.o_mapilla_permit_list tbody tr:hover td,
+.o_mapilla_permit_list .o_list_table tbody tr:hover td { background: #edf2f5 !important; }
+
+.o_list_table.o_mapilla_permit_list td[name="name"],
+.o_mapilla_permit_list .o_list_table td[name="name"] {
+    color: var(--mapilla-heading, #0c2a44);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.o_mapilla_permit_list .badge,
+.o_list_table.o_mapilla_permit_list .badge {
+    min-width: 92px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 750;
+}
+
+@keyframes o-permit-enter {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+@container (max-width: 1240px) {
+    .o_mapilla_stage_notebook .nav-tabs {
+        grid-template-columns: repeat(4, minmax(0, 144px));
+    }
+}
+
+@container (max-width: 540px) {
+    .o_mapilla_stage_notebook .nav-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .o_mapilla_stage_notebook .o_notebook_headers { padding: 12px !important; }
+    .o_mapilla_stage_notebook .nav-link { font-size: 12px; gap: 8px; padding: 12px 6px; }
+    .o_mapilla_weekly_lines table.o_list_table thead th,
+    .o_mapilla_weekly_lines table.o_list_table tbody td { padding: 10px 7px !important; }
+    .o_mapilla_weekly_lines td[name="recipe_used_qty"],
+    .o_mapilla_weekly_lines td[name="received_qty"] { font-size: 13px; }
+}
+
+@container (max-width: 330px) {
+    .o_mapilla_stage_notebook .nav-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@keyframes o-stage-panel-enter {
+    from { opacity: .25; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 991px) {
+    .o_mapilla_permit_meta_grid,
+    .o_mapilla_weekly_overview { grid-template-columns: 1fr; }
+    .o_mapilla_permit_reference { min-width: 150px; }
+    .o_mapilla_weekly_summary_bar { align-items: stretch; flex-direction: column; }
+    .o_mapilla_weekly_dates,
+    .o_mapilla_weekly_inline_metrics { flex-wrap: wrap; }
+    .o_mapilla_weekly_inline_metrics > span { flex: 1 1 130px; justify-content: center; }
+}
+
+@media (max-width: 767px) {
+    .o_form_view.o_mapilla_permit_form .o_mapilla_permit_sheet {
+        width: 100%; margin: 0; padding: 10px; border-radius: 0;
+    }
+    .o_assembly_request_hero {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 12px;
+        min-height: 132px;
+        padding: 18px;
+        border-radius: 15px;
+    }
+    .o_mapilla_permit_hero_icon { width: 48px; height: 48px; border-radius: 14px; font-size: 21px; }
+    .o_assembly_request_hero h1 { font-size: 23px; }
+    .o_mapilla_permit_reference { grid-column: 1 / -1; min-width: 0; padding: 9px 12px; }
+    .o_mapilla_permit_reference h2,
+    .o_mapilla_permit_reference h2 .o_field_widget { font-size: 17px; }
+    .o_mapilla_policy_hero { grid-template-columns: 48px minmax(0, 1fr); }
+    .o_mapilla_permit_flow { grid-template-columns: 1fr; gap: 7px; }
+    .o_mapilla_weekly_metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .o_mapilla_weekly_metric { min-height: 105px; padding: 10px 5px; }
+    .o_mapilla_weekly_metric strong,
+    .o_mapilla_weekly_metric strong .o_field_widget { font-size: 22px; }
+    .o_mapilla_permit_card { padding: 14px; }
+    .o_mapilla_permit_section_heading { padding-inline: 13px; }
+    .o_mapilla_weekly_dates > div { flex: 1 1 120px; border-inline-end: 0; }
+}
+
+@media (max-width: 480px) {
+    .o_mapilla_weekly_metrics { grid-template-columns: 1fr; }
+    .o_mapilla_weekly_metric {
+        min-height: 78px;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding-inline: 14px;
+        text-align: start;
+    }
+    .o_mapilla_weekly_metric strong { margin-inline-start: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_assembly_request_hero,
+    .o_mapilla_stage_notebook .nav-link.active,
+    .o_mapilla_stage_notebook .tab-pane.active { animation: none; }
+    .o_mapilla_stage_notebook .nav-link,
+    .o_mapilla_stage_notebook .nav-link::before,
+    .o_mapilla_stage_notebook .nav-link::after { transition: none; }
+}
+
+/* Per-browser date filters do not edit the saved weekly inventory. */
+.o_mapilla_material_period { width: 100%; min-width: 0; }
+.o_field_widget:has(> .o_mapilla_material_period) { width: 100% !important; }
+.o_mapilla_period_filters {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+    border: 1px solid var(--permit-border);
+    border-radius: 18px;
+    background: var(--permit-surface);
+}
+.o_mapilla_period_heading { display: flex; align-items: center; gap: 12px; margin-inline-end: auto; align-self: center; }
+.o_mapilla_period_heading > i { color: var(--permit-navy); background: #eaf0f4; border-radius: 14px; padding: 14px; font-size: 20px; }
+.o_mapilla_period_heading strong { display: block; color: var(--permit-navy); font-size: 16px; }
+.o_mapilla_period_heading small { display: block; color: var(--permit-muted); margin-top: 5px; }
+.o_mapilla_period_filters label { display: flex; flex-direction: column; gap: 6px; min-width: 155px; font-size: 12px; font-weight: 700; color: var(--permit-navy); }
+.o_mapilla_period_filters input { min-height: 42px; padding: 8px 10px; border: 1px solid #c7d2db; border-radius: 10px; background: var(--permit-surface); color: var(--permit-navy); direction: ltr; font: inherit; }
+.o_mapilla_period_filters input:focus { outline: 2px solid #9db5c6; outline-offset: 2px; }
+.o_mapilla_period_filters .btn { min-height: 42px; border-radius: 10px; font-weight: 700; }
+.o_mapilla_period_caption { color: var(--permit-muted); padding: 4px 8px 14px; font-size: 13px; }
+.o_mapilla_period_workspace { border-radius: 20px; }
+.o_mapilla_period_workspace[aria-busy="true"] { opacity: .55; }
+.o_mapilla_period_empty { padding: 28px !important; text-align: center !important; color: var(--permit-muted); }
+@media (max-width: 767px) {
+    .o_mapilla_period_heading { width: 100%; }
+    .o_mapilla_period_filters { gap: 10px; padding: 12px; }
+    .o_mapilla_period_filters label { min-width: 0; flex: 1 1 130px; }
+    .o_mapilla_period_filters input { width: 100%; min-width: 0; }
+    .o_mapilla_period_filters .btn { flex: 1 1 120px; }
+}

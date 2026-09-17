@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_furniture_mrp_advance_material_release" model="ir.sequence">
+        <field name="name">إذن صرف خامات مراحل مجمّع</field>
+        <field name="code">furniture.mrp.advance.material.release</field>
+        <field name="prefix">AMR/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_release_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.release.list</field>
+        <field name="model">furniture.mrp.advance.material.release</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" default_order="requested_at desc, id desc"
+                  decoration-warning="state == 'pending'"
+                  decoration-success="state == 'issued'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-muted="state == 'returned'">
+                <field name="name" string="رقم الإذن"/>
+                <field name="production_summary" string="أوامر الإنتاج"/>
+                <field name="production_count" string="عدد الأوامر" optional="show"/>
+                <field name="requested_by_id" string="طالب الصرف"/>
+                <field name="assigned_to_id" string="أمين المخزن" optional="show"/>
+                <field name="requested_at" string="وقت الطلب"/>
+                <field name="approved_by_id" string="اعتمد بواسطة" optional="hide"/>
+                <field name="issued_at" string="وقت الصرف" optional="show"/>
+                <field name="state" string="الحالة" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_release_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.release.form</field>
+        <field name="model">furniture.mrp.advance.material.release</field>
+        <field name="arch" type="xml">
+            <form string="إذن صرف خامات مراحل مجمّع"
+                  create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_print_warehouse_receipt"
+                            string="Print"
+                            type="object"
+                            icon="fa-print"
+                            class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper,furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_open_production_order"
+                            string="أوامر الإنتاج"
+                            type="object"
+                            icon="fa-home"
+                            class="btn-info"
+                            invisible="production_count == 0"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_open_mrp_dashboard"
+                            string="لوحة التحكم"
+                            type="object"
+                            icon="fa-th-large"
+                            class="btn-secondary"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_issue"
+                            string="اعتماد وصرف الخامات"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'pending' or not can_warehouse_decide"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+                    <button name="action_reject"
+                            string="رفض الطلب"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'pending' or not can_warehouse_decide"
+                            confirm="لن يتم صرف أي خامات للمراحل المختارة. هل تريد رفض الطلب؟"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+                    <button name="action_return"
+                            string="إرجاع الخامات إلى المخزن"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'issued' or returnable_stage_count == 0 or not can_warehouse_decide"
+                            confirm="سيتم إنشاء حركات عكسية وإرجاع الكميات المصروفة إلى مخزن الخامات. هل تريد المتابعة؟"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="pending,issued,rejected,returned"/>
+                    <field name="returnable_stage_count" invisible="1"/>
+                    <field name="production_count" invisible="1"/>
+                    <field name="can_warehouse_decide" invisible="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="إذن الصرف المجمّع"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        اعتماد أمين المخزن يسلّم الخامات إلى عهدة انتظار الاستلام فقط. مسؤول الإنتاج يراجع
+                        الكميات الفعلية لكل مرحلة ثم يؤكد استلامها قبل دخولها الصالة وظهور زر بدء التصنيع.
+                    </div>
+
+                    <group>
+                        <group string="بيانات أوامر الإنتاج">
+                            <field name="production_ids" readonly="1"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="requested_by_id" readonly="1"/>
+                            <field name="requested_at" readonly="1"/>
+                        </group>
+                        <group string="بيانات المخزن">
+                            <field name="assigned_to_id" readonly="1"/>
+                            <field name="approved_by_id" readonly="1" invisible="not approved_by_id"/>
+                            <field name="approved_at" readonly="1" invisible="not approved_at"/>
+                            <field name="issued_at" readonly="1" invisible="not issued_at"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="المراحل والخامات" name="release_stages">
+                            <div class="alert alert-light border" role="alert">
+                                كل سطر يمثل مرحلة مستقلة. افتح المرحلة لمراجعة الخامات المطلوبة والمتاح والعجز
+                                والكميات التي تم صرفها فعلًا.
+                            </div>
+                            <field name="stage_line_ids" nolabel="1" readonly="1" mode="list,form">
+                                <list create="0" delete="0"
+                                      decoration-warning="state == 'pending'"
+                                      decoration-success="state == 'issued'"
+                                      decoration-info="state == 'started'"
+                                      decoration-muted="state == 'returned'">
+                                    <field name="production_id" string="أمر الإنتاج"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="stage_code" string="المرحلة" widget="badge"/>
+                                    <field name="handover_location_id" string="عهدة التسليم" optional="hide"/>
+                                    <field name="destination_location_id" string="صالة المرحلة"/>
+                                    <field name="state" string="حالة الصرف" widget="badge"/>
+                                    <field name="receipt_state" string="استلام الإنتاج" widget="badge"/>
+                                    <field name="requested_qty" string="الكمية المطلوبة" optional="show"/>
+                                    <field name="received_qty" string="المستلم" optional="show"/>
+                                    <field name="receipt_difference_qty" string="الفرق" optional="show"/>
+                                </list>
+                                <form string="خامات المرحلة" create="0" delete="0">
+                                    <group>
+                                        <group string="المرحلة">
+                                            <field name="production_id" readonly="1"
+                                                   options="{'no_create': True, 'no_open': True}"/>
+                                            <field name="stage_code" readonly="1"/>
+                                            <field name="destination_location_id" readonly="1"/>
+                                            <field name="handover_location_id" readonly="1"/>
+                                        </group>
+                                        <group string="حالة الصرف">
+                                            <field name="state" readonly="1" widget="badge"/>
+                                            <field name="receipt_state" readonly="1" widget="badge"/>
+                                            <field name="receipt_confirmed" readonly="1"/>
+                                            <field name="received_by_id" readonly="1" invisible="not received_by_id"/>
+                                            <field name="received_at" readonly="1" invisible="not received_at"/>
+                                            <field name="receipt_note" readonly="1" invisible="not receipt_note"/>
+                                        </group>
+                                    </group>
+                                    <button name="action_open_receipt_wizard"
+                                            string="استلام من المخزن"
+                                            type="object"
+                                            icon="fa-download"
+                                            class="btn-warning"
+                                            invisible="state != 'issued' or receipt_confirmed"
+                                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                                    <separator string="الخامات المحسوبة لهذه المرحلة"/>
+                                    <field name="material_line_ids" nolabel="1" readonly="1">
+                                        <list create="0" delete="0"
+                                              decoration-danger="shortage_qty &gt; 0"
+                                              decoration-success="issued_qty &gt;= requested_qty and requested_qty &gt; 0">
+                                            <field name="product_id" string="الخامة"/>
+                                            <field name="requested_qty" string="المطلوب"/>
+                                            <field name="product_uom_id" string="الوحدة"/>
+                                            <field name="available_qty" string="المتاح"/>
+                                            <field name="shortage_qty" string="العجز"/>
+                                            <field name="issued_qty" string="تم صرفه"/>
+                                            <field name="received_qty" string="تم استلامه"/>
+                                            <field name="receipt_difference_qty" string="الفرق على المخزن"/>
+                                            <field name="move_id" string="حركة المخزون" optional="show"/>
+                                        </list>
+                                    </field>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_receipt_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.receipt.wizard.form</field>
+        <field name="model">furniture.mrp.advance.material.receipt.wizard</field>
+        <field name="arch" type="xml">
+            <form string="استلام خامات المرحلة من المخزن"
+                  class="o_furniture_stage_transfer_wizard o_furniture_material_receipt_wizard">
+                <div class="o_furniture_transfer_hero o_furniture_material_receipt_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">عهدة فعلية قبل بدء التصنيع</div>
+                        <h2>راجع المصروف وسجل اللي استلمته فعلًا</h2>
+                        <p>لن تدخل إلا الكمية التي تؤكدها إلى صالة المرحلة، وأي فرق سيظل ظاهرًا على عهدة المخزن.</p>
+                    </div>
+                    <div class="o_furniture_transfer_icon">📥</div>
+                </div>
+
+                <group class="o_furniture_transfer_order">
+                    <group>
+                        <field name="production_id" readonly="1"/>
+                        <field name="release_id" readonly="1"/>
+                        <field name="stage_code" readonly="1" widget="badge"/>
+                    </group>
+                    <group>
+                        <field name="handover_location_id" readonly="1"/>
+                        <field name="destination_location_id" readonly="1"/>
+                        <field name="has_difference" invisible="1"/>
+                    </group>
+                </group>
+
+                <div class="alert alert-info" role="alert">
+                    عدّل عمود «المستلم فعليًا» عند وجود نقص. النظام لن يكمل الفرق تلقائيًا من مخزن الخامات عند بدء المرحلة.
+                </div>
+                <field name="line_ids" nolabel="1" class="o_furniture_wizard_list">
+                    <list create="0" delete="0" editable="bottom"
+                          decoration-success="difference_qty == 0"
+                          decoration-danger="difference_qty &gt; 0">
+                        <field name="product_id" string="الخامة" readonly="1"/>
+                        <field name="issued_qty" string="المصروف من المخزن" readonly="1"/>
+                        <field name="received_qty" string="المستلم فعليًا"/>
+                        <field name="difference_qty" string="الفرق على المخزن" readonly="1"/>
+                        <field name="product_uom_id" string="الوحدة" readonly="1"/>
+                    </list>
+                </field>
+                <group>
+                    <field name="receipt_note"
+                           placeholder="اكتب سبب النقص أو أي ملاحظة على الاستلام..."/>
+                </group>
+                <div class="alert alert-warning" role="alert" invisible="not has_difference">
+                    يوجد فرق استلام. اكتب الملاحظة ثم أكد؛ الفرق سيبقى في عهدة التسليم ولن يدخل تكلفة المرحلة.
+                </div>
+                <footer>
+                    <button name="action_confirm_receipt"
+                            string="تأكيد الاستلام الفعلي"
+                            type="object"
+                            icon="fa-check"
+                            class="btn-primary o_furniture_transfer_confirm"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_batch_receipt_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.batch.receipt.wizard.form</field>
+        <field name="model">furniture.mrp.advance.material.batch.receipt.wizard</field>
+        <field name="arch" type="xml">
+            <form string="استلام خامات عدة أوامر من المخزن"
+                  class="o_furniture_stage_transfer_wizard o_furniture_batch_receipt_wizard">
+                <div class="o_furniture_transfer_hero o_furniture_batch_receipt_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">استلام واحد لكل الأوامر والمراحل المصروفة</div>
+                        <h2>راجع اللي خرج من المخزن وسجل المستلم فعليًا</h2>
+                        <p>كل مرحلة تظل مستقلة في عهدتها وتكلفتها، والتأكيد لا يبدأ التصنيع ولا ينقل الخامات إلى الصالة قبل زر بدء المرحلة.</p>
+                    </div>
+                    <div class="o_furniture_transfer_icon">📥</div>
+                </div>
+
+                <sheet class="o_furniture_wizard_sheet o_furniture_batch_receipt_sheet">
+                    <field name="company_id" invisible="1" force_save="1"/>
+                    <field name="release_stage_ids" invisible="1" force_save="1"/>
+                    <field name="release_ids" invisible="1"/>
+                    <field name="has_difference" invisible="1"/>
+
+                    <div class="o_furniture_batch_receipt_totals">
+                        <span>
+                            <i class="fa fa-file-text-o" aria-hidden="true"/>
+                            <strong><field name="release_count" readonly="1"/></strong>
+                            أذونات مجمعة
+                        </span>
+                        <span>
+                            <i class="fa fa-industry" aria-hidden="true"/>
+                            <strong><field name="production_count" readonly="1"/></strong>
+                            أوامر إنتاج
+                        </span>
+                        <span>
+                            <i class="fa fa-tasks" aria-hidden="true"/>
+                            <strong><field name="stage_count" readonly="1"/></strong>
+                            مراحل
+                        </span>
+                        <span>
+                            <i class="fa fa-cubes" aria-hidden="true"/>
+                            <strong><field name="material_count" readonly="1"/></strong>
+                            سطور خامات
+                        </span>
+                    </div>
+
+                    <div class="o_furniture_batch_receipt_stage_summary">
+                        <div class="o_furniture_transfer_card_title">
+                            الأذونات والأوامر والمراحل المنتظرة
+                        </div>
+                        <field name="stage_summary" nolabel="1" readonly="1"/>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        عدّل «المستلم فعليًا» عند وجود نقص. كل السطور ستُعتمد في معاملة واحدة؛ لو فشل سطر فلن يُسجل أي استلام جزئي لباقي الأوامر.
+                    </div>
+                    <field name="line_ids" nolabel="1"
+                           class="o_furniture_wizard_list o_furniture_batch_receipt_lines">
+                        <list create="0" delete="0" editable="bottom"
+                              decoration-success="difference_qty == 0"
+                              decoration-danger="difference_qty &gt; 0">
+                            <!-- The menu action opens an unsaved transient
+                                 wizard.  Keep the server-generated links in
+                                 the browser payload when it persists the rows
+                                 before calling action_confirm_receipts. -->
+                            <field name="release_stage_id"
+                                   column_invisible="1" force_save="1"/>
+                            <field name="release_line_id"
+                                   column_invisible="1" force_save="1"/>
+                            <field name="release_id" string="إذن المخزن" readonly="1"/>
+                            <field name="production_id" string="أمر الإنتاج" readonly="1"/>
+                            <field name="stage_code" string="المرحلة" widget="badge" readonly="1"/>
+                            <field name="product_id" string="الخامة" readonly="1"/>
+                            <field name="issued_qty" string="المصروف"
+                                   readonly="1" force_save="1"/>
+                            <field name="received_qty" string="المستلم فعليًا"/>
+                            <field name="difference_qty" string="الفرق" readonly="1"/>
+                            <field name="product_uom_id" string="الوحدة" readonly="1"/>
+                        </list>
+                    </field>
+                    <group>
+                        <field name="receipt_note"
+                               placeholder="اكتب سبب أي نقص أو ملاحظة مشتركة على الاستلام..."/>
+                    </group>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not has_difference">
+                        يوجد فرق في الكميات. اكتب الملاحظة قبل التأكيد؛ الفروق ستظل على عهدة المخزن ولن تدخل تكلفة المراحل.
+                    </div>
+                </sheet>
+
+                <footer>
+                    <button name="action_confirm_receipts"
+                            string="تأكيد استلام كل الأوامر والمراحل"
+                            type="object"
+                            icon="fa-check"
+                            class="btn-primary o_furniture_transfer_confirm"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_release_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.release.search</field>
+        <field name="model">furniture.mrp.advance.material.release</field>
+        <field name="arch" type="xml">
+            <search string="البحث في أذونات صرف خامات المراحل">
+                <field name="name" string="رقم الإذن"/>
+                <field name="production_ids" string="أوامر الإنتاج"/>
+                <field name="requested_by_id" string="طالب الصرف"/>
+                <field name="assigned_to_id" string="أمين المخزن"/>
+                <separator/>
+                <filter name="pending" string="بانتظار أمين المخزن" domain="[('state', '=', 'pending')]"/>
+                <filter name="issued" string="تم الصرف" domain="[('state', '=', 'issued')]"/>
+                <filter name="rejected" string="مرفوض" domain="[('state', '=', 'rejected')]"/>
+                <filter name="returned" string="تم الإرجاع" domain="[('state', '=', 'returned')]"/>
+                <separator/>
+                <filter name="my_requests" string="طلباتي" domain="[('requested_by_id', '=', uid)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_requested_by" string="طالب الصرف" context="{'group_by': 'requested_by_id'}"/>
+                    <filter name="group_assigned_to" string="أمين المخزن" context="{'group_by': 'assigned_to_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_advance_material_release" model="ir.actions.act_window">
+        <field name="name">صرف خامات عدة مراحل</field>
+        <field name="res_model">furniture.mrp.advance.material.release</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_advance_material_release_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد طلبات صرف مجمّعة حاليًا</p>
+            <p>
+                عند تأكيد أمر الإنتاج يمكن لمسؤول الإنتاج اختيار مرحلتين أو أكثر وإرسال خاماتها
+                في إذن واحد لأمين المخزن.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_furniture_mrp_advance_material_releases"
+              name="📦 صرف خامات عدة مراحل"
+              parent="menu_furniture_store_permissions_root"
+              action="action_furniture_mrp_advance_material_release"
+              sequence="2"
+              groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+
+    <record id="view_furniture_mrp_advance_material_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.release.wizard.form</field>
+        <field name="model">furniture.mrp.advance.material.release.wizard</field>
+        <field name="arch" type="xml">
+            <form string="طلب خامات مراحل مبكرًا"
+                  class="o_furniture_stage_transfer_wizard o_furniture_advance_material_wizard">
+                <sheet class="o_furniture_advance_material_sheet">
+                    <field name="selectable_count" invisible="1"/>
+                    <section class="o_furniture_advance_header"
+                             aria-label="ملخص طلب خامات المراحل">
+                        <div class="o_furniture_advance_intro">
+                            <span class="o_furniture_advance_intro_icon" aria-hidden="true">
+                                <i class="fa fa-cubes"/>
+                            </span>
+                            <span>
+                                <strong>اختار المراحل المطلوب صرف خاماتها</strong>
+                                <small>إذن واحد للمخزن، وخامات كل مرحلة تفضل مستقلة.</small>
+                            </span>
+                        </div>
+                        <div class="o_furniture_advance_order_chip">
+                            <span>أمر الإنتاج</span>
+                            <field name="production_id" nolabel="1" readonly="1" force_save="1"/>
+                        </div>
+                        <div class="o_furniture_advance_count_chip">
+                            <strong><field name="selected_count" nolabel="1" readonly="1"/></strong>
+                            <span>مراحل مختارة</span>
+                        </div>
+                    </section>
+
+                    <div class="o_furniture_advance_note" role="note">
+                        <i class="fa fa-info-circle" aria-hidden="true"/>
+                        <span>
+                            اختار مرحلة أو أكثر الآن. تقدر تطلب باقي المراحل لاحقًا من نفس أمر الإنتاج،
+                            والعجز الظاهر لا يغير الكميات المطلوبة.
+                        </span>
+                    </div>
+
+                    <section class="o_furniture_advance_stage_section"
+                             aria-label="مراحل مسار الإنتاج">
+                        <div class="o_furniture_advance_section_heading">
+                            <span>
+                                <strong>مراحل مسار الإنتاج</strong>
+                                <small>فعّل «إضافة للإذن» للمراحل التي تريد إرسالها للمخزن.</small>
+                            </span>
+                            <div class="o_furniture_advance_section_tools">
+                                <div class="o_furniture_advance_bulk_actions">
+                                    <button name="action_select_all_stages"
+                                            type="object"
+                                            string="تحديد كل المراحل"
+                                            icon="fa-check-square-o"
+                                            class="btn btn-primary o_furniture_advance_select_all"
+                                            invisible="selectable_count == 0"/>
+                                    <button name="action_clear_stage_selection"
+                                            type="object"
+                                            string="إلغاء التحديد"
+                                            icon="fa-undo"
+                                            class="btn btn-secondary o_furniture_advance_clear_all"
+                                            invisible="selected_count == 0"/>
+                                </div>
+                                <span class="o_furniture_advance_legend">
+                                    <span class="is-ready"><i class="fa fa-check-circle"/> متاح</span>
+                                    <span class="is-shortage"><i class="fa fa-exclamation-triangle"/> يوجد عجز</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <field name="line_ids" nolabel="1" mode="kanban"
+                               class="o_furniture_advance_stage_cards">
+                            <form string="مرحلة طلب الخامات">
+                                <field name="selected" force_save="1"/>
+                                <field name="selectable" readonly="1" force_save="1"/>
+                                <field name="stage_code" readonly="1" force_save="1"/>
+                                <field name="material_count" readonly="1" force_save="1"/>
+                                <field name="material_summary" readonly="1" force_save="1"/>
+                                <field name="available_summary" readonly="1" force_save="1"/>
+                                <field name="shortage_summary" readonly="1" force_save="1"/>
+                                <field name="material_items" readonly="1" force_save="1"/>
+                                <field name="available_items" readonly="1" force_save="1"/>
+                                <field name="shortage_items" readonly="1" force_save="1"/>
+                                <field name="has_shortage" readonly="1" force_save="1"/>
+                                <field name="active_release_name" readonly="1" force_save="1"/>
+                                <field name="note" readonly="1" force_save="1"/>
+                            </form>
+                            <kanban create="0" delete="0" can_open="0"
+                                    records_draggable="0"
+                                    class="o_furniture_advance_stage_kanban">
+                                <field name="selected" force_save="1"/>
+                                <field name="selectable" force_save="1"/>
+                                <field name="stage_code" force_save="1"/>
+                                <field name="material_count" force_save="1"/>
+                                <field name="material_summary" force_save="1"/>
+                                <field name="available_summary" force_save="1"/>
+                                <field name="shortage_summary" force_save="1"/>
+                                <field name="material_items" force_save="1"/>
+                                <field name="available_items" force_save="1"/>
+                                <field name="shortage_items" force_save="1"/>
+                                <field name="has_shortage" force_save="1"/>
+                                <field name="active_release_name" force_save="1"/>
+                                <field name="note" force_save="1"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <article class="o_furniture_advance_stage_card"
+                                                 t-att-data-stage-code="record.stage_code.raw_value"
+                                                 t-att-class="{
+                                                     'is-selected': record.selected.raw_value,
+                                                     'is-empty': !record.material_count.raw_value,
+                                                     'has-shortage': record.has_shortage.raw_value,
+                                                     'is-blocked': !record.selectable.raw_value
+                                                 }">
+                                            <div class="o_furniture_advance_stage_header">
+                                                <div class="o_furniture_advance_stage_identity">
+                                                    <field name="stage_code" widget="badge"/>
+                                                    <span class="o_furniture_advance_material_count">
+                                                        <i class="fa fa-cube" title="عدد الخامات"/>
+                                                        <field name="material_count"/> خامات
+                                                    </span>
+                                                </div>
+                                                <div class="o_furniture_advance_stage_actions">
+                                                    <t t-if="!record.material_count.raw_value">
+                                                        <span class="o_furniture_advance_status is-empty">
+                                                            <i class="fa fa-minus-circle" aria-hidden="true"/>
+                                                            بدون خامات
+                                                        </span>
+                                                    </t>
+                                                    <t t-elif="record.has_shortage.raw_value">
+                                                        <span class="o_furniture_advance_status is-shortage">
+                                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"/>
+                                                            يوجد عجز
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="o_furniture_advance_status is-ready">
+                                                            <i class="fa fa-check-circle" aria-hidden="true"/>
+                                                            متاح بالكامل
+                                                        </span>
+                                                    </t>
+
+                                                    <t t-if="record.selectable.raw_value">
+                                                        <div class="o_furniture_advance_select">
+                                                            <span>إضافة للإذن</span>
+                                                            <field name="selected"
+                                                                   widget="boolean_toggle"
+                                                                   nolabel="1"
+                                                                   force_save="1"
+                                                                   options="{'autosave': False}"/>
+                                                        </div>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="o_furniture_advance_locked">
+                                                            <i class="fa fa-lock" title="مرتبط بإذن"/>
+                                                            مرتبط بإذن
+                                                        </span>
+                                                    </t>
+                                                </div>
+                                            </div>
+
+                                            <section class="o_furniture_advance_required">
+                                                <span class="o_furniture_advance_label">
+                                                    <i class="fa fa-list-ul" aria-hidden="true"/>
+                                                    الخامات المطلوبة
+                                                </span>
+                                                <div class="o_furniture_advance_material_items"
+                                                     dir="rtl">
+                                                    <t t-if="record.material_items.raw_value.length">
+                                                        <t t-foreach="record.material_items.raw_value"
+                                                           t-as="item" t-key="item.key">
+                                                            <span class="o_furniture_advance_material_chip">
+                                                                <span class="o_furniture_advance_material_name"
+                                                                      t-att-title="item.name">
+                                                                    <t t-out="item.name"/>
+                                                                </span>
+                                                                <span class="o_furniture_advance_material_qty">
+                                                                    <strong><t t-out="item.quantity"/></strong>
+                                                                    <small t-if="item.uom"><t t-out="item.uom"/></small>
+                                                                </span>
+                                                            </span>
+                                                        </t>
+                                                    </t>
+                                                    <span t-else=""
+                                                          class="o_furniture_advance_material_empty">
+                                                        لا توجد خامات مطلوبة
+                                                    </span>
+                                                </div>
+                                            </section>
+
+                                            <div t-if="record.has_shortage.raw_value"
+                                                 class="o_furniture_advance_shortage_grid">
+                                                <section class="is-available">
+                                                    <span class="o_furniture_advance_label">
+                                                        <i class="fa fa-archive" aria-hidden="true"/>
+                                                        المتاح من المخزن
+                                                    </span>
+                                                    <div class="o_furniture_advance_material_items"
+                                                         dir="rtl">
+                                                        <t t-if="record.available_items.raw_value.length">
+                                                            <t t-foreach="record.available_items.raw_value"
+                                                               t-as="item" t-key="item.key">
+                                                                <span class="o_furniture_advance_material_chip">
+                                                                    <span class="o_furniture_advance_material_name"
+                                                                          t-att-title="item.name">
+                                                                        <t t-out="item.name"/>
+                                                                    </span>
+                                                                    <span class="o_furniture_advance_material_qty">
+                                                                        <strong><t t-out="item.quantity"/></strong>
+                                                                        <small t-if="item.uom"><t t-out="item.uom"/></small>
+                                                                    </span>
+                                                                </span>
+                                                            </t>
+                                                        </t>
+                                                    </div>
+                                                </section>
+                                                <section class="is-shortage">
+                                                    <span class="o_furniture_advance_label">
+                                                        <i class="fa fa-exclamation-circle" aria-hidden="true"/>
+                                                        العجز
+                                                    </span>
+                                                    <div class="o_furniture_advance_material_items"
+                                                         dir="rtl">
+                                                        <t t-if="record.shortage_items.raw_value.length">
+                                                            <t t-foreach="record.shortage_items.raw_value"
+                                                               t-as="item" t-key="item.key">
+                                                                <span class="o_furniture_advance_material_chip">
+                                                                    <span class="o_furniture_advance_material_name"
+                                                                          t-att-title="item.name">
+                                                                        <t t-out="item.name"/>
+                                                                    </span>
+                                                                    <span class="o_furniture_advance_material_qty">
+                                                                        <strong><t t-out="item.quantity"/></strong>
+                                                                        <small t-if="item.uom"><t t-out="item.uom"/></small>
+                                                                    </span>
+                                                                </span>
+                                                            </t>
+                                                        </t>
+                                                    </div>
+                                                </section>
+                                            </div>
+
+                                            <div t-if="!record.selectable.raw_value"
+                                                 class="o_furniture_advance_blocked_note">
+                                                <i class="fa fa-lock" aria-hidden="true"/>
+                                                <field name="note"/>
+                                            </div>
+                                        </article>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </section>
+                </sheet>
+
+                <footer>
+                    <button name="action_send_request"
+                            string="إرسال إذن المراحل المختارة"
+                            type="object"
+                            class="btn-primary o_furniture_transfer_confirm"/>
+                    <button name="action_skip"
+                            string="الطلب لاحقًا"
+                            type="object"
+                            class="btn-secondary"
+                            confirm="يمكنك طلب خامات مراحل إضافية لاحقًا من أمر الإنتاج. هل تريد المتابعة بدون إنشاء إذن الآن؟"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_advance_material_batch_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.advance.material.batch.wizard.form</field>
+        <field name="model">furniture.mrp.advance.material.batch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إذن خامات لأوامر إنتاج متعددة"
+                  class="o_furniture_stage_transfer_wizard o_furniture_batch_release_wizard">
+                <div class="o_furniture_transfer_hero o_furniture_batch_release_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">إذن واحد لعدة أوامر بدون خلط الخامات</div>
+                        <h2>اختار فترة التشغيل ثم حدد أوامر الإنتاج</h2>
+                        <p>
+                            اعرض الأوامر المجدولة داخل الفترة المطلوبة، ثم اختار كل أمر ومراحله. سيصل لأمين المخزن إذن واحد فقط، مع بقاء حركات وتكلفة وربط كل أمر مستقلة داخله.
+                        </p>
+                    </div>
+                    <div class="o_furniture_transfer_icon">📦</div>
+                </div>
+
+                <sheet class="o_furniture_wizard_sheet o_furniture_batch_release_sheet">
+                    <field name="company_id" invisible="1"/>
+                    <field name="production_ids" invisible="1"/>
+                    <field name="launch_warning" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not launch_warning">
+                        <field name="launch_warning" nolabel="1" readonly="1"/>
+                    </div>
+
+                    <section class="o_furniture_batch_period_filter" aria-label="فترة أوامر الإنتاج">
+                        <div class="o_furniture_batch_period_intro">
+                            <span class="o_furniture_batch_period_icon" aria-hidden="true">
+                                <i class="fa fa-calendar"/>
+                            </span>
+                            <span>
+                                <strong>فترة أوامر الإنتاج</strong>
+                                <small>حسب تاريخ البدء والانتهاء المخططين</small>
+                            </span>
+                        </div>
+                        <div class="o_furniture_batch_period_fields">
+                            <div class="o_furniture_batch_period_field">
+                                <label for="period_start" string="بداية الفترة"/>
+                                <field name="period_start" nolabel="1"/>
+                            </div>
+                            <span class="o_furniture_batch_period_arrow" aria-hidden="true">
+                                <i class="fa fa-long-arrow-left"/>
+                            </span>
+                            <div class="o_furniture_batch_period_field">
+                                <label for="period_end" string="نهاية الفترة"/>
+                                <field name="period_end" nolabel="1"/>
+                            </div>
+                        </div>
+                        <div class="o_furniture_batch_period_status">
+                            <span invisible="period_start and period_end">
+                                <i class="fa fa-hand-pointer-o" aria-hidden="true"/>
+                                حدد التاريخين لعرض الأوامر
+                            </span>
+                            <span class="is-ready"
+                                  invisible="not period_start or not period_end or period_start &gt; period_end">
+                                <i class="fa fa-check-circle" aria-hidden="true"/>
+                                <strong><field name="production_count" readonly="1"/></strong>
+                                أوامر مطابقة
+                            </span>
+                        </div>
+                        <div class="o_furniture_batch_period_note">
+                            <i class="fa fa-info-circle" aria-hidden="true"/>
+                            الأمر غير المسجل له تاريخ بدء مخطط لا يظهر ضمن نتائج الفترة.
+                        </div>
+                    </section>
+
+                    <div class="o_furniture_transfer_card o_furniture_batch_stage_picker">
+                        <div class="o_furniture_transfer_card_title">
+                            أوامر الإنتاج المطابقة
+                        </div>
+                        <div class="o_furniture_transfer_contents_hint">
+                            اختار الأمر من الشريط الواضح داخل الكارت، ثم حدد مراحله. المراحل الباهتة إما خارج المسار أو سبق طلبها أو بدأت بالفعل.
+                        </div>
+                        <div class="alert alert-info o_furniture_batch_period_empty"
+                             role="alert"
+                             invisible="period_start and period_end">
+                            اختار بداية الفترة ونهايتها أولًا لعرض أوامر الإنتاج.
+                        </div>
+                        <div class="alert alert-warning o_furniture_batch_period_empty"
+                             role="alert"
+                             invisible="not period_start or not period_end or period_start &gt; period_end or production_ids">
+                            لا توجد أوامر إنتاج مؤكدة أو جارية تتقاطع مواعيدها المخططة مع هذه الفترة.
+                        </div>
+                        <field name="order_line_ids" nolabel="1" mode="kanban"
+                               class="o_furniture_batch_release_lines">
+                            <!-- The inline form is used by Odoo while saving
+                                 the unsaved batch wizard opened from the menu.
+                                 Keep the server-generated production link even
+                                 though users must not edit it. -->
+                            <form string="اختيارات مراحل أمر الإنتاج">
+                                <field name="production_id" force_save="1"/>
+                                <field name="include_in_request" force_save="1"/>
+                                <field name="production_state"/>
+                                <field name="product_summary" force_save="1"/>
+                                <field name="use_priming"/>
+                                <field name="use_painting"/>
+                                <field name="use_carpentry"/>
+                                <field name="use_bases"/>
+                                <field name="use_finishing"/>
+                                <field name="use_tailoring"/>
+                                <field name="use_upholstery"/>
+                                <field name="use_packaging"/>
+                                <field name="can_use_priming" force_save="1"/>
+                                <field name="can_use_painting" force_save="1"/>
+                                <field name="can_use_carpentry" force_save="1"/>
+                                <field name="can_use_bases" force_save="1"/>
+                                <field name="can_use_finishing" force_save="1"/>
+                                <field name="can_use_tailoring" force_save="1"/>
+                                <field name="can_use_upholstery" force_save="1"/>
+                                <field name="can_use_packaging" force_save="1"/>
+                                <field name="reason_use_priming" force_save="1"/>
+                                <field name="reason_use_painting" force_save="1"/>
+                                <field name="reason_use_carpentry" force_save="1"/>
+                                <field name="reason_use_bases" force_save="1"/>
+                                <field name="reason_use_finishing" force_save="1"/>
+                                <field name="reason_use_tailoring" force_save="1"/>
+                                <field name="reason_use_upholstery" force_save="1"/>
+                                <field name="reason_use_packaging" force_save="1"/>
+                                <field name="has_selectable_stages" force_save="1"/>
+                                <field name="blocked_stage_summary" force_save="1"/>
+                                <field name="selected_stage_count"/>
+                                <field name="stage_summary"/>
+                            </form>
+                            <kanban create="0" delete="0" can_open="0"
+                                    records_draggable="0"
+                                    class="o_furniture_batch_release_orders">
+                                <field name="production_id" force_save="1"/>
+                                <field name="include_in_request" force_save="1"/>
+                                <field name="production_state"/>
+                                <field name="product_summary" force_save="1"/>
+                                <field name="use_priming"/>
+                                <field name="use_painting"/>
+                                <field name="use_carpentry"/>
+                                <field name="use_bases"/>
+                                <field name="use_finishing"/>
+                                <field name="use_tailoring"/>
+                                <field name="use_upholstery"/>
+                                <field name="use_packaging"/>
+                                <field name="can_use_priming" force_save="1"/>
+                                <field name="can_use_painting" force_save="1"/>
+                                <field name="can_use_carpentry" force_save="1"/>
+                                <field name="can_use_bases" force_save="1"/>
+                                <field name="can_use_finishing" force_save="1"/>
+                                <field name="can_use_tailoring" force_save="1"/>
+                                <field name="can_use_upholstery" force_save="1"/>
+                                <field name="can_use_packaging" force_save="1"/>
+                                <field name="reason_use_priming" force_save="1"/>
+                                <field name="reason_use_painting" force_save="1"/>
+                                <field name="reason_use_carpentry" force_save="1"/>
+                                <field name="reason_use_bases" force_save="1"/>
+                                <field name="reason_use_finishing" force_save="1"/>
+                                <field name="reason_use_tailoring" force_save="1"/>
+                                <field name="reason_use_upholstery" force_save="1"/>
+                                <field name="reason_use_packaging" force_save="1"/>
+                                <field name="has_selectable_stages" force_save="1"/>
+                                <field name="blocked_stage_summary" force_save="1"/>
+                                <field name="selected_stage_count"/>
+                                <field name="stage_summary"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <article class="o_furniture_batch_release_order_card"
+                                                 t-att-class="{'is-order-selected': record.include_in_request.raw_value}">
+                                            <div class="o_furniture_batch_release_order_header">
+                                                <div>
+                                                    <span class="o_furniture_batch_release_order_eyebrow">أمر إنتاج</span>
+                                                    <strong><field name="production_id"/></strong>
+                                                </div>
+                                                <field name="production_state" widget="badge"/>
+                                            </div>
+                                            <div class="o_furniture_batch_release_products">
+                                                <i class="fa fa-cubes" title="الأصناف" aria-hidden="true"/>
+                                                <field name="product_summary"/>
+                                            </div>
+                                            <field name="use_priming"
+                                                   widget="furniture_stage_selector"
+                                                   nolabel="1"
+                                                   class="o_furniture_stage_cards_field"/>
+                                            <div class="o_furniture_batch_release_order_footer">
+                                                <span class="o_furniture_batch_release_selection">
+                                                    <i class="fa fa-check-circle" title="المراحل المختارة" aria-hidden="true"/>
+                                                    <field name="stage_summary"/>
+                                                </span>
+                                                <span t-if="record.blocked_stage_summary.raw_value"
+                                                      class="o_furniture_batch_release_blocked"
+                                                      t-att-title="record.blocked_stage_summary.raw_value">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"/>
+                                                    توجد مراحل غير متاحة
+                                                </span>
+                                            </div>
+                                            <div t-if="!record.has_selectable_stages.raw_value"
+                                                 class="alert alert-warning mb-0 mt-2" role="alert">
+                                                لا توجد مراحل متاحة للطلب في هذا الأمر حاليًا.
+                                            </div>
+                                        </article>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </div>
+
+                    <div class="o_furniture_batch_release_totals">
+                        <span><strong><field name="production_count" readonly="1"/></strong> أوامر معروضة</span>
+                        <span><strong><field name="selected_production_count" readonly="1"/></strong> أوامر محددة</span>
+                        <span><strong><field name="selected_stage_count" readonly="1"/></strong> مراحل مطلوبة</span>
+                    </div>
+                </sheet>
+
+                <footer>
+                    <button name="action_send_requests"
+                            string="إرسال إذن واحد لأمين المخزن"
+                            type="object"
+                            class="btn-primary o_furniture_transfer_confirm"
+                            groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_advance_material_batch_wizard" model="ir.actions.act_window">
+        <field name="name">إذن خامات لأوامر متعددة</field>
+        <field name="res_model">furniture.mrp.advance.material.batch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_advance_material_batch_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{'form_view_initial_mode': 'edit', 'auto_load_eligible_productions': True}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor')])]"/>
+    </record>
+
+    <record id="action_furniture_mrp_advance_material_batch_receipt_wizard" model="ir.actions.act_window">
+        <field name="name">استلام من المخزن</field>
+        <field name="res_model">furniture.mrp.advance.material.batch.receipt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_advance_material_batch_receipt_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{'form_view_initial_mode': 'edit', 'auto_load_pending_batch_receipts': True}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor')])]"/>
+    </record>
+
+    <menuitem id="menu_furniture_mrp_advance_material_batch_wizard"
+              name="📦 إذن خامات لأوامر متعددة"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_advance_material_batch_wizard"
+              sequence="11"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_finishing,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <menuitem id="menu_furniture_mrp_advance_material_batch_receipt_wizard"
+              name="📥 استلام من المخزن"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_advance_material_batch_receipt_wizard"
+              sequence="12"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_finishing,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+</odoo>

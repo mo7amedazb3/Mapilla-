@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_address_sales_landscape" model="report.paperformat">
+        <field name="name">Address Sales Report - Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">25</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">18</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_address_sales" model="ir.actions.report">
+        <field name="name">Address Sales Report</field>
+        <field name="model">sale.destination.address.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sale_invoice_destination_address.address_sales</field>
+        <field name="report_file">sale_invoice_destination_address.address_sales</field>
+        <field name="paperformat_id" ref="paperformat_address_sales_landscape"/>
+        <field name="print_report_name">'Address_Sales_%s_to_%s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <template id="address_sales">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: Arial, sans-serif; color: #22313f;">
+                        <t t-set="brand_company" t-value="company"/>
+                        <div style="width:100%; border-bottom:2px solid #2f817a; padding:0 6px 12px; margin-bottom:15px; box-sizing:border-box; page-break-inside:avoid;">
+                            <table dir="ltr" style="width:100%; table-layout:fixed; border-collapse:collapse;">
+                                <tr>
+                                    <td style="width:32%; text-align:center; vertical-align:middle; padding:0 12px;">
+                                        <t t-call="sale_invoice_destination_address.report_company_brand_logo"/>
+                                    </td>
+                                    <td dir="rtl" style="width:68%; text-align:right; vertical-align:middle; padding:0 12px;">
+                                        <h2 style="color:#225b57 !important; font-size:26px; font-weight:700; margin:0 0 5px 0;">
+                                            تقرير المبيعات حسب العنوان
+                                        </h2>
+                                        <div style="color:#667085; font-size:13px;">
+                                            الفترة من <strong t-out="date_from"/> إلى <strong t-out="date_to"/>
+                                        </div>
+                                        <div style="color:#667085; font-size:11px; margin-top:3px;">
+                                            الفواتير المرحلة — المبيعات قبل الضريبة بعملة الشركة
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="width: 100%; overflow: hidden; direction: rtl; margin-bottom: 12px;">
+                            <div style="float: right; width: 32%; margin-left: 2%;">
+                                <div style="border: 1px solid #d7e6e4; border-radius: 8px; padding: 10px; background: #f1f8f7;">
+                                    <div style="font-size: 11px; color: #667085;">العناوين النشطة</div>
+                                    <div style="font-size: 19px; font-weight: 700; color: #225b57;" t-out="configured_address_count"/>
+                                </div>
+                            </div>
+                            <div style="float: right; width: 32%; margin-left: 2%;">
+                                <div style="border: 1px solid #d7e6e4; border-radius: 8px; padding: 10px; background: #f1f8f7;">
+                                    <div style="font-size: 11px; color: #667085;">عدد الفواتير</div>
+                                    <div style="font-size: 19px; font-weight: 700; color: #225b57;" t-out="total_invoice_count"/>
+                                </div>
+                            </div>
+                            <div style="float: right; width: 32%;">
+                                <div style="border: 1px solid #d7e6e4; border-radius: 8px; padding: 10px; background: #f1f8f7;">
+                                    <div style="font-size: 11px; color: #667085;">المبيعات قبل الضريبة</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #225b57;">
+                                        <span t-out="total_untaxed_sales"
+                                              t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered"
+                               style="width: 100%; border-collapse: collapse; font-size: 11px; direction: rtl;">
+                            <thead style="display: table-header-group; background: #edf3f2; color: #172b2a; border-bottom: 2px solid #6f9f9a;">
+                                <tr>
+                                    <th class="text-center" style="width: 5%; padding: 9px; color: #172b2a !important; background: #edf3f2 !important;">#</th>
+                                    <th style="width: 40%; padding: 9px; color: #172b2a !important; background: #edf3f2 !important;">العنوان</th>
+                                    <th class="text-center" style="width: 15%; padding: 9px; color: #172b2a !important; background: #edf3f2 !important;">الفواتير</th>
+                                    <th class="text-end" style="width: 22%; padding: 9px; color: #172b2a !important; background: #edf3f2 !important;">المبيعات قبل الضريبة</th>
+                                    <th class="text-center" style="width: 18%; padding: 9px; color: #172b2a !important; background: #edf3f2 !important;">النسبة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-if="not rows">
+                                    <td colspan="5" class="text-center" style="padding: 22px; color: #667085;">
+                                        لا توجد عناوين أو مبيعات في الفترة المحددة.
+                                    </td>
+                                </tr>
+                                <tr t-foreach="rows"
+                                    t-as="row"
+                                    t-att-style="'background: #fff8ef;' if row['is_unassigned'] else ('background: #f7f7f7;' if not row['active'] else '')">
+                                    <td class="text-center" style="padding: 7px;" t-out="row_index + 1"/>
+                                    <td style="padding: 7px; font-weight: 600;">
+                                        <span t-out="row['name']"/>
+                                        <span t-if="not row['active']"
+                                              style="font-size: 9px; color: #8a4b13; margin-right: 5px;">(مؤرشف)</span>
+                                    </td>
+                                    <td class="text-center" style="padding: 7px;" t-out="row['invoice_count']"/>
+                                    <td class="text-end" style="padding: 7px;">
+                                        <span t-out="row['untaxed_sales']"
+                                              t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-center" style="padding: 7px;">
+                                        <strong t-out="'{:.2f}'.format(row['percentage'])"/><strong>%</strong>
+                                        <div style="height: 4px; width: 100px; margin: 4px auto 0; background: #e4eceb; border-radius: 2px; direction: ltr;">
+                                            <div t-att-style="'height: 4px; width: {:.2f}px; background: #2f817a; border-radius: 2px;'.format(row['bar_percentage'])"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot style="display: table-row-group; background: #e7f2f1; font-weight: 700; border-top: 2px solid #225b57;">
+                                <tr>
+                                    <td colspan="2" style="padding: 8px;">الإجمالي</td>
+                                    <td class="text-center" style="padding: 8px;" t-out="total_invoice_count"/>
+                                    <td class="text-end" style="padding: 8px;">
+                                        <span t-out="total_untaxed_sales"
+                                              t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-center" style="padding: 8px;">
+                                        <span t-out="'{:.2f}'.format(total_percentage)"/><span>%</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

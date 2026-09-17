@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_spa_replenishment.CentralPurchaseDashboard" owl="1">
+        <div class="o_spa_cp_dashboard o_spa_central_purchase_dashboard">
+            <div class="o_spa_cp_panel">
+                <div class="o_spa_cp_header">
+                    <div>
+                        <h1>Central Purchase Replenishment <i class="fa fa-star-o"/></h1>
+                        <p>Review stock levels and request purchase review for items below minimum threshold.</p>
+                    </div>
+                    <div class="o_spa_cp_tools">
+                        <button class="btn btn-light o_spa_cp_icon_button" t-on-click="loadData" title="Reload">
+                            <i class="fa fa-refresh"/>
+                        </button>
+                        <button class="btn btn-light" t-on-click="prepareSelected" t-att-disabled="selectedCount === 0">
+                            <i class="fa fa-paper-plane me-1"/> Request Selected
+                            <t t-if="selectedCount">(<t t-esc="selectedCount"/>)</t>
+                        </button>
+                        <button class="btn btn-light" t-on-click="openListView">
+                            <i class="fa fa-list me-1"/> List View
+                        </button>
+                        <button class="btn btn-primary" t-on-click="refreshMaterials">
+                            <i class="fa fa-refresh me-1"/> Refresh Materials
+                        </button>
+                    </div>
+                </div>
+
+                <div class="o_spa_cp_summary">
+                    <div class="o_spa_cp_metric o_spa_cp_metric_total">
+                        <div class="o_spa_cp_metric_icon"><i class="fa fa-cube"/></div>
+                        <div>
+                            <span>Total Items</span>
+                            <strong t-esc="state.summary.total_items"/>
+                            <small>All products</small>
+                        </div>
+                    </div>
+                    <div class="o_spa_cp_metric o_spa_cp_metric_order">
+                        <div class="o_spa_cp_metric_icon"><i class="fa fa-shopping-cart"/></div>
+                        <div>
+                            <span>Need Reorder</span>
+                            <strong t-esc="state.summary.need_reorder"/>
+                            <small>Below minimum</small>
+                        </div>
+                    </div>
+                    <div class="o_spa_cp_metric o_spa_cp_metric_ok">
+                        <div class="o_spa_cp_metric_icon"><i class="fa fa-check"/></div>
+                        <div>
+                            <span>Stock OK</span>
+                            <strong t-esc="state.summary.stock_ok"/>
+                            <small>Sufficient stock</small>
+                        </div>
+                    </div>
+                    <div class="o_spa_cp_metric o_spa_cp_metric_supplier">
+                        <div class="o_spa_cp_metric_icon"><i class="fa fa-users"/></div>
+                        <div>
+                            <span>Suppliers</span>
+                            <strong t-esc="state.summary.suppliers"/>
+                            <small>Active suppliers</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_spa_cp_filters">
+                    <div class="btn-group">
+                        <button t-att-class="'btn ' + (state.status === 'all' ? 'btn-primary' : 'btn-light')" t-on-click="() =&gt; this.setStatus('all')">All</button>
+                        <button t-att-class="'btn ' + (state.status === 'need_reorder' ? 'btn-primary' : 'btn-light')" t-on-click="() =&gt; this.setStatus('need_reorder')">Need Reorder</button>
+                        <button t-att-class="'btn ' + (state.status === 'ok' ? 'btn-primary' : 'btn-light')" t-on-click="() =&gt; this.setStatus('ok')">Stock OK</button>
+                        <button t-att-class="'btn ' + (state.status === 'ordered' ? 'btn-primary' : 'btn-light')" t-on-click="() =&gt; this.setStatus('ordered')">Ordered</button>
+                    </div>
+                    <div class="o_spa_cp_search">
+                        <i class="fa fa-search"/>
+                        <input type="search" placeholder="Search product or supplier..." t-att-value="state.search" t-on-input="updateSearch"/>
+                    </div>
+                </div>
+
+                <t t-if="state.isLoading">
+                    <div class="o_spa_cp_loading">
+                        <div class="spinner-border text-primary" role="status"/>
+                        <span>Loading replenishment data...</span>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="o_spa_cp_table_wrap">
+                        <table class="table o_spa_cp_table">
+                            <thead>
+                                <tr>
+                                    <th class="o_spa_cp_select_col">
+                                        <input type="checkbox" title="Select all visible rows" t-att-checked="allVisibleSelected" t-att-disabled="visibleSelectableRows.length === 0" t-on-change="toggleVisibleRows"/>
+                                    </th>
+                                    <th>Product</th>
+                                    <th>Default Supplier</th>
+                                    <th class="text-end">On Hand</th>
+                                    <th class="text-end">Forecast</th>
+                                    <th class="text-end">Minimum</th>
+                                    <th class="text-end">Maximum</th>
+                                    <th class="text-end">Required Qty</th>
+                                    <th class="text-end">Remaining Qty</th>
+                                    <th>Unit</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="filteredRows" t-as="row" t-key="row.id">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" t-att-checked="state.selectedIds[row.id]" t-att-disabled="!row.can_prepare" t-on-change="() =&gt; this.toggleRow(row)"/>
+                                        </td>
+                                        <td class="o_spa_cp_product" t-esc="row.product"/>
+                                        <td t-esc="row.supplier"/>
+                                        <td class="text-end" t-att-class="'text-end ' + qtyClass(row.on_hand)" t-esc="formatQty(row.on_hand)"/>
+                                        <td class="text-end" t-att-class="'text-end ' + qtyClass(row.forecast)" t-esc="formatQty(row.forecast)"/>
+                                        <td class="text-end">
+                                            <input class="o_spa_cp_limit_input" type="number" min="0" step="0.01" t-att-value="row.minimum" t-att-disabled="state.savingRows[row.id]" t-on-input="(event) =&gt; this.setLimit(row, 'minimum', event)" t-on-change="() =&gt; this.saveLimits(row)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <input class="o_spa_cp_limit_input" type="number" min="0" step="0.01" t-att-value="row.maximum" t-att-disabled="state.savingRows[row.id]" t-on-input="(event) =&gt; this.setLimit(row, 'maximum', event)" t-on-change="() =&gt; this.saveLimits(row)"/>
+                                        </td>
+                                        <td class="text-end" t-att-class="'text-end ' + qtyClass(row.required_qty)" t-esc="formatQty(row.required_qty)"/>
+                                        <td class="text-end" t-att-class="'text-end ' + qtyClass(row.remaining_qty)" t-esc="formatQty(row.remaining_qty)"/>
+                                        <td t-esc="row.unit"/>
+                                        <td>
+                                            <span t-att-class="'o_spa_cp_badge ' + statusClass(row)" t-esc="row.status_label"/>
+                                        </td>
+                                        <td>
+                                            <button t-if="row.can_prepare" class="btn btn-sm btn-primary o_spa_cp_prepare" t-att-disabled="state.preparingRows[row.id]" t-on-click="() =&gt; this.prepareRfq(row)">
+                                                <i t-att-class="'fa me-1 ' + (state.preparingRows[row.id] ? 'fa-spinner fa-spin' : 'fa-paper-plane')"/> Request Purchase
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr t-if="filteredRows.length === 0">
+                                    <td colspan="12" class="o_spa_cp_empty">No materials match the current filter.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="o_spa_cp_note">
+                        <i class="fa fa-info-circle me-1"/> Quantities are in the product's default unit of measure.
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>
+

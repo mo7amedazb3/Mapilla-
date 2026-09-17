@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_delivery_request_admin,Delivery request admin,furniture_mrp.model_furniture_mrp_future_order,base.group_system,1,1,1,1
+access_delivery_request_line_admin,Delivery request line admin,furniture_mrp.model_furniture_mrp_future_order_line,base.group_system,1,1,1,1
+access_delivery_creation_admin,Delivery creation admin,model_furniture_delivery_creation_wizard,base.group_system,1,1,1,1
+access_delivery_creation_line_admin,Delivery creation line admin,model_furniture_delivery_creation_line,base.group_system,1,1,1,1
+access_delivery_spec_admin,Delivery specifications,model_furniture_delivery_spec_wizard,base.group_system,1,1,1,1
+access_delivery_spec_material_admin,Delivery material specification,model_furniture_delivery_spec_material,base.group_system,1,1,1,1
+access_delivery_customer_spec_admin,Delivery customer specifications,model_furniture_delivery_customer_spec,base.group_system,1,1,1,1
+access_delivery_customer_editor_admin,Delivery customer preferences,model_furniture_delivery_customer_editor,base.group_system,1,1,1,1
+access_delivery_stage_warning_admin,Delivery stage warning admin,model_furniture_delivery_request_stage_warning,base.group_system,1,1,1,1
+access_delivery_stage_warning_wizard_admin,Delivery stage warning wizard admin,model_furniture_delivery_request_stage_warning_wizard,base.group_system,1,1,1,1

@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_bom_form_furniture_stages" model="ir.ui.view">
+        <field name="name">mrp.bom.form.furniture.stage.materials</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']" position="before">
+                <field name="furniture_parent_bom_id" invisible="1"/>
+                <field name="furniture_is_model_recipe" invisible="1"/>
+                <field name="furniture_recipe_ready" invisible="1"/>
+                <field name="furniture_source_bom_id" string="نسخ من ريسيبي"
+                       domain="[('type', '=', 'normal'), ('furniture_is_model_recipe', '=', False), ('id', '!=', id)]"
+                       options="{'no_create': True, 'no_create_edit': True}"
+                       invisible="type == 'phantom' or furniture_is_model_recipe"/>
+                <field name="furniture_product_id" string="المنتج النهائي"
+                       domain="[('furniture_is_finished_product', '=', True), ('furniture_dimension_source_product_id', '=', False)] if type == 'normal' else [('furniture_dimension_source_product_id', '=', False)]"
+                       options="{'no_create': True, 'no_create_edit': True}"
+                       readonly="furniture_is_model_recipe"/>
+                <field name="furniture_family_id" invisible="1"/>
+                <!-- The normal BoM remains product-only; this dedicated widget
+                     navigates between its saved model recipes without dirtying
+                     the form. -->
+                <field name="furniture_recipe_model_id" string="عرض خامات موديل"
+                       domain="[]" widget="furniture_model_navigator"
+                       nolabel="1" colspan="2" class="o_furniture_model_cards_field"
+                       required="type == 'normal' and not furniture_is_model_recipe"
+                       invisible="type != 'normal' or furniture_is_model_recipe"
+                       options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                <field name="furniture_model_id" string="الموديل" domain="[]"
+                       required="type == 'phantom'"
+                       invisible="type != 'phantom'"
+                       options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                <field name="furniture_model_id" string="الموديل" domain="[]"
+                       widget="furniture_model_navigator"
+                       nolabel="1" colspan="2" class="o_furniture_model_cards_field"
+                       required="furniture_is_model_recipe"
+                       invisible="not furniture_is_model_recipe"
+                       options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                <field name="furniture_model_match_key" invisible="1"/>
+                <field name="furniture_finished_location_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="replace">
+            </xpath>
+            <xpath expr="//field[@name='type']" position="attributes">
+                <attribute name="readonly">furniture_is_model_recipe</attribute>
+            </xpath>
+            <xpath expr="//sheet/group[1]" position="after">
+                <div invisible="type == 'phantom'">
+                    <separator string="أبعاد المنتج بالسم"/>
+                    <div class="o_furniture_dimensions_row">
+                        <div class="o_furniture_dimension_item">
+                            <label for="furniture_width_cm" string="العرض"/>
+                            <field name="furniture_width_cm" nolabel="1" widget="furniture_compact_quantity"/>
+                        </div>
+                        <div class="o_furniture_dimension_item">
+                            <label for="furniture_depth_cm" string="العمق"/>
+                            <field name="furniture_depth_cm" nolabel="1" widget="furniture_compact_quantity"/>
+                        </div>
+                        <div class="o_furniture_dimension_item">
+                            <label for="furniture_height_cm" string="الارتفاع"/>
+                            <field name="furniture_height_cm" nolabel="1" widget="furniture_compact_quantity"/>
+                        </div>
+                    </div>
+                    <separator string="مراحل التصنيع المطلوبة"/>
+                    <group>
+                        <group>
+                            <field name="use_priming"/>
+                            <field name="use_painting"/>
+                            <field name="use_carpentry"/>
+                            <field name="use_bases"/>
+                            <field name="use_finishing"/>
+                        </group>
+                        <group>
+                            <field name="use_tailoring"/>
+                            <field name="use_upholstery"/>
+                            <field name="use_packaging"/>
+                        </group>
+                    </group>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='product_tmpl_id']" position="attributes">
+                <attribute name="string">قالب المنتج</attribute>
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_tmpl_id']/following-sibling::field[@name='product_id']" position="replace">
+            </xpath>
+            <xpath expr="//page[@name='components']" position="attributes">
+                <attribute name="string">منتجات الطقم</attribute>
+                <attribute name="invisible">type != 'phantom'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_id']" position="attributes">
+                <attribute name="string">المنتج التام</attribute>
+                <attribute name="domain">[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False), ('id', '!=', parent.furniture_product_id)]</attribute>
+                <attribute name="context">{'default_is_storable': True, 'location': parent.furniture_finished_location_id}</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_id']" position="after">
+                <field name="furniture_component_model_id" string="الموديل" readonly="1"/>
+                <field name="furniture_finished_stock_qty" string="المتاح في المنتج التام" readonly="1"/>
+            </xpath>
+            <xpath expr="//page[@name='components']//button[@name='action_add_from_catalog']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']/list/field[@name='product_qty']" position="after">
+                <field name="furniture_quantity_mode" string="حساب الكمية" column_invisible="parent.type == 'phantom'"/>
+            </xpath>
+            <xpath expr="//page[@name='components']" position="before">
+                <page string="خامات مراحل التصنيع" name="furniture_stage_materials" invisible="type == 'phantom'">
+                    <notebook class="o_furniture_stage_materials">
+                        <page string="1. التقديم" invisible="not use_priming">
+                            <field name="priming_material_line_ids" context="{'default_stage': 'priming'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="2. تصنيع دهانات" invisible="not use_painting">
+                            <field name="painting_material_line_ids" context="{'default_stage': 'painting'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="3. تجميع" invisible="not use_carpentry">
+                            <field name="carpentry_material_line_ids" context="{'default_stage': 'carpentry'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="4. القواعد" invisible="not use_bases">
+                            <field name="bases_material_line_ids" context="{'default_stage': 'bases'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/><field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة" domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]" options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/><field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/><field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/><field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="5. تجهيز" invisible="not use_finishing">
+                            <field name="finishing_material_line_ids" context="{'default_stage': 'finishing'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="6. تفصيل" invisible="not use_tailoring">
+                            <field name="tailoring_material_line_ids" context="{'default_stage': 'tailoring'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="furniture_tailoring_material_kind"
+                                           string="دورها في التقسيمة" optional="show"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="7. كسوه" invisible="not use_upholstery">
+                            <field name="upholstery_material_line_ids" context="{'default_stage': 'upholstery'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="furniture_tailoring_material_kind"
+                                           string="دورها في التقسيمة" optional="show"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="8. التغليف" invisible="not use_packaging">
+                            <field name="packaging_material_line_ids" context="{'default_stage': 'packaging'}">
+                                <list editable="bottom" create="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="stage" column_invisible="1"/>
+                                    <field name="product_id" string="الخامة"
+                                           domain="[('furniture_is_finished_product', '=', False), ('id', '!=', parent.furniture_product_id)]"
+                                           options="{'no_quick_create': True}"/>
+                                    <field name="product_qty" string="الكمية" widget="furniture_compact_quantity"/>
+                                    <field name="quantity_mode" string="حساب الكمية"/>
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" column_invisible="1"/>
+                                    <field name="product_uom_code" string="الوحدة"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="recipe_quantity_cost" string="تكلفة الكمية" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_mrp_bom_tree_furniture_stages" model="ir.ui.view">
+        <field name="name">mrp.bom.list.furniture.stage.materials</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']" position="after">
+                <field name="furniture_product_id" string="المنتج النهائي" optional="show"/>
+                <field name="furniture_model_id" string="الموديل" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="replace">
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_mrp_bom_kanban_furniture_stages" model="ir.ui.view">
+        <field name="name">mrp.bom.kanban.furniture.stage.materials</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code']" position="replace">
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Internal per-model recipe snapshots must never appear as extra BoM rows. -->
+    <record id="mrp.mrp_bom_form_action" model="ir.actions.act_window">
+        <field name="domain">[('furniture_is_model_recipe', '=', False)]</field>
+    </record>
+
+    <record id="mrp.template_open_bom" model="ir.actions.act_window">
+        <field name="domain">['&amp;', ('furniture_is_model_recipe', '=', False), '|', ('product_tmpl_id', '=', active_id), ('byproduct_ids.product_id.product_tmpl_id', '=', active_id)]</field>
+    </record>
+
+    <record id="mrp.product_open_bom" model="ir.actions.act_window">
+        <field name="domain">[('furniture_is_model_recipe', '=', False)]</field>
+    </record>
+
+    <record id="view_mrp_bom_filter_furniture_stages" model="ir.ui.view">
+        <field name="name">mrp.bom.select.furniture.stage.materials</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.view_mrp_bom_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code']" position="replace">
+            </xpath>
+        </field>
+    </record>
+</odoo>

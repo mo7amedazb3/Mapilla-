@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- القائمة الجذر -->
+    <menuitem id="menu_furniture_mrp_root"
+              name="MRP II"
+              sequence="50"
+              web_icon="furniture_mrp,static/description/icon.png"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor,base.group_user"/>
+    <!-- Without a fixed root action Odoo opens the first child the caller can
+         access: managers land on the factory dashboard, workers on their MPS
+         queue.  This avoids sending a worker to the manager-only dashboard. -->
+    <record id="menu_furniture_mrp_root" model="ir.ui.menu">
+        <field name="action" eval="False"/>
+    </record>
+
+    <menuitem id="menu_furniture_product_configuration"
+              name="تصنيف المنتجات"
+              parent="menu_furniture_mrp_root"
+              sequence="8"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+    <menuitem id="menu_furniture_product_family"
+              name="الفئات الرئيسية"
+              parent="menu_furniture_product_configuration"
+              action="action_furniture_product_family"
+              active="False"
+              sequence="1"/>
+    <menuitem id="menu_furniture_product_model"
+              name="Models"
+              parent="mrp.menu_mrp_bom"
+              action="action_furniture_product_model"
+              sequence="3"/>
+
+    <!-- لوحة التحكم -->
+    <menuitem id="menu_furniture_mrp_dashboard"
+              name="📊 لوحة التحكم"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_stage_dashboard_page"
+              sequence="1"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+
+    <menuitem id="menu_furniture_mrp_future_orders"
+              name="🔔 طلبات التسليم"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_future_order"
+              sequence="5"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <!-- أوامر التشغيل الأسبوعية -->
+    <menuitem id="menu_furniture_mrp_production"
+              name="📋 أوامر التشغيل الأسبوعية"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_production"
+              sequence="10"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <!-- جدول MPS -->
+    <menuitem id="menu_furniture_mrp_mps"
+              name="📅 تخطيط المراحل والعمال"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_mps_dashboard_page"
+              sequence="15"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging,base.group_user"/>
+
+    <menuitem id="menu_furniture_mrp_mps_worker_schedule"
+              name="خطة المراحل والعمال"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_mrp_mps_schedule"
+              active="False"
+              sequence="1"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging,base.group_user"/>
+
+    <menuitem id="menu_furniture_mrp_mps_plans"
+              name="خطط أوامر الإنتاج"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_mrp_mps_plans"
+              active="False"
+              sequence="2"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <menuitem id="menu_furniture_mrp_mps_operations"
+              name="معايير العمليات"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_mrp_mps_operations"
+              active="False"
+              sequence="20"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_mrp_mps_product_times"
+              name="⏱️ أزمنة خطوات الأصناف"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_mrp_mps_product_times"
+              active="False"
+              sequence="19"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_mrp_mps_profiles"
+              name="بروفايلات التشغيل"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_mrp_mps_profiles"
+              active="False"
+              sequence="21"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_fabric_work_types"
+              name="أنواع القماش التشغيلية"
+              parent="menu_furniture_mrp_mps"
+              action="action_furniture_fabric_work_type"
+              active="False"
+              sequence="22"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <!-- نقطة الالتقاء بين أمر التجهيز وأمر الكسوة/التفصيل. -->
+    <menuitem id="menu_furniture_mrp_completion_pool"
+              name="✅ جاهز لإتمام المنتج"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_completion_pool"
+              sequence="16"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_completion_operator,furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_mrp_final_assembly"
+              name="🧾 سجل إتمام المنتج"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_final_assembly"
+              sequence="17"
+              active="False"
+              groups="furniture_mrp.group_furniture_mrp_completion_operator,furniture_mrp.group_furniture_mrp_manager"/>
+
+    <!-- المخازن -->
+    <menuitem id="menu_furniture_mrp_locations"
+              name="🏬 المخازن"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_locations"
+              sequence="18"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <menuitem id="menu_furniture_store_permissions_root"
+              name="أذونات المخزن"
+              sequence="51"
+              web_icon="furniture_mrp,static/description/icon.png"
+              groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+
+    <menuitem id="menu_furniture_mrp_store_requests"
+              name="📨 أذونات المخزن"
+              parent="menu_furniture_store_permissions_root"
+              action="action_furniture_mrp_store_request"
+              sequence="1"
+              groups="furniture_mrp.group_furniture_mrp_storekeeper"/>
+
+    <!-- Replace legacy menu groups instead of only appending to them on upgrade. -->
+    <record id="menu_furniture_store_permissions_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_storekeeper')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_store_requests" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_storekeeper')])]"/>
+    </record>
+
+    <!-- قائمة الأقسام -->
+    <menuitem id="menu_furniture_mrp_departments"
+              name="🏭 الأقسام"
+              parent="menu_furniture_mrp_root"
+              sequence="20"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <menuitem id="menu_furniture_mrp_priming"
+              name="🎨 التقديم"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_priming"
+              sequence="21"/>
+
+    <menuitem id="menu_furniture_mrp_painting"
+              name="🖌️ تصنيع دهانات"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_painting"
+              sequence="22"/>
+
+    <menuitem id="menu_furniture_mrp_carpentry"
+              name="🪵 تجميع"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_carpentry"
+              sequence="23"/>
+
+    <menuitem id="menu_furniture_mrp_finishing"
+              name="🔧 تجهيز"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_finishing"
+              sequence="25"/>
+
+    <menuitem id="menu_furniture_mrp_bases"
+              name="🧱 القواعد"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_bases"
+              sequence="24"/>
+
+    <menuitem id="menu_furniture_mrp_tailoring"
+              name="✂️ تفصيل"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_tailoring"
+              sequence="27"/>
+
+    <menuitem id="menu_furniture_mrp_upholstery"
+              name="🛋️ كسوه"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_upholstery"
+              sequence="26"/>
+
+    <menuitem id="menu_furniture_mrp_packaging"
+              name="📦 التغليف"
+              parent="menu_furniture_mrp_departments"
+              action="action_furniture_mrp_packaging"
+              sequence="29"/>
+
+    <!-- التكاليف -->
+    <menuitem id="menu_furniture_mrp_costing"
+              name="💰 توزيع التكاليف"
+              parent="menu_furniture_mrp_root"
+              action="action_furniture_mrp_costing"
+              sequence="30"
+              groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor_painting,furniture_mrp.group_furniture_mrp_supervisor_tailoring,furniture_mrp.group_furniture_mrp_supervisor_sewing,furniture_mrp.group_furniture_mrp_supervisor_upholstery,furniture_mrp.group_furniture_mrp_supervisor_packaging"/>
+
+    <!-- Keep the four direct product-batch supervisors on the same focused
+         dashboard surface.  Explicit replacements are required here because
+         menuitem group updates are additive and would otherwise retain an old
+         direct finishing-supervisor assignment in upgraded databases. -->
+    <record id="menu_furniture_product_configuration" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_production" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_mps" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging'), ref('base.group_user')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_mps_worker_schedule" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging'), ref('base.group_user')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_mps_plans" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_locations" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_departments" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+    <record id="menu_furniture_mrp_costing" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor_painting'), ref('furniture_mrp.group_furniture_mrp_supervisor_tailoring'), ref('furniture_mrp.group_furniture_mrp_supervisor_sewing'), ref('furniture_mrp.group_furniture_mrp_supervisor_upholstery'), ref('furniture_mrp.group_furniture_mrp_supervisor_packaging')])]"/>
+    </record>
+</odoo>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>نواقص المراحل</title>
+  <path d="M22 33v60h72" fill="none" stroke="#96dcdb" stroke-width="9" stroke-linejoin="round"/>
+  <path d="m8 24 22-12 22 12-22 12z" fill="#91d9d1"/>
+  <path d="M8 24v26l22 12V36z" fill="#299c98"/>
+  <path d="m30 36 22-12v26L30 62z" fill="#196970"/>
+  <path d="m66 78 22-12 22 12-22 12z" fill="#c0afd9"/>
+  <path d="M66 78v26l22 12V90z" fill="#8b70a6"/>
+  <path d="m88 90 22-12v26l-22 12z" fill="#695080"/>
+  <circle cx="95" cy="33" r="21" fill="#ffc668"/>
+  <path d="M86 33h18" stroke="#895c25" stroke-width="5" stroke-linecap="round"/>
+  <path d="m48 86 8 7-8 7" fill="none" stroke="#196970" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

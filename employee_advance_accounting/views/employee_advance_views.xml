@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_advance_search" model="ir.ui.view">
+        <field name="name">employee.advance.search</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="advance_date"/>
+                <filter string="مسودة" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="عليه رصيد" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="مسددة بالكامل" name="closed" domain="[('state', '=', 'closed')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter string="العامل" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="الحالة" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="الشهر" name="group_month" context="{'group_by': 'advance_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_list" model="ir.ui.view">
+        <field name="name">employee.advance.list</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'active'" decoration-success="state == 'closed'" decoration-muted="state == 'cancelled'" sample="1">
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="first_installment_date"/>
+                <field name="amount" sum="إجمالي السلف" decoration-bf="1"/>
+                <field name="paid_amount" sum="إجمالي المسدد" decoration-success="paid_amount &gt; 0"/>
+                <field name="balance" sum="إجمالي المتبقي" decoration-danger="balance &gt; 0" decoration-bf="1"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="installment_count" optional="show" sum="إجمالي الدفعات"/>
+                <field name="installment_amount" optional="show" sum="إجمالي قيمة الأقساط"/>
+                <button name="action_disburse" type="object" string="موافقة وصرف" icon="fa-check-circle" class="btn-primary" groups="account.group_account_user" invisible="state != 'draft'" confirm="سيتم صرف السلفة وترحيل القيد المحاسبي فورًا. هل تريد المتابعة؟"/>
+                <field name="repayment_frequency" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'active'" decoration-success="state == 'closed'" decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_form" model="ir.ui.view">
+        <field name="name">employee.advance.form</field>
+        <field name="model">employee.advance</field>
+        <field name="arch" type="xml">
+            <form class="o_employee_advance_accounting_form">
+                <header>
+                    <button name="action_disburse" type="object" string="موافقة وصرف" class="btn-primary" groups="account.group_account_user" invisible="state != 'draft'" confirm="سيتم صرف السلفة وترحيل القيد المحاسبي فورًا. هل تريد المتابعة؟"/>
+                    <button name="action_open_repayment_wizard" type="object" string="تسجيل دفعة" class="btn-primary" groups="account.group_account_user" invisible="state != 'active'"/>
+                    <button name="action_cancel" type="object" string="إلغاء" invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" type="object" string="إرجاع لمسودة" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,closed,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_entry" icon="fa-book" invisible="not move_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">قيد الصرف</span>
+                                <span class="o_stat_value"><field name="move_id"/></span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_repayments" icon="fa-money">
+                            <field name="repayment_count" widget="statinfo" string="الدفعات المسجلة"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Fully Repaid" bg_color="text-bg-success" invisible="state != 'closed'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-calm-primary fw-bold mb-3"><i class="fa fa-user-circle me-2"/> بيانات السلفة</h5>
+                                    <group>
+                                        <field name="employee_id" readonly="state != 'draft'" widget="many2one_avatar_employee"/>
+                                        <field name="advance_date" readonly="state != 'draft'"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="amount" readonly="state != 'draft'" class="fw-bold text-calm-primary" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="reason" readonly="state != 'draft'"/>
+                                        <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-calm-success fw-bold mb-3"><i class="fa fa-money me-2"/> حالة السداد</h5>
+                                    <group>
+                                        <field name="paid_amount" readonly="1" class="fw-bold text-calm-success"/>
+                                        <field name="balance" readonly="1" class="fw-bold text-calm-danger"/>
+                                        <field name="progress" widget="progressbar" readonly="1"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-calm-info fw-bold mb-3"><i class="fa fa-calendar me-2"/> خطة السداد</h5>
+                                    <group>
+                                        <field name="installment_count" readonly="state != 'draft'"/>
+                                        <field name="repayment_frequency" readonly="state != 'draft'"/>
+                                        <field name="first_installment_date" readonly="state != 'draft'"/>
+                                        <field name="installment_amount" readonly="1" class="fw-bold text-calm-info"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-muted fw-bold mb-3"><i class="fa fa-book me-2"/> المحاسبة</h5>
+                                    <group>
+                                        <field name="payment_journal_id" readonly="state != 'draft'"/>
+                                        <field name="advance_account_id" readonly="state != 'draft'"/>
+                                        <field name="move_id" readonly="1"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="o_employee_advance_payment_plan card border-0 shadow-sm rounded-4">
+                        <div class="card-body">
+                            <div class="o_employee_advance_payment_plan_header">
+                                <div>
+                                    <h5><i class="fa fa-calendar-check-o me-2"/> Payment Plan — خطة السداد</h5>
+                                    <p>اضغط «دفع» أمام القسط المطلوب؛ السداد لا يُسجل إلا يدويًا بواسطة المحاسب.</p>
+                                </div>
+                                <span class="o_employee_advance_payment_plan_count">
+                                    <field name="installment_count" readonly="1"/> أقساط
+                                </span>
+                            </div>
+                            <field name="installment_ids" readonly="1">
+                                <list create="false" edit="false" delete="false" decoration-success="state == 'paid'" decoration-warning="state == 'partial'" decoration-info="state == 'pending'" sample="1">
+                                    <field name="sequence"/>
+                                    <field name="due_date"/>
+                                    <field name="amount" decoration-bf="1"/>
+                                    <field name="paid_amount" decoration-success="paid_amount &gt; 0"/>
+                                    <field name="balance" decoration-danger="balance &gt; 0" decoration-bf="1"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'paid'" decoration-warning="state == 'partial'" decoration-info="state == 'pending'"/>
+                                    <field name="advance_state" column_invisible="True"/>
+                                    <button name="action_open_repayment_wizard" type="object" string="دفع" icon="fa-money" class="btn btn-sm o_employee_advance_installment_pay" groups="account.group_account_user" invisible="state == 'paid' or advance_state != 'active'"/>
+                                </list>
+                            </field>
+                        </div>
+                    </div>
+                    <notebook>
+                        <page string="الدفعات المسجلة">
+                            <field name="repayment_ids">
+                                <list create="false" delete="false" decoration-success="state == 'posted'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'">
+                                    <field name="name" decoration-bf="1"/>
+                                    <field name="payment_date"/>
+                                    <field name="installment_id" optional="show"/>
+                                    <field name="amount" sum="Total" decoration-bf="1" decoration-success="1"/>
+                                    <field name="journal_id" optional="hide"/>
+                                    <field name="move_id" optional="show"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" decoration-muted="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="ملاحظات">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_repayment_list" model="ir.ui.view">
+        <field name="name">employee.advance.repayment.list</field>
+        <field name="model">employee.advance.repayment</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false" decoration-success="state == 'posted'" decoration-muted="state == 'cancelled'" decoration-info="state == 'draft'" sample="1">
+                <field name="name" decoration-bf="1"/>
+                <field name="advance_id"/>
+                <field name="employee_id" widget="many2one_avatar_employee"/>
+                <field name="payment_date"/>
+                <field name="installment_id" optional="show"/>
+                <field name="amount" sum="Total" decoration-bf="1" decoration-success="1"/>
+                <field name="journal_id" optional="hide"/>
+                <field name="move_id" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'posted'" decoration-info="state == 'draft'" decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_employee_advance_repayment_form" model="ir.ui.view">
+        <field name="name">employee.advance.repayment.form</field>
+        <field name="model">employee.advance.repayment</field>
+        <field name="arch" type="xml">
+            <form class="o_employee_advance_accounting_form">
+                <header>
+                    <button name="action_view_entry" type="object" string="Journal Entry" class="btn-primary" invisible="not move_id"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-calm-primary fw-bold mb-3"><i class="fa fa-info-circle me-2"/> Repayment Info</h5>
+                                    <group>
+                                        <field name="name" class="fw-bold text-calm-primary"/>
+                                        <field name="advance_id"/>
+                                        <field name="installment_id"/>
+                                        <field name="employee_id" widget="many2one_avatar_employee"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm bg-calm-light rounded-4">
+                                <div class="card-body">
+                                    <h5 class="card-title text-calm-success fw-bold mb-3"><i class="fa fa-credit-card me-2"/> Payment Details</h5>
+                                    <group>
+                                        <field name="payment_date"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="amount" class="fw-bold text-calm-success" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="journal_id"/>
+                                        <field name="move_id"/>
+                                        <field name="notes"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_employee_advance" model="ir.actions.act_window">
+        <field name="name">Employee Advances</field>
+        <field name="res_model">employee.advance</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_employee_advance_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an employee advance.</p>
+            <p>Disbursement and repayment entries are posted to accounting immediately.</p>
+        </field>
+    </record>
+
+    <record id="action_employee_advance_repayment" model="ir.actions.act_window">
+        <field name="name">Advance Repayments</field>
+        <field name="res_model">employee.advance.repayment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

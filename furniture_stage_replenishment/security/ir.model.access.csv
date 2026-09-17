@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_furniture_stage_replenishment_manager,furniture stage replenishment manager,model_furniture_mrp_stage_replenishment_rule,furniture_mrp.group_furniture_mrp_manager,1,1,0,0
+access_furniture_final_replenishment_manager,furniture final replenishment manager,model_furniture_mrp_final_replenishment_rule,furniture_mrp.group_furniture_mrp_manager,1,1,0,0
+access_furniture_stage_time_standard_manager,furniture stage time standard manager,model_furniture_mrp_stage_time_standard,furniture_mrp.group_furniture_mrp_manager,1,1,0,0

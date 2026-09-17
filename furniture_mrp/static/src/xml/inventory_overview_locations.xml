@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_mrp.InventoryOverviewRenderer"
+       t-inherit="web.KanbanRenderer"
+       t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_kanban_renderer')]/t[@t-foreach='getGroupsOrRecords()']"
+               position="before">
+            <div t-if="dashboardState.loaded and dashboardState.pending.total"
+                 class="o_furniture_store_alert d-flex flex-wrap align-items-center justify-content-between gap-2"
+                 dir="rtl"
+                 role="alert">
+                <div class="o_furniture_store_alert_message d-flex align-items-center gap-2">
+                    <i class="fa fa-bell" aria-hidden="true"/>
+                    <span>
+                        عندك <t t-out="dashboardState.pending.total"/>
+                        طلب مخزن محتاج مراجعتك
+                    </span>
+                </div>
+                <div class="d-flex flex-wrap gap-1">
+                    <button t-if="dashboardState.pending.regular_count"
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary py-0 px-2"
+                            t-on-click="() => this.openPendingRequests('regular')">
+                        أذونات مراحل
+                        (<t t-out="dashboardState.pending.regular_count"/>)
+                    </button>
+                    <button t-if="dashboardState.pending.advance_count"
+                            type="button"
+                            class="btn btn-sm btn-warning py-0 px-2"
+                            t-on-click="() => this.openPendingRequests('advance')">
+                        صرف مراحل متعددة
+                        (<t t-out="dashboardState.pending.advance_count"/>)
+                    </button>
+                </div>
+            </div>
+
+            <div t-if="!dashboardState.loaded"
+                 class="o_furniture_inventory_state text-muted">
+                <i class="fa fa-spinner fa-spin me-1"/> جاري تحميل المخازن...
+            </div>
+            <div t-elif="dashboardState.error"
+                 class="o_furniture_inventory_state text-muted">
+                تعذر تحميل ملخص المخازن. حدّث الصفحة وحاول مرة أخرى.
+            </div>
+            <t t-else="">
+                <article t-foreach="dashboardState.locations"
+                         t-as="location"
+                         t-key="location.key"
+                         role="button"
+                         tabindex="0"
+                         t-att-aria-label="'عرض رصيد ' + location.title"
+                         t-attf-class="o_kanban_record d-flex o_legacy_kanban_record flex-grow-1 flex-md-shrink-1 flex-shrink-0 o_furniture_inventory_card o_furniture_inventory_{{ location.key }}"
+                         t-on-click="() => this.openInventoryLocation(location)"
+                         t-on-keydown="(event) => this.onInventoryLocationKeydown(event, location)">
+                    <div class="o_furniture_inventory_card_shell" dir="rtl">
+                        <span class="o_furniture_inventory_card_icon">
+                            <i t-att-class="'fa ' + location.icon" aria-hidden="true"/>
+                        </span>
+                        <span class="o_furniture_inventory_card_identity">
+                            <strong class="text-truncate" t-out="location.title"/>
+                            <small class="text-truncate"
+                                   t-att-title="location.subtitle"
+                                   t-out="location.subtitle"/>
+                        </span>
+                        <span class="o_furniture_inventory_metric o_furniture_inventory_products">
+                            <strong t-out="location.product_count"/>
+                            <small>صنف برصيد</small>
+                        </span>
+                        <span class="o_furniture_inventory_metric o_furniture_inventory_pending_moves">
+                            <strong t-out="location.pending_move_count"/>
+                            <small>حركة منتظرة</small>
+                        </span>
+                        <span class="o_furniture_inventory_open">
+                            عرض الرصيد
+                            <i class="fa fa-chevron-left" aria-hidden="true"/>
+                        </span>
+                    </div>
+                </article>
+                <div class="o_furniture_inventory_row_break" aria-hidden="true"/>
+            </t>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,820 @@
+.o_furniture_completion_kanban,
+.o_furniture_completion_form,
+.o_furniture_completion_wizard {
+    --completion-navy: #12314a;
+    --completion-ink: #173f42;
+    --completion-muted: #6f8587;
+    --completion-teal: #287d75;
+    --completion-teal-dark: #1d645f;
+    --completion-line: #d9e6e4;
+    --completion-soft: #f2f8f7;
+    --completion-ready: #23845f;
+    --completion-waiting: #b66b20;
+    direction: rtl;
+}
+
+.o_furniture_completion_kanban .o_kanban_renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    align-content: start;
+    gap: 16px !important;
+    min-height: 100%;
+    padding: 18px !important;
+    background:
+        radial-gradient(circle at 92% 0%, rgba(40, 125, 117, 0.1), transparent 29%),
+        radial-gradient(circle at 4% 18%, rgba(18, 49, 74, 0.065), transparent 24%),
+        linear-gradient(180deg, #f8fbfa 0%, #eff5f4 100%);
+}
+
+.o_furniture_completion_kanban .o_kanban_renderer::before {
+    content: "طابق النجارة الجاهزة مع طقم الكسوة المطابق، ثم أكد الإتمام بعد التركيب الفعلي";
+    display: flex;
+    grid-column: 1 / -1;
+    min-height: 46px;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #d5e4e2;
+    border-radius: 13px;
+    color: #496b6e;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 5px 16px rgba(25, 63, 65, 0.05);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.o_furniture_completion_kanban .o_kanban_record {
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+.o_furniture_completion_card {
+    --completion-state-color: #7d8c90;
+    display: flex;
+    height: 100%;
+    min-height: 322px;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--completion-line) !important;
+    border-top: 4px solid var(--completion-state-color) !important;
+    border-radius: 18px !important;
+    color: var(--completion-ink);
+    background: #fff !important;
+    box-shadow: 0 9px 25px rgba(24, 62, 65, 0.08);
+}
+
+.o_furniture_completion_card.is-ready {
+    --completion-state-color: var(--completion-ready);
+}
+
+.o_furniture_completion_card.is-waiting-body,
+.o_furniture_completion_card.is-waiting-cover {
+    --completion-state-color: var(--completion-waiting);
+}
+
+.o_furniture_completion_card_header {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 92px;
+    padding: 14px 15px;
+    border-bottom: 1px solid #e7efee;
+    background: linear-gradient(180deg, #fff, #fbfdfd);
+}
+
+.o_furniture_completion_product_image {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #d8e6e4;
+    border-radius: 16px;
+    color: #5b7d7e;
+    background: #eef6f4;
+    font-size: 25px;
+}
+
+.o_furniture_completion_product_image .o_field_image,
+.o_furniture_completion_product_image img {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.o_furniture_completion_product_image img {
+    object-fit: cover;
+}
+
+.o_furniture_completion_identity {
+    min-width: 0;
+}
+
+.o_furniture_completion_identity small,
+.o_furniture_completion_identity strong,
+.o_furniture_completion_identity_meta {
+    display: block;
+}
+
+.o_furniture_completion_identity small {
+    margin-bottom: 3px;
+    color: #8a9b9d;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+.o_furniture_completion_identity strong,
+.o_furniture_completion_identity strong .o_field_widget {
+    overflow: hidden;
+    color: var(--completion-ink);
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_completion_identity_meta {
+    margin-top: 5px;
+    overflow: hidden;
+    color: var(--completion-teal-dark);
+    font-size: 12px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_completion_state {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.o_furniture_completion_state.is-ready {
+    border-color: #b8dfcf;
+    color: #216d4f;
+    background: #eaf8f0;
+}
+
+.o_furniture_completion_state.is-waiting {
+    border-color: #ead1ae;
+    color: #925619;
+    background: #fff6e9;
+}
+
+.o_furniture_completion_state.is-empty {
+    border-color: #d8e1e2;
+    color: #667b7e;
+    background: #f3f6f6;
+}
+
+.o_furniture_completion_card_body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 15px;
+}
+
+.o_furniture_completion_metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.o_furniture_completion_metric {
+    display: flex;
+    min-width: 0;
+    min-height: 86px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 7px;
+    border: 1px solid #dce8e7;
+    border-radius: 14px;
+    background: #f8fbfa;
+    text-align: center;
+}
+
+.o_furniture_completion_metric i {
+    color: #628587;
+    font-size: 15px;
+}
+
+.o_furniture_completion_metric small {
+    overflow: hidden;
+    max-width: 100%;
+    color: var(--completion-muted);
+    font-size: 10px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_furniture_completion_metric strong,
+.o_furniture_completion_metric strong .o_field_widget {
+    color: var(--completion-navy);
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.o_furniture_completion_metric.is-available {
+    border-color: #aedacb;
+    background: linear-gradient(145deg, #eaf8f1, #f4fbf7);
+}
+
+.o_furniture_completion_metric.is-available i,
+.o_furniture_completion_metric.is-available strong,
+.o_furniture_completion_metric.is-available strong .o_field_widget {
+    color: var(--completion-ready);
+}
+
+.o_furniture_completion_flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    margin-top: auto;
+    padding: 9px 11px;
+    border: 1px solid #e0eae9;
+    border-radius: 12px;
+    color: #526f72;
+    background: #f7faf9;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.o_furniture_completion_flow i {
+    color: #8ca0a2;
+    transform: rotate(180deg);
+}
+
+.o_furniture_completion_card_footer {
+    padding: 11px 15px 14px;
+    border-top: 1px solid #e7efee;
+    background: #fbfdfd;
+}
+
+.o_furniture_completion_action,
+.o_furniture_completion_wizard footer .btn-primary {
+    display: inline-flex !important;
+    width: 100%;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-color: #24736c !important;
+    border-radius: 13px !important;
+    color: #fff !important;
+    background: linear-gradient(135deg, #2d877d, #246b72) !important;
+    box-shadow: 0 8px 18px rgba(31, 105, 99, 0.2);
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    touch-action: manipulation;
+}
+
+.o_furniture_completion_action:hover,
+.o_furniture_completion_action:focus-visible,
+.o_furniture_completion_wizard footer .btn-primary:hover,
+.o_furniture_completion_wizard footer .btn-primary:focus-visible {
+    border-color: #1c5e59 !important;
+    outline: none;
+    background: linear-gradient(135deg, #27776f, #1c5e66) !important;
+    box-shadow: 0 10px 22px rgba(26, 89, 85, 0.25);
+}
+
+.o_furniture_completion_waiting_note {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border: 1px dashed #ddc49f;
+    border-radius: 12px;
+    color: #8d5a23;
+    background: #fff9ef;
+    font-size: 12px;
+    font-weight: 850;
+    text-align: center;
+}
+
+.o_furniture_completion_form .o_furniture_completion_form_hero,
+.o_furniture_completion_wizard .o_furniture_completion_wizard_hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border: 1px solid #d5e5e2;
+    border-radius: 18px;
+    color: var(--completion-ink);
+    background:
+        radial-gradient(circle at 7% 5%, rgba(40, 125, 117, 0.13), transparent 34%),
+        linear-gradient(135deg, #f7fbfa, #eef6f5);
+}
+
+.o_furniture_completion_form_hero h2,
+.o_furniture_completion_wizard_hero h2 {
+    margin: 0;
+    color: var(--completion-navy);
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.o_furniture_completion_form_hero p,
+.o_furniture_completion_wizard_hero p {
+    margin: 5px 0 0;
+    color: var(--completion-muted);
+    font-size: 13px;
+}
+
+.o_furniture_completion_hero_icon {
+    display: grid;
+    width: 56px;
+    height: 56px;
+    flex: 0 0 56px;
+    place-items: center;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #2d877d, #315f7e);
+    font-size: 23px;
+    box-shadow: 0 8px 19px rgba(32, 103, 98, 0.2);
+}
+
+.o_furniture_completion_form .o_furniture_completion_form_metrics,
+.o_furniture_completion_wizard .o_furniture_completion_wizard_metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.o_furniture_completion_form_metric,
+.o_furniture_completion_wizard_metric {
+    display: flex;
+    min-height: 88px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid #d9e7e5;
+    border-radius: 15px;
+    background: #f8fbfa;
+    text-align: center;
+}
+
+.o_furniture_completion_form_metric span,
+.o_furniture_completion_wizard_metric span {
+    color: var(--completion-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.o_furniture_completion_form_metric strong,
+.o_furniture_completion_form_metric .o_field_widget,
+.o_furniture_completion_wizard_metric strong,
+.o_furniture_completion_wizard_metric .o_field_widget {
+    color: var(--completion-navy);
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+}
+
+.o_furniture_completion_wizard .o_furniture_completion_quantity {
+    max-width: 360px;
+    margin: 4px auto 12px;
+    padding: 15px;
+    border: 1px solid #cce0dc;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.o_furniture_completion_wizard .o_furniture_completion_quantity .o_input {
+    min-height: 52px;
+    border: 2px solid #91c2ba;
+    border-radius: 13px;
+    color: var(--completion-navy);
+    background: #f8fcfb;
+    font-size: 23px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    text-align: center;
+}
+
+.o_furniture_completion_wizard footer {
+    display: flex;
+    gap: 9px;
+    padding: 12px 15px;
+}
+
+.o_furniture_completion_wizard footer .btn-primary {
+    width: auto;
+    min-width: 190px;
+}
+
+.o_furniture_completion_wizard footer .btn-secondary {
+    min-height: 52px;
+    min-width: 90px;
+    border-radius: 13px;
+    font-size: 14px;
+    font-weight: 800;
+    touch-action: manipulation;
+}
+
+/* Production orders: make the two generated lanes unmistakable on touch UI. */
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector {
+    display: grid;
+    grid-template-columns: minmax(245px, 0.75fr) minmax(430px, 1.25fr);
+    grid-template-areas:
+        "copy choices"
+        "hint hint";
+    align-items: center;
+    gap: 10px 16px;
+    width: 100%;
+    padding: 14px 16px;
+    border-bottom: 1px solid #d8e6e4;
+    background: linear-gradient(135deg, #f2f8f7, #f8fafc);
+    direction: rtl;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_copy {
+    display: flex;
+    grid-area: copy;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, #287d75, #315f7e);
+    box-shadow: 0 6px 14px rgba(32, 103, 98, 0.17);
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_copy strong,
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_copy small {
+    display: block;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_copy strong {
+    color: #173f42;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_selector_copy small {
+    margin-top: 2px;
+    color: #6f8587;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_header_badge {
+    flex: 0 0 auto;
+    margin-inline: auto;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_order_model_hero
+    .o_furniture_lane_header_badge {
+    margin: 1px 0 0;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_order_model_hero
+    .o_furniture_lane_header_badge .badge {
+    min-width: 128px;
+    min-height: 25px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_header_badge .badge {
+    min-width: 165px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border: 1px solid currentColor;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_radio {
+    grid-area: choices;
+    width: 100% !important;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio > .o_horizontal {
+    display: grid !important;
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_item {
+    position: relative;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input + label {
+    display: flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 8px 10px;
+    border: 2px solid #d4e0df;
+    border-radius: 12px;
+    color: #526b6d;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input:focus-visible + label {
+    outline: 3px solid rgba(40, 125, 117, 0.22);
+    outline-offset: 2px;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input[data-value="body"]:checked + label {
+    border-color: #2d8178;
+    color: #165f59;
+    background: #eaf7f3;
+    box-shadow: 0 5px 12px rgba(35, 119, 108, 0.13);
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input[data-value="cover"]:checked + label {
+    border-color: #d28a37;
+    color: #8b5517;
+    background: #fff4e5;
+    box-shadow: 0 5px 12px rgba(180, 111, 33, 0.13);
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input[data-value="legacy"]:checked + label {
+    border-color: #788d96;
+    color: #52666f;
+    background: #f0f4f5;
+}
+
+.o_form_view.o_furniture_production_form
+    .o_furniture_lane_radio .o_radio_input:disabled + label {
+    cursor: default;
+    opacity: 0.88;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_hint {
+    display: flex;
+    grid-area: hint;
+    min-height: 34px;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border: 1px solid #dce7e6;
+    border-radius: 10px;
+    color: #587173;
+    background: rgba(255, 255, 255, 0.72);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_hint.is-body {
+    border-color: #bfdfd7;
+    color: #25675f;
+    background: #edf8f5;
+}
+
+.o_form_view.o_furniture_production_form .o_furniture_lane_hint.is-cover {
+    border-color: #ead2af;
+    color: #8c5a20;
+    background: #fff8ed;
+}
+
+.o_furniture_lane_badge {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border: 1px solid #d3dfe0;
+    border-radius: 999px;
+    color: #5c7174;
+    background: #f3f6f6;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.o_furniture_lane_badge.is-body {
+    border-color: #b7ded5;
+    color: #216b61;
+    background: #eaf7f3;
+}
+
+.o_furniture_lane_badge.is-cover {
+    border-color: #e8cea8;
+    color: #925b1d;
+    background: #fff5e8;
+}
+
+.o_furniture_lane_badge.is-frame {
+    border-color: #b7ded5;
+    color: #216b61;
+    background: #eaf7f3;
+}
+
+.o_furniture_lane_badge.is-finish {
+    border-color: #bfd5e8;
+    color: #285f87;
+    background: #edf6fc;
+}
+
+.o_furniture_lane_badge.is-tailoring {
+    border-color: #ddc9ec;
+    color: #74449a;
+    background: #f7effc;
+}
+
+.o_furniture_lane_badge.is-painting {
+    border-color: #f0c6a5;
+    color: #9a5524;
+    background: #fff3e9;
+}
+
+.o_furniture_lane_badge.is-upholstery {
+    border-color: #c7d5ef;
+    color: #405f9a;
+    background: #eff4ff;
+}
+
+.o_furniture_lane_badge.is-packaging {
+    border-color: #c6dfc7;
+    color: #31703a;
+    background: #eef8ef;
+}
+
+@media (max-width: 1024px) {
+    .o_furniture_completion_kanban .o_kanban_renderer {
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: 12px !important;
+        padding: 12px !important;
+    }
+
+    .o_furniture_completion_card {
+        min-height: 306px;
+    }
+
+    .o_form_view.o_furniture_production_form .o_furniture_lane_selector {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "copy"
+            "choices"
+            "hint";
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_furniture_completion_kanban .o_kanban_renderer {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 9px !important;
+    }
+
+    .o_furniture_completion_kanban .o_kanban_renderer::before {
+        font-size: 11px;
+    }
+
+    .o_furniture_completion_card {
+        min-height: 0;
+    }
+
+    .o_furniture_completion_card_header {
+        grid-template-columns: 52px minmax(0, 1fr);
+        grid-template-areas:
+            "image identity"
+            "state state";
+        min-height: 0;
+    }
+
+    .o_furniture_completion_product_image {
+        grid-area: image;
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
+    }
+
+    .o_furniture_completion_identity {
+        grid-area: identity;
+    }
+
+    .o_furniture_completion_state {
+        grid-area: state;
+        justify-self: stretch;
+    }
+
+    .o_furniture_completion_metrics,
+    .o_furniture_completion_form .o_furniture_completion_form_metrics,
+    .o_furniture_completion_wizard .o_furniture_completion_wizard_metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .o_furniture_completion_metric {
+        min-height: 78px;
+        padding-inline: 4px;
+    }
+
+    .o_furniture_completion_metric strong,
+    .o_furniture_completion_metric strong .o_field_widget {
+        font-size: 21px;
+    }
+
+    .o_furniture_completion_flow {
+        font-size: 9px;
+    }
+
+    .o_furniture_completion_form .o_furniture_completion_form_hero,
+    .o_furniture_completion_wizard .o_furniture_completion_wizard_hero {
+        padding: 14px;
+    }
+
+    .o_furniture_completion_wizard footer {
+        flex-direction: column;
+    }
+
+    .o_furniture_completion_wizard footer .btn-primary,
+    .o_furniture_completion_wizard footer .btn-secondary {
+        width: 100%;
+    }
+
+    .o_form_view.o_furniture_production_form
+        .o_furniture_lane_radio > .o_horizontal {
+        grid-template-columns: 1fr;
+    }
+
+    .o_furniture_production_card_header {
+        flex-wrap: wrap;
+    }
+
+    .o_furniture_lane_badge {
+        order: 3;
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_furniture_completion_action,
+    .o_furniture_completion_card {
+        transition: none !important;
+    }
+}

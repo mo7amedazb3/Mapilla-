@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_attendance_lunch.Dashboard"
+       t-inherit="factory_attendance_dashboard.FactoryAttendanceDashboard" t-inherit-mode="extension">
+        <xpath expr="//section[hasclass('o_factory_attendance_stats')]" position="after">
+            <div class="o_factory_lunch_policy" t-if="state.data.lunch_policy">
+                <i class="fa fa-cutlery"/>
+                <span>ساعة غدا واحدة مدفوعة الأجر. أي مدة زيادة حتى بصمة الرجوع تُحسب تأخيرًا، وعدم الرجوع يُحسب انصرافًا بوقت الخروج.</span>
+                <button class="btn btn-sm" t-on-click="() => this.selectStatus('lunch')">
+                    في استراحة الآن: <t t-esc="state.data.counts.lunch || 0"/>
+                </button>
+            </div>
+        </xpath>
+        <xpath expr="//colgroup/col[last()]" position="before">
+            <col class="o_factory_col_lunch"/>
+        </xpath>
+        <xpath expr="//thead/tr/th[last()]" position="before">
+            <th scope="col">مدة الغداء</th>
+        </xpath>
+        <xpath expr="//tbody/tr/td[last()]" position="before">
+            <td class="o_factory_lunch_cell">
+                <strong t-esc="employee.lunch_duration_label"/>
+                <span t-if="employee.lunch_state !== 'none'"
+                      t-att-class="'o_factory_lunch_detail is-' + employee.lunch_state">
+                    <i class="fa fa-cutlery"/>
+                    <t t-if="employee.lunch_state === 'pending'">غدا — في انتظار الرجوع</t>
+                    <t t-elif="employee.lunch_state === 'returned'">مدفوع الأجر</t>
+                    <t t-else="">انصراف — لم يرجع قبل 16:00</t>
+                </span>
+            </td>
+        </xpath>
+        <xpath expr="//span[@t-att-class=&quot;'o_factory_status state-' + employee.status&quot;]/t[@t-esc]" position="replace">
+            <t t-esc="employee.lunch_state === 'pending' ? 'في استراحة غدا' : statusLabel(employee.status)"/>
+        </xpath>
+        <xpath expr="//div[hasclass('o_factory_employee_cell')]/button" position="attributes">
+            <attribute name="t-att-title">state.selectedStatus === 'lunch' ? 'إدارة استراحة الغداء' : 'إدارة الحضور والانصراف'</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_factory_dialog_body')]" position="inside">
+            <div class="o_factory_manual_mode" role="group" aria-label="نوع تعديل الحضور">
+                <button type="button" t-att-class="{'is-active': !state.manualDialog.lunchMode}"
+                        t-att-disabled="state.manualDialog.processing || state.manualDialog.loading"
+                        t-att-aria-pressed="!state.manualDialog.lunchMode"
+                        t-on-click="() => this.selectManualAttendanceMode(false)">حضور وانصراف</button>
+                <button type="button" t-att-class="{'is-active': state.manualDialog.lunchMode}"
+                        t-att-disabled="state.manualDialog.processing || state.manualDialog.loading || !state.manualDialog.lunchEnabled"
+                        t-att-title="!state.manualDialog.lunchEnabled ? 'هذا الموظف ليس له غداء حسب إعداداته' : 'تسجيل الخروج والرجوع من الغداء'"
+                        t-att-aria-pressed="!!state.manualDialog.lunchMode"
+                        t-on-click="() => this.selectManualAttendanceMode(true)">استراحة غداء</button>
+            </div>
+        </xpath>
+        <xpath expr="//section[hasclass('o_factory_dialog')]/header/div/h3" position="replace">
+            <h3 t-esc="state.manualDialog.lunchMode ? 'إدارة استراحة الغداء' : 'إدارة الحضور والانصراف'"/>
+        </xpath>
+        <xpath expr="//label[hasclass('o_factory_manual_record_selector')]/span" position="replace">
+            <span t-esc="state.manualDialog.lunchMode ? 'سجل استراحة الغداء' : 'سجل الحضور'"/>
+        </xpath>
+        <xpath expr="//label[hasclass('o_factory_manual_record_selector')]/select/option[@value='']" position="attributes">
+            <attribute name="t-if">!state.manualDialog.lunchMode</attribute>
+        </xpath>
+        <xpath expr="//p[hasclass('o_factory_manual_empty_hint')]" position="replace">
+            <p class="o_factory_manual_empty_hint" t-else="" t-esc="state.manualDialog.lunchMode ? 'لا يوجد سجل حضور متاح لتسجيل الغداء في هذا اليوم.' : 'لا يوجد سجل في هذا اليوم؛ سيتم إنشاء سجل جديد.'"/>
+        </xpath>
+        <xpath expr="//ManualAttendanceDateTime[@value='state.manualDialog.checkIn']" position="attributes">
+            <attribute name="caption">state.manualDialog.lunchMode ? 'وقت الخروج للغداء' : 'وقت الحضور'</attribute>
+        </xpath>
+        <xpath expr="//ManualAttendanceDateTime[@value='state.manualDialog.checkOut']" position="attributes">
+            <attribute name="caption">state.manualDialog.lunchMode ? 'وقت الرجوع من الغداء' : 'وقت الانصراف'</attribute>
+            <attribute name="optional">!state.manualDialog.lunchMode</attribute>
+        </xpath>
+        <xpath expr="//tbody" position="attributes">
+            <attribute name="t-foreach">state.data.attendance_groups || []</attribute>
+            <attribute name="t-as">attendanceGroup</attribute>
+            <attribute name="t-key">attendanceGroup.key</attribute>
+        </xpath>
+        <xpath expr="//tbody/tr[@t-as='employee']" position="attributes">
+            <attribute name="t-foreach">attendanceGroup.employees</attribute>
+        </xpath>
+        <xpath expr="//tbody/tr[@t-as='employee']" position="before">
+            <tr class="o_factory_attendance_group_heading">
+                <th colspan="9" scope="rowgroup">
+                    <i class="fa fa-users"/>
+                    <t t-esc="attendanceGroup.label"/>
+                    <span><t t-esc="attendanceGroup.employees.length"/> عامل</span>
+                </th>
+            </tr>
+        </xpath>
+    </t>
+</templates>

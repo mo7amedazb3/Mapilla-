@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_product_family_list" model="ir.ui.view">
+        <field name="name">furniture.product.family.list</field>
+        <field name="model">furniture.product.family</field>
+        <field name="arch" type="xml">
+            <list string="الفئات الرئيسية" default_order="sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_product_family_form" model="ir.ui.view">
+        <field name="name">furniture.product.family.form</field>
+        <field name="model">furniture.product.family</field>
+        <field name="arch" type="xml">
+            <form string="الفئة الرئيسية">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="مثال: كرسي"/></h1>
+                    </div>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="الموديلات">
+                            <field name="model_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="active" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="المنتجات النهائية">
+                            <field name="product_template_ids" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="furniture_model_id"/>
+                                    <field name="default_code" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_product_model_list" model="ir.ui.view">
+        <field name="name">furniture.product.model.list</field>
+        <field name="model">furniture.product.model</field>
+        <field name="arch" type="xml">
+            <list string="Models" default_order="sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name" string="Model"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_product_model_form" model="ir.ui.view">
+        <field name="name">furniture.product.model.form</field>
+        <field name="model">furniture.product.model</field>
+        <field name="arch" type="xml">
+            <form string="Model">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="مثال: ميروني"/></h1>
+                    </div>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="المنتجات النهائية">
+                        <field name="product_template_ids" readonly="1">
+                            <list create="false" edit="false" delete="false">
+                                <field name="name"/>
+                                <field name="default_code" optional="show"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_product_family" model="ir.actions.act_window">
+        <field name="name">الفئات الرئيسية</field>
+        <field name="res_model">furniture.product.family</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_furniture_product_model" model="ir.actions.act_window">
+        <field name="name">Models</field>
+        <field name="res_model">furniture.product.model</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

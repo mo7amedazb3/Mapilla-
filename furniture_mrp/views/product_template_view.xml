@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_product_tree_furniture_display_name" model="ir.ui.view">
+        <field name="name">product.product.tree.furniture.display.name</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="furniture_display_name" string="Name" readonly="1"/>
+                <field name="furniture_tailoring_material_kind" string="نوع الخامة"
+                       optional="show"/>
+                <field name="furniture_fabric_type_id" string="نوع القماش التشغيلي"
+                       optional="show"
+                       invisible="furniture_tailoring_material_kind != 'fabric'"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge"
+                       class="o_furniture_classification_badge" optional="show"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge"
+                       class="o_furniture_dimension_badge" optional="show"
+                       decoration-info="furniture_dimension_label"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_product_template_tree_furniture_display_name" model="ir.ui.view">
+        <field name="name">product.template.tree.furniture.display.name</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="furniture_display_name" string="Product Name"/>
+                <field name="furniture_tailoring_material_kind" string="نوع الخامة"
+                       optional="show"/>
+                <field name="furniture_fabric_type_id" string="نوع القماش التشغيلي"
+                       optional="show"
+                       invisible="furniture_tailoring_material_kind != 'fabric'"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge"
+                       class="o_furniture_classification_badge" optional="show"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge"
+                       class="o_furniture_dimension_badge" optional="show"
+                       decoration-info="furniture_dimension_label"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_quant_tree_furniture_model" model="ir.ui.view">
+        <field name="name">stock.quant.list.furniture.model</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="furniture_tailoring_material_kind" string="نوع الخامة"
+                       widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge" readonly="1" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_quant_tree_simple_furniture_model" model="ir.ui.view">
+        <field name="name">stock.quant.list.simple.furniture.model</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_simple"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="furniture_tailoring_material_kind" string="نوع الخامة"
+                       widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge" readonly="1" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_quant_inventory_furniture_model" model="ir.ui.view">
+        <field name="name">stock.quant.inventory.furniture.model</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_inventory_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="furniture_tailoring_material_kind" string="نوع الخامة"
+                       widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_model_id" string="الموديل" widget="badge" readonly="1" optional="show"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge" readonly="1" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_product_template_form_furniture_supplier" model="ir.ui.view">
+        <field name="name">product.template.form.furniture.supplier</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_furniture_stage_progress" type="object" class="oe_stat_button" icon="fa-tasks">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">مراحل التصنيع</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <field name="furniture_has_manufacturing_progress" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Manufacturing" invisible="not furniture_has_manufacturing_progress">
+                    <field name="furniture_manufacturing_progress_html" nolabel="1" readonly="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']" position="inside">
+                <field name="furniture_supplier_id" options="{'no_create_edit': True}"/>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="furniture_tailoring_material_kind"
+                       string="نوع الخامة"
+                       placeholder="ولا قماش ولا تكاوي"
+                       help="اختياري: اختر قماش أو تكاوي، واتركه فارغًا لأي صنف آخر."/>
+                <field name="furniture_fabric_type_id"
+                       string="نوع القماش التشغيلي (MPS)"
+                       options="{'no_create_edit': True}"
+                       invisible="furniture_tailoring_material_kind != 'fabric'"
+                       required="furniture_tailoring_material_kind == 'fabric'"
+                       help="حدد ليكرا أو كتان أو أي نوع تضيفه؛ الجدولة تقرأ النوع من خامة القماش المختارة في أمر الإنتاج."/>
+            </xpath>
+            <xpath expr="(//field[@name='name'])[1]" position="after">
+                <field name="furniture_family_id" invisible="1"/>
+                <field name="furniture_model_id" string="الموديل" domain="[]"/>
+                <field name="furniture_dimension_label" string="المقاس" widget="badge"
+                       class="o_furniture_dimension_badge"
+                       readonly="1" invisible="not furniture_dimension_label"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Remove the obsolete variant-only view from earlier deployments.
+         The template form inheritance already reaches the variant form. -->
+    <delete id="view_product_product_form_furniture_material_kind"
+            model="ir.ui.view"/>
+
+</odoo>

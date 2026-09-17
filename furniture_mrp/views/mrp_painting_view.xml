@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_painting_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.painting.form</field>
+        <field name="model">furniture.mrp.painting</field>
+        <field name="arch" type="xml">
+            <form string="أمر تصنيع دهانات">
+                <header>
+                    <button name="action_request_store_approval" string="📨 طلب إذن المخزن" type="object" class="btn-info o_furniture_store_request_button" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state not in ('none', 'started', 'rejected', 'cancelled')"/>
+                    <button name="action_open_store_request" string="⏳ الإذن بانتظار المخزن" type="object" class="btn-warning o_furniture_store_request_pending" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'pending'"/>
+                    <button name="action_open_advance_material_receipt" string="📥 استلام من المخزن" type="object" class="btn-warning o_furniture_material_receipt_button" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'awaiting_receipt'" groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"/>
+                    <button name="action_open_store_request" string="✅ الإذن معتمد" type="object" class="btn-success" invisible="not can_operate_stage_actions or state != 'pending' or store_request_state != 'approved'"/>
+                    <button name="action_start" string="▶️ بدء العمل" type="object" class="btn-primary o_furniture_store_start_ready" invisible="not can_operate_stage_actions or state != 'pending' or not can_start_stage_work or store_request_state != 'approved'"/>
+                    <button name="action_send_to_quality" string="🔍 إرسال للجودة" type="object" class="btn-warning" invisible="state != 'in_progress' or not all_substages_done"/>
+                    <button name="action_approve_quality" string="✅ قبول الجودة" type="object" class="btn-success" invisible="state != 'quality_check'"/>
+                    <button name="action_reject_quality" string="❌ رفض - إعادة عمل" type="object" class="btn-danger" invisible="state != 'quality_check'"/>
+                    <field name="all_substages_done" invisible="1"/>
+                    <button name="action_transfer_finished_product" string="📦 تحويل للمخزن التام" type="object" class="btn-info o_furniture_finished_transfer_button" invisible="not production_can_transfer_finished_product"/>
+                    <field name="production_can_transfer_finished_product" invisible="1"/>
+                    <field name="can_start_stage_work" invisible="1"/>
+                    <field name="can_operate_stage_actions" invisible="1"/>
+                    <field name="store_request_id" invisible="1"/>
+                    <field name="store_request_state" invisible="1"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,in_progress,quality_check,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                        <h3><field name="production_product_summary" readonly="1" nolabel="1" class="o_furniture_multiline_summary"/></h3>
+                    </div>
+                    <group>
+                        <group string="بيانات أمر التشغيل الأسبوعي">
+                            <field name="production_order_id" readonly="1"/>
+                            <field name="priming_order_id" readonly="1"/>
+                        </group>
+                        <group string="التواريخ">
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_planned_finish"/>
+                            <field name="date_finish" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="🧩 مراحل تصنيع الدهانات">
+                            <group>
+                                <group string="اختيار مراحل تصنيع الدهانات">
+                                    <field name="substage_priming_required" readonly="state != 'pending'"/>
+                                    <field name="substage_assembly_required" readonly="state != 'pending'"/>
+                                    <field name="substage_cells_required" readonly="state != 'pending'"/>
+                                    <field name="substage_veneer_required" readonly="state != 'pending'"/>
+                                    <field name="substage_impregnation_required" readonly="state != 'pending'"/>
+                                    <field name="substage_paint_required" readonly="state != 'pending'"/>
+                                </group>
+                                <group string="ملخص التنفيذ">
+                                    <field name="current_substage" readonly="1"/>
+                                    <field name="substage_summary" readonly="1"/>
+                                    <field name="substage_progress" widget="progressbar" readonly="1"/>
+                                </group>
+                                <group string="المراحل داخل المصنع" col="1"
+                                       invisible="not substage_priming_required and not substage_assembly_required and not substage_impregnation_required">
+                                    <group col="2" invisible="not substage_priming_required">
+                                        <label for="substage_priming_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_priming_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_priming_state == 'pending'"
+                                                   decoration-info="substage_priming_state == 'in_progress'"
+                                                   decoration-success="substage_priming_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'painting_internal_substage': 'priming'}"
+                                                    invisible="state != 'in_progress' or substage_priming_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                    <group col="2" invisible="not substage_assembly_required">
+                                        <label for="substage_assembly_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_assembly_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_assembly_state == 'pending'"
+                                                   decoration-info="substage_assembly_state == 'in_progress'"
+                                                   decoration-success="substage_assembly_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'painting_internal_substage': 'assembly'}"
+                                                    invisible="state != 'in_progress' or substage_assembly_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                    <group col="2" invisible="not substage_impregnation_required">
+                                        <label for="substage_impregnation_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_impregnation_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_impregnation_state == 'pending'"
+                                                   decoration-info="substage_impregnation_state == 'in_progress'"
+                                                   decoration-success="substage_impregnation_state == 'done'"/>
+                                            <button name="action_complete_internal_substage" string="✅ إنهاء" type="object" class="btn-success"
+                                                    context="{'painting_internal_substage': 'impregnation'}"
+                                                    invisible="state != 'in_progress' or substage_impregnation_state != 'in_progress'"/>
+                                        </div>
+                                    </group>
+                                </group>
+                                <group string="المراحل خارج المصنع: الحلايا والقشرة والدهان" col="1"
+                                       invisible="not substage_cells_required and not substage_veneer_required and not substage_paint_required">
+                                    <field name="substage_cells_state" invisible="1"/>
+                                    <field name="substage_veneer_state" invisible="1"/>
+                                    <field name="substage_paint_state" invisible="1"/>
+
+                                    <group col="2" invisible="not substage_cells_required">
+                                        <label for="substage_cells_external_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_cells_external_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_cells_external_state == 'pending'"
+                                                   decoration-warning="substage_cells_external_state == 'out'"
+                                                   decoration-info="substage_cells_external_state == 'delivered'"
+                                                   decoration-success="substage_cells_external_state == 'received'"/>
+                                            <button name="action_external_substage_exit" string="🚚 خروج من المخزن" type="object" class="btn-primary"
+                                                    context="{'painting_external_substage': 'cells'}"
+                                                    invisible="state != 'in_progress' or substage_cells_state != 'in_progress' or substage_cells_external_state != 'pending'"/>
+                                            <button name="action_external_substage_deliver" string="🤝 تسليم" type="object" class="btn-info"
+                                                    context="{'painting_external_substage': 'cells'}"
+                                                    invisible="state != 'in_progress' or substage_cells_state != 'in_progress' or substage_cells_external_state != 'out'"/>
+                                            <button name="action_external_substage_receive" string="📥 استلام" type="object" class="btn-success"
+                                                    context="{'painting_external_substage': 'cells'}"
+                                                    invisible="state != 'in_progress' or substage_cells_state != 'in_progress' or substage_cells_external_state != 'delivered'"/>
+                                        </div>
+                                    </group>
+
+                                    <group col="2" invisible="not substage_veneer_required">
+                                        <label for="substage_veneer_external_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_veneer_external_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_veneer_external_state == 'pending'"
+                                                   decoration-warning="substage_veneer_external_state == 'out'"
+                                                   decoration-info="substage_veneer_external_state == 'delivered'"
+                                                   decoration-success="substage_veneer_external_state == 'received'"/>
+                                            <button name="action_external_substage_exit" string="🚚 خروج من المخزن" type="object" class="btn-primary"
+                                                    context="{'painting_external_substage': 'veneer'}"
+                                                    invisible="state != 'in_progress' or substage_veneer_state != 'in_progress' or substage_veneer_external_state != 'pending'"/>
+                                            <button name="action_external_substage_deliver" string="🤝 تسليم" type="object" class="btn-info"
+                                                    context="{'painting_external_substage': 'veneer'}"
+                                                    invisible="state != 'in_progress' or substage_veneer_state != 'in_progress' or substage_veneer_external_state != 'out'"/>
+                                            <button name="action_external_substage_receive" string="📥 استلام" type="object" class="btn-success"
+                                                    context="{'painting_external_substage': 'veneer'}"
+                                                    invisible="state != 'in_progress' or substage_veneer_state != 'in_progress' or substage_veneer_external_state != 'delivered'"/>
+                                        </div>
+                                    </group>
+
+                                    <group col="2" invisible="not substage_paint_required">
+                                        <label for="substage_paint_external_state"/>
+                                        <div class="o_furniture_painting_substage_row d-flex align-items-center gap-2 flex-nowrap">
+                                            <field name="substage_paint_external_state" nolabel="1" readonly="1" widget="badge" class="w-auto flex-shrink-0"
+                                                   decoration-muted="substage_paint_external_state == 'pending'"
+                                                   decoration-warning="substage_paint_external_state == 'out'"
+                                                   decoration-info="substage_paint_external_state == 'delivered'"
+                                                   decoration-success="substage_paint_external_state == 'received'"/>
+                                            <button name="action_external_substage_exit" string="🚚 خروج من المخزن" type="object" class="btn-primary"
+                                                    context="{'painting_external_substage': 'paint'}"
+                                                    invisible="state != 'in_progress' or substage_paint_state != 'in_progress' or substage_paint_external_state != 'pending'"/>
+                                            <button name="action_external_substage_deliver" string="🤝 تسليم" type="object" class="btn-info"
+                                                    context="{'painting_external_substage': 'paint'}"
+                                                    invisible="state != 'in_progress' or substage_paint_state != 'in_progress' or substage_paint_external_state != 'out'"/>
+                                            <button name="action_external_substage_receive" string="📥 استلام" type="object" class="btn-success"
+                                                    context="{'painting_external_substage': 'paint'}"
+                                                    invisible="state != 'in_progress' or substage_paint_state != 'in_progress' or substage_paint_external_state != 'delivered'"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="🖌️ تفاصيل تصنيع دهانات" invisible="1">
+                            <group>
+                                <group string="نوع الدهان">
+                                    <field name="paint_type"/>
+                                    <field name="paint_color"/>
+                                    <field name="num_coats"/>
+                                    <field name="drying_time_hr"/>
+                                </group>
+                                <group string="كميات المواد">
+                                    <field name="paint_qty_liters"/>
+                                    <field name="thinner_qty"/>
+                                    <field name="varnish_qty_liters"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="👷 العمالة والتكاليف">
+                            <group>
+                                <group string="الفريق">
+                                    <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','painting')]"/>
+                                    <field name="worker_user_ids" widget="many2many_tags" domain="[('share','=',False), ('employee_ids.furniture_mrp_role','=','worker'), ('employee_ids.furniture_mrp_worker_stage_ids.code','=','painting')]"/>
+                                </group>
+                                <group string="تكلفة العمالة">
+                                    <field name="expected_labor_hours"/>
+                                    <field name="waiting_labor_hours" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="waiting_labor_cost" readonly="1" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                                    <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_hours" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                    <field name="total_labor_cost" readonly="1" invisible="state not in ('quality_check', 'done')"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="🔍 الجودة">
+                            <group>
+                                <field name="quality_inspector_id"/>
+                                <field name="quality_check" widget="radio"/>
+                                <field name="quality_notes" placeholder="ملاحظات مراقب الجودة..."/>
+                            </group>
+                        </page>
+                        <page string="⏱ سجل الوقت" invisible="state not in ('quality_check', 'done')">
+                            <field name="worker_time_log_ids" readonly="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="user_id"/>
+                                    <field name="start_datetime"/>
+                                    <field name="end_datetime"/>
+                                    <field name="duration_hours"/>
+                                    <field name="employee_id"/>
+                                    <field name="contract_id"/>
+                                    <field name="contract_wage"/>
+                                    <field name="hourly_rate"/>
+                                    <field name="labor_cost"/>
+                                    <field name="is_active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="📝 ملاحظات">
+                            <field name="notes" placeholder="ملاحظات إضافية..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_painting_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.painting.list</field>
+        <field name="model">furniture.mrp.painting</field>
+        <field name="arch" type="xml">
+            <list string="أوامر تصنيع دهانات" decoration-success="state == 'done'" decoration-warning="state == 'quality_check'" decoration-muted="state == 'pending'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="product_id"/>
+                <field name="current_substage"/>
+                <field name="substage_progress" widget="progressbar"/>
+                <field name="paint_type"/>
+                <field name="paint_color"/>
+                <field name="foreman_id" domain="[('furniture_mrp_role','=','supervisor'), ('furniture_mrp_supervisor_stage_ids.code','=','painting')]"/>
+                <field name="expected_labor_hours"/>
+                <field name="waiting_labor_hours" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="waiting_labor_cost" invisible="state not in ('in_progress', 'quality_check', 'done')"/>
+                <field name="labor_hours" invisible="state not in ('quality_check', 'done')"/>
+                <field name="labor_cost" invisible="state not in ('quality_check', 'done')"/>
+                <field name="quality_check"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'quality_check'" decoration-info="state == 'in_progress'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_painting" model="ir.actions.act_window">
+        <field name="name">تصنيع دهانات</field>
+        <field name="res_model">furniture.mrp.painting</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

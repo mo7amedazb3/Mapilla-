@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_delivery_request_form_workbench" model="ir.ui.view">
+        <field name="name">furniture.delivery.request.form.workbench</field>
+        <field name="model">furniture.mrp.future.order</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_future_order_form"/>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_produce_shortage']" position="before">
+                <button name="action_open_delivery_stage_warning_wizard"
+                        type="object"
+                        string="⚠️ تحذيرات الإنتاج"
+                        class="btn-primary"
+                        groups="base.group_system"
+                        invisible="state != 'pending'"/>
+            </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="class" add="o_furniture_delivery_request_form" separator=" "/>
+            </xpath>
+            <xpath expr="//sheet" position="replace">
+                <sheet class="o_furniture_delivery_request_sheet">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_reservation" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="not reservation_picking_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">حجز المخزن</span>
+                                <span class="o_stat_value">
+                                    <field name="reservation_fully_ready" widget="boolean_favorite"/>
+                                </span>
+                            </div>
+                        </button>
+                        <button name="action_open_productions" type="object"
+                                class="oe_stat_button" icon="fa-industry"
+                                invisible="production_count == 0">
+                            <field name="production_count" widget="statinfo" string="أوامر الإنتاج"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="بانتظار قرارك" bg_color="text-bg-warning"
+                            invisible="state != 'pending'"/>
+                    <widget name="web_ribbon" title="محجوز من المخزن" bg_color="text-bg-success"
+                            invisible="state != 'reserved'"/>
+                    <widget name="web_ribbon" title="إنتاج العجز" bg_color="text-bg-info"
+                            invisible="state != 'production'"/>
+
+                    <div class="o_delivery_request_workbench">
+                        <div class="o_delivery_request_workbench_header">
+                            <div class="o_delivery_request_identity">
+                                <span class="o_delivery_request_identity_label">
+                                    <i class="fa fa-truck" aria-hidden="true"/>
+                                    طلب التسليم
+                                </span>
+                                <field name="name" nolabel="1" class="o_delivery_request_identity_value"/>
+                            </div>
+                            <div class="o_delivery_request_availability">
+                                <span class="o_form_label">حالة التوافر الآن</span>
+                                <field name="availability_state" widget="badge" nolabel="1"
+                                       decoration-success="availability_state == 'available'"
+                                       decoration-warning="availability_state == 'partial'"
+                                       decoration-danger="availability_state in ('unavailable', 'invalid')"/>
+                                <field name="availability_label" nolabel="1" class="o_delivery_request_availability_text"/>
+                            </div>
+                        </div>
+
+                        <div class="o_delivery_request_planning_strip">
+                            <div class="o_delivery_request_planning_field">
+                                <span class="o_form_label">موعد التسليم</span>
+                                <field name="delivery_date" nolabel="1" readonly="state != 'pending'"/>
+                            </div>
+                            <div class="o_delivery_request_planning_field" groups="base.group_multi_company">
+                                <span class="o_form_label">الشركة</span>
+                                <field name="company_id" nolabel="1" readonly="state != 'pending'"/>
+                            </div>
+                        </div>
+
+                        <div class="o_delivery_request_common_strip">
+                            <div class="o_delivery_request_common_field">
+                                <span class="o_form_label">المشتري (العميل)</span>
+                                <field name="buyer_partner_id" nolabel="1" readonly="state != 'pending'"
+                                       options="{'no_create_edit': True}"/>
+                            </div>
+                            <div class="o_delivery_request_common_field">
+                                <span class="o_form_label">المستهلك</span>
+                                <field name="beneficiary_partner_id" nolabel="1" readonly="state != 'pending'"/>
+                            </div>
+                        </div>
+
+                        <div class="o_delivery_request_decision_strip" invisible="state == 'pending'">
+                            <span class="o_delivery_request_decision_title">
+                                <i class="fa fa-check-circle" aria-hidden="true"/> بيانات القرار
+                            </span>
+                            <div>
+                                <span class="o_form_label">اتخذ القرار</span>
+                                <field name="decision_user_id" nolabel="1" readonly="1"/>
+                            </div>
+                            <div>
+                                <span class="o_form_label">تاريخ القرار</span>
+                                <field name="decision_date" nolabel="1" readonly="1"/>
+                            </div>
+                        </div>
+
+                        <div class="o_delivery_request_products_shell">
+                            <div class="o_delivery_request_products_heading">
+                                <span class="o_delivery_request_products_heading_icon" aria-hidden="true">
+                                    <i class="fa fa-cubes"/>
+                                </span>
+                                <span class="o_delivery_request_products_heading_copy">
+                                    <strong>أصناف طلب التسليم</strong>
+                                    <small>أضف الأصناف والكميات والموديل المطلوب، وسيظهر المتاح والعجز مباشرة.</small>
+                                </span>
+                            </div>
+                            <field name="line_ids" class="o_delivery_request_lines" readonly="state != 'pending'">
+                                <list editable="bottom" string="أصناف طلب التسليم"
+                                      decoration-danger="shortage_qty &gt; 0"
+                                      decoration-success="shortage_qty == 0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="available_model_ids" column_invisible="True"/>
+                                    <field name="product_id" string="الصنف النهائي"
+                                           domain="[('active', '=', True), ('furniture_dimension_source_product_id', '=', False), '|', ('furniture_has_active_normal_recipe', '=', True), ('is_kits', '=', True)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="route_label" string="نوع الصنف" optional="show"/>
+                                    <field name="furniture_model_id" string="الموديل"
+                                           domain="[('id', 'in', available_model_ids)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="quantity" string="الكمية"/>
+                                    <field name="product_uom_id" string="الوحدة"/>
+                                    <field name="available_qty" string="المتاح للحجز"/>
+                                    <field name="shortage_qty" string="العجز"/>
+                                    <field name="configuration_error" string="ملاحظة الإعداد" optional="show"/>
+                                    <field name="production_order_id" optional="hide"/>
+                                </list>
+                            </field>
+                            <div class="o_delivery_request_products_hint">
+                                <i class="fa fa-info-circle" aria-hidden="true"/>
+                                الأصناف المتاحة هنا هي المنتجات المصنّعة والأطقم؛ ويُفك الطقم تلقائيًا حسب الموديل عند الحجز أو الإنتاج.
+                            </div>
+                        </div>
+
+                        <div class="o_delivery_request_notes">
+                            <span class="o_delivery_request_notes_icon" aria-hidden="true"><i class="fa fa-sticky-note-o"/></span>
+                            <div class="o_delivery_request_notes_content">
+                                <strong>ملاحظات</strong>
+                                <div class="o_delivery_request_note_composer" invisible="state != 'pending'">
+                                    <field name="note_draft" nolabel="1"
+                                           placeholder="اكتب الملاحظة هنا..."/>
+                                    <button name="action_add_note" type="object" string="إضافة"
+                                            icon="fa-plus" class="btn-primary o_delivery_request_note_add"/>
+                                </div>
+                                <field name="notes" invisible="1"/>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_delivery_requests_all" model="ir.actions.act_window">
+        <field name="name">طلبات التسليم</field>
+        <field name="res_model">furniture.mrp.future.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="furniture_mrp.view_furniture_mrp_future_order_search"/>
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">سجّل أول طلب تسليم</p>
+            <p>حدد العميل والأصناف وموعد التسليم، ثم احجز من المخزون التام أو أنشئ إنتاج العجز في MRP II.</p>
+        </field>
+    </record>
+    <menuitem id="menu_delivery_requests_root" name="طلبات التسليم" sequence="51"
+              web_icon="furniture_delivery_requests,static/description/icon.svg"
+              groups="base.group_system"/>
+    <menuitem id="menu_delivery_requests_all" name="كل الطلبات" sequence="10"
+              parent="menu_delivery_requests_root" action="action_delivery_requests_all"
+              groups="base.group_system"/>
+    <!-- Move the existing entry instead of copying its records or breaking URLs. -->
+    <record id="furniture_mrp.menu_furniture_mrp_future_orders" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_delivery_requests_root"/>
+        <field name="name">بانتظار القرار</field>
+        <field name="sequence">20</field>
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+    </record>
+    <record id="furniture_mrp.action_furniture_mrp_future_order" model="ir.actions.act_window">
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
+    </record>
+</odoo>

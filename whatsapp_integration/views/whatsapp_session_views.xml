@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_session_list" model="ir.ui.view">
+        <field name="name">whatsapp.session.list</field>
+        <field name="model">whatsapp.session</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Chats">
+                <field name="name"/>
+                <field name="mobile"/>
+                <field name="instance_id"/>
+                <field name="partner_id"/>
+                <field name="state"/>
+                <field name="last_message_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_session_form" model="ir.ui.view">
+        <field name="name">whatsapp.session.form</field>
+        <field name="model">whatsapp.session</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Chat">
+                <header>
+                    <button name="action_send_reply" string="Send Reply" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="mobile"/>
+                            <field name="partner_id"/>
+                            <field name="instance_id"/>
+                        </group>
+                        <group>
+                            <field name="host_phone" readonly="1"/>
+                            <field name="whatsapp_name"/>
+                            <field name="whatsapp_id" readonly="1"/>
+                            <field name="last_message_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="reply_text" placeholder="Type a reply..."/>
+                    </group>
+                    <notebook>
+                        <page string="Messages">
+                            <field name="message_ids" readonly="1">
+                                <list string="Messages">
+                                    <field name="date"/>
+                                    <field name="msg_type"/>
+                                    <field name="body"/>
+                                    <field name="media_type"/>
+                                    <field name="wa_message_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_session" model="ir.actions.act_window">
+        <field name="name">Chats</field>
+        <field name="res_model">whatsapp.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_session"
+              name="Chats"
+              parent="menu_whatsapp_msg_root"
+              action="action_whatsapp_session"
+              sequence="20"/>
+</odoo>

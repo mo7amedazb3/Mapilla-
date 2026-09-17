@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+    <t t-name="furniture_delivery_requests.DeliveryList" t-inherit="web.ListView" t-inherit-mode="primary">
+        <xpath expr="//div[@t-ref='root']" position="attributes">
+            <attribute name="t-att-class">className + ' mp_delivery_list'</attribute>
+        </xpath>
+        <xpath expr="//button[hasclass('o_list_button_add')]" position="replace">
+            <button type="button" class="btn btn-primary o_list_button_add" data-hotkey="c" t-on-click="onClickCreate"><i class="fa fa-plus me-2"/>طلب تسليم جديد</button>
+        </xpath>
+
+    </t>
+    <t t-name="furniture_delivery_requests.DeliveryLinesRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary">
+        <xpath expr="//table/tbody" position="after">
+            <tbody t-if="cushionGroups.length || savedNotes.length" class="o_delivery_cushion_rows">
+                <tr t-foreach="cushionGroups" t-as="group" t-key="group.key">
+                    <td t-att-colspan="nbCols">
+                        <div class="o_delivery_cushion_group" dir="rtl">
+                            <div class="o_delivery_cushion_title"><strong>التكاوي</strong><small t-if="cushionGroups.length &gt; 1" t-esc="group.model"/></div>
+                            <div class="o_delivery_cushion_names"><div class="o_delivery_cushion_card" t-foreach="group.items" t-as="item" t-key="item.key">
+                                <strong class="o_delivery_cushion_name" t-att-title="item.name" t-esc="item.name"/>
+                                <div class="o_delivery_cushion_specs">
+                                    <span t-att-title="'العدد: ' + item.count">العدد: <bdi t-esc="item.count"/></span>
+                                    <span t-if="item.size" t-att-title="'المقاس: ' + item.size"><bdi t-esc="item.size"/></span>
+                                </div>
+                            </div></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr t-if="savedNotes.length" class="o_delivery_note_row">
+                    <td t-att-colspan="nbCols">
+                        <div class="o_delivery_cushion_group" dir="rtl">
+                            <div class="o_delivery_cushion_title"><strong>ملاحظة</strong></div>
+                            <div class="o_delivery_cushion_names">
+                                <div class="o_delivery_cushion_card" t-foreach="savedNotes" t-as="note" t-key="note.key">
+                                    <strong class="o_delivery_cushion_name" t-att-title="note.text" t-esc="note.text"/>
+                                    <button t-if="canDeleteNotes" type="button"
+                                            class="btn o_delivery_note_delete"
+                                            title="حذف الملاحظة" aria-label="حذف الملاحظة"
+                                            t-on-click="(ev) => this.deleteNote(note, ev)">
+                                        <i class="fa fa-trash-o" aria-hidden="true"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </xpath>
+    </t>
+    <t t-name="furniture_delivery_requests.DeliverySortedRows" t-inherit="web.ListRenderer.Rows" t-inherit-mode="primary">
+        <xpath expr="//t[@t-foreach='list.records']" position="attributes">
+            <attribute name="t-foreach">sortedDeliveryRows(list.records)</attribute>
+        </xpath>
+    </t>
+</templates>

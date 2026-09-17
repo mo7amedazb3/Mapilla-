@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- تقرير التقديم -->
+    <record id="action_report_furniture_mrp_priming" model="ir.actions.report">
+        <field name="name">أمر التقديم</field>
+        <field name="model">furniture.mrp.priming</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_priming_template</field>
+        <field name="report_file">furniture_mrp.report_priming_template</field>
+        <field name="print_report_name">(object.name or 'أمر تقديم') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_priming"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- تقرير تصنيع دهانات -->
+    <record id="action_report_furniture_mrp_painting" model="ir.actions.report">
+        <field name="name">أمر تصنيع دهانات</field>
+        <field name="model">furniture.mrp.painting</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_painting_template</field>
+        <field name="report_file">furniture_mrp.report_painting_template</field>
+        <field name="print_report_name">(object.name or 'أمر تصنيع دهانات') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_painting"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- تقرير تجميع -->
+    <record id="action_report_furniture_mrp_carpentry" model="ir.actions.report">
+        <field name="name">أمر تجميع</field>
+        <field name="model">furniture.mrp.carpentry</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_carpentry_template</field>
+        <field name="report_file">furniture_mrp.report_carpentry_template</field>
+        <field name="print_report_name">(object.name or 'أمر نجارة') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_carpentry"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <record id="action_report_furniture_mrp_bases" model="ir.actions.report">
+        <field name="name">أمر القواعد</field><field name="model">furniture.mrp.bases</field>
+        <field name="report_type">qweb-pdf</field><field name="report_name">furniture_mrp.report_bases_template</field>
+        <field name="report_file">furniture_mrp.report_bases_template</field><field name="print_report_name">(object.name or 'أمر القواعد') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_bases"/><field name="binding_type">report</field><field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- تقرير كسوه -->
+    <record id="action_report_furniture_mrp_upholstery" model="ir.actions.report">
+        <field name="name">أمر كسوه</field>
+        <field name="model">furniture.mrp.upholstery</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_upholstery_template</field>
+        <field name="report_file">furniture_mrp.report_upholstery_template</field>
+        <field name="print_report_name">(object.name or 'أمر كسوة') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_upholstery"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- تقرير تجهيز -->
+    <record id="action_report_furniture_mrp_finishing" model="ir.actions.report">
+        <field name="name">أمر تجهيز</field>
+        <field name="model">furniture.mrp.finishing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_finishing_template</field>
+        <field name="report_file">furniture_mrp.report_finishing_template</field>
+        <field name="print_report_name">(object.name or 'أمر تجهيز') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_finishing"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- تقرير تفصيل -->
+    <record id="action_report_furniture_mrp_tailoring" model="ir.actions.report">
+        <field name="name">أمر تفصيل</field>
+        <field name="model">furniture.mrp.tailoring</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_tailoring_template</field>
+        <field name="report_file">furniture_mrp.report_tailoring_template</field>
+        <field name="print_report_name">(object.name or 'أمر تفصيل') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_furniture_mrp_tailoring"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

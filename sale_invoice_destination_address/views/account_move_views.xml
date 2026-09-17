@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_move_form_destination_address" model="ir.ui.view">
+        <field name="name">account.move.form.destination.address</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='header_left_group']/field[@name='partner_shipping_id']" position="after">
+                <field name="destination_address_id"
+                       string="العنوان"
+                       placeholder="اختر أو أنشئ عنوانًا"
+                       domain="[('company_id', '=', company_id)]"
+                       options="{'no_create_edit': False}"
+                       invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"
+                       readonly="state != 'draft'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

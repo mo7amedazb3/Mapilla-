@@ -1,0 +1,63 @@
+<odoo>
+<record id="rule_priming_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: priming</field>
+ <field name="model_id" ref="model_furniture_mrp_priming"/>
+ <field name="domain_force">user._stage_order_visibility_domain('priming')</field>
+</record>
+<record id="rule_painting_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: painting</field>
+ <field name="model_id" ref="model_furniture_mrp_painting"/>
+ <field name="domain_force">user._stage_order_visibility_domain('painting')</field>
+</record>
+<record id="rule_carpentry_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: carpentry</field>
+ <field name="model_id" ref="model_furniture_mrp_carpentry"/>
+ <field name="domain_force">user._stage_order_visibility_domain('carpentry')</field>
+</record>
+<record id="rule_bases_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: bases</field>
+ <field name="model_id" ref="model_furniture_mrp_bases"/>
+ <field name="domain_force">user._stage_order_visibility_domain('bases')</field>
+</record>
+<record id="rule_finishing_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: finishing</field>
+ <field name="model_id" ref="model_furniture_mrp_finishing"/>
+ <field name="domain_force">user._stage_order_visibility_domain('finishing')</field>
+</record>
+<record id="rule_tailoring_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: tailoring</field>
+ <field name="model_id" ref="model_furniture_mrp_tailoring"/>
+ <field name="domain_force">user._stage_order_visibility_domain('tailoring')</field>
+</record>
+<record id="rule_upholstery_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: upholstery</field>
+ <field name="model_id" ref="model_furniture_mrp_upholstery"/>
+ <field name="domain_force">user._stage_order_visibility_domain('upholstery')</field>
+</record>
+<record id="rule_packaging_delivery_visibility" model="ir.rule">
+ <field name="name">Stage delivery visibility: packaging</field>
+ <field name="model_id" ref="model_furniture_mrp_packaging"/>
+ <field name="domain_force">user._stage_order_visibility_domain('packaging')</field>
+</record>
+
+<record id="rule_mps_work_delivery_visibility" model="ir.rule">
+ <field name="name">MPS delivery visibility: work</field>
+ <field name="model_id" ref="model_furniture_mrp_mps_work"/>
+ <field name="domain_force">user._stage_work_visibility_domain()</field>
+</record>
+<record id="rule_mps_assignment_delivery_visibility" model="ir.rule">
+ <field name="name">MPS delivery visibility: assignment</field>
+ <field name="model_id" ref="model_furniture_mrp_mps_assignment"/>
+ <field name="domain_force">user._stage_work_visibility_domain()</field>
+</record>
+<record id="rule_mps_assignment_output_delivery_visibility" model="ir.rule">
+ <field name="name">MPS delivery visibility: assignment.output</field>
+ <field name="model_id" ref="model_furniture_mrp_mps_assignment_output"/>
+ <field name="domain_force">user._stage_work_visibility_domain()</field>
+</record>
+<record id="rule_production_delivery_visibility" model="ir.rule">
+ <field name="name">Production delivery visibility</field>
+ <field name="model_id" ref="model_furniture_mrp_production"/>
+ <field name="domain_force">user._production_visibility_domain()</field>
+</record>
+</odoo>

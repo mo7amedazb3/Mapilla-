@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_msg_list" model="ir.ui.view">
+        <field name="name">whatsapp.msg.list</field>
+        <field name="model">whatsapp.msg</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Messages">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="mobile"/>
+                <field name="state"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_msg_form" model="ir.ui.view">
+        <field name="name">whatsapp.msg.form</field>
+        <field name="model">whatsapp.msg</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Message">
+                <header>
+                    <button name="action_send_whatsapp" string="Send via Web" type="object" class="oe_highlight" invisible="state == 'sent'"/>
+                    <button name="action_send_via_api" string="Send via API" type="object" class="btn-secondary" invisible="state == 'sent'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id"/>
+                            <field name="mobile"/>
+                        </group>
+                        <group>
+                            <field name="res_model" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_msg" model="ir.actions.act_window">
+        <field name="name">Messages</field>
+        <field name="res_model">whatsapp.msg</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="seq_whatsapp_msg" model="ir.sequence">
+        <field name="name">WhatsApp Message</field>
+        <field name="code">whatsapp.msg</field>
+        <field name="prefix">WAMSG/</field>
+        <field name="padding">5</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_msg_root"
+              name="Inbox"
+              parent="whatsapp_connector.menu_whatsapp_connector_root"
+              sequence="20"/>
+
+    <menuitem id="menu_whatsapp_msg"
+              name="Pending Messages"
+              parent="menu_whatsapp_msg_root"
+              action="action_whatsapp_msg"
+              sequence="10"/>
+</odoo>

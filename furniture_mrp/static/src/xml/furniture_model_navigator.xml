@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="furniture_mrp.FurnitureModelNavigator">
+        <section class="o_furniture_model_selector"
+                 t-att-class="{'is-busy': cardState.switchingModelId}"
+                 t-att-aria-busy="cardState.switchingModelId ? 'true' : 'false'">
+            <div class="o_furniture_model_selector__heading">
+                <span class="o_furniture_model_selector__heading_icon" aria-hidden="true">
+                    <i class="fa fa-th-large"/>
+                </span>
+                <span class="o_furniture_model_selector__heading_text">
+                    <strong>اختار موديل الخامات</strong>
+                    <small>كل موديل له ريسيبي وخامات مستقلة</small>
+                </span>
+            </div>
+
+            <div class="o_furniture_model_selector__cards"
+                 role="radiogroup"
+                 aria-label="موديل خامات التصنيع">
+                <t t-if="cardState.loading">
+                    <span t-foreach="[1, 2, 3]" t-as="placeholder" t-key="placeholder"
+                          class="o_furniture_model_card is-placeholder" aria-hidden="true">
+                        <span class="o_furniture_model_card__icon"/>
+                        <span class="o_furniture_model_card__name"/>
+                    </span>
+                </t>
+                <t t-elif="cardState.models.length">
+                    <button t-foreach="cardState.models" t-as="model" t-key="model.id"
+                            type="button"
+                            class="o_furniture_model_card"
+                            t-att-class="{
+                                'is-selected': isSelected(model.id),
+                                'is-switching': cardState.switchingModelId === model.id,
+                            }"
+                            t-att-disabled="cardState.switchingModelId !== false"
+                            t-att-aria-checked="isSelected(model.id) ? 'true' : 'false'"
+                            role="radio"
+                            t-on-click="() => this.selectModel(model)">
+                        <span class="o_furniture_model_card__icon" aria-hidden="true">
+                            <i class="fa fa-cube"/>
+                        </span>
+                        <span class="o_furniture_model_card__name" t-esc="model.name"/>
+                        <span class="o_furniture_model_card__check" aria-hidden="true">
+                            <i t-att-class="cardState.switchingModelId === model.id ? 'fa fa-spinner fa-spin' : 'fa fa-check'"/>
+                        </span>
+                    </button>
+                </t>
+                <div t-else="" class="o_furniture_model_selector__empty">
+                    <i t-att-class="cardState.loadFailed ? 'fa fa-exclamation-triangle' : 'fa fa-info-circle'"
+                       aria-hidden="true"/>
+                    <span t-if="cardState.loadFailed">تعذر تحميل الموديلات. حدّث الصفحة وحاول مرة أخرى.</span>
+                    <span t-else="">لا توجد موديلات متاحة للاختيار.</span>
+                </div>
+            </div>
+        </section>
+    </t>
+
+</templates>

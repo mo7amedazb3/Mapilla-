@@ -1,0 +1,326 @@
+// Optional-addon adapters. Only presentation tokens/surfaces are changed;
+// workflow status colours, graph geometry, scroll, timers and data stay owned
+// by their modules. Loaded last by ir.asset, even for subsequently added apps.
+@media screen {
+    body.o_web_client {
+        .o_ntp_pipeline_view, .o_ntp_workspace {
+            --pipeline-ink: var(--mapilla-heading);
+            --pipeline-muted: var(--mapilla-muted);
+            --pipeline-teal: var(--mapilla-action);
+        }
+        .o_ntp_view, .o_ntp_form, .o_ntp_stage_form {
+            --ntp-ink: var(--mapilla-heading); --ntp-teal: var(--mapilla-action);
+            --ntp-muted: var(--mapilla-muted); --ntp-line: var(--mapilla-border);
+            --ntp-surface: var(--mapilla-page);
+        }
+        .o_fsr_dashboard, .o_fsr_dashboard.o_ntp_minmax {
+            --fsr-navy: var(--mapilla-oxford);
+            --fsr-navy-deep: #0c2a44;
+            --fsr-teal: var(--mapilla-action);
+            --fsr-teal-dark: var(--mapilla-action-hover);
+            --fsr-mint: var(--mapilla-selected);
+            --fsr-ink: var(--mapilla-heading);
+            --fsr-muted: var(--mapilla-muted);
+            --fsr-line: var(--mapilla-border);
+            --fsr-surface: var(--mapilla-surface);
+        }
+        .o_furniture_stage_dashboard_view {
+            --stage-dashboard-ink: var(--mapilla-heading);
+            --stage-dashboard-muted: var(--mapilla-muted);
+            --stage-dashboard-teal: var(--mapilla-action);
+            --stage-dashboard-teal-dark: var(--mapilla-action-hover);
+            --stage-dashboard-blue: var(--mapilla-oxford-500);
+            --stage-dashboard-border: var(--mapilla-border);
+            --stage-dashboard-surface: var(--mapilla-inset);
+            --stage-dashboard-shadow: var(--mapilla-shadow-sm);
+        }
+        .o_form_view, .o_form_view .o_furniture_sale_order_sheet {
+            --furniture-sale-ink: var(--mapilla-heading);
+            --furniture-sale-muted: var(--mapilla-muted);
+            --furniture-sale-accent: var(--mapilla-action);
+            --furniture-sale-accent-dark: var(--mapilla-action-hover);
+            --furniture-sale-border: var(--mapilla-border);
+            --furniture-sale-soft: var(--mapilla-inset);
+        }
+        .o_furniture_factory_dashboard {
+            --dashboard-ink: var(--mapilla-heading);
+            --dashboard-muted: var(--mapilla-muted);
+            --dashboard-border: var(--mapilla-border);
+            --dashboard-accent: var(--mapilla-action);
+            --dashboard-soft: var(--mapilla-inset);
+        }
+        .o_furniture_mps_dashboard {
+            --mps-ink: var(--mapilla-heading); --mps-muted: var(--mapilla-muted);
+            --mps-border: var(--mapilla-border); --mps-teal: var(--mapilla-action);
+        }
+        .o_furniture_completion_kanban, .o_furniture_completion_form, .o_furniture_completion_wizard {
+            --completion-navy: var(--mapilla-oxford); --completion-ink: var(--mapilla-heading);
+            --completion-muted: var(--mapilla-muted); --completion-teal: var(--mapilla-action);
+            --completion-teal-dark: var(--mapilla-action-hover);
+            --completion-line: var(--mapilla-border); --completion-soft: var(--mapilla-inset);
+        }
+        .o_ntp_workspace .o_content, .o_ntp_pipeline_view .o_content,
+        .o_fsr_dashboard.o_ntp_minmax, .o_fsr_dashboard, .o_spa_cp_dashboard,
+        .o_furniture_stage_dashboard_page, .o_factory_attendance_dashboard,
+        .o_dynamic_report_container, .o_furniture_mps_dashboard,
+        .o_furniture_completion_kanban .o_kanban_renderer {
+            background: var(--mapilla-page) !important;
+            color: var(--mapilla-text);
+        }
+
+        // Shared hero treatment: Oxford + neutral fabric-like muted accent.
+        .o_ntp_workspace_intro, .o_fsr_header, .o_ntp_minmax .o_fsr_header,
+        .o_factory_attendance_hero, .o_furniture_stage_bom_wizard__hero, .o_ntp_hero {
+            background: var(--mapilla-hero) !important;
+            border-color: var(--mapilla-timberwolf) !important;
+            color: #fff;
+        }
+        .o_ntp_workspace_intro h1, .o_fsr_heading h1,
+        .o_factory_attendance_brand h1 { color: #fff !important; }
+        .o_ntp_workspace_intro small, .o_ntp_workspace_intro_tag,
+        .o_fsr_eyebrow, .o_fsr_heading h1 bdi,
+        .o_factory_attendance_brand > div > span {
+            color: var(--mapilla-on-hero) !important;
+        }
+        .o_ntp_workspace_intro_art .o_ntp_furniture_art {
+            --art-main: #ada696; --art-light: #e0d8d1; --art-dark: #6e787c;
+            --art-seam: #8a8e89; --art-accent: #f1efeb;
+            --art-guide: #e0d8d14d; --art-arch: #ffffff08;
+        }
+
+        // Preserve each model's unique hue; harmonise saturation and neutrals.
+        .o_ntp_model_theme {
+            --ntp-model-ink: var(--mapilla-heading);
+            --ntp-model-muted: var(--mapilla-muted);
+            --ntp-model-color: hsl(var(--ntp-model-hue), 20%, 44%);
+            --ntp-model-border: hsl(var(--ntp-model-hue), 18%, 79%);
+            --ntp-model-soft: hsl(var(--ntp-model-hue), 22%, 93%);
+            --ntp-model-wash: var(--mapilla-surface);
+        }
+        .o_ntp_model_theme .o_ntp_furniture_art {
+            --art-main: hsl(var(--ntp-model-hue), 22%, 64%);
+            --art-light: hsl(var(--ntp-model-hue), 25%, 80%);
+            --art-dark: hsl(var(--ntp-model-hue), 20%, 43%);
+            --art-accent: #e0d8d1;
+        }
+        .o_ntp_workspace_home, .o_ntp_workspace_nav nav .o_ntp_workspace_home,
+        .o_ntp_workspace_approve_scope, .o_fsr_btn_primary,
+        .o_factory_refresh_button, .o_factory_help_done {
+            background: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+            color: var(--mapilla-action-text) !important;
+            box-shadow: 0 3px 9px rgba(12, 42, 68, .15) !important;
+        }
+        .o_ntp_workspace_home:hover, .o_ntp_workspace_approve_scope:hover,
+        .o_fsr_btn_primary:hover, .o_factory_refresh_button:hover, .o_factory_help_done:hover {
+            background: var(--mapilla-action-hover) !important;
+        }
+        .o_fsr_header .o_fsr_btn_primary, .o_ntp_minmax .o_ntp_open_needs {
+            background: var(--mapilla-timberwolf) !important;
+            border-color: var(--mapilla-timberwolf) !important;
+            color: #0c2a44 !important;
+        }
+        .o_fsr_header .o_fsr_btn_ghost { color: #fff !important; border-color: #ffffff55 !important; }
+        .o_ntp_workspace_refresh, .o_ntp_workspace_nav .o_ntp_workspace_refresh,
+        .o_fsr_btn_secondary, .o_fsr_row_btn,
+        .o_factory_attendance_dashboard .o_factory_overtime_button {
+            background: var(--mapilla-surface) !important;
+            border-color: var(--mapilla-border-strong) !important;
+            color: var(--mapilla-heading) !important;
+        }
+        .o_ntp_workspace_nav, .o_ntp_workspace_products_title,
+        .o_ntp_workspace_models_title, .o_ntp_stage_navigation_heading,
+        .o_dynamic_report_header h2 { color: var(--mapilla-heading) !important; }
+        .o_ntp_workspace_nav nav button:not(.o_ntp_workspace_home),
+        .o_ntp_step_pending { color: var(--mapilla-muted); }
+        .o_ntp_step_number { border-color: var(--mapilla-border); }
+        .is-current > .o_ntp_step_number, .o_ntp_step_active > .o_ntp_step_number {
+            background: var(--mapilla-action); border-color: var(--mapilla-action); color: var(--mapilla-action-text);
+        }
+
+        // Stage selectors are navigation, not progress/quality statuses.
+        .o_ntp_stage_tabs button, .o_fsr_stage_tab,
+        .o_furniture_stage_dashboard__stage {
+            background: var(--mapilla-surface) !important;
+            border-color: var(--mapilla-border) !important;
+            color: var(--mapilla-heading) !important;
+        }
+        .o_ntp_stage_tabs button i, .o_furniture_stage_dashboard__stage_icon {
+            color: var(--mapilla-action) !important;
+        }
+        .o_furniture_stage_dashboard__stage_icon { background: var(--mapilla-inset) !important; }
+        .o_ntp_stage_tabs button.is-active, .o_fsr_stage_tab.is-active,
+        .o_furniture_stage_dashboard__stage.is-selected {
+            background: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+            color: var(--mapilla-action-text) !important;
+            box-shadow: 0 4px 12px rgba(12, 42, 68, .16) !important;
+        }
+        .o_ntp_stage_tabs button.is-active i,
+        .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_icon {
+            color: var(--mapilla-action-text) !important; background: #ffffff18 !important;
+        }
+        .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_copy small,
+        .o_furniture_stage_dashboard__stage.is-selected .o_furniture_stage_dashboard__stage_percentage {
+            color: #e0d8d1 !important;
+        }
+
+        // Some custom actions use WebKit text fill as well as color. Keep the
+        // actual painted glyph colour in sync with the shared button variant.
+        .o_furniture_stage_dashboard_page__action.is-material-check,
+        .o_furniture_stage_dashboard_page__action.is-material-check:hover,
+        .o_furniture_stage_dashboard_page__action.is-material-check:focus-visible {
+            -webkit-text-fill-color: var(--mapilla-heading) !important;
+        }
+        .o_form_view .o_furniture_sale_order_sheet,
+        .o_form_view .o_furniture_sale_lines_heading {
+            background: var(--mapilla-inset) !important;
+        }
+        .o_form_view .o_furniture_sale_order_lines .o_list_table thead th {
+            background: var(--mapilla-oxford) !important; color: #fff !important;
+        }
+        .o_form_view:has(.o_sale_order) .o_form_status_indicator_buttons .o_form_button_save {
+            background: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+            color: var(--mapilla-action-text) !important;
+        }
+        .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order {
+            border-color: var(--mapilla-border);
+            background: var(--mapilla-surface);
+        }
+        .o_furniture_stage_dashboard_view .o_furniture_order_supervisor_order__model {
+            background: var(--mapilla-inset); color: var(--mapilla-heading);
+            border-color: var(--mapilla-border);
+        }
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details,
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_header,
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_header {
+            background: var(--mapilla-inset); border-color: var(--mapilla-border);
+        }
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_row {
+            background: var(--mapilla-surface); border-color: var(--mapilla-border);
+        }
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_order_model strong,
+        .o_furniture_stage_dashboard_view .o_furniture_stage_dashboard__details_title strong {
+            color: var(--mapilla-heading);
+        }
+
+        .o_ntp_stage_navigation, .o_ntp_bulk_toolbar, .o_fsr_control_panel,
+        .o_fsr_stage_section, .o_fsr_table_card, .o_spa_cp_panel,
+        .o_factory_attendance_filters, .o_factory_attendance_table_card,
+        .o_furniture_stage_dashboard, .o_furniture_stage_navigation,
+        .o_furniture_stage_dashboard_page__header,
+        .o_furniture_sale_header_card, .o_furniture_info_card, .o_furniture_cost_card {
+            border-color: var(--mapilla-border) !important;
+            background: var(--mapilla-surface) !important;
+            box-shadow: var(--mapilla-shadow-sm);
+        }
+        .o_assembly_requisition .o_assembly_request_hero,
+        .o_assembly_requisition .o_assembly_request_item,
+        .o_furniture_header_summary, .o_furniture_order_common_strip,
+        .o_furniture_order_planning_strip {
+            background: var(--mapilla-inset) !important;
+            border-color: var(--mapilla-border) !important; color: var(--mapilla-heading) !important;
+        }
+        .o_assembly_requisition .o_assembly_request_item > .fa,
+        .o_furniture_stage_dashboard__title_icon, .o_furniture_stage_dashboard_page__icon {
+            color: var(--mapilla-action) !important; background-color: var(--mapilla-inset) !important;
+        }
+        .o_fsr_metric, .o_spa_cp_metric { border-color: var(--mapilla-border); background: var(--mapilla-surface); }
+        .o_fsr_metric_total { --metric-color: var(--mapilla-oxford-500); }
+        .o_fsr_metric_draft { --metric-color: #817967; }
+        .o_fsr_table thead th, .o_report_table thead th {
+            background: var(--mapilla-surface-soft) !important;
+            color: var(--mapilla-heading) !important;
+            border-color: var(--mapilla-border) !important;
+        }
+        .o_fsr_table tbody tr:not(.is-selected):nth-child(even) td { background: var(--mapilla-inset) !important; }
+        .o_fsr_table tbody tr:hover td { background: var(--mapilla-hover) !important; }
+        .o_fsr_table .o_fsr_model_heading th, .o_factory_department_row td {
+            background: var(--mapilla-surface-soft) !important; color: var(--mapilla-heading) !important;
+        }
+        // Min/Max: cool blue model bands and white/ice-blue product rows.
+        .o_ntp_minmax .o_fsr_model_table {
+            thead th, .o_fsr_model_heading th {
+                background: #e3f0f8 !important;
+                color: #0c2a44 !important;
+                border-color: #c9deec !important;
+            }
+            .o_fsr_model_heading th { border-top-color: #ffffff !important; }
+            tbody tr.o_fsr_row td {
+                background: #ffffff !important;
+                border-color: #dfebf3 !important;
+            }
+            tbody tr.o_fsr_row:nth-child(even) td { background: #f1f8fc !important; }
+            tbody tr.o_fsr_row:hover td { background: #e3f1fb !important; }
+            tbody tr.o_fsr_row.is-selected td { background: #cde6f7 !important; }
+            .o_fsr_limit_cell input {
+                background: #ffffff !important;
+                border-color: #bfd7e7 !important;
+                color: #0c2a44 !important;
+            }
+        }
+        .o_fsr_limit_cell input, .o_fsr_search input, .o_fsr_status_filter select,
+        .o_ntp_model_filter select {
+            border-color: var(--mapilla-border-strong) !important;
+            background: var(--mapilla-surface) !important; color: var(--mapilla-text) !important;
+        }
+        .o_ntp_selected_count, .o_fsr_selection_count, .o_ntp_piece_icon {
+            background: var(--mapilla-inset) !important; color: var(--mapilla-heading) !important;
+        }
+        .o_ntp_piece_eta, .o_ntp_graph_toggle, .o_ntp_piece_custom_partners {
+            background: var(--mapilla-inset) !important; border-color: var(--mapilla-border) !important;
+            color: var(--mapilla-heading) !important;
+        }
+        .o_ntp_piece_eta_title, .o_ntp_piece_eta_title > .fa, .o_ntp_piece_eta_metric,
+        .o_ntp_piece_eta_metric strong, .o_ntp_piece_eta_equals {
+            color: var(--mapilla-heading) !important;
+        }
+        .o_ntp_piece_pipeline:has(.o_ntp_piece_selector input:checked) .o_ntp_piece_header {
+            background: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+            box-shadow: inset -5px 0 var(--mapilla-timberwolf);
+        }
+        .o_ntp_piece_pipeline:has(.o_ntp_piece_selector input:checked) .o_ntp_piece_icon {
+            background: #ffffff20 !important; color: #fff !important;
+        }
+        // Keep the requested 3D bevel, but use stone instead of purple edges.
+        .o_ntp_pipeline_view .o_kanban_renderer .o_kanban_record:has(.o_ntp_piece_pipeline) {
+            border-color: var(--mapilla-border) !important;
+            box-shadow: -1px 1px 0 #e0d8d1, -2px 2px 0 #d2cbc3,
+                -3px 3px 0 #c4bfb4, -4px 4px 0 #b8b2a5, -5px 5px 0 #ada696,
+                -8px 10px 18px rgba(12, 42, 68, .14) !important;
+        }
+        .o_ntp_graph_canvas { border-color: var(--mapilla-border); }
+        // Do not recolour .o_ntp_node or its arrows: amber waiting, purple
+        // manufacturing and green completion remain semantically meaningful.
+
+        // Help is one reusable component across every app; keep its existing
+        // focus handling, mobile sizing, Escape and close interactions.
+        button.o_factory_help_button {
+            background: var(--mapilla-surface-soft); color: var(--mapilla-heading);
+            border-color: var(--mapilla-border-strong);
+        }
+        button.o_factory_help_button:hover { background: var(--mapilla-selected); }
+        .o_ntp_workspace_intro button.o_factory_help_button {
+            background: #ffffff18; border-color: #ffffff66; color: #fff;
+        }
+        .o_dialog .modal.o_technical_modal .o_factory_help_modal > .modal-header {
+            background: var(--mapilla-hero) !important;
+        }
+        .o_dialog .o_factory_help_title { color: #fff !important; }
+        .o_factory_help_eyebrow { color: #e0d8d1; }
+        .o_factory_help_emblem { background: #e0d8d1; color: #0c2a44; box-shadow: none; border-color: #e0d8d1; }
+        .o_factory_help_close { color: #fff; background: #ffffff14; border-color: #ffffff40; }
+        .o_factory_help_close:hover { color: #0c2a44; background: #e0d8d1; }
+        .o_factory_help_dialog {
+            background: var(--mapilla-inset); border-color: var(--mapilla-border);
+            border-inline-start-color: var(--mapilla-quick-silver); color: var(--mapilla-text);
+        }
+        .o_dialog .modal.o_technical_modal .o_factory_help_modal > .o_factory_help_body,
+        .o_dialog .modal.o_technical_modal .o_factory_help_modal > .modal-footer {
+            background: var(--mapilla-surface) !important;
+        }
+        .o_factory_help_modal button:focus-visible { outline-color: var(--mapilla-focus); }
+    }
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_costing" model="ir.ui.view">
+        <field name="name">product.template.form.costing.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_standard_price']" position="inside">
+                <separator string="SPA Service Costing"/>
+                <field name="costing_eligible"/>
+                <field name="costing_department_id" invisible="not costing_eligible"/>
+                <field name="costing_bom_id" readonly="1" invisible="not costing_eligible"/>
+                <field name="costing_material_cost" widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       invisible="not costing_eligible"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_form_view_service_bom_button" model="ir.ui.view">
+        <field name="name">product.template.form.service.bom.button</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="mrp.product_template_form_view_bom_button"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(mrp.template_open_bom)d']" position="attributes">
+                <attribute name="invisible">type not in ('consu', 'service')</attribute>
+                <attribute name="groups">mrp.group_mrp_user,account.group_account_user</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

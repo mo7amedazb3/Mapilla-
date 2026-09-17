@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_form_stage_replenishment_policy" model="ir.ui.view">
+        <field name="name">product.template.form.stage.replenishment.policy</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="furniture_mrp.view_product_template_form_furniture_supplier"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='furniture_model_id'])[1]" position="after">
+                <field name="furniture_stage_replenishment_separate_order"
+                       string="أمر Min/Max منفصل"
+                       invisible="1"
+                       groups="furniture_mrp.group_furniture_mrp_manager"
+                       help="حقل تاريخي غير مستخدم؛ كل أصناف الموديل تتجمع في أمر واحد لكل مسار."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Fallback views: the dashboard remains the primary working screen. -->
+    <record id="view_furniture_stage_replenishment_rule_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.replenishment.rule.list</field>
+        <field name="model">furniture.mrp.stage.replenishment.rule</field>
+        <field name="arch" type="xml">
+            <list string="Min/Max مراحل الإنتاج"
+                  create="false"
+                  delete="false"
+                  editable="bottom"
+                  decoration-danger="replenishment_status == 'to_produce'"
+                  decoration-warning="replenishment_status == 'draft'"
+                  decoration-success="replenishment_status == 'ok'"
+                  decoration-muted="replenishment_status == 'disabled'">
+                <header>
+                    <button name="action_stage_replenishment_sync_rules"
+                            type="object"
+                            string="تحديث الأصناف من الريسيبي"
+                            class="btn-secondary"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager"/>
+                    <button name="action_stage_replenishment_run_now"
+                            type="object"
+                            string="تشغيل كل الاحتياجات الآن"
+                            class="btn-primary"
+                            display="always"
+                            groups="furniture_mrp.group_furniture_mrp_manager"/>
+                </header>
+                <field name="company_id" optional="hide" groups="base.group_multi_company" readonly="1"/>
+                <field name="stage_code" widget="badge" readonly="1"/>
+                <field name="product_id" readonly="1"/>
+                <field name="furniture_model_id" readonly="1"/>
+                <field name="bom_id" optional="show" readonly="1"/>
+                <field name="current_qty" string="WIP متاح" sum="إجمالي WIP المتاح" readonly="1"/>
+                <field name="reserved_qty" sum="إجمالي المحجوز للإتمام" readonly="1"/>
+                <field name="incoming_qty" string="جاري في المسار" sum="الإجمالي الجاري" readonly="1"/>
+                <field name="draft_qty" sum="إجمالي المسودات" readonly="1"/>
+                <field name="forecast_qty" sum="إجمالي المغطى" readonly="1"/>
+                <field name="min_qty"/>
+                <field name="max_qty"/>
+                <field name="qty_to_produce" sum="إجمالي المطلوب" readonly="1"/>
+                <field name="uom_id" optional="hide" readonly="1"/>
+                <field name="replenishment_status" widget="badge" readonly="1"
+                       decoration-danger="replenishment_status == 'to_produce'"
+                       decoration-warning="replenishment_status == 'draft'"
+                       decoration-info="replenishment_status in ('incoming', 'working')"
+                       decoration-success="replenishment_status == 'ok'"
+                       decoration-muted="replenishment_status == 'disabled'"/>
+                <field name="last_production_id" optional="show" readonly="1"/>
+                <field name="last_generated_at" optional="hide" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_stage_replenishment_rule_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.replenishment.rule.form</field>
+        <field name="model">furniture.mrp.stage.replenishment.rule</field>
+        <field name="arch" type="xml">
+            <form string="حدود مرحلة الإنتاج" create="false" delete="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_stage_replenishment_sync_rules"
+                                icon="fa-refresh"
+                                groups="furniture_mrp.group_furniture_mrp_manager">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">تحديث الريسيبي</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="يحتاج تصنيع" bg_color="text-bg-danger"
+                            invisible="replenishment_status != 'to_produce'"/>
+                    <div class="oe_title">
+                        <label for="product_id" string="الصنف"/>
+                        <h1>
+                            <field name="product_id" readonly="1" options="{'no_open': True}"/>
+                        </h1>
+                        <h2>
+                            <field name="furniture_model_id" readonly="1" options="{'no_open': True}"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="تعريف البند">
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                            <field name="stage_code" readonly="1"/>
+                            <field name="bom_id" readonly="1"/>
+                            <field name="uom_id" readonly="1"/>
+                        </group>
+                        <group string="حدود التشغيل">
+                            <field name="min_qty"/>
+                            <field name="max_qty"/>
+                            <field name="replenishment_status" widget="badge" readonly="1"
+                                   decoration-danger="replenishment_status == 'to_produce'"
+                                   decoration-warning="replenishment_status == 'draft'"
+                                   decoration-info="replenishment_status in ('incoming', 'working')"
+                                   decoration-success="replenishment_status == 'ok'"
+                                   decoration-muted="replenishment_status == 'disabled'"/>
+                        </group>
+                    </group>
+                    <group string="رصيد المرحلة" col="6">
+                        <field name="current_qty" readonly="1"/>
+                        <field name="reserved_qty" readonly="1"/>
+                        <field name="incoming_qty" readonly="1"/>
+                        <field name="draft_qty" readonly="1"/>
+                        <field name="forecast_qty" readonly="1"/>
+                        <field name="qty_to_produce" readonly="1"/>
+                        <field name="last_production_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="last_generated_at" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_stage_replenishment_rule_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.replenishment.rule.search</field>
+        <field name="model">furniture.mrp.stage.replenishment.rule</field>
+        <field name="arch" type="xml">
+            <search string="بحث Min/Max المراحل">
+                <field name="product_id"/>
+                <field name="furniture_model_id"/>
+                <field name="bom_id"/>
+                <field name="stage_code"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <separator/>
+                <filter name="not_configured" string="غير مُعدة"
+                        domain="['|', ('min_qty', '=', 0), ('max_qty', '=', 0)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_stage" string="المرحلة" context="{'group_by': 'stage_code'}"/>
+                    <filter name="group_product" string="الصنف" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_model" string="الموديل" context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_company" string="الشركة" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_stage_replenishment_rule_list" model="ir.actions.act_window">
+        <field name="name">إعدادات Min/Max المراحل</field>
+        <field name="res_model">furniture.mrp.stage.replenishment.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_stage_replenishment_rule_search"/>
+        <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+        <field name="context">{'search_default_group_stage': 1, 'default_company_id': allowed_company_ids[0]}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد ريسيبي جاهزة للموديلات بعد.</p>
+            <p>استخدم زر تحديث الأصناف من الريسيبي، ثم اضبط Min و Max لكل مرحلة.</p>
+        </field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+
+    <!-- One generic dashboard action plus a direct action for every production stage. -->
+    <record id="action_furniture_stage_replenishment_dashboard" model="ir.actions.client">
+        <field name="name">Min/Max مراحل الإنتاج</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{}</field>
+    </record>
+
+    <record id="action_furniture_final_replenishment_dashboard" model="ir.actions.client">
+        <field name="name">Min/Max المنتج التام</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'final'}</field>
+    </record>
+
+    <record id="view_furniture_stage_time_standard_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.time.standard.list</field>
+        <field name="model">furniture.mrp.stage.time.standard</field>
+        <field name="arch" type="xml">
+            <list string="الوقت القياسي للمراحل"
+                  create="false" delete="false" editable="bottom">
+                <field name="sequence" column_invisible="True"/>
+                <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                <field name="stage_code" readonly="1" widget="badge"/>
+                <field name="hours_per_piece" string="ساعات لكل قطعة"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_furniture_stage_time_standard" model="ir.actions.act_window">
+        <field name="name">⏱ وقت القطعة لكل مرحلة</field>
+        <field name="res_model">furniture.mrp.stage.time.standard</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+        <field name="context">{'default_company_id': allowed_company_ids[0]}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager')])]"/>
+    </record>
+
+    <record id="action_furniture_stage_replenishment_priming" model="ir.actions.client">
+        <field name="name">Min/Max التقديم</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'priming'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_painting" model="ir.actions.client">
+        <field name="name">Min/Max تصنيع دهانات</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'painting'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_carpentry" model="ir.actions.client">
+        <field name="name">Min/Max التجميع</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'carpentry'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_bases" model="ir.actions.client">
+        <field name="name">Min/Max القواعد</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'bases'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_finishing" model="ir.actions.client">
+        <field name="name">Min/Max القواعد والتجهيز</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'finishing'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_tailoring" model="ir.actions.client">
+        <field name="name">Min/Max التفصيل</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'tailoring'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_upholstery" model="ir.actions.client">
+        <field name="name">Min/Max الكسوه</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'upholstery'}</field>
+    </record>
+    <record id="action_furniture_stage_replenishment_packaging" model="ir.actions.client">
+        <field name="name">Min/Max التغليف</field>
+        <field name="tag">furniture_stage_replenishment.stage_replenishment_dashboard</field>
+        <field name="target">current</field>
+        <field name="context">{'stage_code': 'packaging'}</field>
+    </record>
+
+    <menuitem id="menu_furniture_stage_replenishment_root"
+              name="📈 Min/Max المراحل"
+              parent="furniture_mrp.menu_furniture_mrp_root"
+              action="action_furniture_stage_replenishment_dashboard"
+              sequence="19"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <!--
+        Stage selection lives inside the dashboard.  Keep these XML IDs and
+        actions for compatibility, but do not expose a second navigation layer
+        under the main Min/Max menu.
+    -->
+    <menuitem id="menu_furniture_stage_replenishment_all"
+              name="📊 كل المراحل"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_dashboard"
+              active="False"
+              sequence="0"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_stage_replenishment_priming"
+              name="🎨 التقديم"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_priming"
+              active="False"
+              sequence="1"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_painting"
+              name="🖌️ تصنيع دهانات"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_painting"
+              active="False"
+              sequence="2"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_carpentry"
+              name="🪵 تجميع"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_carpentry"
+              active="False"
+              sequence="3"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_bases"
+              name="🧱 القواعد"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_bases"
+              active="False"
+              sequence="4"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_finishing"
+              name="🔧 تجهيز"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_finishing"
+              active="False"
+              sequence="5"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_tailoring"
+              name="✂️ تفصيل"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_tailoring"
+              active="False"
+              sequence="7"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_upholstery"
+              name="🛋️ كسوه"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_upholstery"
+              active="False"
+              sequence="6"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+    <menuitem id="menu_furniture_stage_replenishment_packaging"
+              name="📦 التغليف"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_replenishment_packaging"
+              active="False"
+              sequence="8"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <!-- Min/Max opens the unified dashboard directly. Keep old menu/action IDs
+         for compatibility without a duplicate submenu. -->
+    <record id="menu_furniture_stage_replenishment_root" model="ir.ui.menu">
+        <field name="name">Min / Max</field>
+        <field name="parent_id" eval="False"/>
+        <field name="action" ref="action_furniture_stage_replenishment_dashboard"/>
+        <field name="web_icon">furniture_stage_replenishment,static/description/icon.svg</field>
+        <field name="sequence">53</field>
+    </record>
+    <record id="menu_furniture_stage_replenishment_all" model="ir.ui.menu">
+        <field name="name">📊 مراحل الإنتاج</field>
+        <field name="active" eval="False"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <menuitem id="menu_furniture_final_replenishment"
+              name="📦 مخزون المنتج النهائي"
+              active="False"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_final_replenishment_dashboard"
+              sequence="10"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+
+    <menuitem id="menu_furniture_stage_time_standard"
+              name="⏱ أوقات المراحل"
+              active="False"
+              parent="menu_furniture_stage_replenishment_root"
+              action="action_furniture_stage_time_standard"
+              sequence="30"
+              groups="furniture_mrp.group_furniture_mrp_manager"/>
+</odoo>

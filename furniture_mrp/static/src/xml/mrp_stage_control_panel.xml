@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.FormView" t-inherit-mode="extension">
+        <xpath expr="//t[@t-set-slot='control-panel-additional-actions']/CogMenu" position="before">
+            <div t-if="isFurnitureMrpNavigationForm" class="o_furniture_stage_cp_nav d-inline-flex align-items-center gap-1">
+                <button t-if="!isFurnitureProductionOrder"
+                        type="button"
+                        class="btn o_furniture_stage_nav_button o_furniture_production_nav_button"
+                        title="الرجوع إلى أمر التصنيع الرئيسي"
+                        t-on-click.stop="openFurnitureProductionOrder">
+                    <i class="fa fa-home me-1"/>
+                    <span>أمر التصنيع</span>
+                </button>
+                <button type="button"
+                        class="btn o_furniture_stage_nav_button o_furniture_dashboard_nav_button"
+                        title="الرجوع إلى لوحة تحكم المصنع"
+                        t-on-click.stop="openFurnitureMrpDashboard">
+                    <i class="fa fa-th-large me-1"/>
+                    <span>لوحة التحكم</span>
+                </button>
+                <span t-if="isFurnitureProductionOrder &amp;&amp; furnitureProductionOrderName"
+                      class="o_furniture_production_cp_order"
+                      title="رقم أمر الإنتاج الحالي">
+                    <small>أمر الإنتاج</small>
+                    <strong t-esc="furnitureProductionOrderName"/>
+                </span>
+            </div>
+        </xpath>
+    </t>
+</templates>

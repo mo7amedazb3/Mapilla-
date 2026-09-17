@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================================================================
+         Production lane selector and badges
+         ================================================================ -->
+    <record id="view_furniture_mrp_production_form_lane" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.form.lane</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="view_furniture_mrp_production_form"/>
+        <field name="priority" eval="96"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' o_furniture_order_model_hero ')]"
+                   position="inside">
+                <field name="production_lane"
+                       string="مسار أمر الإنتاج"
+                       widget="badge"
+                       nolabel="1"
+                       readonly="1"
+                       decoration-muted="production_lane == 'legacy'"
+                       decoration-info="production_lane == 'body'"
+                       decoration-warning="production_lane == 'cover'"
+                       class="o_furniture_lane_header_badge"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_list_lane" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.list.lane</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="view_furniture_mrp_production_list"/>
+        <field name="priority" eval="96"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='name']" position="after">
+                <field name="production_lane" string="مسار الإنتاج"
+                       widget="badge" optional="show"
+                       decoration-muted="production_lane == 'legacy'"
+                       decoration-info="production_lane == 'body'"
+                       decoration-warning="production_lane == 'cover'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_kanban_lane" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.kanban.lane</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="view_furniture_mrp_production_kanban"/>
+        <field name="priority" eval="96"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/field[@name='state']" position="after">
+                <field name="production_lane"/>
+            </xpath>
+            <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' o_furniture_production_card_heading ')]"
+                   position="after">
+                <t t-if="record.production_lane.raw_value == 'frame'">
+                    <span class="o_furniture_lane_badge is-frame">
+                        <i class="fa fa-cubes" title="نجارة"/> نجارة
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'finish'">
+                    <span class="o_furniture_lane_badge is-finish">
+                        <i class="fa fa-wrench" title="القواعد والتجهيز"/> القواعد والتجهيز
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'tailoring'">
+                    <span class="o_furniture_lane_badge is-tailoring">
+                        <i class="fa fa-scissors" title="التفصيل والخياطة"/> التفصيل والخياطة
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'painting'">
+                    <span class="o_furniture_lane_badge is-painting">
+                        <i class="fa fa-tint" title="تصنيع الدهانات"/> تصنيع الدهانات
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'upholstery'">
+                    <span class="o_furniture_lane_badge is-upholstery">
+                        <i class="fa fa-cube" title="الكسوة"/> الكسوة
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'packaging'">
+                    <span class="o_furniture_lane_badge is-packaging">
+                        <i class="fa fa-archive" title="التغليف"/> التغليف
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'body'">
+                    <span class="o_furniture_lane_badge is-body">
+                        <i class="fa fa-cogs" title="نجارة (قديم)"/> نجارة (قديم)
+                    </span>
+                </t>
+                <t t-elif="record.production_lane.raw_value == 'cover'">
+                    <span class="o_furniture_lane_badge is-cover">
+                        <i class="fa fa-scissors" title="الكسوة والتفصيل (قديم)"/> الكسوة والتفصيل (قديم)
+                    </span>
+                </t>
+                <t t-else="">
+                    <span class="o_furniture_lane_badge is-legacy">
+                        <i class="fa fa-list-alt" title="أمر إنتاج كامل"/> أمر إنتاج كامل
+                    </span>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_search_lane" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.search.lane</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="view_furniture_mrp_production_search"/>
+        <field name="priority" eval="96"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[@name='product_id']" position="after">
+                <field name="production_lane" string="مسار الإنتاج"/>
+            </xpath>
+            <xpath expr="//filter[@name='confirmed']" position="after">
+                <separator/>
+                <filter name="lane_body" string="نجارة"
+                        domain="[('production_lane', '=', 'body')]"/>
+                <filter name="lane_cover" string="الكسوة والتفصيل"
+                        domain="[('production_lane', '=', 'cover')]"/>
+                <filter name="lane_legacy" string="المسار القديم"
+                        domain="[('production_lane', '=', 'legacy')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='group_product']" position="after">
+                <filter name="group_lane" string="مسار الإنتاج"
+                        context="{'group_by': 'production_lane'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         Ready-to-complete pool
+         ================================================================ -->
+    <record id="view_furniture_mrp_lane_output_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.lane.output.search</field>
+        <field name="model">furniture.mrp.lane.output</field>
+        <field name="arch" type="xml">
+            <search string="جاهز لإتمام المنتج">
+                <field name="name" string="المرجع"/>
+                <field name="final_product_id" string="الصنف النهائي"/>
+                <field name="furniture_model_id" string="الموديل"/>
+                <field name="bom_id" string="الريسيبي"/>
+                <field name="production_id" string="أمر الإنتاج"/>
+                <separator/>
+                <filter name="open" string="الرصيد المفتوح"
+                        domain="[('state', '!=', 'exhausted')]"/>
+                <filter name="completable" string="جاهز للإتمام"
+                        domain="[('completable_qty', '&gt;', 0)]"/>
+                <filter name="waiting" string="غير قابل للإتمام الآن"
+                        domain="[('state', '!=', 'exhausted'), ('completable_qty', '=', 0)]"/>
+                <separator/>
+                <filter name="body" string="التجهيز"
+                        domain="[('lane', '=', 'body')]"/>
+                <filter name="cover" string="الكسوة والتفصيل"
+                        domain="[('lane', '=', 'cover')]"/>
+                <separator/>
+                <filter name="ready" string="متاح"
+                        domain="[('state', '=', 'ready')]"/>
+                <filter name="partially_reserved" string="محجوز جزئيًا"
+                        domain="[('state', '=', 'partially_reserved')]"/>
+                <filter name="exhausted" string="مستهلك بالكامل"
+                        domain="[('state', '=', 'exhausted')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_product" string="الصنف النهائي"
+                            context="{'group_by': 'final_product_id'}"/>
+                    <filter name="group_model" string="الموديل"
+                            context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_bom" string="الريسيبي"
+                            context="{'group_by': 'bom_id'}"/>
+                    <filter name="group_lane" string="مسار الإنتاج"
+                            context="{'group_by': 'lane'}"/>
+                    <filter name="group_ready_day" string="يوم الجاهزية"
+                            context="{'group_by': 'ready_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_lane_output_kanban" model="ir.ui.view">
+        <field name="name">furniture.mrp.lane.output.kanban</field>
+        <field name="model">furniture.mrp.lane.output</field>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <kanban string="جاهز لإتمام المنتج"
+                    class="o_furniture_completion_kanban"
+                    create="false"
+                    edit="false"
+                    delete="false"
+                    quick_create="false"
+                    records_draggable="false"
+                    default_order="completable_qty desc, fifo_date asc, ready_at asc">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="lane"/>
+                <field name="final_product_id"/>
+                <field name="furniture_model_id"/>
+                <field name="bom_id"/>
+                <field name="uom_id"/>
+                <field name="production_id"/>
+                <field name="available_qty"/>
+                <field name="physical_available_qty"/>
+                <field name="matching_available_qty"/>
+                <field name="completable_qty"/>
+                <field name="ready_at"/>
+                <field name="fifo_date"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="oe_kanban_card o_furniture_completion_card #{record.state.raw_value == 'exhausted' ? 'is-exhausted' : (record.completable_qty.raw_value &gt; 0 ? 'is-ready' : (record.lane.raw_value == 'body' ? 'is-waiting-cover' : 'is-waiting-body'))}">
+                            <div class="o_furniture_completion_card_header">
+                                <div class="o_furniture_completion_product_image">
+                                    <t t-if="record.final_product_id.raw_value">
+                                        <img t-att-src="kanban_image('product.product', 'image_128', record.final_product_id.raw_value)"
+                                             t-att-alt="record.final_product_id.value"/>
+                                    </t>
+                                    <i t-else="" class="fa fa-cube" title="صورة الصنف"/>
+                                </div>
+                                <div class="o_furniture_completion_identity">
+                                    <small>الصنف النهائي</small>
+                                    <strong><field name="final_product_id"/></strong>
+                                    <span class="o_furniture_completion_identity_meta">
+                                        <i class="fa fa-cubes" title="الصنف النهائي"/>
+                                        <t t-if="record.furniture_model_id.raw_value">
+                                            <field name="furniture_model_id"/>
+                                        </t>
+                                        <t t-else="">بدون موديل</t>
+                                        <span> · </span>
+                                        <t t-if="record.bom_id.raw_value">
+                                            <field name="bom_id"/>
+                                            <span> · </span>
+                                        </t>
+                                        <field name="name"/>
+                                        <span> · </span>
+                                        <t t-if="record.lane.raw_value == 'body'">دفعة نجارة</t>
+                                        <t t-else="">دفعة كسوة وتفصيل</t>
+                                    </span>
+                                </div>
+                                <t t-if="record.state.raw_value == 'exhausted'">
+                                    <span class="o_furniture_completion_state is-empty">
+                                        <i class="fa fa-check" title="تم استهلاكه"/> تم استهلاكه
+                                    </span>
+                                </t>
+                                <t t-elif="record.physical_available_qty.raw_value &lt;= 0">
+                                    <span class="o_furniture_completion_state is-empty">
+                                        <i class="fa fa-exclamation-circle" title="لا يوجد رصيد فعلي"/> لا يوجد رصيد فعلي
+                                    </span>
+                                </t>
+                                <t t-elif="record.completable_qty.raw_value &gt; 0">
+                                    <span class="o_furniture_completion_state is-ready">
+                                        <i class="fa fa-check-circle" title="جاهز للإتمام"/> جاهز للإتمام
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="o_furniture_completion_state is-waiting">
+                                        <i class="fa fa-clock-o" title="الأقدم أولًا"/>
+                                        <t t-if="record.lane.raw_value == 'body'">بانتظار الكسوة</t>
+                                        <t t-else="">بانتظار التجهيز</t>
+                                    </span>
+                                </t>
+                            </div>
+
+                            <div class="o_furniture_completion_card_body">
+                                <div class="o_furniture_completion_metrics">
+                                    <div class="o_furniture_completion_metric">
+                                        <i class="fa fa-cogs" title="رصيد النجارة"/>
+                                        <small>جاهز من النجارة</small>
+                                        <strong>
+                                            <t t-if="record.lane.raw_value == 'body'">
+                                                <field name="physical_available_qty"/>
+                                            </t>
+                                            <t t-else="">
+                                                <field name="matching_available_qty"/>
+                                            </t>
+                                        </strong>
+                                    </div>
+                                    <div class="o_furniture_completion_metric">
+                                        <i class="fa fa-scissors" title="رصيد الكسوة"/>
+                                        <small>جاهز من الكسوة</small>
+                                        <strong>
+                                            <t t-if="record.lane.raw_value == 'cover'">
+                                                <field name="physical_available_qty"/>
+                                            </t>
+                                            <t t-else="">
+                                                <field name="matching_available_qty"/>
+                                            </t>
+                                        </strong>
+                                    </div>
+                                    <div class="o_furniture_completion_metric is-available">
+                                        <i class="fa fa-link" title="المتاح للإتمام"/>
+                                        <small>يمكن إتمامه الآن</small>
+                                        <strong><field name="completable_qty"/></strong>
+                                    </div>
+                                </div>
+
+                                <div class="o_furniture_completion_flow">
+                                    <span>جسم مجهز</span>
+                                    <i class="fa fa-plus" title="مع"/>
+                                    <span>طقم كسوة مطابق</span>
+                                    <i class="fa fa-long-arrow-left" title="يتطابق مع"/>
+                                    <span>منتج تام</span>
+                                </div>
+                            </div>
+
+                            <div class="o_furniture_completion_card_footer">
+                                <t t-if="record.completable_qty.raw_value &gt; 0 and record.state.raw_value != 'exhausted'">
+                                    <button name="action_open_completion_wizard"
+                                            string="إتمام المنتج"
+                                            type="object"
+                                            class="btn btn-primary o_furniture_completion_action">
+                                        <i class="fa fa-link" title="إتمام المنتج"/> إتمام المنتج
+                                    </button>
+                                </t>
+                                <t t-elif="record.physical_available_qty.raw_value &lt;= 0 and record.state.raw_value != 'exhausted'">
+                                    <div class="o_furniture_completion_waiting_note">
+                                        <i class="fa fa-exclamation-triangle" title="الرصيد الفعلي غير كافٍ"/>
+                                        الرصيد الدفتري موجود لكن لا يوجد رصيد مخزني فعلي متاح
+                                    </div>
+                                </t>
+                                <t t-elif="record.state.raw_value != 'exhausted'">
+                                    <div class="o_furniture_completion_waiting_note">
+                                        <i class="fa fa-info-circle" title="في انتظار المسار المطابق"/>
+                                        سيظهر زر الإتمام عند توفر الرصيد المطابق
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="o_furniture_completion_waiting_note">
+                                        <i class="fa fa-archive" title="دفعة مستهلكة"/> تم استخدام كامل هذه الدفعة
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_lane_output_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.lane.output.list</field>
+        <field name="model">furniture.mrp.lane.output</field>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <list string="أرصدة مساري الإنتاج"
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  default_order="completable_qty desc, fifo_date asc, ready_at asc"
+                  decoration-success="completable_qty &gt; 0"
+                  decoration-muted="state == 'exhausted'">
+                <field name="name" string="المرجع"/>
+                <field name="lane" string="المسار" widget="badge"
+                       decoration-info="lane == 'body'"
+                       decoration-warning="lane == 'cover'"/>
+                <field name="final_product_id" string="الصنف النهائي"/>
+                <field name="furniture_model_id" string="الموديل" optional="show"/>
+                <field name="bom_id" string="الريسيبي" optional="show"/>
+                <field name="production_id" string="أمر الإنتاج" optional="show"/>
+                <field name="qty_ready" string="الجاهز" sum="إجمالي الجاهز" optional="hide"/>
+                <field name="reserved_qty" string="المحجوز" sum="إجمالي المحجوز" optional="hide"/>
+                <field name="assembled_qty" string="تم تجميعه" sum="إجمالي المجمع" optional="hide"/>
+                <field name="available_qty" string="المتاح الدفتري" sum="إجمالي الدفتري" optional="hide"/>
+                <field name="physical_available_qty" string="المتاح فعليًا"/>
+                <field name="matching_available_qty" string="المطابق" sum="إجمالي المطابق"/>
+                <field name="completable_qty" string="قابل للإتمام" sum="إجمالي قابل للإتمام"/>
+                <field name="uom_id" string="الوحدة" optional="hide"/>
+                <field name="ready_at" string="جاهز منذ" optional="show"/>
+                <field name="state" string="الحالة" widget="badge"
+                       decoration-success="state == 'ready'"
+                       decoration-warning="state == 'partially_reserved'"
+                       decoration-muted="state == 'exhausted'"/>
+                <button name="action_open_completion_wizard"
+                        string="إتمام"
+                        type="object"
+                        icon="fa-link"
+                        class="btn-primary"
+                        invisible="completable_qty &lt;= 0 or state == 'exhausted'"/>
+                <field name="company_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_lane_output_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.lane.output.form</field>
+        <field name="model">furniture.mrp.lane.output</field>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <form string="رصيد مسار الإنتاج"
+                  class="o_furniture_completion_form"
+                  create="false"
+                  edit="false"
+                  delete="false">
+                <header>
+                    <button name="action_open_completion_wizard"
+                            string="إتمام المنتج"
+                            type="object"
+                            class="btn-primary"
+                            invisible="completable_qty &lt;= 0 or state == 'exhausted'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="ready,partially_reserved,exhausted"/>
+                </header>
+                <sheet>
+                    <div class="o_furniture_completion_form_hero">
+                        <div>
+                            <h2><field name="final_product_id"/></h2>
+                            <p>
+                                <field name="furniture_model_id"/>
+                                <span> · </span>
+                                <field name="name"/>
+                            </p>
+                        </div>
+                        <div class="o_furniture_completion_hero_icon">
+                            <i class="fa fa-link" title="دفعة المسار"/>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_completion_form_metrics">
+                        <div class="o_furniture_completion_form_metric">
+                            <span>الرصيد الفعلي لهذه الدفعة</span>
+                            <strong><field name="physical_available_qty"/></strong>
+                        </div>
+                        <div class="o_furniture_completion_form_metric">
+                            <span>الرصيد المطابق</span>
+                            <strong><field name="matching_available_qty"/></strong>
+                        </div>
+                        <div class="o_furniture_completion_form_metric">
+                            <span>قابل للإتمام الآن</span>
+                            <strong><field name="completable_qty"/></strong>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="بيانات الرصيد">
+                            <field name="lane" string="مسار الإنتاج" readonly="1"/>
+                            <field name="final_product_id" string="الصنف النهائي" readonly="1"/>
+                            <field name="furniture_model_id" string="الموديل" readonly="1"/>
+                            <field name="bom_id" string="الريسيبي" readonly="1"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="uom_id" string="وحدة القياس" readonly="1"/>
+                            <field name="ready_at" string="تاريخ الجاهزية" readonly="1"/>
+                        </group>
+                        <group string="مصدر التشغيل">
+                            <field name="production_id" string="أمر الإنتاج" readonly="1"/>
+                            <field name="production_line_id" string="سطر الصنف" readonly="1"/>
+                            <field name="wip_product_id" string="صنف تحت التشغيل" readonly="1"/>
+                            <field name="source_location_id" string="مخزن المسار" readonly="1"/>
+                            <field name="origin_receipt_move_id" string="حركة الاستلام الأصلية" readonly="1"
+                                   groups="stock.group_stock_user"/>
+                            <field name="ready_move_id" string="حركة الرصيد الجاهز" readonly="1"
+                                   groups="stock.group_stock_user"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="حركة الكميات">
+                            <field name="qty_ready" string="الكمية الجاهزة" readonly="1"/>
+                            <field name="reserved_qty" string="المحجوز" readonly="1"/>
+                            <field name="assembled_qty" string="تم تجميعه" readonly="1"/>
+                            <field name="available_qty" string="المتبقي الدفتري" readonly="1"/>
+                            <field name="physical_available_qty" string="المتبقي فعليًا" readonly="1"/>
+                        </group>
+                        <group string="التكلفة" groups="furniture_mrp.group_furniture_mrp_manager">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="unit_cost" string="تكلفة الوحدة" readonly="1"/>
+                            <field name="total_cost" string="إجمالي التكلفة" readonly="1"/>
+                            <field name="company_id" string="الشركة" readonly="1" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_completion_pool" model="ir.actions.act_window">
+        <field name="name">تجميع المنتج</field>
+        <field name="res_model">furniture.mrp.lane.output</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_lane_output_search"/>
+        <field name="domain">[('lane', '=', 'body'), ('completable_qty', '&gt;', 0)]</field>
+        <field name="context">{'search_default_completable': 1, 'search_default_body': 1}</field>
+        <field name="help" type="html">
+            <div class="o_view_nocontent_smiling_face">
+                لا يوجد رصيد جاهز للمطابقة حاليًا
+            </div>
+            <p>
+                عند استلام ناتج التجهيز أو ناتج الكسوة والتفصيل سيظهر هنا تلقائيًا،
+                ويحسب النظام الكمية التي يمكن إتمامها من الصنف والموديل نفسيهما.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_completion_pool_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_furniture_mrp_lane_output_kanban"/>
+        <field name="act_window_id" ref="action_furniture_mrp_completion_pool"/>
+    </record>
+    <record id="action_furniture_mrp_completion_pool_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_furniture_mrp_lane_output_list"/>
+        <field name="act_window_id" ref="action_furniture_mrp_completion_pool"/>
+    </record>
+    <record id="action_furniture_mrp_completion_pool_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_lane_output_form"/>
+        <field name="act_window_id" ref="action_furniture_mrp_completion_pool"/>
+    </record>
+
+    <!-- ================================================================
+         Reserve / complete wizard
+         ================================================================ -->
+    <record id="view_furniture_mrp_final_assembly_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.final.assembly.wizard.form</field>
+        <field name="model">furniture.mrp.final.assembly.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إتمام المنتج النهائي" class="o_furniture_completion_wizard">
+                <div class="o_furniture_completion_wizard_hero">
+                    <div>
+                        <h2>تجميع المسارين وإتمام المنتج</h2>
+                        <p>
+                            راجع الصنف والموديل والكمية، ثم أكد بعد تركيب النجارة مع طقم الكسوة فعليًا.
+                        </p>
+                    </div>
+                    <div class="o_furniture_completion_hero_icon">
+                        <i class="fa fa-link" title="إتمام المنتج"/>
+                    </div>
+                </div>
+
+                <group>
+                    <group string="المنتج المطلوب إتمامه">
+                        <field name="final_product_id" string="الصنف النهائي" readonly="1"/>
+                        <field name="furniture_model_id" string="الموديل" readonly="1"/>
+                        <field name="bom_id" string="الريسيبي المطابق" readonly="1"
+                               options="{'no_open': True, 'no_create': True}"/>
+                        <field name="uom_id" string="وحدة القياس" readonly="1"/>
+                        <field name="company_id" string="الشركة" readonly="1"
+                               groups="base.group_multi_company"/>
+                    </group>
+                    <group string="الرصيد المختار">
+                        <field name="body_output_id" string="رصيد النجارة"
+                               required="1"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="cover_output_id" string="رصيد الكسوة والتفصيل"
+                               required="1"
+                               options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                </group>
+
+                <div class="o_furniture_completion_wizard_metrics">
+                    <div class="o_furniture_completion_wizard_metric">
+                        <span>المتاح من النجارة</span>
+                        <strong><field name="available_body_qty"/></strong>
+                    </div>
+                    <div class="o_furniture_completion_wizard_metric">
+                        <span>المتاح من الكسوة</span>
+                        <strong><field name="available_cover_qty"/></strong>
+                    </div>
+                    <div class="o_furniture_completion_wizard_metric">
+                        <span>الكمية المختارة</span>
+                        <strong><field name="quantity" readonly="1"/></strong>
+                    </div>
+                </div>
+
+                <div class="o_furniture_completion_quantity">
+                    <label for="quantity" string="الكمية المطلوب إتمامها" class="fw-bold"/>
+                    <field name="quantity" nolabel="1" required="1"/>
+                </div>
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-info-circle" title="طريقة الإتمام"/>
+                    <strong>حجز فقط</strong> يثبت النجارة والكسوة للعملية بدون إدخالهما المخزن التام.
+                    <strong>إتمام الآن</strong> ينفذ الحجز والإتمام وينشئ حركة المنتج التام.
+                </div>
+
+                <footer>
+                    <button name="action_complete" string="إتمام الآن"
+                            type="object" class="btn-primary"/>
+                    <button name="action_reserve" string="حجز فقط"
+                            type="object" class="btn-secondary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_final_assembly_wizard" model="ir.actions.act_window">
+        <field name="name">إتمام المنتج النهائي</field>
+        <field name="res_model">furniture.mrp.final.assembly.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_final_assembly_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ================================================================
+         Assembly audit trail
+         ================================================================ -->
+    <record id="view_furniture_mrp_final_assembly_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.final.assembly.search</field>
+        <field name="model">furniture.mrp.final.assembly</field>
+        <field name="arch" type="xml">
+            <search string="سجل إتمام المنتج">
+                <field name="name" string="المرجع"/>
+                <field name="final_product_id" string="الصنف النهائي"/>
+                <field name="furniture_model_id" string="الموديل"/>
+                <field name="bom_id" string="الريسيبي"/>
+                <field name="reserved_by_id" string="حجز بواسطة"/>
+                <field name="completed_by_id" string="أتم بواسطة"/>
+                <separator/>
+                <filter name="active" string="قيد التنفيذ"
+                        domain="[('state', 'in', ('draft', 'reserved'))]"/>
+                <filter name="reserved" string="محجوز"
+                        domain="[('state', '=', 'reserved')]"/>
+                <filter name="done" string="مكتمل"
+                        domain="[('state', '=', 'done')]"/>
+                <filter name="cancelled" string="ملغي"
+                        domain="[('state', '=', 'cancelled')]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_product" string="الصنف النهائي"
+                            context="{'group_by': 'final_product_id'}"/>
+                    <filter name="group_model" string="الموديل"
+                            context="{'group_by': 'furniture_model_id'}"/>
+                    <filter name="group_bom" string="الريسيبي"
+                            context="{'group_by': 'bom_id'}"/>
+                    <filter name="group_state" string="الحالة"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_completed_day" string="يوم الإتمام"
+                            context="{'group_by': 'completed_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_final_assembly_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.final.assembly.list</field>
+        <field name="model">furniture.mrp.final.assembly</field>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <list string="سجل إتمام المنتج"
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  default_order="id desc"
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'reserved'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name" string="المرجع"/>
+                <field name="final_product_id" string="الصنف النهائي"/>
+                <field name="furniture_model_id" string="الموديل" optional="show"/>
+                <field name="bom_id" string="الريسيبي" optional="show"/>
+                <field name="quantity" string="الكمية" sum="الإجمالي"/>
+                <field name="uom_id" string="الوحدة" optional="show"/>
+                <field name="body_output_id" string="رصيد النجارة" optional="show"/>
+                <field name="cover_output_id" string="رصيد الكسوة" optional="show"/>
+                <field name="frame_output_id" string="نجارة" optional="show"/>
+                <field name="finish_output_id" string="القواعد والتجهيز" optional="show"/>
+                <field name="tailoring_output_id" string="التفصيل والخياطة" optional="show"/>
+                <field name="upholstery_output_id" string="الكسوة" optional="show"/>
+                <field name="reserved_by_id" string="حجز بواسطة" optional="hide"/>
+                <field name="reserved_at" string="وقت الحجز" optional="hide"/>
+                <field name="completed_by_id" string="أتم بواسطة" optional="show"/>
+                <field name="completed_at" string="وقت الإتمام" optional="show"/>
+                <field name="total_cost" string="التكلفة" optional="hide"
+                       groups="furniture_mrp.group_furniture_mrp_manager"/>
+                <field name="state" string="الحالة" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'reserved'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+                <button name="action_reserve" string="حجز" type="object"
+                        icon="fa-lock" class="btn-secondary"
+                        invisible="state != 'draft'"/>
+                <button name="action_complete" string="إتمام" type="object"
+                        icon="fa-check" class="btn-primary"
+                        invisible="state != 'reserved'"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_final_assembly_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.final.assembly.form</field>
+        <field name="model">furniture.mrp.final.assembly</field>
+        <field name="priority" eval="90"/>
+        <field name="arch" type="xml">
+            <form string="عملية إتمام المنتج"
+                  class="o_furniture_completion_form"
+                  create="false"
+                  edit="false"
+                  delete="false">
+                <header>
+                    <button name="action_reserve" string="حجز مكونات المنتج"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_complete" string="إتمام وتحويل للمخزن التام"
+                            type="object" class="btn-primary"
+                            invisible="state != 'reserved'"/>
+                    <button name="action_cancel" string="إلغاء الحجز"
+                            type="object" class="btn-secondary"
+                            confirm="هل تريد إلغاء هذه العملية وفك حجز الكميات؟"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,reserved,done,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="o_furniture_completion_form_hero">
+                        <div>
+                            <h2><field name="final_product_id"/></h2>
+                            <p>
+                                <field name="name"/>
+                                <span> · </span>
+                                <field name="furniture_model_id"/>
+                            </p>
+                        </div>
+                        <div class="o_furniture_completion_hero_icon">
+                            <i class="fa fa-check" title="منتج تام"/>
+                        </div>
+                    </div>
+
+                    <div class="o_furniture_completion_form_metrics">
+                        <div class="o_furniture_completion_form_metric">
+                            <span>الكمية</span>
+                            <strong><field name="quantity"/></strong>
+                        </div>
+                        <div class="o_furniture_completion_form_metric"
+                             groups="furniture_mrp.group_furniture_mrp_manager">
+                            <span>تكلفة الوحدة</span>
+                            <strong><field name="unit_cost"/></strong>
+                        </div>
+                        <div class="o_furniture_completion_form_metric"
+                             groups="furniture_mrp.group_furniture_mrp_manager">
+                            <span>إجمالي التكلفة</span>
+                            <strong><field name="total_cost"/></strong>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="المطابقة">
+                            <field name="final_product_id" string="الصنف النهائي" readonly="1"/>
+                            <field name="furniture_model_id" string="الموديل" readonly="1"/>
+                            <field name="bom_id" string="الريسيبي" readonly="1"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="quantity" string="الكمية" readonly="1"/>
+                            <field name="uom_id" string="وحدة القياس" readonly="1"/>
+                            <field name="company_id" string="الشركة" readonly="1"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                        <group string="التنفيذ">
+                            <field name="reserved_by_id" string="حجز بواسطة" readonly="1"/>
+                            <field name="reserved_at" string="وقت الحجز" readonly="1"/>
+                            <field name="completed_by_id" string="أتم بواسطة" readonly="1"/>
+                            <field name="completed_at" string="وقت الإتمام" readonly="1"/>
+                            <field name="final_move_id" string="حركة المنتج التام" readonly="1"
+                                   groups="stock.group_stock_user"/>
+                        </group>
+                    </group>
+                    <field name="currency_id" invisible="1"/>
+
+                    <notebook>
+                        <page string="مصادر مكونات المنتج" name="allocations">
+                            <field name="allocation_ids" nolabel="1" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="lane" string="المسار" widget="badge"
+                                           decoration-info="lane == 'body'"
+                                           decoration-warning="lane == 'cover'"/>
+                                    <field name="output_id" string="دفعة الرصيد"/>
+                                    <field name="qty" string="الكمية" sum="الإجمالي"/>
+                                    <field name="consumption_move_id" string="حركة الاستهلاك" optional="show"
+                                           groups="stock.group_stock_user"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="حركات المخزون" name="stock_moves"
+                              groups="stock.group_stock_user">
+                            <field name="component_move_ids" nolabel="1" readonly="1">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="reference" string="المرجع"/>
+                                    <field name="product_id" string="الصنف"/>
+                                    <field name="product_uom_qty" string="الكمية"/>
+                                    <field name="location_id" string="من"/>
+                                    <field name="location_dest_id" string="إلى"/>
+                                    <field name="state" string="الحالة" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_final_assembly" model="ir.actions.act_window">
+        <field name="name">سجل إتمام المنتج</field>
+        <field name="res_model">furniture.mrp.final.assembly</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_final_assembly_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <div class="o_view_nocontent_smiling_face">
+                لم تُسجّل عمليات إتمام بعد
+            </div>
+            <p>عمليات الحجز والإتمام تظهر هنا كسجل تتبع كامل.</p>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_final_assembly_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_furniture_mrp_final_assembly_list"/>
+        <field name="act_window_id" ref="action_furniture_mrp_final_assembly"/>
+    </record>
+    <record id="action_furniture_mrp_final_assembly_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_final_assembly_form"/>
+        <field name="act_window_id" ref="action_furniture_mrp_final_assembly"/>
+    </record>
+</odoo>

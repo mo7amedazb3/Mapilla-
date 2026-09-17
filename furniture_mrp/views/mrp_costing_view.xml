@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_costing_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.costing.form</field>
+        <field name="model">furniture.mrp.costing</field>
+        <field name="arch" type="xml">
+            <form string="تقرير توزيع التكلفة">
+                <header>
+                    <button name="action_compute" string="⚙️ احسب التكاليف" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="✅ اعتماد" type="object" class="btn-success" invisible="state != 'computed'"/>
+                    <button name="action_reset_draft" string="↩️ إعادة للمسودة" type="object" invisible="state == 'approved'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,computed,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="أمر التشغيل الأسبوعي">
+                            <field name="production_id"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="product_qty" readonly="1"/>
+                            <field name="analytic_account_id" readonly="1"/>
+                        </group>
+                        <group string="ملخص التكاليف">
+                            <field name="total_material_cost" readonly="1"/>
+                            <field name="total_labor_cost" readonly="1"/>
+                            <field name="total_overhead_cost" readonly="1"/>
+                            <field name="grand_total" readonly="1" class="fw-bold text-primary"/>
+                            <field name="cost_per_unit" readonly="1" class="fw-bold"/>
+                        </group>
+                    </group>
+                    <!-- شريط مرئي لتوزيع التكاليف -->
+                    <group string="نسب التوزيع">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="text-muted">المواد الخام</div>
+                                <div class="fs-4 fw-bold text-danger"><field name="material_pct" readonly="1"/>%</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted">العمالة</div>
+                                <div class="fs-4 fw-bold text-warning"><field name="labor_pct" readonly="1"/>%</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted">Overhead</div>
+                                <div class="fs-4 fw-bold text-info"><field name="overhead_pct" readonly="1"/>%</div>
+                            </div>
+                        </div>
+                    </group>
+                    <notebook>
+                        <page string="🏭 المواد الخام">
+                            <field name="material_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_cost"/>
+                                    <field name="total_cost" readonly="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_material_cost" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="👷 العمالة">
+                            <field name="labor_line_ids">
+                                <list editable="bottom">
+                                    <field name="stage_name"/>
+                                    <field name="foreman_id"/>
+                                    <field name="hours"/>
+                                    <field name="rate"/>
+                                    <field name="total_cost" readonly="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_labor_cost" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="💰 Overhead (الخزينة)">
+                            <field name="overhead_line_ids">
+                                <list editable="bottom">
+                                    <field name="description"/>
+                                    <field name="date"/>
+                                    <field name="amount"/>
+                                    <field name="analytic_line_id"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_overhead_cost" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_costing_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.costing.list</field>
+        <field name="model">furniture.mrp.costing</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'approved'" decoration-info="state == 'computed'">
+                <field name="name"/>
+                <field name="production_id"/>
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="total_material_cost"/>
+                <field name="total_labor_cost"/>
+                <field name="total_overhead_cost"/>
+                <field name="grand_total" class="fw-bold"/>
+                <field name="cost_per_unit" class="fw-bold"/>
+                <field name="state" widget="badge" decoration-success="state == 'approved'" decoration-info="state == 'computed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!--
+        Live costing views use the production order itself as their source.
+        This avoids the legacy draft report's single-header-product quantity
+        and prevents recounting warehouse handover/consumption stock moves.
+    -->
+    <record id="view_furniture_mrp_production_costing_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.costing.list</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <list string="توزيع تكاليف الإنتاج" create="0" edit="0" delete="0"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'in_production'"
+                  decoration-warning="state == 'confirmed'">
+                <field name="name" string="أمر التشغيل"/>
+                <field name="date_planned_start" string="تاريخ البداية" optional="show"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="actual_costed_quantity" sum="إجمالي الكمية المعتمدة"/>
+                <field name="material_cost" sum="إجمالي الخامات"/>
+                <field name="labor_cost" sum="إجمالي العمالة"/>
+                <field name="overhead_cost" sum="إجمالي Overhead"/>
+                <field name="total_cost" sum="إجمالي التكلفة" class="fw-bold text-primary"/>
+                <field name="cost_per_unit" string="متوسط تكلفة الوحدة" class="fw-bold"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-info="state == 'in_production'"
+                       decoration-warning="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_costing_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.costing.form</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <form string="توزيع تكاليف الإنتاج" create="0" edit="0" delete="0"
+                  class="o_furniture_live_costing_form">
+                <header>
+                    <button name="action_view_stage_cost_entries" type="object"
+                            string="تفاصيل التكلفة حسب المرحلة" class="btn-primary"/>
+                    <button name="action_print_cost_report" type="object"
+                            string="طباعة تقرير التكاليف" class="btn-secondary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="confirmed,in_production,done"/>
+                </header>
+                <sheet class="o_furniture_live_costing_sheet">
+                    <field name="company_id" invisible="1"/>
+                    <div class="o_furniture_live_costing_hero">
+                        <div>
+                            <span>تكلفة فعلية من دفعات الإنتاج المعتمدة</span>
+                            <h1><field name="name" nolabel="1" readonly="1"/></h1>
+                            <p>يتم التحديث تلقائيًا مع كل قبول جودة، بدون إعادة عدّ حركات المخزون.</p>
+                        </div>
+                        <i class="fa fa-calculator" title="توزيع التكاليف"/>
+                    </div>
+
+                    <group class="o_furniture_live_costing_meta">
+                        <group string="بيانات الإنتاج">
+                            <field name="header_product_summary" widget="text"/>
+                            <field name="date_planned_start"/>
+                            <field name="date_start"/>
+                            <field name="progress" widget="progressbar"/>
+                        </group>
+                        <group string="ملخص التكلفة المعتمدة">
+                            <field name="actual_costed_quantity"/>
+                            <field name="material_cost"/>
+                            <field name="labor_cost"/>
+                            <field name="overhead_cost"/>
+                            <field name="total_cost" class="fw-bold text-primary"/>
+                            <field name="cost_per_unit" string="متوسط تكلفة الوحدة" class="fw-bold"/>
+                        </group>
+                    </group>
+
+                    <field name="cost_distribution_html" nolabel="1" readonly="1"
+                           class="o_furniture_cost_distribution_html"/>
+
+                    <notebook class="o_furniture_live_costing_notebook">
+                        <page string="سجل التكاليف المعتمدة حسب المرحلة">
+                            <field name="stage_cost_entry_ids" readonly="1">
+                                <list create="0" edit="0" delete="0"
+                                      decoration-success="stage_total_cost &gt; 0">
+                                    <field name="accepted_at"/>
+                                    <field name="stage"/>
+                                    <field name="stage_order_name" optional="show"/>
+                                    <field name="product_id"/>
+                                    <field name="dimension_label" optional="show"/>
+                                    <field name="quantity" sum="إجمالي الكمية"/>
+                                    <field name="stage_material_cost" sum="إجمالي خامات المرحلة"/>
+                                    <field name="stage_labor_cost" sum="إجمالي عمالة المرحلة"/>
+                                    <field name="stage_total_cost" sum="إجمالي تكلفة المرحلة"/>
+                                    <field name="current_unit_cost" string="تكلفة الوحدة الحالية"/>
+                                    <field name="accepted_by_id" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_production_costing_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.costing.search</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <search string="بحث في تكاليف الإنتاج">
+                <field name="name"/>
+                <field name="product_id"/>
+                <filter name="has_approved_cost" string="بها تكلفة معتمدة"
+                        domain="[('actual_costed_quantity', '&gt;', 0)]"/>
+                <filter name="in_production" string="جاري التصنيع"
+                        domain="[('state', '=', 'in_production')]"/>
+                <filter name="done" string="منتهي"
+                        domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <group expand="0" string="تجميع حسب">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_start_month" string="شهر البداية"
+                            context="{'group_by': 'date_planned_start:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_costing" model="ir.actions.act_window">
+        <field name="name">توزيع التكاليف من الإنتاج</field>
+        <field name="res_model">furniture.mrp.production</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_production_costing_search"/>
+        <field name="domain">[('state', 'in', ('confirmed', 'in_production', 'done'))]</field>
+        <field name="context">{'search_default_has_approved_cost': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد أوامر إنتاج بتكلفة معتمدة حتى الآن</p>
+            <p>تظهر التكلفة تلقائيًا بمجرد اعتماد الجودة لأي دفعة في مراحل الإنتاج.</p>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_costing_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_furniture_mrp_production_costing_list"/>
+        <field name="act_window_id" ref="action_furniture_mrp_costing"/>
+    </record>
+
+    <record id="action_furniture_mrp_costing_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_production_costing_form"/>
+        <field name="act_window_id" ref="action_furniture_mrp_costing"/>
+    </record>
+</odoo>

@@ -1,0 +1,209 @@
+// Loaded only by Odoo's native dark asset bundle.
+:root {
+    --mapilla-page: #0f171e;
+    --mapilla-surface: #17222d;
+    --mapilla-surface-soft: #1d2b36;
+    --mapilla-surface-muted: #223746;
+    --mapilla-border: #344652;
+    --mapilla-border-strong: #465b68;
+    --mapilla-text: #f0ece8;
+    --mapilla-heading: #f7f5f2;
+    --mapilla-muted: #aab6be;
+    --mapilla-hover: #20333f;
+    --mapilla-shadow-sm: 0 3px 12px rgba(0, 0, 0, 0.24);
+    --mapilla-shadow-md: 0 14px 34px rgba(0, 0, 0, 0.36);
+}
+
+@media screen {
+    body.o_web_client,
+    .o_action_manager,
+    .o_form_view,
+    .o_kanban_renderer {
+        background: var(--mapilla-page);
+        color: var(--mapilla-text);
+    }
+
+    .o_control_panel,
+    .o_form_view .o_form_statusbar,
+    .o_form_view .o_form_sheet,
+    .o_list_renderer,
+    .o_list_view,
+    .o_kanban_record,
+    .o_kanban_quick_create,
+    .card,
+    .dropdown-menu,
+    .o-dropdown--menu,
+    .popover,
+    .o_popover,
+    .modal-content,
+    .o_notification,
+    .o-mail-Chatter,
+    .o-mail-Thread,
+    .o_Chatter,
+    .o_chatter {
+        background-color: var(--mapilla-surface);
+        color: var(--mapilla-text);
+    }
+
+    .o_list_table {
+        color: var(--mapilla-text);
+    }
+
+    .o_list_table thead,
+    .o_list_table tfoot,
+    .modal-header,
+    .modal-footer,
+    .o-mail-Composer,
+    .o_Composer {
+        background: var(--mapilla-surface-soft);
+    }
+
+    .form-control,
+    .form-select,
+    .o_input,
+    .o_field_widget input,
+    .o_field_widget textarea,
+    .o_field_widget select {
+        border-color: var(--mapilla-border);
+        background-color: #121d26;
+        color: var(--mapilla-text);
+    }
+
+    .form-control::placeholder,
+    .o_input::placeholder,
+    .o_field_widget input::placeholder,
+    .o_field_widget textarea::placeholder {
+        color: var(--mapilla-muted);
+    }
+
+    // Some installed manufacturing views ship high-specificity light-only
+    // backgrounds. Harden native dark mode at the form boundary without
+    // changing those modules or affecting print bundles.
+    body.o_web_client .o_form_view .o_form_sheet_bg {
+        background: var(--mapilla-page) !important;
+    }
+
+    body.o_web_client .o_form_view .o_form_sheet {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view .o_notebook_content {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view .o_furniture_order_common_strip {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface-soft) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view .o_furniture_order_planning_strip {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface-soft) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view .o_furniture_stage_strip {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface-soft) !important;
+    }
+
+    body.o_web_client .o_form_view .o_form_statusbar .o_arrow_button {
+        border-color: var(--mapilla-border) !important;
+        background-color: var(--mapilla-surface-soft) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view .o_furniture_production_sheet table {
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+            border-color: var(--mapilla-border) !important;
+            background: var(--mapilla-surface) !important;
+            color: var(--mapilla-text) !important;
+        }
+
+        thead,
+        th {
+            background: var(--mapilla-surface-soft) !important;
+        }
+    }
+
+    body.o_web_client .o-mail-Chatter-top,
+    body.o_web_client .o_Chatter_top {
+        border-color: var(--mapilla-border) !important;
+        background: var(--mapilla-surface) !important;
+        color: var(--mapilla-text) !important;
+    }
+
+    body.o_web_client .o_form_view {
+        .o_field_widget .o_input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+        .o_field_widget input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+        .o_field_widget textarea,
+        .o_field_widget select {
+            border-color: var(--mapilla-border) !important;
+            background: #121d26 !important;
+            color: var(--mapilla-text) !important;
+            -webkit-text-fill-color: var(--mapilla-text) !important;
+        }
+
+        .o_field_widget .o_input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):focus,
+        .o_field_widget input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):focus,
+        .o_field_widget textarea:focus,
+        .o_field_widget select:focus {
+            border-color: #6f8ea4 !important;
+            background: #121d26 !important;
+            box-shadow: 0 0 0 3px rgba(173, 166, 150, 0.16) !important;
+        }
+    }
+
+    // Compatibility for the custom production form used by action 734.
+    body.o_web_client .o_form_view {
+        .o_furniture_production_sheet,
+        .o_furniture_production_hero,
+        .o_furniture_info_card,
+        .o_furniture_cost_card,
+        .o_furniture_weekly_stage_plan_card {
+            border-color: var(--mapilla-border) !important;
+            background: var(--mapilla-surface) !important;
+            color: var(--mapilla-text) !important;
+        }
+
+        .o_furniture_header_summary {
+            border-color: var(--mapilla-border) !important;
+            background: var(--mapilla-surface-soft) !important;
+            color: var(--mapilla-text) !important;
+        }
+
+        .o_furniture_production_hero h1 .o_field_widget,
+        .o_furniture_production_hero label,
+        .o_furniture_production_hero .o_furniture_header_summary .o_field_widget,
+        .o_furniture_info_card .o_form_label,
+        .o_furniture_cost_card .o_form_label,
+        .o_furniture_weekly_stage_plan_card .o_form_label,
+        .o_furniture_weekly_field_item .o_form_label,
+        .o_furniture_production_sheet .o_field_widget.o_readonly_modifier {
+            color: var(--mapilla-text) !important;
+        }
+    }
+
+    .btn-secondary,
+    .btn-light {
+        border-color: var(--mapilla-border);
+        background: var(--mapilla-surface-soft);
+        color: var(--mapilla-text);
+    }
+
+    .dropdown-item,
+    .nav-link,
+    .breadcrumb-item,
+    .o_menu_item {
+        color: var(--mapilla-text);
+    }
+}

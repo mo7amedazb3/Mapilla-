@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_biometric_command_search" model="ir.ui.view">
+        <field name="name">factory.biometric.command.search</field>
+        <field name="model">factory.biometric.command</field>
+        <field name="arch" type="xml">
+            <search string="أوامر أجهزة البصمة">
+                <field name="command_id"/>
+                <field name="device_id"/>
+                <field name="identity_id"/>
+                <field name="target_device_user_id"/>
+                <filter name="waiting" string="في الانتظار" domain="[('state', 'in', ['queued', 'sent'])]"/>
+                <filter name="failed" string="فشل" domain="[('state', '=', 'failed')]"/>
+                <filter name="roster_queries" string="استعلامات الجرد" domain="[('command_type', '=', 'query_roster_user')]"/>
+                <filter name="roster_deletes" string="حذف مستخدمي الجرد" domain="[('command_type', '=', 'delete_roster_user')]"/>
+                <group expand="0" string="تجميع">
+                    <filter name="group_device" string="الجهاز" context="{'group_by': 'device_id'}"/>
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_biometric_command_list" model="ir.ui.view">
+        <field name="name">factory.biometric.command.list</field>
+        <field name="model">factory.biometric.command</field>
+        <field name="arch" type="xml">
+            <list string="أوامر أجهزة البصمة" create="false" delete="false" decoration-danger="state == 'failed'" decoration-success="state == 'done'" decoration-warning="state in ['queued', 'sent']">
+                <field name="command_id"/>
+                <field name="device_id"/>
+                <field name="identity_id"/>
+                <field name="target_device_user_id" optional="show"/>
+                <field name="expected_roster_name" optional="hidden"/>
+                <field name="roster_source_query_command_id" optional="hidden"/>
+                <field name="command_type"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'" decoration-warning="state in ['queued', 'sent']"/>
+                <field name="roster_snapshot_name" optional="show"/>
+                <field name="roster_snapshot_metadata_complete" optional="hidden"/>
+                <field name="roster_snapshot_has_password" optional="hidden"/>
+                <field name="roster_snapshot_at" optional="hidden"/>
+                <field name="attempt_count"/>
+                <field name="sent_at" optional="show"/>
+                <field name="acknowledged_at" optional="show"/>
+                <field name="return_code" optional="hidden"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biometric_command_form" model="ir.ui.view">
+        <field name="name">factory.biometric.command.form</field>
+        <field name="model">factory.biometric.command</field>
+        <field name="arch" type="xml">
+            <form string="أمر جهاز بصمة" create="false" delete="false">
+                <header>
+                    <button name="action_cancel" string="إلغاء" type="object" invisible="state != 'queued'" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_retry" string="إعادة المحاولة" type="object" class="btn-primary" invisible="state not in ['failed', 'cancelled'] or command_type in ['delete_user', 'delete_roster_user']" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="command_id"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="device_id" readonly="1"/>
+                            <field name="identity_id" readonly="1"/>
+                            <field name="target_device_user_id" readonly="1" invisible="command_type not in ['query_roster_user', 'delete_roster_user', 'delete_user']"/>
+                            <field name="command_type" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="attempt_count"/>
+                            <field name="sent_at"/>
+                            <field name="acknowledged_at"/>
+                            <field name="return_code"/>
+                        </group>
+                    </group>
+                    <group string="الأمر المرسل">
+                        <field name="command_text" nolabel="1"/>
+                    </group>
+                    <group string="نتيجة جرد المستخدم" invisible="command_type != 'query_roster_user'">
+                        <group>
+                            <field name="roster_snapshot_name"/>
+                            <field name="roster_snapshot_at"/>
+                        </group>
+                        <group>
+                            <field name="roster_snapshot_metadata_complete"/>
+                            <field name="roster_snapshot_has_password"/>
+                        </group>
+                    </group>
+                    <group string="تأكيد حذف مستخدم الجرد" invisible="command_type != 'delete_roster_user'">
+                        <group>
+                            <field name="expected_roster_name"/>
+                            <field name="expected_roster_name_set"/>
+                        </group>
+                        <group>
+                            <field name="roster_source_query_command_id"/>
+                        </group>
+                    </group>
+                    <group string="رد الجهاز" invisible="not response_text">
+                        <field name="response_text" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_biometric_command" model="ir.actions.act_window">
+        <field name="name">أوامر الأجهزة</field>
+        <field name="res_model">factory.biometric.command</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biometric_command_search"/>
+    </record>
+</odoo>

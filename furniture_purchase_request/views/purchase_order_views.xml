@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_send_via_whatsapp" model="ir.ui.view">
+        <field name="name">purchase.order.form.send.via.whatsapp</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_send_via_whatsapp"
+                        string="Send Via WhatsApp"
+                        type="object"
+                        class="btn-success"
+                        icon="fa-whatsapp"
+                        groups="purchase.group_purchase_user"
+                        invisible="not partner_id or state == 'cancel'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="whatsapp_message_form_purchase_api_only" model="ir.ui.view">
+        <field name="name">whatsapp.msg.form.purchase.api.only</field>
+        <field name="model">whatsapp.msg</field>
+        <field name="inherit_id" ref="whatsapp_integration.view_whatsapp_msg_form"/>
+        <field name="priority">95</field>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_send_whatsapp']" position="attributes">
+                <attribute name="invisible">state == 'sent' or res_model == 'purchase.order'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_send_via_api']" position="attributes">
+                <attribute name="string">Send Via WhatsApp</attribute>
+                <attribute name="class">btn-success</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

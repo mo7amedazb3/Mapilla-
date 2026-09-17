@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="furniture_mrp.FurnitureQuickCardSelector">
+        <t t-if="props.readonly">
+            <span t-esc="displayName"/>
+        </t>
+        <section t-else=""
+                 class="o_furniture_quick_selector"
+                 t-att-class="variantClass"
+                 t-att-aria-busy="cardState.loading || cardState.selectingId ? 'true' : 'false'">
+            <div class="o_furniture_quick_selector__heading">
+                <span class="o_furniture_quick_selector__heading_icon" aria-hidden="true">
+                    <i t-att-class="'fa ' + icon"/>
+                </span>
+                <span class="o_furniture_quick_selector__heading_text">
+                    <strong t-esc="title"/>
+                    <small t-esc="subtitle"/>
+                </span>
+            </div>
+
+            <div class="o_furniture_quick_selector__primary"
+                 role="radiogroup"
+                 t-att-aria-label="title">
+                <t t-if="cardState.loading">
+                    <span t-foreach="[1, 2, 3, 4, 5]"
+                          t-as="placeholder"
+                          t-key="placeholder"
+                          class="o_furniture_quick_card is-placeholder"
+                          aria-hidden="true">
+                        <span class="o_furniture_quick_card__icon"/>
+                        <span class="o_furniture_quick_card__name"/>
+                    </span>
+                </t>
+                <t t-elif="cardState.items.length">
+                    <button t-foreach="quickItems"
+                            t-as="item"
+                            t-key="item.id"
+                            type="button"
+                            class="o_furniture_quick_card"
+                            t-att-class="{
+                                'is-selected': isSelected(item.id),
+                                'is-switching': cardState.selectingId === item.id,
+                            }"
+                            t-att-disabled="cardState.selectingId !== false"
+                            t-att-aria-checked="isSelected(item.id) ? 'true' : 'false'"
+                            role="radio"
+                            t-on-click="() => this.selectItem(item)">
+                        <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                            <i t-att-class="cardState.selectingId === item.id ? 'fa fa-spinner fa-spin' : 'fa ' + icon"/>
+                        </span>
+                        <span class="o_furniture_quick_card__name" t-esc="item.displayName"/>
+                        <span class="o_furniture_quick_card__check" aria-hidden="true">
+                            <i class="fa fa-check"/>
+                        </span>
+                    </button>
+
+                    <button t-if="showMoreCard"
+                            type="button"
+                            class="o_furniture_quick_card o_furniture_quick_card--more"
+                            t-att-class="{
+                                'is-expanded': cardState.expanded,
+                                'is-selected': overflowSelected,
+                            }"
+                            t-att-aria-expanded="cardState.expanded ? 'true' : 'false'"
+                            t-on-click="toggleMore">
+                        <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                            <i class="fa fa-th"/>
+                        </span>
+                        <span class="o_furniture_quick_card__name">More</span>
+                        <span class="o_furniture_quick_card__count" t-esc="overflowItems.length"/>
+                        <span class="o_furniture_quick_card__chevron" aria-hidden="true">
+                            <i t-att-class="cardState.expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                        </span>
+                    </button>
+                </t>
+                <div t-else="" class="o_furniture_quick_selector__empty">
+                    <i t-att-class="cardState.loadFailed ? 'fa fa-exclamation-triangle' : 'fa fa-info-circle'"
+                       aria-hidden="true"/>
+                    <span t-if="cardState.loadFailed">تعذر تحميل الاختيارات. حدّث الصفحة وحاول مرة أخرى.</span>
+                    <span t-else="">لا توجد اختيارات متاحة.</span>
+                </div>
+            </div>
+
+            <div t-if="showMoreCard and cardState.expanded"
+                 class="o_furniture_quick_selector__more_grid"
+                 role="radiogroup"
+                 t-att-aria-label="'باقي ' + title">
+                <div t-if="!overflowItems.length" class="o_furniture_quick_selector__empty">
+                    <i class="fa fa-info-circle" aria-hidden="true"/>
+                    <span>لا توجد موديلات إضافية مسجلة حاليًا.</span>
+                </div>
+                <button t-foreach="overflowItems"
+                        t-as="item"
+                        t-key="item.id"
+                        type="button"
+                        class="o_furniture_quick_card o_furniture_quick_card--secondary"
+                        t-att-class="{
+                            'is-selected': isSelected(item.id),
+                            'is-switching': cardState.selectingId === item.id,
+                        }"
+                        t-att-disabled="cardState.selectingId !== false"
+                        t-att-aria-checked="isSelected(item.id) ? 'true' : 'false'"
+                        role="radio"
+                        t-on-click="() => this.selectItem(item)">
+                    <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                        <i t-att-class="cardState.selectingId === item.id ? 'fa fa-spinner fa-spin' : 'fa ' + icon"/>
+                    </span>
+                    <span class="o_furniture_quick_card__name" t-esc="item.displayName"/>
+                    <span class="o_furniture_quick_card__check" aria-hidden="true">
+                        <i class="fa fa-check"/>
+                    </span>
+                </button>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="furniture_mrp.FurnitureMultiCardSelector">
+        <t t-if="props.readonly">
+            <span t-esc="readonlyDisplayName"/>
+        </t>
+        <section t-else=""
+                 class="o_furniture_quick_selector o_furniture_quick_selector--multi"
+                 t-att-class="variantClass"
+                 t-att-aria-busy="cardState.loading || cardState.selectingId ? 'true' : 'false'">
+            <div class="o_furniture_quick_selector__heading">
+                <span class="o_furniture_quick_selector__heading_icon" aria-hidden="true">
+                    <i t-att-class="'fa ' + icon"/>
+                </span>
+                <span class="o_furniture_quick_selector__heading_text">
+                    <strong t-esc="title"/>
+                    <small t-esc="subtitle"/>
+                </span>
+                <div t-if="props.searchable || selectedIds.size"
+                     class="o_furniture_multi_selector__heading_tools">
+                    <label t-if="props.searchable"
+                           class="o_furniture_multi_selector__search">
+                        <i class="fa fa-search" aria-hidden="true"/>
+                        <input type="search"
+                               t-att-value="cardState.searchQuery"
+                               t-att-placeholder="searchPlaceholder"
+                               t-att-aria-label="searchPlaceholder"
+                               t-on-input="onSearchInput"/>
+                        <button t-if="cardState.searchQuery"
+                                type="button"
+                                aria-label="مسح البحث"
+                                t-on-click.stop.prevent="clearSearch">
+                            <i class="fa fa-times" aria-hidden="true"/>
+                        </button>
+                    </label>
+                    <span t-if="selectedIds.size"
+                          class="o_furniture_multi_selector__selected_count">
+                        <strong t-esc="selectedIds.size"/>
+                        <span>مختار</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="o_furniture_quick_selector__primary"
+                 role="group"
+                 t-att-aria-label="title">
+                <t t-if="cardState.loading">
+                    <span t-foreach="[1, 2, 3, 4, 5]"
+                          t-as="placeholder"
+                          t-key="placeholder"
+                          class="o_furniture_quick_card is-placeholder"
+                          aria-hidden="true">
+                        <span class="o_furniture_quick_card__icon"/>
+                        <span class="o_furniture_quick_card__name"/>
+                    </span>
+                </t>
+                <t t-elif="quickItems.length">
+                    <button t-foreach="quickItems"
+                            t-as="item"
+                            t-key="item.id"
+                            type="button"
+                            class="o_furniture_quick_card"
+                            t-att-class="{
+                                'is-selected': isSelected(item.id),
+                                'is-switching': cardState.selectingId === item.id,
+                            }"
+                            t-att-disabled="cardState.selectingId !== false"
+                            t-att-aria-pressed="isSelected(item.id) ? 'true' : 'false'"
+                            t-on-click="() => this.toggleItem(item)">
+                        <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                            <i t-att-class="cardState.selectingId === item.id ? 'fa fa-spinner fa-spin' : 'fa ' + icon"/>
+                        </span>
+                        <span class="o_furniture_quick_card__name" t-esc="item.displayName"/>
+                        <span class="o_furniture_quick_card__check" aria-hidden="true">
+                            <i class="fa fa-check"/>
+                        </span>
+                    </button>
+
+                    <button t-if="showMoreCard"
+                            type="button"
+                            class="o_furniture_quick_card o_furniture_quick_card--more"
+                            t-att-class="{
+                                'is-expanded': cardState.expanded,
+                                'is-selected': overflowSelected,
+                            }"
+                            t-att-aria-expanded="cardState.expanded ? 'true' : 'false'"
+                            t-on-click="toggleMore">
+                        <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                            <i class="fa fa-th"/>
+                        </span>
+                        <span class="o_furniture_quick_card__name">More</span>
+                        <span class="o_furniture_quick_card__count" t-esc="overflowItems.length"/>
+                        <span class="o_furniture_quick_card__chevron" aria-hidden="true">
+                            <i t-att-class="cardState.expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                        </span>
+                    </button>
+                </t>
+                <div t-else="" class="o_furniture_quick_selector__empty">
+                    <i t-att-class="cardState.loadFailed ? 'fa fa-exclamation-triangle' : 'fa fa-info-circle'"
+                       aria-hidden="true"/>
+                    <span t-if="cardState.loadFailed">تعذر تحميل المنتجات. حدّث الصفحة وحاول مرة أخرى.</span>
+                    <span t-elif="isSearching">لا توجد نتائج مطابقة للبحث.</span>
+                    <span t-else="">لا توجد منتجات لها ريسيبي جاهزة لهذا الموديل.</span>
+                </div>
+            </div>
+
+            <div t-if="showMoreCard and cardState.expanded"
+                 class="o_furniture_quick_selector__more_grid"
+                 role="group"
+                 t-att-aria-label="'باقي ' + title">
+                <div t-if="!overflowItems.length" class="o_furniture_quick_selector__empty">
+                    <i class="fa fa-info-circle" aria-hidden="true"/>
+                    <span>لا توجد منتجات إضافية متاحة حاليًا.</span>
+                </div>
+                <button t-foreach="overflowItems"
+                        t-as="item"
+                        t-key="item.id"
+                        type="button"
+                        class="o_furniture_quick_card o_furniture_quick_card--secondary"
+                        t-att-class="{
+                            'is-selected': isSelected(item.id),
+                            'is-switching': cardState.selectingId === item.id,
+                        }"
+                        t-att-disabled="cardState.selectingId !== false"
+                        t-att-aria-pressed="isSelected(item.id) ? 'true' : 'false'"
+                        t-on-click="() => this.toggleItem(item)">
+                    <span class="o_furniture_quick_card__icon" aria-hidden="true">
+                        <i t-att-class="cardState.selectingId === item.id ? 'fa fa-spinner fa-spin' : 'fa ' + icon"/>
+                    </span>
+                    <span class="o_furniture_quick_card__name" t-esc="item.displayName"/>
+                    <span class="o_furniture_quick_card__check" aria-hidden="true">
+                        <i class="fa fa-check"/>
+                    </span>
+                </button>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="furniture_mrp.FurnitureDimensionToggle">
+        <button type="button"
+                class="o_furniture_dimension_toggle"
+                t-att-class="{'is-expanded': expanded}"
+                t-att-aria-expanded="expanded ? 'true' : 'false'"
+                t-on-click.stop.prevent="toggle">
+            <span t-esc="label"/>
+            <i t-att-class="expanded ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"
+               aria-hidden="true"/>
+        </button>
+    </t>
+
+    <t t-name="furniture_mrp.FurnitureTouchSelection">
+        <div class="o_furniture_touch_selection"
+             role="radiogroup"
+             t-att-aria-label="label"
+             t-att-aria-busy="touchState.selectingValue !== false ? 'true' : 'false'">
+            <button t-foreach="options"
+                    t-as="option"
+                    t-key="option[0]"
+                    type="button"
+                    role="radio"
+                    class="o_furniture_touch_selection__button"
+                    t-att-class="{
+                        'is-selected': isSelected(option[0]),
+                        'is-selecting': touchState.selectingValue === option[0],
+                    }"
+                    t-att-disabled="props.readonly or touchState.selectingValue !== false"
+                t-att-aria-checked="isSelected(option[0]) ? 'true' : 'false'"
+                t-att-aria-label="`${label}: ${option[1]}`"
+                t-on-click.stop.prevent="() => this.selectValue(option[0])">
+            <span t-esc="option[1]"/>
+        </button>
+        </div>
+    </t>
+
+</templates>

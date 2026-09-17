@@ -1,0 +1,76 @@
+<odoo>
+    <record id="shortages_cards_help" model="ir.ui.view">
+        <field name="name">shortages.cards.context.help</field><field name="model">furniture.need.to.produce</field>
+        <field name="inherit_id" ref="furniture_need_to_produce.view_need_to_produce_pipeline"/>
+        <field name="arch" type="xml">
+            <xpath expr="//p[hasclass('o_ntp_piece_eta_note')][@t-else]" position="replace">
+                <widget t-else="" name="factory_context_help" title="شرح التقدير" message="حسب مسار هذه القطعة؛ المخزون الجاهز لا يضيف وقت تصنيع."/>
+            </xpath>
+            <xpath expr="//footer[hasclass('o_ntp_piece_footer')]" position="replace">
+                <footer class="o_ntp_piece_footer"><widget name="factory_context_help" title="مدة المسار" message="ساعتان لكل عملية مؤقتًا · يوم العمل ١٠ ساعات.&#10;المدة تراعي توازي المراحل، وليست موعد تسليم."/></footer>
+            </xpath>
+        </field>
+    </record>
+    <record id="shortages_stage_help" model="ir.ui.view">
+        <field name="name">shortages.stage.context.help</field><field name="model">furniture.need.to.produce.stage</field>
+        <field name="inherit_id" ref="furniture_need_to_produce.view_need_to_produce_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')]" position="replace">
+                <widget name="factory_context_help" title="تعديل خامات القطعة" invisible="state != 'draft'" message="تعديل الخامات هنا يخص هذه القطعة وهذه المرحلة فقط، ولا يغيّر ريسيبي الصنف الأصلية.&#10;راجع الكمية ووحدة القياس، ثم احفظ قبل اعتماد القطعة."/>
+            </xpath>
+        </field>
+    </record>
+    <record id="shortages_piece_help" model="ir.ui.view">
+        <field name="name">shortages.piece.context.help</field><field name="model">furniture.need.to.produce</field>
+        <field name="inherit_id" ref="furniture_need_to_produce.view_need_to_produce_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')]" position="replace">
+                <widget name="factory_context_help" title="التقدير المؤقت" message="التقدير المؤقت ساعتان لكل قطعة في كل عملية، ويوم العمل ١٠ ساعات.&#10;ساعات المسار تراعي توازي المراحل؛ وهي تقدير عمل وليست موعد تسليم من MPS."/>
+            </xpath>
+        </field>
+    </record>
+    <record id="mps_step_help" model="ir.ui.view">
+        <field name="name">mps.step.context.help</field><field name="model">furniture.mrp.mps.operation.output</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_mps_step_time_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')]" position="replace"><widget name="factory_context_help" title="زمن الخطوة" message="عدّل زمن تنفيذ قطعة كاملة واحدة فقط. يحفظ MPS الخطوات والمراحل القياسية، ولا يوزع أي جزء من القطعة على عامل آخر."/></xpath>
+        </field>
+    </record>
+    <record id="mps_product_help" model="ir.ui.view">
+        <field name="name">mps.product.context.help</field><field name="model">furniture.mrp.mps.product.time</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_mps_product_time_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')]" position="replace"><widget name="factory_context_help" title="زمن القطعة" invisible="uses_detailed_standard" message="اكتب زمن تنفيذ قطعة كاملة واحدة. النظام يوزع قطعًا كاملة فقط، ولا يقسم كرسيًا أو فوتيه بين عاملين."/></xpath>
+            <xpath expr="//div[hasclass('alert-secondary')]" position="replace"><widget name="factory_context_help" title="زمن القطعة" invisible="not uses_detailed_standard" message="هذا الزمن محسوب تلقائيًا من خطوات البروفايل التفصيلي، ولذلك يُعدّل من شاشة معايير العمليات."/></xpath>
+        </field>
+    </record>
+    <record id="mps_operation_help" model="ir.ui.view">
+        <field name="name">mps.operation.context.help</field><field name="model">furniture.mrp.mps.operation</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_mps_operation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('text-muted')][contains(text(), 'العمليات بلا تبعية')]" position="replace"><widget name="factory_context_help" title="توازي العمليات" message="العمليات بلا تبعية مشتركة يمكن جدولتها بالتوازي. تقويم العامل يمنع تداخل شغلين لنفس العامل."/></xpath>
+        </field>
+    </record>
+    <record id="delivery_help" model="ir.ui.view">
+        <field name="name">delivery.context.help</field><field name="model">furniture.mrp.future.order</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_future_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')]" position="replace"><widget name="factory_context_help" title="أصناف طلب التسليم" message="تظهر هنا فقط الأصناف المضبوطة كـ Manufacture this Product أو Kit. الـKit يُفك تلقائيًا إلى قطعه الفعلية حسب الموديل عند الحجز أو الإنتاج."/></xpath>
+        </field>
+    </record>
+    <record id="assembly_request_help" model="ir.ui.view">
+        <field name="name">assembly.request.context.help</field><field name="model">furniture.assembly.requisition</field>
+        <field name="inherit_id" ref="furniture_assembly_requisitions.assembly_request_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_assembly_request_hero')]//p" position="replace"/>
+            <xpath expr="//div[hasclass('alert-info')]" position="replace"><widget name="factory_context_help" title="طلب الاذونات" message="خامات صالة التجميع — أدخل الكميات فقط.&#10;الأصناف ووحداتها ثابتة طبقًا للوصفة. اعتماد أمين المخزن ينقل الكميات للصالة، وكل أمر تجميع يستهلك احتياجه من رصيدها."/></xpath>
+        </field>
+    </record>
+    <record id="assembly_hall_help" model="ir.ui.view">
+        <field name="name">assembly.hall.context.help</field><field name="model">furniture.mrp.carpentry</field>
+        <field name="inherit_id" ref="furniture_assembly_requisitions.assembly_form_hall_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-info')][contains(text(), 'خامات التجميع تُطلب')]" position="replace"><widget name="factory_context_help" title="خامات التجميع" message="خامات التجميع تُطلب من تطبيق «طلب الاذونات». عند البدء، يُستهلك احتياج هذا الأمر من رصيد صالة التجميع بعد وصول المنتج من التقديم."/></xpath>
+        </field>
+    </record>
+</odoo>

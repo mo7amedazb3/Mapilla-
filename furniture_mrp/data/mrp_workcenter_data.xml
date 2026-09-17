@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- مراكز العمل للأقسام -->
+        <record id="workcenter_carpentry" model="mrp.workcenter">
+            <field name="name">قسم تجميع</field>
+            <field name="code">NJR</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">85</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="workcenter_bases" model="mrp.workcenter">
+            <field name="name">قسم القواعد</field>
+            <field name="code">BAS</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">85</field>
+            <field name="color">3</field>
+        </record>
+
+        <record id="workcenter_foam" model="mrp.workcenter">
+            <field name="name">قسم السفنجة</field>
+            <field name="code">SFN</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">85</field>
+            <field name="color">2</field>
+        </record>
+
+        <record id="workcenter_sewing" model="mrp.workcenter">
+            <field name="name">قسم تفصيل</field>
+            <field name="code">TFS</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">85</field>
+            <field name="color">4</field>
+        </record>
+
+        <record id="workcenter_stitching" model="mrp.workcenter">
+            <field name="name">قسم الخياطة (مؤرشف - داخل التفصيل)</field>
+            <field name="code">SEW</field>
+            <field name="active" eval="False"/>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">85</field>
+            <field name="color">5</field>
+        </record>
+
+        <record id="workcenter_upholstery" model="mrp.workcenter">
+            <field name="name">قسم كسوه</field>
+            <field name="code">KSW</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">90</field>
+            <field name="color">10</field>
+        </record>
+
+        <record id="workcenter_packaging" model="mrp.workcenter">
+            <field name="name">قسم التغليف</field>
+            <field name="code">PKG</field>
+            <field name="time_efficiency">100</field>
+            <field name="oee_target">90</field>
+            <field name="color">11</field>
+        </record>
+    </data>
+</odoo>

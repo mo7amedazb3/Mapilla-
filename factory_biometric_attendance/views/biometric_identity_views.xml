@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_biometric_identity_search" model="ir.ui.view">
+        <field name="name">factory.biometric.identity.search</field>
+        <field name="model">factory.biometric.identity</field>
+        <field name="arch" type="xml">
+            <search string="بصمات الموظفين">
+                <field name="employee_id"/>
+                <field name="device_user_name"/>
+                <field name="device_id"/>
+                <field name="device_user_id" string="رقم الجهاز (تلقائي)"/>
+                <field name="department_id"/>
+                <filter name="not_enrolled" string="غير مسجل" domain="[('enrollment_state', '!=', 'enrolled')]"/>
+                <filter name="inactive" string="غير نشط" domain="[('active', '=', False)]"/>
+                <group expand="0" string="تجميع">
+                    <filter name="group_device" string="الجهاز" context="{'group_by': 'device_id'}"/>
+                    <filter name="group_employee" string="الموظف" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_biometric_identity_list" model="ir.ui.view">
+        <field name="name">factory.biometric.identity.list</field>
+        <field name="model">factory.biometric.identity</field>
+        <field name="arch" type="xml">
+            <list string="دليل بصمات الموظفين"
+                  decoration-muted="not active">
+                <header>
+                    <button name="action_print_biometric_directory"
+                            string="طباعة PDF"
+                            type="object"
+                            icon="fa-print"
+                            class="btn-primary"
+                            display="always"
+                            groups="hr_attendance.group_hr_attendance_manager"/>
+                </header>
+                <field name="device_user_id" string="PIN" readonly="1" required="0"/>
+                <field name="employee_id" widget="many2one_avatar_employee" readonly="id"/>
+                <field name="device_user_name" string="الاسم الظاهر على البصمة" placeholder="بالإنجليزي"/>
+                <field name="department_id" optional="show" readonly="1"/>
+                <field name="job_id" optional="show" readonly="1"/>
+                <field name="device_id" readonly="id"/>
+                <field name="enrollment_state" widget="badge" readonly="1" decoration-success="enrollment_state == 'enrolled'" decoration-warning="enrollment_state == 'requested'"/>
+                <field name="last_enrollment_at" optional="hide" readonly="1"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <button name="action_queue_user_sync"
+                        string="إرسال للجهاز"
+                        type="object"
+                        icon="fa-cloud-upload"
+                        class="btn-link"
+                        invisible="not id or not active"
+                        groups="hr_attendance.group_hr_attendance_manager"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biometric_identity_form" model="ir.ui.view">
+        <field name="name">factory.biometric.identity.form</field>
+        <field name="model">factory.biometric.identity</field>
+        <field name="arch" type="xml">
+            <form string="ربط بصمة موظف">
+                <header>
+                    <button name="action_queue_user_sync" string="إرسال العامل للجهاز" type="object" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_request_enrollment" string="تسجيل بصمة على الجهاز" type="object" class="btn-primary" groups="hr_attendance.group_hr_attendance_manager" confirm="سيظهر طلب تسجيل على شاشة الجهاز ويجب أن يضع العامل إصبعه هناك. متابعة؟"/>
+                    <button name="action_delete_from_device_and_purge" string="حذف من الجهاز والسجلات" type="object" class="btn-danger" groups="hr_attendance.group_hr_attendance_manager" confirm="سيتم حذف العامل وقالب بصمته من الجهاز، وحذف حركات البصمة والحضور البيومتري المرتبط به من Odoo نهائياً. لا يمكن التراجع. متابعة؟"/>
+                    <field name="enrollment_state" widget="statusbar" statusbar_visible="not_enrolled,requested,enrolled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_events" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="event_count" widget="statinfo" string="الحركات"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="employee_id" widget="many2one_avatar_employee"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="device_id"/>
+                            <field name="device_user_id" string="رقم الجهاز (تلقائي)" readonly="1" required="0" placeholder="يظهر تلقائياً بعد الحفظ"/>
+                            <field name="device_user_name" placeholder="يُستخدم اسم الموظف تلقائياً إذا تُرك فارغاً"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="last_enrollment_at"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        قالب البصمة يظل داخل الجهاز ولا يتم نسخه إلى Odoo. زر التسجيل يرسل للعامل طلباً يظهر على شاشة الجهاز.
+                    </div>
+                    <div class="alert alert-danger" role="alert">
+                        الحذف العادي أو زر «حذف من الجهاز والسجلات» يرسل حذف العامل وقالب بصمته للجهاز، ثم يمسح سجل بصماته والحضور البيومتري المرتبط من Odoo.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_biometric_identity" model="ir.actions.act_window">
+        <field name="name">بصمات الموظفين</field>
+        <field name="res_model">factory.biometric.identity</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biometric_identity_search"/>
+    </record>
+
+    <record id="action_employee_biometric_directory" model="ir.actions.act_window">
+        <field name="name">دليل بصمات الموظفين</field>
+        <field name="res_model">factory.biometric.identity</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_biometric_identity_list"/>
+        <field name="search_view_id" ref="view_biometric_identity_search"/>
+        <field name="context">{'active_test': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">أضف أول موظف إلى جهاز البصمة</p>
+            <p>اكتب الاسم الإنجليزي؛ رقم PIN يُخصص تلقائياً عند الحفظ، ثم اضغط «إرسال للجهاز».</p>
+        </field>
+    </record>
+</odoo>

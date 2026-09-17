@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_readonly_sales_purchase_operator" model="res.groups">
+        <field name="name">Read Only System / Sales &amp; Purchase Operator</field>
+        <field name="category_id" ref="base.module_category_administration"/>
+        <field name="comment">Can read the whole system and can modify only Sales and Purchase orders.</field>
+    </record>
+</odoo>

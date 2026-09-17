@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_supervisor_mobile" model="ir.actions.client">
+        <field name="name">مشرفي المصنع</field>
+        <field name="tag">furniture_supervisor_mobile.app</field>
+        <field name="path">supervisors</field>
+    </record>
+    <record id="action_supervisor_standalone" model="ir.actions.act_url">
+        <field name="name">تطبيق المشرفين</field>
+        <field name="url">/odoo</field>
+        <field name="target">self</field>
+    </record>
+    <menuitem id="menu_supervisor_mobile" name="مشرفي المصنع"
+              action="action_supervisor_standalone" sequence="3"
+              web_icon="furniture_supervisor_mobile,static/img/icon-192.png"
+              groups="furniture_mrp.group_furniture_mrp_supervisor,furniture_mrp.group_furniture_mrp_manager"/>
+    <record id="menu_supervisor_mobile" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <template id="mobile_bootstrap" inherit_id="web.webclient_bootstrap" priority="150" active="False">
+        <xpath expr="//link[@rel='manifest']" position="attributes">
+            <attribute name="t-att-href">'/supervisor/manifest.webmanifest' if request.httprequest.path.startswith('/odoo/supervisors') else '/web/manifest.webmanifest'</attribute>
+        </xpath>
+        <xpath expr="//link[@rel='apple-touch-icon']" position="attributes">
+            <attribute name="t-att-href">'/furniture_supervisor_mobile/static/img/icon-192.png' if request.httprequest.path.startswith('/odoo/supervisors') else '/web/static/img/odoo-icon-ios.png'</attribute>
+        </xpath>
+        <xpath expr="//meta[@name='theme-color']" position="attributes">
+            <attribute name="t-att-content">'#0c2a44' if request.httprequest.path.startswith('/odoo/supervisors') else '#71639e'</attribute>
+        </xpath>
+        <xpath expr="//meta[@name='viewport']" position="after">
+            <t t-if="request.httprequest.path.startswith('/odoo/supervisors')">
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <meta name="apple-mobile-web-app-title" content="المشرفين"/>
+                <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+            </t>
+        </xpath>
+    </template>
+</odoo>

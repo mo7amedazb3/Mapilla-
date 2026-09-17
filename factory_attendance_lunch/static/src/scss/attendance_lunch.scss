@@ -1,0 +1,66 @@
+.o_factory_attendance_dashboard {
+    .o_factory_lunch_policy {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        border: 1px solid #e7dcc4;
+        border-radius: 12px;
+        padding: 12px 16px;
+        background: #faf7f0;
+        color: #66593b;
+        font-size: 13px;
+        > span { flex: 1; min-width: 220px; }
+        button { background: #eee5d1; color: #51462e; white-space: nowrap; }
+    }
+    .o_factory_attendance_table {
+        min-width: 1150px;
+        .o_factory_col_employee { width: 21%; }
+        .o_factory_col_pin { width: 6%; }
+        .o_factory_col_schedule { width: 10%; }
+        .o_factory_col_time { width: 7%; }
+        .o_factory_col_delay { width: 14%; }
+        .o_factory_col_overtime { width: 8%; }
+        .o_factory_col_lunch { width: 19%; }
+        .o_factory_col_source { width: 8%; }
+    }
+    .o_factory_lunch_cell {
+        strong { color: #203b4a; }
+        small { display: block; font-size: 10px; line-height: 1.6; color: #77838a; }
+        .o_factory_lunch_detail {
+            display: block;
+            margin-top: 5px;
+            font-size: 11px;
+            color: #596a61;
+            white-space: normal;
+            &.is-pending { color: #947021; }
+            &.is-departed { color: #81594c; }
+            i { margin-inline-end: 4px; }
+        }
+    }
+    .o_factory_attendance_table .o_factory_attendance_group_heading th {
+        padding: 11px 16px;
+        background: #f4f0e6;
+        color: #655332;
+        font-size: 13px;
+        text-align: right;
+        border-top: 1px solid #e8dfcb;
+        border-bottom: 1px solid #e8dfcb;
+        i { margin-inline-end: 8px; }
+        span { font-size: 11px; font-weight: 400; margin-inline-start: 12px; }
+    }
+}
+.o_factory_dialog_body { display: flex; flex-direction: column; }
+.o_factory_manual_mode {
+    order: -1; align-self: flex-end; display: flex;
+    border: 1px solid #cedbe4; border-radius: 9px; overflow: hidden; margin-bottom: 18px;
+    button { border: 0; background: #fff; color: #0d2c43; padding: 9px 14px; font-weight: 700; }
+    button.is-active { background: #0d2c43; color: #fff; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+}
+.o_factory_dialog .o_factory_dialog_body > .o_factory_manual_mode {
+    width: fit-content !important;
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: 0;
+}

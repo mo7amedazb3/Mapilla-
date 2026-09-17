@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_biometric_device_search" model="ir.ui.view">
+        <field name="name">factory.biometric.device.search</field>
+        <field name="model">factory.biometric.device</field>
+        <field name="arch" type="xml">
+            <search string="أجهزة البصمة">
+                <field name="name"/>
+                <field name="serial_number"/>
+                <filter name="pending" string="في انتظار الاعتماد" domain="[('state', '=', 'pending')]"/>
+                <filter name="active" string="نشط" domain="[('state', '=', 'active')]"/>
+                <filter name="blocked" string="محظور" domain="[('state', '=', 'blocked')]"/>
+                <group expand="0" string="تجميع">
+                    <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="الشركة" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_biometric_device_list" model="ir.ui.view">
+        <field name="name">factory.biometric.device.list</field>
+        <field name="model">factory.biometric.device</field>
+        <field name="arch" type="xml">
+            <list string="أجهزة البصمة" decoration-warning="state == 'pending'" decoration-danger="state == 'blocked'" decoration-success="state == 'active'">
+                <field name="name"/>
+                <field name="serial_number"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'" decoration-success="state == 'active'" decoration-danger="state == 'blocked'"/>
+                <field name="identity_count" string="الموظفون"/>
+                <field name="pending_event_count" string="تحتاج مراجعة"/>
+                <field name="last_seen"/>
+                <field name="last_source_ip" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_biometric_device_form" model="ir.ui.view">
+        <field name="name">factory.biometric.device.form</field>
+        <field name="model">factory.biometric.device</field>
+        <field name="arch" type="xml">
+            <form string="جهاز بصمة">
+                <header>
+                    <button name="action_activate" string="اعتماد وتشغيل" type="object" class="btn-primary" invisible="state != 'pending'" groups="hr_attendance.group_hr_attendance_manager" confirm="سيبدأ احتساب البصمات الجديدة فقط كحضور وانصراف. هل راجعت الرقم التسلسلي وعنوان الإنترنت العام؟"/>
+                    <button name="action_block" string="حظر الجهاز" type="object" class="btn-secondary" invisible="state == 'blocked'" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_reset_pending" string="إرجاع للمراجعة" type="object" invisible="state != 'blocked'" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <button name="action_reprocess_events" string="إعادة معالجة المعلّق" type="object" invisible="state != 'active'" groups="hr_attendance.group_hr_attendance_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,active,blocked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_identities" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="identity_count" widget="statinfo" string="الموظفون"/>
+                        </button>
+                        <button name="action_view_events" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="event_count" widget="statinfo" string="الحركات"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" text="غير معتمد" bg_color="text-bg-warning" invisible="state != 'pending'"/>
+                    <widget name="web_ribbon" text="محظور" bg_color="text-bg-danger" invisible="state != 'blocked'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="مثال: بصمة بوابة المصنع"/></h1>
+                        <h3><field name="serial_number" placeholder="Serial Number"/></h3>
+                    </div>
+                    <group>
+                        <group string="إعدادات التحويل">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="timezone"/>
+                            <field name="pairing_mode"/>
+                            <field name="accept_events_from"/>
+                            <field name="debounce_seconds"/>
+                            <field name="max_open_hours"/>
+                            <field name="max_future_minutes"/>
+                            <field name="allowed_verify_modes"/>
+                            <field name="source_ip_mode"/>
+                            <field name="expected_source_ip"/>
+                            <field name="push_comm_key" password="True"/>
+                            <field name="command_encoding"/>
+                        </group>
+                        <group string="آخر اتصال">
+                            <field name="last_seen"/>
+                            <field name="last_source_ip"/>
+                            <field name="push_version"/>
+                            <field name="firmware_version"/>
+                            <field name="platform"/>
+                            <field name="attlog_stamp"/>
+                            <field name="operlog_stamp"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="الموظفون المرتبطون" name="identities">
+                            <field name="identity_ids" context="{'default_device_id': id}">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="device_user_id" string="رقم الجهاز (تلقائي)" readonly="1" required="0"/>
+                                    <field name="device_user_name" optional="show"/>
+                                    <field name="enrollment_state" widget="badge"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="معلومات الاتصال الخام" name="connection_info">
+                            <field name="last_info" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_biometric_device" model="ir.actions.act_window">
+        <field name="name">أجهزة البصمة</field>
+        <field name="res_model">factory.biometric.device</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_biometric_device_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">أضف جهاز ZKTeco باستخدام الرقم التسلسلي الموجود في الجهاز.</p>
+            <p>اكتب عنوان الإنترنت العام للمصنع، اربط أرقام العمال، ثم اعتمد الجهاز.</p>
+        </field>
+    </record>
+</odoo>

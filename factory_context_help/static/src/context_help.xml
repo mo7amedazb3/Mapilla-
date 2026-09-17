@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_context_help.Dialog">
+        <Dialog title="props.title" size="'md'" contentClass="'o_factory_help_modal'"
+                bodyClass="'o_factory_help_body'" modalRef="(ref) => this.setModalRef(ref)">
+            <t t-set-slot="header">
+                <span class="o_factory_help_emblem" aria-hidden="true">!</span>
+                <div class="o_factory_help_heading">
+                    <span class="o_factory_help_eyebrow">دليل سريع</span>
+                    <h4 class="o_factory_help_title" t-esc="props.title"/>
+                </div>
+                <button type="button" class="o_factory_help_close" aria-label="إغلاق الشرح"
+                        title="إغلاق" t-on-click="props.close">
+                    <i class="fa fa-times" aria-hidden="true"/>
+                </button>
+            </t>
+            <div class="o_factory_help_dialog" dir="rtl"><p t-esc="props.message"/></div>
+            <t t-set-slot="footer">
+                <button type="button" class="btn o_factory_help_done" t-on-click="props.close">
+                    <i class="fa fa-check" aria-hidden="true"/> تمام
+                </button>
+            </t>
+        </Dialog>
+    </t>
+    <t t-name="factory_context_help.Widget">
+        <button type="button" class="o_factory_help_button" aria-haspopup="dialog" aria-label="عرض الشرح"
+                t-att-data-help-message="props.message" t-att-data-help-title="props.title" t-att-title="props.title">!</button>
+    </t>
+</templates>

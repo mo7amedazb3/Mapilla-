@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_production_stage_warning_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.production.stage.warning.wizard.form</field>
+        <field name="model">furniture.mrp.production.stage.warning.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إضافة تحذير لمشرف مرحلة"
+                  class="o_furniture_stage_transfer_wizard o_furniture_stage_warning_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">تنبيه مرتبط بأمر الإنتاج</div>
+                        <h2>ماذا يجب أن يعرف مشرف المرحلة؟</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">⚠</div>
+                </div>
+                <group>
+                    <field name="production_id" options="{'no_open': True}"/>
+                    <field name="stage"/>
+                    <field name="message" placeholder="اكتب التحذير أو التعليمات المهمة هنا..."/>
+                </group>
+                <div class="alert alert-warning" role="alert">
+                    سيظهر التحذير لمشرف المرحلة بعد نجاح «قبول التحويل» مباشرة.
+                </div>
+                <footer>
+                    <button name="action_add_warning" string="حفظ التحذير"
+                            type="object" class="btn-primary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_product_production_warning_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.product.production.warning.wizard.form</field>
+        <field name="model">furniture.mrp.product.production.warning.wizard</field>
+        <field name="arch" type="xml">
+            <form string="تحذيرات الإنتاج"
+                  class="o_furniture_stage_transfer_wizard o_furniture_stage_warning_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">تنبيه جودة بين مشرفي المراحل</div>
+                        <h2>ما الملاحظة التي يجب ألا تتكرر؟</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">⚠</div>
+                </div>
+                <field name="available_target_stage_ids" invisible="1"/>
+                <field name="production_line_ids" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <group>
+                    <field name="model_id" options="{'no_open': True}"/>
+                    <field name="product_id" options="{'no_open': True}"/>
+                    <field name="source_stage"/>
+                    <field name="target_stage_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="message" required="1"
+                           placeholder="مثال: الخشم مش متقطع كويس..."/>
+                </group>
+                <div class="alert alert-warning" role="alert">
+                    سيظهر التنبيه فورًا للمشرف المستهدف، ثم مرة واحدة عند أول تشغيل تالٍ لنفس الموديل والصنف.
+                </div>
+                <footer>
+                    <button name="action_send_warning" string="إرسال التحذير"
+                            type="object" class="btn-primary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_payroll_slip_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.payroll.slip.wizard.form</field>
+        <field name="model">furniture.mrp.payroll.slip.wizard</field>
+        <field name="arch" type="xml">
+            <form string="إنشاء كشف أجر لعامل">
+                <div class="alert alert-info" role="alert">
+                    اختر العامل والفترة. الفترة الافتراضية هي آخر 7 أيام حتى اليوم،
+                    والجمعة إجازة أسبوعية مدفوعة ولا تُحسب غيابًا.
+                </div>
+                <group>
+                    <group string="العامل">
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="employee_id"
+                               options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                    <group string="فترة كشف الأجر">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </group>
+                <div class="alert alert-light border" role="status">
+                    إذا كان هناك كشف لنفس العامل ونفس الفترة فسيُفتح أو يُطبع
+                    بدل إنشاء نسخة مكررة.
+                </div>
+                <footer>
+                    <button name="action_open_slip" type="object"
+                            string="إنشاء وفتح للمراجعة"
+                            icon="fa-external-link" class="btn-secondary"/>
+                    <button name="action_print_pdf" type="object"
+                            string="طباعة PDF مباشرة"
+                            icon="fa-file-pdf-o" class="btn-primary"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_payroll_slip_wizard" model="ir.actions.act_window">
+        <field name="name">إنشاء كشف أجر</field>
+        <field name="res_model">furniture.mrp.payroll.slip.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_furniture_mrp_payroll_slip_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+// Mapilla Direction Two palette (derived from the supplied brand presentation).
+$mapilla-oxford-blue: #0c2a44;
+$mapilla-timberwolf: #e0d8d1;
+$mapilla-quick-silver: #ada696;
+$mapilla-platinum: #e2e2e2;
+$mapilla-black: #000000;
+$mapilla-white: #ffffff;
+
+// Core brand tokens. These are loaded before Odoo's !default declarations.
+$o-brand-odoo: $mapilla-oxford-blue;
+$o-brand-primary: $mapilla-oxford-blue;
+$o-brand-secondary: $mapilla-quick-silver;
+$o-brand-lightsecondary: #f3efed;
+$o-action: $mapilla-oxford-blue;
+
+// Readability and surfaces.
+$o-main-text-color: #2d2d2d;
+$o-main-headings-color: $mapilla-oxford-blue;
+$o-main-link-color: $mapilla-oxford-blue;
+$o-view-background-color: $mapilla-white;
+$o-webclient-background-color: #f7f5f2;
+$o-control-panel-background-color: #fdfcfb;
+$o-control-panel-border-bottom: 1px solid $mapilla-timberwolf;
+$o-component-active-color: $mapilla-oxford-blue;
+$o-component-active-bg: #eaf0f4;
+$o-component-active-border: $mapilla-oxford-blue;
+$o-form-lightsecondary: $mapilla-timberwolf;
+$o-input-border-required: $mapilla-oxford-blue;
+
+// Geometry.
+$o-border-radius: 8px;
+$o-border-radius-sm: 6px;
+$o-border-radius-lg: 14px;
+
+// Main navigation.
+$o-navbar-height: 52px;
+$o-navbar-background: $mapilla-oxford-blue;
+$o-navbar-border-bottom: 1px solid #071c2e;
+$o-navbar-entry-margin-h: 2px;
+$o-navbar-entry-padding-h: 0.72em;
+$o-navbar-entry-border-radius: 8px;
+$o-navbar-entry-color: rgba($mapilla-white, 0.92);
+$o-navbar-entry-color--hover: $mapilla-white;
+$o-navbar-entry-bg--hover: rgba($mapilla-white, 0.10);
+$o-navbar-entry-bg--active: rgba($mapilla-white, 0.17);
+$o-navbar-brand-color: $mapilla-white;
+$o-navbar-badge-bg: $mapilla-timberwolf;
+$o-navbar-badge-color: $mapilla-oxford-blue;
+$o-navbar-badge-text-shadow: none;

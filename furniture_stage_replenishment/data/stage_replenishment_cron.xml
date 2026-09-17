@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_furniture_mrp_stage_replenishment" model="ir.cron">
+        <field name="name">MRP Stage Min/Max Replenishment</field>
+        <field name="model_id" ref="model_furniture_mrp_stage_replenishment_rule"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate_stage_replenishment()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

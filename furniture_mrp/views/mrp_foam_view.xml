@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ══════════════════════════════════════════════════════
+         قسم السفنجة - Foam Department Views
+    ══════════════════════════════════════════════════════ -->
+
+    <record id="view_furniture_mrp_foam_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.foam.form</field>
+        <field name="model">furniture.mrp.foam</field>
+        <field name="arch" type="xml">
+            <form string="قسم السفنجة">
+                <header>
+                    <button name="action_start" string="🧽 بدء العمل" type="object"
+                            class="btn-primary" invisible="state != 'pending'"/>
+                    <button name="action_quality_check" string="🔍 فحص الجودة" type="object"
+                            class="btn-warning" invisible="state != 'in_progress'"/>
+                    <button name="action_approve_quality" string="✅ قبول" type="object"
+                            class="btn-success" invisible="state != 'quality_check'"/>
+                    <button name="action_reject_quality" string="❌ رفض" type="object"
+                            class="btn-danger" invisible="state != 'quality_check'"/>
+                    <button name="action_mark_done" string="إنهاء" type="object"
+                            invisible="state not in ('in_progress', 'quality_check')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,in_progress,quality_check,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="معلومات عامة">
+                            <field name="production_order_id"/>
+                            <field name="carpentry_order_id"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="foreman_id"/>
+                            <field name="worker_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="التواريخ">
+                            <field name="date_planned_finish"/>
+                            <field name="date_start" readonly="1"/>
+                            <field name="date_finish" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="🧽 تفاصيل السفنج">
+                            <group>
+                                <group string="نوع السفنج">
+                                    <field name="foam_type"/>
+                                    <field name="foam_product_id"/>
+                                    <field name="foam_density"/>
+                                </group>
+                                <group string="الأبعاد والكمية">
+                                    <field name="foam_qty"/>
+                                    <field name="foam_thickness"/>
+                                    <field name="foam_length"/>
+                                    <field name="foam_width"/>
+                                </group>
+                            </group>
+                            <group string="المواد المستهلكة">
+                                <field name="glue_qty"/>
+                            </group>
+                        </page>
+                        <page string="🔍 فحص الجودة">
+                            <group>
+                                <field name="quality_check"/>
+                                <field name="quality_notes"/>
+                                <field name="defect_description"
+                                       invisible="quality_check not in ('fail', 'rework')"/>
+                            </group>
+                        </page>
+                        <page string="📝 ملاحظات">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_foam_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.foam.list</field>
+        <field name="model">furniture.mrp.foam</field>
+        <field name="arch" type="xml">
+            <list string="أوامر السفنجة"
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-info="state == 'quality_check'">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="foam_type"/>
+                <field name="foam_density"/>
+                <field name="foam_qty"/>
+                <field name="foreman_id"/>
+                <field name="date_planned_finish"/>
+                <field name="priority" widget="priority"/>
+                <field name="quality_check" widget="badge"
+                       decoration-success="quality_check == 'pass'"
+                       decoration-danger="quality_check in ('fail','rework')"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-info="state == 'pending'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_foam_kanban" model="ir.ui.view">
+        <field name="name">furniture.mrp.foam.kanban</field>
+        <field name="model">furniture.mrp.foam</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="production_order_id"/>
+                <field name="foam_type"/>
+                <field name="foreman_id"/>
+                <field name="state"/>
+                <field name="priority"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="name"/></strong>
+                                <field name="priority" widget="priority"/>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>🏭 <field name="production_order_id"/></div>
+                                <div>🧽 <field name="foam_type"/></div>
+                                <div t-if="record.foreman_id.value">
+                                    👷 <field name="foreman_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_furniture_mrp_foam_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.foam.search</field>
+        <field name="model">furniture.mrp.foam</field>
+        <field name="arch" type="xml">
+            <search string="البحث في أوامر السفنجة">
+                <field name="name" string="رقم الأمر"/>
+                <field name="production_order_id" string="أمر التشغيل الأسبوعي"/>
+                <field name="foreman_id" string="رئيس القسم"/>
+                <separator/>
+                <filter name="filter_pending" string="في الانتظار" domain="[('state','=','pending')]"/>
+                <filter name="filter_in_progress" string="جاري التنفيذ" domain="[('state','=','in_progress')]"/>
+                <filter name="filter_quality" string="فحص الجودة" domain="[('state','=','quality_check')]"/>
+                <filter name="filter_done" string="منتهي" domain="[('state','=','done')]"/>
+                <separator/>
+                <group expand="0" string="تجميع بـ">
+                    <filter name="group_state" string="الحالة" context="{'group_by':'state'}"/>
+                    <filter name="group_foam_type" string="نوع السفنج" context="{'group_by':'foam_type'}"/>
+                    <filter name="group_foreman" string="رئيس القسم" context="{'group_by':'foreman_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_foam" model="ir.actions.act_window">
+        <field name="name">🧹 قسم السفنجة</field>
+        <field name="res_model">furniture.mrp.foam</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_foam_search"/>
+        <field name="context">{'search_default_filter_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد أوامر سفنجة بعد</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_whatsapp_msg_user,access.whatsapp.msg.user,model_whatsapp_msg,base.group_user,1,1,1,1
+access_whatsapp_session_user,access.whatsapp.session.user,model_whatsapp_session,base.group_user,1,1,1,1
+access_whatsapp_session_message_user,access.whatsapp.session.message.user,model_whatsapp_session_message,base.group_user,1,1,1,1
+access_whatsapp_label_user,access.whatsapp.label.user,model_whatsapp_label,base.group_user,1,1,1,1

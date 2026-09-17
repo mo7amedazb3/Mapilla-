@@ -1,0 +1,311 @@
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form {
+    color: #0c2a44;
+    .o_form_sheet_bg { background: #f5f3f0; }
+    .o_furniture_delivery_request_sheet { padding: 18px; background: transparent; max-width: 1500px; margin: 0 auto; }
+    .o_delivery_request_workbench { background: transparent; box-shadow: none; overflow: visible; }
+    .o_ribbon { display: none; }
+    .mp_delivery_banner {
+        display: flex; align-items: center; justify-content: space-between; gap: 20px;
+        padding: 18px 26px; min-height: 156px; border-radius: 20px; margin-bottom: 20px;
+        background: linear-gradient(115deg, #284359, #0c2a44 65%); color: #fff;
+        box-shadow: 0 10px 24px #0c2a4414; animation: mp-delivery-enter .35s ease-out;
+        h1 { color: #fff; font-size: 27px; font-weight: 800; margin: 5px 0 3px; }
+        .o_field_widget { color: inherit; width: auto; margin: 0; }
+    }
+    .mp_delivery_eyebrow { color: #e0d8d1; font-size: 10px; letter-spacing: .1em; }
+    .mp_delivery_facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+        > span { display: inline-flex; align-items: center; gap: 7px; border: 1px solid #ffffff24; background: #ffffff0d; padding: 5px 10px; border-radius: 8px; font-size: 11px; }
+    }
+    .mp_delivery_brand { display: flex; align-items: center; max-width: 48%; gap: 12px;
+        img { width: 125px; max-width: 40%; object-fit: contain; }
+        .mp_delivery_sofa { width: 230px; max-width: 60%; height: 115px; }
+    }
+    .mp_delivery_toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; margin-bottom: 14px; border: 1px solid #e0d8d1; border-radius: 14px; background: #fff;
+        > div:first-child { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+        .o_field_widget { width: auto; margin: 0; }
+        .o_form_label { margin: 0; color: #63717a; font-size: 12px; }
+        .o_field_char { font-size: 12px; }
+        .btn { white-space: nowrap; border-radius: 9px; min-height: 40px; }
+    }
+    .mp_delivery_details { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;
+        > section { min-width: 0; background: #fff; border: 1px solid #e0d8d1; border-radius: 14px; }
+    }
+    .mp_delivery_section_title { display: flex; gap: 10px; align-items: center; padding: 15px 16px 0; font-size: 14px; font-weight: 800;
+        > i { display: grid; place-items: center; width: 34px; height: 34px; background: #f0ece7; color: #756e60; border-radius: 10px; }
+        small { display: block; margin-top: 3px; color: #787a7b; font-size: 10px; font-weight: 400; }
+    }
+    .o_delivery_request_planning_strip, .o_delivery_request_common_strip { background: transparent; padding: 14px 16px 17px; margin: 0; border: 0; gap: 12px;
+        .o_form_label { color: #52606a; font-size: 11px; margin-bottom: 6px; }
+        .o_input { background: #faf9f7 !important; border: 1px solid #e0d8d1 !important; border-radius: 8px !important; min-height: 36px; padding: 6px 9px !important; }
+        .o_input:focus { border-color: #0c2a44 !important; box-shadow: 0 0 0 3px #0c2a4418; }
+    }
+    .o_delivery_request_products_shell { margin: 0; padding: 0; border: 1px solid #e0d8d1; border-radius: 16px; overflow: hidden; background: #fff; }
+    .o_delivery_request_products_heading { background: #fff; border: 0; padding: 16px 18px; }
+    .o_delivery_request_products_heading strong { color: #0c2a44; font-size: 16px; }
+    .o_delivery_request_products_heading_icon { background: #eeeae5; color: #0c2a44; }
+    .o_delivery_request_lines { border: 0; border-radius: 0; }
+    .o_delivery_request_lines table.o_list_table { border-spacing: 0;
+        thead th { background: #eeeae5 !important; color: #0c2a44 !important; height: 40px; border-radius: 0 !important; }
+        tbody tr.o_data_row td { height: 60px; border-radius: 0 !important; box-shadow: none !important; border: 0 !important; border-bottom: 1px solid #eeebe7 !important; padding: 12px !important; }
+        tbody tr.o_data_row:hover td { background: #f5f2ed !important; }
+    }
+    .o_delivery_request_products_hint { background: #faf9f7; color: #63717a; border-color: #e0d8d1; }
+    .o_delivery_request_notes { border: 1px solid #e0d8d1; border-radius: 14px; background: #fff; margin: 16px 0 0; }
+    .o_delivery_request_notes_icon { background: #eeeae5; color: #0c2a44; }
+    .o_form_statusbar { margin: 10px 18px; border: 1px solid #e0d8d1; border-radius: 12px; padding: 7px; }
+    @media (min-width: 1200px) { .o-mail-Form-chatter.o-aside { width: 320px; max-width: 320px; flex-basis: 320px; } }
+    @media (max-width: 1100px) { .mp_delivery_details { grid-template-columns: 1fr; } }
+    @media (max-width: 767px) {
+        .o_furniture_delivery_request_sheet { padding: 10px; }
+        .mp_delivery_banner { padding: 18px; min-height: 145px; border-radius: 14px; h1 { font-size: 23px; } }
+        .mp_delivery_brand { max-width: 29%; img { width: 100%; max-width: 100%; } .mp_delivery_sofa { display: none; } }
+        .mp_delivery_toolbar { flex-wrap: wrap; }
+        .o_delivery_request_common_strip { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+}
+.mp_delivery_picker {
+    color: #0c2a44;
+    .mp_delivery_picker_banner { display: flex; justify-content: space-between; align-items: center; background: #0c2a44; color: #fff; border-bottom: 4px solid #ada696; padding: 20px; border-radius: 12px; margin-bottom: 16px;
+        h3 { color: #fff; margin: 7px 0; font-size: 23px; } p, small { color: #e0d8d1; margin: 0; } > i { font-size: 38px; margin: 15px; color: #e0d8d1; }
+    }
+    section { padding: 16px; border: 1px solid #e0d8d1; border-radius: 12px; margin-bottom: 14px; }
+    h4 { font-size: 15px; color: #0c2a44; font-weight: 700; margin: 0 0 12px; small { color: #73787b; font-size: 12px; } }
+    .mp_delivery_choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;
+        button { display: flex; align-items: center; gap: 10px; min-height: 64px; background: #faf9f7; color: #0c2a44; border: 1px solid #e0d8d1; border-radius: 9px; padding: 12px; font-weight: 700; text-align: right; transition: border-color .15s, background .15s;
+            span { flex: 1; } small { display: block; font-size: 10px; font-weight: 400; }
+            &:hover { border-color: #ada696; } &:focus-visible { outline: 3px solid #ada696; outline-offset: 2px; }
+            &.is-selected { background: #0c2a44; border-color: #0c2a44; color: #fff; }
+        }
+    }
+    .mp_delivery_picker_heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; h4 { margin: 0; } input { max-width: 220px; } }
+    .mp_delivery_qty { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #eeeae5; input { width: 100px; padding: 8px; border: 1px solid #ada696; border-radius: 7px; text-align: center; font-weight: 700; color: #0c2a44; } }
+    @media (max-width: 600px) { .mp_delivery_choices { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mp_delivery_picker_heading { flex-wrap: wrap; } section { padding: 12px; } }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+}
+@keyframes mp-delivery-enter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+.o_form_view.o_mapilla_delivery_form .o_delivery_request_lines {
+    .o_list_renderer { overflow-x: auto; direction: ltr; }
+    table.o_list_table {
+        direction: ltr !important;
+        min-width: 1060px;
+        thead th {
+            background: #eaf0f5 !important; color: #0d2c43 !important;
+            padding: 14px 12px !important; white-space: normal !important;
+            text-align: center !important; border-bottom: 2px solid #c4b694 !important;
+        }
+        tbody tr.o_data_row td {
+            vertical-align: middle !important; color: #43566a !important;
+            text-align: center !important; line-height: 1.7;
+        }
+        tbody tr.o_data_row:nth-child(even) td { background: #f8fafc; }
+        tbody tr.o_data_row:hover td { background: #eef3f7 !important; }
+        th[data-name="product_id"], td[name="product_id"] { min-width: 150px; text-align: right !important; }
+        td[name="product_id"] { font-size: 14px; font-weight: 700; color: #0d2c43 !important; }
+        th[data-name="route_label"], td[name="route_label"] { min-width: 140px; max-width: 180px; white-space: normal !important; }
+        td[name="route_label"] .o_field_widget { white-space: normal !important; font-size: 12px; }
+        td[name="furniture_model_id"] .o_field_widget { background: #edf1f5; border-radius: 7px; padding: 4px 9px; color: #0d2c43; }
+        th[data-name="dimension_label"], td[name="dimension_label"] { min-width: 155px; }
+        td[name="dimension_label"] { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        td[name="quantity"], td[name="available_qty"], td[name="shortage_qty"] {
+            font-weight: 700; font-variant-numeric: tabular-nums;
+            .o_field_widget { display: inline-block; min-width: 34px; padding: 4px 8px; border-radius: 7px; background: #edf1f5; }
+            input { text-align: center !important; }
+        }
+        td[name="available_qty"] .o_field_widget { background: #edf5f2; color: #32675c; }
+        tr.text-danger td[name="shortage_qty"] .o_field_widget { background: #fbefee; color: #994b49; }
+        td[name="configuration_error"] { min-width: 130px; max-width: 220px; white-space: normal !important; font-size: 12px; }
+    }
+}
+.o_mapilla_delivery_form {
+    .o_delivery_order_models { display: flex; align-items: center; gap: 14px; padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e3e8ee; }
+    .o_delivery_order_models .o_field_widget { margin-bottom: 0; }
+    .o_delivery_request_lines td[name="fabric_summary"], .o_delivery_request_lines td[name="takawe_summary"] { min-width: 200px; max-width: 270px; text-align: right !important; }
+    .o_delivery_material_summary { direction: rtl; white-space: normal; }
+    .o_delivery_material_item { border: 1px solid #e3e8ee; background: #f7f9fb; border-radius: 8px; padding: 8px 10px; margin: 4px 0; }
+    .o_delivery_material_item strong { display: block; color: #0d2c43; font-size: 13px; white-space: normal; }
+    .o_delivery_material_meta { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+    .o_delivery_material_meta span { background: white; border: 1px solid #e1e6eb; border-radius: 5px; padding: 1px 6px; font-size: 12px; }
+    .o_delivery_material_empty { color: #8b95a2; font-size: 12px; }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form {
+    .o_delivery_request_products_heading { padding: 12px 16px; }
+    .o_delivery_order_models { padding: 8px 16px; }
+    .o_delivery_request_lines table.o_list_table {
+        tbody tr.o_data_row td { height: auto; padding: 9px 10px !important; }
+        td[name="fabric_summary"], td[name="takawe_summary"] { min-width: 180px; }
+        th[data-name="dimension_label"], td[name="dimension_label"] { min-width: 170px; width: 170px; }
+        td[name="dimension_label"] .o_field_widget { overflow: visible !important; max-width: none !important; }
+        td[name="dimension_label"] .badge { white-space: nowrap; font-size: 11px; }
+    }
+    .o_delivery_material_item {
+        background: transparent; border: 0; border-radius: 0;
+        padding: 3px 0; margin: 0; text-align: right;
+        + .o_delivery_material_item { border-top: 1px solid #e8edf2; margin-top: 4px; padding-top: 6px; }
+        strong { font-size: 12px; font-weight: 600; line-height: 1.5; }
+    }
+    .o_delivery_material_meta {
+        gap: 4px 8px; margin-top: 3px; align-items: center;
+        span { border: 0; background: transparent; padding: 0; font-size: 11px; color: #6b7887; white-space: nowrap; }
+        span + span { border-inline-start: 1px solid #d8e0e8; padding-inline-start: 8px; }
+    }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_material_item {
+    display: inline-block;
+    min-width: 130px;
+    max-width: 100%;
+    background: #f7f9fc;
+    border: 1px solid #dfe6ee;
+    border-radius: 7px;
+    padding: 5px 8px;
+    margin: 2px 0;
+    + .o_delivery_material_item { margin-top: 4px; padding-top: 5px; }
+}
+
+.o_form_view.o_mapilla_delivery_form .o_delivery_order_models {
+    > strong { font-size: 14px; }
+    .o_tag {
+        font-size: 15px !important;
+        font-weight: 700;
+        line-height: 1.5;
+        padding: 5px 12px !important;
+        height: auto !important;
+        background: #e9eff5 !important;
+        color: #0d2c43 !important;
+        border: 1px solid #d4dfe9;
+        border-radius: 8px;
+        .o_tag_badge_text { font-size: inherit !important; color: inherit !important; max-width: none; }
+    }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form {
+    .o_delivery_request_lines {
+        .o_list_renderer, table.o_list_table { direction: rtl !important; }
+    }
+    .o_delivery_order_models {
+        .o_field_many2many_tags, .o_field_tags { height: auto !important; overflow: visible !important; }
+        .o_tag {
+            font-size: 17px !important;
+            height: auto !important; min-height: 38px;
+            padding: 6px 14px !important;
+            line-height: 1.6 !important;
+            overflow: visible !important;
+            align-items: center;
+            .o_tag_badge_text {
+                display: inline-block;
+                height: auto !important; max-height: none !important;
+                line-height: 1.6 !important;
+                overflow: visible !important;
+                white-space: normal !important;
+                padding-block: 2px;
+            }
+        }
+    }
+}
+.o_mapilla_delivery_form .o_delivery_request_lines td[name="dimension_label"] .badge {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.o_mapilla_delivery_form .o_delivery_cushion_rows {
+    td { padding: 18px 22px !important; background: #f6f8fb; border-top: 2px solid #c6b58d; }
+    .o_delivery_cushion_group { display: flex; align-items: center; gap: 24px; white-space: normal; }
+    .o_delivery_cushion_title { min-width: 110px; display: grid; gap: 4px; color: #102f45; font-size: 17px; }
+    .o_delivery_cushion_title small { font-size: 13px; color: #728698; }
+    .o_delivery_cushion_names { display: flex; flex-wrap: wrap; gap: 10px; }
+    .o_delivery_cushion_names span { padding: 10px 16px; background: #fff; border: 1px solid #dbe4ef; border-radius: 10px; color: #34566e; font-weight: 700; }
+}
+
+/* Keep the simplified order summary comfortably readable. */
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form {
+    .o_delivery_request_products_heading { padding: 16px 20px; }
+    .o_delivery_request_products_heading_copy strong { font-size: 19px; }
+    .o_delivery_order_models { padding: 11px 20px; font-size: 15px; }
+    .o_delivery_request_lines table.o_list_table {
+        thead th { padding: 13px 16px !important; font-size: 14px; }
+        tbody tr.o_data_row td { height: 70px; padding: 12px 16px !important; }
+        td[name="product_id"], td[name="product_id"] .o_field_widget { font-size: 16px; font-weight: 700; }
+        td[name="quantity"] .o_field_widget { min-width: 38px; padding: 5px 9px; font-size: 16px; border-radius: 12px; }
+        td[name="fabric_summary"] { min-width: 260px; max-width: 440px; }
+        td[name="configuration_error"] { font-size: 15px; }
+    }
+    .o_delivery_material_summary { width: 100%; }
+    .o_delivery_material_item {
+        display: block; width: 100%; min-width: 0; margin: 0;
+        padding: 9px 13px; border-radius: 12px;
+        background: #f0f5fa; border: 1px solid #dce6ef;
+        box-shadow: 0 2px 4px rgba(16,47,69,.025);
+        strong { font-size: 15px; font-weight: 600; line-height: 1.6; }
+        + .o_delivery_material_item { margin-top: 8px; padding: 9px 13px; }
+    }
+    .o_delivery_material_empty { font-size: 16px; }
+    .o_delivery_cushion_rows {
+        td { padding: 17px 20px !important; background: #f0f4f7; }
+        .o_delivery_cushion_group { gap: 18px; min-height: 46px; }
+        .o_delivery_cushion_title { min-width: 110px; font-size: 17px; padding-inline-end: 22px; border-inline-end: 3px solid #b69a60; }
+        .o_delivery_cushion_names { flex: 1; gap: 12px; }
+        .o_delivery_cushion_names span { flex: 1 1 180px; padding: 10px 14px; font-size: 15px; line-height: 1.6; border-radius: 12px; text-align: center; background: #fff; }
+    }
+}
+@media (max-width: 767px) {
+    .o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_group { flex-direction: column; align-items: stretch; }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_request_lines {
+    min-width: 0;
+    width: 100%;
+    table.o_list_table {
+        width: 100% !important;
+        min-width: 0 !important;
+        table-layout: fixed;
+        th, td { min-width: 0 !important; max-width: none !important; white-space: normal !important; overflow-wrap: anywhere; }
+        th { width: auto !important; }
+        th[data-name="sequence"], th.o_list_actions_header, th.o_list_record_selector { width: 36px !important; padding-inline: 4px !important; }
+        th[data-name="product_id"] { width: 25% !important; }
+        th[data-name="quantity"] { width: 12% !important; }
+        th[data-name="fabric_summary"] { width: 38% !important; }
+        td .o_field_widget { max-width: 100%; min-width: 0; }
+        td[name="product_id"] .o_field_widget, td[name="product_id"] .o_field_widget span { white-space: normal !important; }
+        .o_delivery_material_item { min-width: 0; box-sizing: border-box; }
+    }
+    .o_delivery_cushion_group, .o_delivery_cushion_names { min-width: 0; }
+    .o_delivery_cushion_names span { min-width: 0; overflow-wrap: anywhere; }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_rows {
+    .o_delivery_cushion_names { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .o_delivery_cushion_card { min-width: 0; padding: 13px 16px; background: #fff; border: 1px solid #dce5ed; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; text-align: right; }
+    .o_delivery_cushion_name { font-size: 15px; line-height: 1.6; color: #183b53; overflow-wrap: anywhere; }
+    .o_delivery_cushion_specs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+    .o_delivery_cushion_specs span { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 9px; min-width: 0; padding: 4px 9px; font-size: 14px; line-height: 1.5; white-space: nowrap; background: #f1f5f8; border: 0; border-radius: 6px; }
+    .o_delivery_cushion_specs small { font-size: 12px; font-weight: 400; color: #70838f; }
+    .o_delivery_cushion_specs bdi { font-weight: 700; color: #16384e; }
+    .o_delivery_note_delete {
+        flex: 0 0 auto; width: 34px; height: 34px; padding: 0;
+        border: 1px solid #ead8d6; border-radius: 8px;
+        background: #fff7f6; color: #a64e49;
+        &:hover, &:focus-visible { background: #f8e5e3; color: #8e3935; border-color: #dcb9b5; }
+    }
+}
+@media (max-width: 767px) {
+    .o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_rows .o_delivery_cushion_names { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+    .o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_rows .o_delivery_cushion_names { grid-template-columns: minmax(0, 1fr); }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_rows {
+    .o_delivery_cushion_card { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; }
+    .o_delivery_cushion_name { flex: 1 1 100px; font-size: 14px; }
+    .o_delivery_cushion_specs { flex: 0 0 auto; flex-wrap: nowrap; gap: 5px; margin-top: 0; }
+    .o_delivery_cushion_specs span { padding: 3px 7px; font-size: 13px; }
+}
+
+.o_form_view.o_furniture_delivery_request_form.o_mapilla_delivery_form .o_delivery_cushion_rows {
+    .o_delivery_cushion_card { flex-wrap: nowrap; gap: 7px; }
+    .o_delivery_cushion_name { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .o_delivery_cushion_specs span { gap: 4px; white-space: nowrap; }
+}

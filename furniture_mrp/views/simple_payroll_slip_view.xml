@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_simple_payroll_slip_list_furniture" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.list.furniture</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_list"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="js_class">furniture_payroll_period_list</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="replace"/>
+            <xpath expr="//field[@name='employee_advance_total_amount']"
+                   position="attributes">
+                <attribute name="string">إجمالي السلف</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_advance_paid_amount']"
+                   position="attributes">
+                <attribute name="string">المسدد</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='outstanding_advance_balance']"
+                   position="attributes">
+                <attribute name="string">الباقي</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_from']" position="replace"/>
+            <xpath expr="//field[@name='date_to']" position="replace"/>
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="furniture_pay_basis" optional="show"/>
+                <field name="furniture_completed_piece_qty"
+                       optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='base_wage']" position="attributes">
+                <attribute name="string">أجر الفترة</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='contract_allowances']" position="attributes">
+                <attribute name="string">بدلات الفترة</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='attendance_hours']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='attendance_deduction']" position="attributes">
+                <attribute name="string">إجمالي الخصومات</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='net_salary']" position="attributes">
+                <attribute name="string">صافي المستحق</attribute>
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='commission_amount']" position="attributes">
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='factory_other_deduction_amount']" position="attributes">
+                <attribute name="widget">furniture_payroll_rounded_monetary</attribute>
+                <attribute name="digits">[16, 0]</attribute>
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='factory_net_after_due_advance']"
+                   position="replace"/>
+            <xpath expr="//field[@name='factory_overtime_hours']" position="after">
+                <field name="furniture_overtime_multiplier"
+                       string="معامل الإضافي" optional="hide"/>
+                <field name="furniture_regular_hour_rate"
+                       string="سعر الساعة" widget="furniture_payroll_rounded_monetary"
+                       digits="[16, 0]" optional="hide"/>
+                <field name="furniture_overtime_amount"
+                       string="قيمة الإضافي" widget="furniture_payroll_rounded_monetary"
+                       digits="[16, 0]" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_form_furniture" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.form.furniture</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="class" add="o_furniture_payroll_form" separator=" "/>
+            </xpath>
+            <xpath expr="//header/button[@type='action'][1]" position="attributes">
+                <attribute name="string">طباعة PDF</attribute>
+                <attribute name="invisible">False</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_recompute_factory_payroll']"
+                   position="replace"/>
+            <xpath expr="//header/button[@name='action_confirm']" position="before">
+                <button name="action_recalculate_furniture_payroll"
+                        type="object" string="إعادة الحساب"
+                        icon="fa-refresh" class="btn-secondary"
+                        invisible="state != 'draft'"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_confirm']" position="attributes">
+                <attribute name="string">اعتماد الكشف</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_paid']" position="attributes">
+                <attribute name="string">تم الدفع</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_reset_to_draft']" position="attributes">
+                <attribute name="string">إرجاع لمسودة</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_cancel']" position="attributes">
+                <attribute name="string">إلغاء</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="string">العامل</attribute>
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='contract_id']" position="attributes">
+                <attribute name="string">العقد المستخدم</attribute>
+            </xpath>
+            <xpath expr="//field[@name='contract_id']" position="after">
+                <field name="furniture_pay_basis" widget="radio"/>
+                <field name="furniture_piece_rate"
+                       invisible="furniture_pay_basis != 'production'"/>
+                <field name="furniture_completed_piece_qty"
+                       invisible="furniture_pay_basis != 'production'"/>
+                <field name="furniture_piece_earning"
+                       invisible="furniture_pay_basis != 'production'"/>
+            </xpath>
+            <xpath expr="//field[@name='date_from']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_to']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="string">الشركة</attribute>
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//div[@name='advance_button_box']" position="replace">
+                <div class="oe_button_box" name="advance_button_box">
+                    <button class="oe_stat_button" type="object"
+                            name="action_view_employee_advances" icon="fa-money"
+                            invisible="employee_advance_count == 0">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value"><field name="outstanding_advance_balance"/></span>
+                            <span class="o_stat_text">رصيد السلفة</span>
+                        </div>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//sheet/group//field[@name='outstanding_advance_balance']"
+                   position="replace"/>
+            <xpath expr="//sheet/group//field[@name='due_advance_installments']"
+                   position="replace"/>
+
+            <xpath expr="//div[hasclass('mt-4', 'mb-4')][.//field[@name='expected_working_days']]"
+                   position="replace">
+                <div class="mt-4 mb-4 o_furniture_payroll_attendance">
+                    <h2 class="payroll-section-title">الحضور والخصومات</h2>
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <div class="o_furniture_payroll_info_card is-schedule">
+                                <h5>جدول العمل</h5>
+                                <group>
+                                    <field name="expected_working_days" string="أيام العمل المطلوبة"/>
+                                    <field name="hours_per_day" string="ساعات العمل اليومية"/>
+                                    <field name="expected_hours" string="الساعات المطلوبة" readonly="1"/>
+                                </group>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="o_furniture_payroll_info_card is-attendance">
+                                <h5>الحضور الفعلي</h5>
+                                <group>
+                                    <field name="attendance_hours" string="ساعات الحضور" readonly="1"/>
+                                    <field name="factory_biometric_attendance_count" string="حركات البصمة" readonly="1"/>
+                                    <field name="absence_days" string="أيام الغياب" readonly="1"/>
+                                    <field name="furniture_actual_late_hours" string="التأخير الفعلي" readonly="1"/>
+                                    <field name="delay_hours" string="التأخير المخصوم" readonly="1"/>
+                                    <field name="factory_overtime_hours" string="ساعات العمل الإضافي" readonly="1"/>
+                                    <field name="attendance_deduction" string="خصم الغياب والتأخير" readonly="1" widget="monetary"/>
+                                    <field name="factory_other_deduction_amount" string="خصومات أخرى" widget="monetary" readonly="state != 'draft'"/>
+                                </group>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//div[hasclass('mt-5')][.//field[@name='base_wage']]"
+                   position="replace">
+                <div class="mt-4 o_furniture_payroll_summary">
+                    <h2 class="payroll-section-title">تفاصيل الاستحقاق</h2>
+                    <div class="row g-3 o_furniture_payroll_summary_row">
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-wage">
+                                <h5>أجر الفترة</h5>
+                                <field name="base_wage" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details"
+                                     invisible="furniture_pay_basis != 'production'">
+                                    <span>القطع: <field name="furniture_completed_piece_qty" readonly="1"/></span>
+                                    <span>سعر القطعة: <field name="furniture_piece_rate" readonly="1" widget="monetary"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-allowance">
+                                <h5>بدلات الفترة</h5>
+                                <field name="contract_allowances" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details">
+                                    <span>أكل: <field name="furniture_food_allowance_period" readonly="1" widget="monetary"/></span>
+                                    <span>مواصلات: <field name="furniture_transport_allowance_period" readonly="1" widget="monetary"/></span>
+                                    <span>أساسي: <field name="furniture_basic_allowance_period" readonly="1" widget="monetary"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-bonus">
+                                <h5>حوافز</h5>
+                                <field name="factory_bonus_amount" widget="monetary"
+                                       readonly="state != 'draft'"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details">
+                                    تسجل على كشف الأسبوع عند وجودها.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-overtime">
+                                <h5>العمل الإضافي</h5>
+                                <field name="furniture_overtime_amount" readonly="1"
+                                       widget="monetary"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details">
+                                    <span><field name="factory_overtime_hours" readonly="1"/> ساعة</span>
+                                    <span>× <field name="furniture_overtime_multiplier" readonly="1"/></span>
+                                    <span>سعر الساعة: <field name="furniture_regular_hour_rate" readonly="1" widget="monetary"/></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-net">
+                                <h5>صافي المستحق</h5>
+                                <field name="net_salary" readonly="1" widget="monetary"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details">
+                                    بعد البدلات والحوافز والإضافي والخصومات.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl col-md-6">
+                            <div class="o_furniture_payroll_summary_card is-advance">
+                                <h5>السلف — متابعة فقط</h5>
+                                <field name="outstanding_advance_balance" readonly="1"
+                                       widget="monetary"
+                                       options="{'currency_field': 'company_currency_id'}"/>
+                                <div class="o_furniture_payroll_card_details">
+                                    <span>إجمالي السلف: <field name="employee_advance_total_amount" readonly="1" widget="monetary"/></span>
+                                    <span>المسدد: <field name="employee_advance_paid_amount" readonly="1" widget="monetary"/></span>
+                                    <span>الباقي: <field name="outstanding_advance_balance" readonly="1" widget="monetary"/></span>
+                                    <span>السداد يُسجل يدويًا من شاشة السلفة.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//div[hasclass('alert')][.//field[@name='factory_last_calculated_at']]"
+                   position="replace"/>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_report_list_furniture" model="ir.ui.view">
+        <field name="name">simple.payroll.report.list.furniture</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="arch" type="xml">
+            <list string="تقرير الرواتب التفصيلي"
+                  js_class="furniture_payroll_period_list"
+                  class="o_furniture_payroll_report_list"
+                  create="0" edit="0" delete="0"
+                  export_xlsx="1"
+                  default_order="date_from desc"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'confirmed'"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'cancel'">
+                <field name="company_currency_id" column_invisible="1"/>
+                <field name="employee_id" string="العامل" optional="show"/>
+                <field name="furniture_department_id" string="القسم" optional="show"/>
+                <field name="furniture_pay_basis" string="طريقة الأجر" optional="show"/>
+
+                <field name="base_wage" string="أجر الفترة" widget="furniture_payroll_rounded_monetary"
+                       digits="[16, 0]"
+                       optional="show" sum="إجمالي الأجور"
+                       class="o_furniture_payroll_earning_cell"/>
+                <field name="contract_allowances" string="بدلات الفترة" widget="furniture_payroll_rounded_monetary"
+                       digits="[16, 0]"
+                       optional="show" sum="إجمالي البدلات"
+                       class="o_furniture_payroll_earning_cell"/>
+                <field name="factory_bonus_amount" string="حوافز" widget="furniture_payroll_rounded_monetary"
+                       digits="[16, 0]"
+                       optional="show" sum="إجمالي الحوافز"
+                       class="o_furniture_payroll_earning_cell"/>
+                <field name="factory_overtime_hours" string="ساعات إضافية"
+                       optional="show" sum="إجمالي ساعات الإضافي"/>
+                <field name="furniture_overtime_multiplier" string="معامل الإضافي"
+                       optional="show"/>
+                <field name="furniture_regular_hour_rate" string="سعر الساعة العادية"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="hide"/>
+                <field name="furniture_overtime_hour_rate" string="سعر ساعة الإضافي"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="hide"/>
+                <field name="furniture_overtime_amount" string="قيمة الإضافي"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي قيمة الإضافي"
+                       class="o_furniture_payroll_earning_cell"/>
+                <field name="furniture_total_earnings" string="إجمالي الاستحقاقات"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي الاستحقاقات"
+                       class="o_furniture_payroll_earning_total"/>
+
+                <field name="absence_days" string="أيام الغياب"
+                       optional="show" sum="إجمالي أيام الغياب"/>
+                <field name="absence_deduction" string="خصم الغياب"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي خصم الغياب"
+                       class="o_furniture_payroll_deduction_cell"/>
+                <field name="furniture_actual_late_hours" string="ساعات التأخير"
+                       optional="show" sum="إجمالي ساعات التأخير"/>
+                <field name="delay_deduction" string="خصم التأخير"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي خصم التأخير"
+                       class="o_furniture_payroll_deduction_cell"/>
+                <field name="factory_other_deduction_amount" string="خصومات أخرى"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي الخصومات الأخرى"
+                       class="o_furniture_payroll_deduction_cell"/>
+                <field name="furniture_total_deductions" string="إجمالي الخصومات"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي كل الخصومات"
+                       class="o_furniture_payroll_deduction_total"/>
+                <field name="employee_advance_total_amount" string="إجمالي السلف"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show"
+                       class="o_furniture_payroll_advance_cell"/>
+                <field name="employee_advance_paid_amount" string="المسدد"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show"
+                       class="o_furniture_payroll_advance_cell"/>
+                <field name="outstanding_advance_balance" string="الباقي"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show"
+                       class="o_furniture_payroll_advance_cell"/>
+                <field name="net_salary" string="صافي المستحق"
+                       widget="furniture_payroll_rounded_monetary" digits="[16, 0]"
+                       optional="show" sum="إجمالي صافي المستحق"
+                       class="o_furniture_payroll_net_cell"/>
+                <field name="state" string="الحالة" widget="badge" optional="show"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-success="state == 'paid'"
+                       decoration-muted="state == 'cancel'"/>
+
+            </list>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_report_search_furniture" model="ir.ui.view">
+        <field name="name">simple.payroll.report.search.furniture</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="arch" type="xml">
+            <search string="بحث تقرير الرواتب">
+                <field name="name" string="مرجع الكشف"/>
+                <field name="employee_id" string="العامل"/>
+                <field name="furniture_department_id" string="القسم"/>
+                <field name="contract_id" string="العقد"/>
+                <field name="furniture_pay_basis" string="طريقة الأجر"/>
+                <field name="state" string="الحالة"/>
+                <filter string="الفترة" name="filter_period" date="date_from"/>
+                <separator/>
+                <filter string="مسودة" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="معتمد" name="filter_confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter string="مدفوع" name="filter_paid"
+                        domain="[('state', '=', 'paid')]"/>
+                <filter string="ملغي" name="filter_cancelled"
+                        domain="[('state', '=', 'cancel')]"/>
+                <filter string="غير الملغي" name="filter_not_cancelled"
+                        domain="[('state', '!=', 'cancel')]"/>
+                <filter string="به عمل إضافي" name="filter_with_overtime"
+                        domain="[('factory_overtime_hours', '&gt;', 0)]"/>
+                <group expand="0" string="تجميع حسب">
+                    <filter string="العامل" name="group_employee"
+                            context="{'group_by': 'employee_id'}"/>
+                    <filter string="القسم" name="group_department"
+                            context="{'group_by': 'furniture_department_id'}"/>
+                    <filter string="طريقة الأجر" name="group_pay_basis"
+                            context="{'group_by': 'furniture_pay_basis'}"/>
+                    <filter string="الحالة" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="الأسبوع" name="group_week"
+                            context="{'group_by': 'date_from:week'}"/>
+                    <filter string="الشهر" name="group_month"
+                            context="{'group_by': 'date_from:month'}"/>
+                    <filter string="الشركة" name="group_company"
+                            context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_pivot_furniture_overtime"
+            model="ir.ui.view">
+        <field name="name">simple.payroll.slip.pivot.furniture.overtime</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id"
+               ref="simple_payroll_salary-2.view_simple_payroll_slip_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='commission_amount']" position="after">
+                <field name="factory_overtime_hours" type="measure"/>
+                <field name="furniture_overtime_amount" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_graph_furniture_overtime"
+            model="ir.ui.view">
+        <field name="name">simple.payroll.slip.graph.furniture.overtime</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id"
+               ref="simple_payroll_salary-2.view_simple_payroll_slip_graph"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='net_salary']" position="after">
+                <field name="furniture_overtime_amount" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="simple_payroll_salary-2.action_simple_payroll_reports"
+            model="ir.actions.act_window">
+        <field name="name">تقرير الرواتب التفصيلي</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="mobile_view_mode">list</field>
+        <field name="view_id" ref="furniture_mrp.view_simple_payroll_report_list_furniture"/>
+        <field name="search_view_id" ref="furniture_mrp.view_simple_payroll_report_search_furniture"/>
+        <field name="limit">200</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">لا توجد كشوف أجر في الفترة المختارة.</p>
+            <p>أنشئ كشوف الأجر أولًا لتظهر بيانات العمال والاستحقاقات والخصومات هنا.</p>
+        </field>
+    </record>
+
+    <record id="simple_payroll_salary-2.action_simple_payroll_slip" model="ir.actions.act_window">
+        <field name="name">Payroll - كشوف الأجور</field>
+    </record>
+</odoo>

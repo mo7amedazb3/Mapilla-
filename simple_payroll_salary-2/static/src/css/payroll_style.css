@@ -1,0 +1,123 @@
+.payroll-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 15px;
+    border: none;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.payroll-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    border-radius: 15px 15px 0 0;
+    z-index: 2;
+}
+
+.payroll-card.base-wage::before { background: #3498db; }
+.payroll-card.allowances::before { background: #9b59b6; }
+.payroll-card.commission::before { background: #f39c12; }
+.payroll-card.net-salary { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; }
+.payroll-card.net-salary::before { background: #22c55e; }
+
+.payroll-card.hover-animate:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+.payroll-header-title {
+    background: linear-gradient(90deg, #2c3e50, #3498db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    font-size: 2.2rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.payroll-section-title {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    border-bottom: 2px dashed #ecf0f1;
+    padding-bottom: 10px;
+    animation: fadeIn 1s ease-out;
+    font-weight: bold;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.payroll-stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.payroll-stat-value.net {
+    font-size: 2.2rem;
+    color: #15803d;
+}
+
+/* Custom Ribbon Styling */
+.o_form_view .ribbon .text-bg-success {
+    background: linear-gradient(135deg, #00b09b, #96c93d) !important;
+    box-shadow: 0 4px 10px rgba(0, 176, 155, 0.4) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px;
+}
+
+.o_form_view .ribbon .text-bg-info {
+    background: linear-gradient(135deg, #2193b0, #6dd5ed) !important;
+    box-shadow: 0 4px 10px rgba(33, 147, 176, 0.4) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px;
+}
+
+/* Custom Header Buttons Styling */
+.o_form_view .o_form_statusbar button.btn-primary {
+    background: linear-gradient(135deg, #005A9C, #3498db) !important;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(0, 90, 156, 0.3) !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.o_form_view .o_form_statusbar button.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 90, 156, 0.4) !important;
+}
+
+.o_form_view .o_form_statusbar button.btn-success {
+    background: linear-gradient(135deg, #00A859, #27ae60) !important;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(39, 174, 96, 0.3) !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.o_form_view .o_form_statusbar button.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(39, 174, 96, 0.4) !important;
+}

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_attendance_dashboard.FactoryAttendanceDashboard">
+        <div class="o_factory_attendance_dashboard" dir="rtl">
+            <header class="o_factory_attendance_hero">
+                <div class="o_factory_attendance_brand">
+                    <img src="/factory_attendance_dashboard/static/src/img/factory-mark.svg"
+                         alt="Factory"/>
+                    <div>
+                        <span>HUMAN RESOURCES</span>
+                        <h1>لوحة الحضور اليومية</h1>
+                        <p>متابعة عمال المصنع ومواعيد الحضور والانصراف من جهاز البصمة.</p>
+                    </div>
+                </div>
+                <ArabicAttendanceDatePicker value="state.selectedDate" today="state.data.today"
+                    serverTime="state.data.server_time" onChange.bind="onCalendarDateChanged"/>
+            </header>
+
+            <main class="o_factory_attendance_body">
+                <section class="o_factory_attendance_filters" aria-label="فلاتر الحضور">
+                    <div class="o_factory_filter_group">
+                        <label for="factory_attendance_department">
+                            <i class="fa fa-sitemap"/> القسم
+                        </label>
+                        <select id="factory_attendance_department"
+                                class="form-select"
+                                t-on-change="onDepartmentChange">
+                            <option value="" t-att-selected="!state.selectedDepartmentId">كل الأقسام</option>
+                            <option t-foreach="state.data.departments"
+                                    t-as="department"
+                                    t-key="department.id"
+                                    t-att-value="department.id"
+                                    t-att-selected="department.id === state.selectedDepartmentId"
+                                    t-esc="department.name"/>
+                        </select>
+                    </div>
+                    <div class="o_factory_filter_group">
+                        <span class="o_factory_pay_label">طريقة حساب الأجر</span>
+                        <div class="o_factory_pay_switch" role="group" aria-label="طريقة حساب الأجر">
+                            <button type="button" t-att-class="state.selectedPayBasis === 'time' ? 'active' : ''"
+                                aria-label="بالوقت" t-att-aria-pressed="state.selectedPayBasis === 'time' ? 'true' : 'false'" t-att-disabled="state.refreshing"
+                                t-on-click="() => this.selectPayBasis('time')"><i class="fa fa-clock-o"/> بالوقت</button>
+                            <button type="button" t-att-class="state.selectedPayBasis === 'production' ? 'active' : ''"
+                                aria-label="بالإنتاج" t-att-aria-pressed="state.selectedPayBasis === 'production' ? 'true' : 'false'" t-att-disabled="state.refreshing"
+                                t-on-click="() => this.selectPayBasis('production')"><i class="fa fa-industry"/> بالإنتاج</button>
+                        </div>
+                    </div>
+                    <button class="btn o_factory_refresh_button"
+                            t-att-disabled="state.refreshing"
+                            t-on-click="refresh">
+                        <i t-att-class="state.refreshing ? 'fa fa-refresh fa-spin' : 'fa fa-refresh'"/>
+                        تحديث
+                    </button>
+                </section>
+
+                <div t-if="state.data.can_configure_absence_allowance" class="o_factory_allowance_setting">
+                    <button type="button" role="switch" aria-label="سماح 4 أيام غياب كل ربع سنة"
+                        t-att-aria-checked="state.data.quarter_absence_enabled ? 'true' : 'false'"
+                        t-att-disabled="state.savingAllowance || state.refreshing" t-on-click="toggleQuarterAllowance">
+                        <i t-att-class="state.savingAllowance ? 'fa fa-spinner fa-spin' : state.data.quarter_absence_enabled ? 'fa fa-toggle-on' : 'fa fa-toggle-off'"/>
+                        سماح 4 أيام غياب كل ربع سنة:
+                        <strong t-esc="state.data.quarter_absence_enabled ? 'مفعّل' : 'غير مفعّل'"/>
+                    </button>
+                </div>
+                <section class="o_factory_attendance_stats" aria-label="ملخص الحضور">
+                    <button t-att-class="state.selectedStatus === 'all' ? 'o_factory_stat active all' : 'o_factory_stat all'"
+                            t-on-click="() => this.selectStatus('all')">
+                        <span class="o_stat_icon"><i class="fa fa-users"/></span>
+                        <span><small>إجمالي العمال</small><strong t-esc="state.data.counts.all || 0"/></span>
+                    </button>
+                    <button t-att-class="state.selectedStatus === 'at_work' ? 'o_factory_stat active at-work' : 'o_factory_stat at-work'"
+                            t-on-click="() => this.selectStatus('at_work')">
+                        <span class="o_stat_icon"><i class="fa fa-check-circle"/></span>
+                        <span><small>حاضر</small><strong t-esc="state.data.counts.at_work || 0"/></span>
+                    </button>
+                    <button t-att-class="state.selectedStatus === 'absent' ? 'o_factory_stat active absent' : 'o_factory_stat absent'"
+                            t-on-click="() => this.selectStatus('absent')">
+                        <span class="o_stat_icon"><i class="fa fa-user-times"/></span>
+                        <span><small>غياب</small><strong t-esc="state.data.counts.absent || 0"/></span>
+                    </button>
+                    <button t-att-class="state.selectedStatus === 'late' ? 'o_factory_stat active late' : 'o_factory_stat late'"
+                            t-on-click="() => this.selectStatus('late')">
+                        <span class="o_stat_icon"><i class="fa fa-clock-o"/></span>
+                        <span><small>متأخرون</small><strong t-esc="state.data.counts.late || 0"/></span>
+                    </button>
+                    <button t-att-class="state.selectedStatus === 'overtime' ? 'o_factory_stat active overtime' : 'o_factory_stat overtime'"
+                            t-on-click="() => this.selectStatus('overtime')">
+                        <span class="o_stat_icon"><i class="fa fa-hourglass-half"/></span>
+                        <span><small>وقت إضافي</small><strong t-esc="state.data.counts.overtime || 0"/></span>
+                    </button>
+                </section>
+
+                <div t-if="state.error" class="alert alert-danger o_factory_attendance_error" role="alert">
+                    <i class="fa fa-exclamation-triangle"/> <t t-esc="state.error"/>
+                </div>
+
+                <section class="o_factory_attendance_table_card">
+                    <div class="o_factory_table_heading">
+                        <div>
+                            <span>DAILY ATTENDANCE</span>
+                            <h2>بيانات العمال</h2>
+                        </div>
+                        <strong><t t-esc="state.data.employees.length || 0"/> عامل</strong>
+                    </div>
+
+                    <div t-if="state.loading" class="o_factory_attendance_loading">
+                        <i class="fa fa-circle-o-notch fa-spin"/>
+                        <span>جاري تحميل بيانات الحضور…</span>
+                    </div>
+                    <div t-elif="state.data.employees.length" class="table-responsive">
+                        <table class="table o_factory_attendance_table">
+                            <colgroup>
+                                <col class="o_factory_col_employee"/>
+                                <col class="o_factory_col_pin"/>
+                                <col class="o_factory_col_schedule"/>
+                                <col class="o_factory_col_time"/>
+                                <col class="o_factory_col_time"/>
+                                <col class="o_factory_col_delay"/>
+                                <col class="o_factory_col_overtime"/>
+                                <col class="o_factory_col_source"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>العامل</th>
+                                    <th>PIN البصمة</th>
+                                    <th>وقت الدوام</th>
+                                    <th>الحضور</th>
+                                    <th>الانصراف</th>
+                                    <th>التأخير</th>
+                                    <th>الإضافي</th>
+                                    <th>المصدر</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="state.data.employees"
+                                    t-as="employee"
+                                    t-key="employee.id"
+                                    t-att-class="'state-' + employee.status">
+                                    <td>
+                                        <div class="o_factory_employee_cell">
+                                            <img t-att-src="'/web/image/hr.employee/' + employee.id + '/avatar_128'"
+                                                 t-att-alt="employee.name"/>
+                                            <button t-if="state.data.can_manage_manual_attendance and employee.manual_attendance_enabled"
+                                                    type="button"
+                                                    class="o_factory_employee_identity is-actionable"
+                                                    title="إدارة الحضور والانصراف"
+                                                    t-on-click="() => this.openManualAttendanceDialog(employee)">
+                                                <strong t-esc="employee.name"/>
+                                                <span t-esc="employee.department"/>
+                                            </button>
+                                            <div t-else="" class="o_factory_employee_identity">
+                                                <strong t-esc="employee.name"/>
+                                                <span t-esc="employee.department"/>
+                                            </div>
+                                            <span t-if="employee.status !== 'not_started'"
+                                                  t-att-class="'o_factory_status state-' + employee.status">
+                                                <t t-esc="statusLabel(employee.status)"/>
+                                                <small t-if="employee.status === 'leave' and employee.leave_type"
+                                                       t-esc="employee.leave_type"/>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="o_factory_mono" t-esc="employee.fingerprint_pin"/>
+                                    <td class="o_factory_time" t-esc="employee.work_schedule"/>
+                                    <td class="o_factory_time check-in" t-esc="employee.check_in"/>
+                                    <td class="o_factory_time check-out" t-esc="employee.check_out"/>
+                                    <td t-att-class="employee.late_minutes || employee.early_departure_minutes ? 'o_factory_delay has-value' : 'o_factory_delay'"
+                                        t-esc="employee.delay_label"/>
+                                    <td t-att-class="employee.overtime_minutes ? 'o_factory_overtime has-value' : 'o_factory_overtime'"
+                                        t-esc="employee.overtime_label"/>
+                                    <td>
+                                        <span t-att-class="'o_factory_source source-' + employee.source_code">
+                                            <i t-att-class="employee.source_code === 'biometric' ? 'fa fa-hand-pointer-o' : (employee.source_code === 'manual' ? 'fa fa-pencil' : 'fa fa-minus')"/>
+                                            <t t-esc="employee.source"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div t-else="" class="o_factory_attendance_empty">
+                        <span><i class="fa fa-search"/></span>
+                        <h3>لا توجد نتائج مطابقة</h3>
+                        <p>جرّب اختيار تاريخ أو قسم أو حالة مختلفة.</p>
+                    </div>
+                </section>
+            </main>
+
+            <div t-if="state.manualDialog.open"
+                 class="o_factory_dialog_backdrop"
+                 role="presentation">
+                <section class="o_factory_dialog" role="dialog" aria-modal="true">
+                    <header>
+                        <div>
+                            <span>MANUAL ATTENDANCE</span>
+                            <h3>إدارة الحضور والانصراف</h3>
+                            <p t-esc="state.manualDialog.employeeName"/>
+                        </div>
+                        <button type="button"
+                                aria-label="إغلاق"
+                                t-att-disabled="state.manualDialog.processing"
+                                t-on-click="closeManualDialog">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </header>
+                    <div class="o_factory_dialog_body">
+                        <div class="o_factory_manual_date_selector o_manual_field">
+                            <span>يوم الحضور</span>
+                            <ArabicAttendanceDatePicker compact="true" value="state.manualDialog.selectedDate"
+                                today="state.manualDialog.today" serverTime="''"
+                                disabled="state.manualDialog.loading || state.manualDialog.processing" onChange.bind="onManualDateChange"/>
+                        </div>
+                        <div t-if="state.manualDialog.loading" class="o_factory_manual_loading">
+                            <i class="fa fa-circle-o-notch fa-spin"/> جاري التحميل…
+                        </div>
+                        <t t-else="">
+                            <label t-if="state.manualDialog.records.length" class="o_factory_manual_record_selector">
+                                <span>سجل الحضور</span>
+                                <select t-att-disabled="state.manualDialog.processing"
+                                        t-on-change="onManualRecordChange">
+                                    <option value="" t-att-selected="!state.manualDialog.attendanceId">إنشاء سجل جديد</option>
+                                    <option t-foreach="state.manualDialog.records"
+                                            t-as="record"
+                                            t-key="record.id"
+                                            t-att-value="record.id"
+                                            t-att-selected="record.id === state.manualDialog.attendanceId"
+                                            t-esc="record.label"/>
+                                </select>
+                            </label>
+                            <p t-else="" class="o_factory_manual_empty_hint">
+                                <i class="fa fa-info-circle"/> لا يوجد سجل في هذا اليوم؛ سيتم إنشاء سجل جديد.
+                            </p>
+                            <div class="o_factory_manual_datetime_grid">
+                                <ManualAttendanceDateTime caption="'وقت الحضور'" value="state.manualDialog.checkIn"
+                                    defaultDate="state.manualDialog.selectedDate"
+                                    disabled="state.manualDialog.processing" onChange.bind="onManualCheckInInput"/>
+                                <ManualAttendanceDateTime caption="'وقت الانصراف'" value="state.manualDialog.checkOut"
+                                    defaultDate="state.manualDialog.selectedDate" optional="true"
+                                    disabled="state.manualDialog.processing" onChange.bind="onManualCheckOutInput"/>
+                            </div>
+                            <div t-if="state.manualDialog.selectedIsStale" class="o_factory_stale_warning">
+                                <i class="fa fa-exclamation-triangle"/>
+                                <div>
+                                    <strong>هذا سجل قديم ما زال مفتوحًا</strong>
+                                    <p>راجع موعد الحضور وأدخل موعد الانصراف الصحيح.</p>
+                                </div>
+                            </div>
+                        </t>
+                        <div t-if="state.manualDialog.error"
+                             class="alert alert-danger"
+                             role="alert"
+                             t-esc="state.manualDialog.error"/>
+                    </div>
+                    <footer>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                t-att-disabled="state.manualDialog.processing"
+                                t-on-click="closeManualDialog">إلغاء</button>
+                        <button type="button"
+                                class="btn o_factory_dialog_confirm"
+                                t-att-disabled="state.manualDialog.loading or state.manualDialog.processing"
+                                t-on-click="saveManualAttendance">
+                            <i t-att-class="state.manualDialog.processing ? 'fa fa-circle-o-notch fa-spin' : 'fa fa-save'"/>
+                            حفظ المواعيد
+                        </button>
+                    </footer>
+                </section>
+            </div>
+        </div>
+    </t>
+    <t t-name="factory_attendance_dashboard.ArabicAttendanceDatePicker">
+                <div t-att-class="'o_factory_attendance_clock' + (props.compact ? ' is-compact' : '')" t-ref="dateCard"
+                     role="button"
+                     t-att-tabindex="props.disabled ? -1 : 0"
+                     t-att-aria-disabled="props.disabled ? 'true' : 'false'"
+                     aria-haspopup="dialog"
+                     t-att-aria-expanded="state.calendar.open ? 'true' : 'false'"
+                     t-on-click="openDatePicker"
+                     t-on-keydown="onDateCardKeydown">
+                    <span t-if="!props.compact" class="o_factory_date_caption"><i class="fa fa-calendar"/> تاريخ الحضور</span>
+                    <div class="o_factory_date_value">
+                        <strong t-esc="selectedDateLongLabel"/>
+                        <i class="fa fa-angle-down"/>
+                    </div>
+                    <small t-if="!props.compact">آخر تحديث <t t-esc="props.serverTime || '--:--'"/></small>
+
+                    <section t-if="state.calendar.open"
+                             class="o_factory_arabic_calendar"
+                             role="dialog"
+                             aria-modal="false"
+                             aria-label="اختيار تاريخ الحضور"
+                             t-on-click="stopCalendarPropagation">
+                        <header>
+                            <button type="button"
+                                    aria-label="الشهر التالي"
+                                    t-att-disabled="nextCalendarMonthDisabled"
+                                    t-on-click="(event) => this.changeCalendarMonth(1, event)">
+                                <i class="fa fa-angle-right"/>
+                            </button>
+                            <div>
+                                <span t-esc="props.caption || 'اختر تاريخ الحضور'"/>
+                                <strong t-esc="calendarMonthLabel"/>
+                            </div>
+                            <button type="button"
+                                    aria-label="الشهر السابق"
+                                    t-on-click="(event) => this.changeCalendarMonth(-1, event)">
+                                <i class="fa fa-angle-left"/>
+                            </button>
+                        </header>
+                        <div class="o_factory_calendar_weekdays">
+                            <span t-foreach="weekDays" t-as="weekDay" t-key="weekDay" t-esc="weekDay"/>
+                        </div>
+                        <div class="o_factory_calendar_days">
+                            <button t-foreach="calendarDays"
+                                    t-as="day"
+                                    t-key="day.key"
+                                    type="button"
+                                    t-att-class="calendarDayClass(day)"
+                                    t-att-disabled="day.future"
+                                    t-att-aria-label="day.iso"
+                                    t-on-click="(event) => this.chooseCalendarDate(day, event)">
+                                <span t-esc="day.label"/>
+                                <small t-if="day.today">اليوم</small>
+                            </button>
+                        </div>
+                        <footer>
+                            <span><i class="fa fa-info-circle"/> لا يمكن اختيار يوم قادم</span>
+                            <button type="button" t-on-click="chooseToday">العودة لليوم</button>
+                        </footer>
+                    </section>
+                </div>
+    </t>
+    <t t-name="factory_attendance_dashboard.ManualAttendanceDateTime">
+        <div class="o_manual_field o_manual_datetime" t-ref="timePicker">
+            <label class="o_manual_time"><span t-esc="props.caption"/>
+                <div class="o_factory_time_input">
+                    <input type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5"
+                        t-att-value="state.time" t-att-disabled="props.disabled"
+                        t-att-aria-label="props.caption + ' — الوقت'" t-on-change="onTime"/>
+                    <button type="button" class="o_factory_time_toggle" t-att-disabled="props.disabled"
+                        t-att-aria-label="'اختيار ' + props.caption" t-att-aria-expanded="state.open" t-on-click.prevent="openTime"><i class="fa fa-clock-o"/></button>
+                </div>
+            </label>
+            <t t-if="state.open" t-portal="'body'"><div class="o_manual_datetime o_factory_time_portal"><section t-ref="timePanel" class="o_factory_time_panel" role="group" t-att-aria-label="props.caption">
+                <header><span t-esc="props.caption"/><strong><t t-esc="state.hour"/>:<t t-esc="state.minute"/> <small t-esc="state.period === 'AM' ? 'صباحًا' : 'مساءً'"/></strong></header>
+                <div class="o_factory_time_choices">
+                    <div class="o_factory_time_period">
+                        <button type="button" t-att-class="state.period === 'AM' ? 'is-selected' : ''" t-on-click="() => this.state.period = 'AM'">صباحًا</button>
+                        <button type="button" t-att-class="state.period === 'PM' ? 'is-selected' : ''" t-on-click="() => this.state.period = 'PM'">مساءً</button>
+                    </div>
+                    <span>الساعة</span>
+                    <div class="o_factory_time_hours"><button t-foreach="hours" t-as="hour" t-key="hour" type="button" t-att-class="state.hour === hour ? 'is-selected' : ''" t-on-click="() => this.state.hour = hour" t-esc="hour"/></div>
+                    <span>الدقيقة</span>
+                    <div class="o_factory_time_minutes"><button t-foreach="minutes" t-as="minute" t-key="minute" type="button" t-att-class="state.minute === minute ? 'is-selected' : ''" t-on-click="() => this.state.minute = minute" t-esc="minute"/></div>
+                </div>
+                <footer><button type="button" class="o_factory_time_apply" t-on-click="applyTime">تأكيد الوقت</button><button t-if="props.optional" type="button" t-on-click="clear">مسح</button><button type="button" t-on-click="closeTime">إلغاء</button></footer>
+            </section></div></t>
+        </div>
+    </t>
+</templates>

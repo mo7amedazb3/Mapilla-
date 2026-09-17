@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="sequence_employee_advance" model="ir.sequence">
+        <field name="name">Employee Advance</field>
+        <field name="code">employee.advance</field>
+        <field name="prefix">ADV/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="sequence_employee_advance_repayment" model="ir.sequence">
+        <field name="name">Employee Advance Repayment</field>
+        <field name="code">employee.advance.repayment</field>
+        <field name="prefix">ADVR/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+</odoo>
+

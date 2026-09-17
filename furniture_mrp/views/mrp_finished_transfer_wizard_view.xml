@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_finished_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.finished.transfer.wizard.form</field>
+        <field name="model">furniture.mrp.finished.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="تحويل المنتجات الجاهزة للمخزن التام" class="o_furniture_stage_transfer_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">المنتجات الجاهزة للتحويل</div>
+                        <h2>اختار المنتجات اللي خلصت كل المراحل وعايز تحولها للمخزن التام، وسيب الباقي في مخازنه الحالية</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">📦</div>
+                </div>
+                <group class="o_furniture_transfer_order">
+                    <field name="production_id" invisible="1"/>
+                </group>
+                <div class="o_furniture_transfer_card o_furniture_transfer_contents">
+                    <div class="o_furniture_transfer_card_title">المنتجات الجاهزة الآن</div>
+                    <div class="o_furniture_transfer_contents_hint">
+                        لو فيه منتج قديم مكمل مع أمر الأسبوع الحالي أو ناتج من آخر مرحلة، علّم عليه هنا عشان يتحول للمخزن التام.
+                    </div>
+                    <field name="line_ids" nolabel="1"
+                           class="o_furniture_standard_transfer_lines o_furniture_wizard_list">
+                        <list editable="bottom" create="false" delete="false">
+                            <field name="selected"/>
+                            <field name="transfer_line_id" invisible="1" column_invisible="1"/>
+                            <field name="transfer_line_ids" invisible="1" column_invisible="1"/>
+                            <field name="source_kind" string="المصدر" readonly="1"/>
+                            <field name="source_stage" string="المرحلة" readonly="1"/>
+                            <field name="source_origin" string="المرجع" readonly="1" optional="show"/>
+                            <field name="product_id" string="الصنف" readonly="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   decoration-info="dimension_label"/>
+                            <field name="qty" string="الكمية" readonly="1"/>
+                            <field name="product_uom_id" string="الوحدة" readonly="1"/>
+                            <field name="state" string="الحالة" readonly="1" optional="show"/>
+                        </list>
+                    </field>
+                </div>
+                <footer>
+                    <button name="action_transfer_selected" string="تحويل المحدد" type="object" class="btn-primary o_furniture_transfer_confirm"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

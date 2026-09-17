@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_biometric_device_manager,biometric.device.manager,model_factory_biometric_device,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_biometric_identity_manager,biometric.identity.manager,model_factory_biometric_identity,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_biometric_event_manager,biometric.event.manager,model_factory_biometric_event,hr_attendance.group_hr_attendance_manager,1,0,0,0
+access_biometric_command_manager,biometric.command.manager,model_factory_biometric_command,hr_attendance.group_hr_attendance_manager,1,0,0,0

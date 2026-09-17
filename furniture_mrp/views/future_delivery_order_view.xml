@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_future_order_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.future.order.search</field>
+        <field name="model">furniture.mrp.future.order</field>
+        <field name="arch" type="xml">
+            <search string="طلبات التسليم القادمة">
+                <field name="name"/>
+                <field name="buyer_partner_id"/>
+                <field name="beneficiary_partner_id"/>
+                <field name="delivery_date"/>
+                <field name="line_ids"/>
+                <filter name="pending" string="بانتظار القرار"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="due_soon" string="خلال 15 يوم أو متأخر"
+                        domain="[('state', '=', 'pending'), ('delivery_date', '&lt;=', (context_today() + relativedelta(days=15)).strftime('%Y-%m-%d'))]"/>
+                <filter name="reserved" string="محجوز من التام"
+                        domain="[('state', '=', 'reserved')]"/>
+                <filter name="production" string="له أوامر إنتاج"
+                        domain="[('state', '=', 'production')]"/>
+                <separator/>
+                <filter name="group_delivery_date" string="تاريخ التسليم"
+                        context="{'group_by': 'delivery_date'}"/>
+                <filter name="group_buyer" string="المشتري"
+                        context="{'group_by': 'buyer_partner_id'}"/>
+                <filter name="group_state" string="الحالة"
+                        context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_future_order_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.future.order.list</field>
+        <field name="model">furniture.mrp.future.order</field>
+        <field name="arch" type="xml">
+            <list string="طلبات التسليم القادمة"
+                  decoration-warning="state == 'pending'"
+                  decoration-success="state == 'reserved'"
+                  decoration-info="state == 'production'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="delivery_date"/>
+                <field name="buyer_partner_id"/>
+                <field name="beneficiary_partner_id"/>
+                <field name="product_summary"/>
+                <field name="line_count" optional="show"/>
+                <field name="availability_state" widget="badge"
+                       decoration-success="availability_state == 'available'"
+                       decoration-warning="availability_state == 'partial'"
+                       decoration-danger="availability_state in ('unavailable', 'invalid')"
+                       optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'pending'"
+                       decoration-success="state == 'reserved'"
+                       decoration-info="state == 'production'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="decision_user_id" optional="hide"/>
+                <field name="decision_date" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_mrp_future_order_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.future.order.form</field>
+        <field name="model">furniture.mrp.future.order</field>
+        <field name="arch" type="xml">
+            <form string="طلب تسليم قادم" class="o_furniture_future_order_form">
+                <header>
+                    <button name="action_reserve_from_finished" type="object"
+                            string="حجز كامل من المخزن التام" icon="fa-lock"
+                            class="btn-primary"
+                            confirm="سيتم إنشاء حركة تسليم وحجز الكمية كاملة من مخزن الإنتاج التام. متابعة؟"
+                            invisible="state != 'pending'"/>
+                    <button name="action_produce_shortage" type="object"
+                            string="إنتاج العجز وحجز المتاح" icon="fa-industry"
+                            class="btn-secondary"
+                            confirm="سيتم حجز المتاح وإنشاء أوامر إنتاج بالعجز فقط. متابعة؟"
+                            invisible="state != 'pending'"/>
+                    <button name="action_cancel" type="object"
+                            string="إلغاء الطلب" icon="fa-times"
+                            class="btn-secondary"
+                            confirm="سيتم تحرير أي حجز وإلغاء أوامر الإنتاج المسودة المرتبطة. متابعة؟"
+                            invisible="state == 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,reserved,production,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_reservation" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="not reservation_picking_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">حجز المخزن</span>
+                                <span class="o_stat_value">
+                                    <field name="reservation_fully_ready" widget="boolean_favorite"/>
+                                </span>
+                            </div>
+                        </button>
+                        <button name="action_open_productions" type="object"
+                                class="oe_stat_button" icon="fa-industry"
+                                invisible="production_count == 0">
+                            <field name="production_count" widget="statinfo"
+                                   string="أوامر الإنتاج"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="بانتظار قرارك" bg_color="text-bg-warning"
+                            invisible="state != 'pending'"/>
+                    <widget name="web_ribbon" title="محجوز من المخزن" bg_color="text-bg-success"
+                            invisible="state != 'reserved'"/>
+                    <widget name="web_ribbon" title="إنتاج العجز" bg_color="text-bg-info"
+                            invisible="state != 'production'"/>
+                    <div class="oe_title">
+                        <label for="name" string="طلب التسليم"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+
+                    <div class="o_furniture_future_order_form__summary">
+                        <div class="o_furniture_future_order_form__summary_icon">
+                            <i class="fa fa-calendar-check-o" title="طلب تسليم قادم"
+                               aria-label="طلب تسليم قادم"/>
+                        </div>
+                        <div>
+                            <small>موعد التسليم</small>
+                            <field name="delivery_date" readonly="state != 'pending'"/>
+                        </div>
+                        <div>
+                            <small>حالة التوافر الآن</small>
+                            <field name="availability_state" widget="badge"
+                                   decoration-success="availability_state == 'available'"
+                                   decoration-warning="availability_state == 'partial'"
+                                   decoration-danger="availability_state in ('unavailable', 'invalid')"/>
+                            <field name="availability_label" class="d-block text-muted"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="بيانات العميل">
+                            <field name="buyer_partner_id" readonly="state != 'pending'"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="beneficiary_partner_id" readonly="state != 'pending'"/>
+                        </group>
+                        <group string="بيانات القرار">
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'pending'"/>
+                            <field name="decision_user_id" invisible="state == 'pending'"/>
+                            <field name="decision_date" invisible="state == 'pending'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="الأصناف المطلوبة" name="products">
+                            <field name="line_ids" readonly="state != 'pending'">
+                                <list editable="bottom" string="الأصناف المطلوبة"
+                                      decoration-danger="shortage_qty &gt; 0"
+                                      decoration-success="shortage_qty == 0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="available_model_ids" column_invisible="True"/>
+                                    <field name="product_id"
+                                           domain="[('active', '=', True), ('furniture_dimension_source_product_id', '=', False), '|', ('furniture_has_active_normal_recipe', '=', True), ('is_kits', '=', True)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="route_label" optional="show"/>
+                                    <field name="furniture_model_id"
+                                           domain="[('id', 'in', available_model_ids)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="available_qty"/>
+                                    <field name="shortage_qty"/>
+                                    <field name="configuration_error" optional="show"/>
+                                    <field name="production_order_id" optional="hide"/>
+                                </list>
+                            </field>
+                            <div class="alert alert-info mt-3" role="alert">
+                                <i class="fa fa-info-circle me-1"/>
+                                تظهر هنا فقط الأصناف المضبوطة كـ Manufacture this Product أو Kit.
+                                الـKit يُفك تلقائيًا إلى قطعه الفعلية حسب الموديل عند الحجز أو الإنتاج.
+                            </div>
+                        </page>
+                        <page string="ملاحظات" name="notes">
+                            <field name="notes" placeholder="أي تعليمات خاصة بالتسليم أو التصنيع..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_furniture_mrp_future_order" model="ir.actions.act_window">
+        <field name="name">طلبات التسليم القادمة</field>
+        <field name="res_model">furniture.mrp.future.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="groups_id" eval="[(4, ref('furniture_mrp.group_furniture_mrp_manager'))]"/>
+        <field name="search_view_id" ref="view_furniture_mrp_future_order_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">سجّل أول طلب تسليم قادم</p>
+            <p>حدد المشتري والمستهلك وموعد التسليم، ثم اختر حجز المخزون أو إنتاج العجز.</p>
+        </field>
+    </record>
+</odoo>

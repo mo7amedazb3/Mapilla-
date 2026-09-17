@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_furniture_kit_allocation" model="ir.ui.view">
+        <field name="name">sale.order.furniture.kit.allocation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@id='send_by_email_primary']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_send" separator=" "/>
+                <attribute name="icon">fa-envelope</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@id='send_by_email']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_send" separator=" "/>
+                <attribute name="icon">fa-envelope</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@id='action_confirm']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_confirm" separator=" "/>
+                <attribute name="icon">fa-check</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_confirm' and not(@id)]" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_confirm" separator=" "/>
+                <attribute name="icon">fa-check</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_preview_sale_order']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_preview" separator=" "/>
+                <attribute name="icon">fa-eye</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_cancel']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_workflow_button o_furniture_sale_action_cancel" separator=" "/>
+                <attribute name="icon">fa-times</attribute>
+            </xpath>
+
+            <xpath expr="//sheet" position="attributes">
+                <attribute name="class" add="o_furniture_sale_order_sheet" separator=" "/>
+            </xpath>
+
+            <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' oe_title ')]" position="attributes">
+                <attribute name="class" add="o_furniture_sale_order_title" separator=" "/>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_header']" position="before">
+                <div class="o_furniture_sale_section_heading">
+                    <span class="o_furniture_sale_section_icon">
+                        <i class="fa fa-user-circle" title="بيانات عرض السعر"/>
+                    </span>
+                    <div>
+                        <h4>بيانات العميل وعرض السعر</h4>
+                        <p>العميل ومواعيد العرض وشروط السداد في مكان واحد.</p>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_header']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_header_card" separator=" "/>
+            </xpath>
+
+            <xpath expr="//group[@name='partner_details']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_customer_panel" separator=" "/>
+            </xpath>
+
+            <xpath expr="//group[@name='order_details']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_details_panel" separator=" "/>
+            </xpath>
+
+            <xpath expr="//group[@name='order_details']/field[@name='validity_date']" position="after">
+                <field name="furniture_delivery_date"
+                       string="تاريخ التسليم"
+                       readonly="state == 'cancel' or locked"/>
+            </xpath>
+
+            <xpath expr="//group[@name='order_details']/field[@name='payment_term_id']"
+                   position="replace"/>
+
+            <xpath expr="//page[@name='order_lines']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_lines_page" separator=" "/>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']" position="before">
+                <div class="o_furniture_sale_lines_heading">
+                    <span class="o_furniture_sale_lines_icon">
+                        <i class="fa fa-shopping-basket" title="منتجات عرض السعر"/>
+                    </span>
+                    <div>
+                        <h4>المنتجات والأسعار</h4>
+                        <p>أضف الأطقم أو المنتجات، ثم حدّد الكمية والسعر لكل سطر.</p>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']" position="attributes">
+                <attribute name="class" add="o_furniture_sale_order_lines" separator=" "/>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/form//field[@name='product_id']"
+                   position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), ('furniture_has_active_sale_kit_recipe', '=', True)]</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list/field[@name='product_id']"
+                   position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), ('furniture_has_active_sale_kit_recipe', '=', True)]</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list/field[@name='product_template_id']"
+                   position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), ('furniture_has_active_sale_kit_recipe', '=', True)]</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list/control/create[@name='add_section_control']"
+                   position="replace"/>
+
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/kanban/control/create[@name='add_section_control']"
+                   position="replace"/>
+
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="after">
+                <field name="furniture_is_kit" column_invisible="1"/>
+                <field name="furniture_kit_state"
+                       string="حالة الطقم"
+                       widget="badge"
+                       optional="show"
+                       readonly="1"
+                       invisible="not furniture_is_kit"
+                       decoration-muted="furniture_kit_state == 'none'"
+                       decoration-success="furniture_kit_state in ('ready', 'delivered')"
+                       decoration-info="furniture_kit_state == 'wip'"
+                       decoration-danger="furniture_kit_state == 'shortage'"/>
+                <field name="furniture_kit_availability"
+                       string="تفاصيل التوافر"
+                       optional="hide"
+                       readonly="1"
+                       invisible="not furniture_is_kit"/>
+            </xpath>
+
+            <xpath expr="//page[@name='order_lines']" position="after">
+                <page string="🧰 توافر الأطقم"
+                      name="furniture_kit_availability"
+                      class="o_furniture_kit_availability_page"
+                      invisible="not furniture_has_kit_lines and not furniture_kit_allocation_ids">
+                    <field name="furniture_has_kit_lines" invisible="1"/>
+                    <field name="furniture_kit_has_shortage" invisible="1"/>
+                    <field name="furniture_kit_allocation_ids" invisible="1"/>
+                    <field name="furniture_shortage_production_ids" invisible="1"/>
+
+                    <div class="o_furniture_kit_dashboard">
+                        <div class="o_furniture_kit_hero">
+                            <div class="o_furniture_kit_hero_copy">
+                                <span class="o_furniture_kit_eyebrow">توافر أمر البيع</span>
+                                <h3>اعرف مكان كل قطعة قبل التسليم</h3>
+                                <p>الفحص يراجع المخزن التام أولًا، ثم القطع المحجوزة داخل مراحل التصنيع.</p>
+                            </div>
+                            <div class="o_furniture_kit_hero_actions">
+                                <button name="action_refresh_furniture_kit_availability"
+                                        type="object"
+                                        string="إعادة فحص التوافر"
+                                        icon="fa-refresh"
+                                        class="btn-primary o_furniture_kit_refresh_button"
+                                        invisible="state == 'cancel'"/>
+                                <button name="action_open_or_create_furniture_shortage_production"
+                                        type="object"
+                                        string="تجهيز أوامر إنتاج العجز"
+                                        icon="fa-industry"
+                                        class="btn-warning o_furniture_kit_production_button"
+                                        groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                                        invisible="not furniture_kit_has_shortage and not furniture_shortage_production_ids"/>
+                                <button name="action_open_furniture_shortage_mps"
+                                        type="object"
+                                        string="عرض خطة العجز MPS"
+                                        icon="fa-calendar"
+                                        class="btn-secondary o_furniture_kit_mps_button"
+                                        groups="furniture_mrp.group_furniture_mrp_manager,furniture_mrp.group_furniture_mrp_supervisor"
+                                        invisible="not furniture_shortage_mps_id"/>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info o_furniture_kit_first_refresh"
+                             role="alert"
+                             invisible="furniture_kit_allocation_ids">
+                            <i class="fa fa-info-circle me-2" title="معلومة"/>
+                            <strong>جارٍ حساب التوافر.</strong>
+                            النظام يحدّث كل طقم تلقائيًا بعد حفظ السطر.
+                        </div>
+
+                        <div class="o_furniture_kit_status_bar" invisible="not furniture_kit_allocation_ids">
+                            <div class="o_furniture_kit_status_title">
+                                <span>الحالة الحالية</span>
+                                <field name="furniture_kit_status"
+                                       widget="badge"
+                                       decoration-success="furniture_kit_status in ('ready', 'delivered')"
+                                       decoration-info="furniture_kit_status == 'wip'"
+                                       decoration-danger="furniture_kit_status == 'shortage'"
+                                       readonly="1"/>
+                            </div>
+                            <field name="furniture_kit_availability_summary"
+                                   class="o_furniture_kit_status_summary"
+                                   nolabel="1"
+                                   readonly="1"/>
+                        </div>
+
+                        <div class="o_furniture_kit_metrics" invisible="not furniture_kit_allocation_ids">
+                            <div class="o_furniture_kit_metric o_furniture_kit_metric_total">
+                                <div class="o_furniture_kit_metric_icon"><i class="fa fa-cubes" title="إجمالي الأطقم"/></div>
+                                <div>
+                                    <span>إجمالي الأطقم</span>
+                                    <field name="furniture_kit_total_qty" class="o_furniture_kit_metric_number" nolabel="1" readonly="1"/>
+                                    <small><field name="furniture_kit_type_count" class="o_furniture_kit_type_count" nolabel="1" readonly="1"/> نوع</small>
+                                </div>
+                            </div>
+                            <div class="o_furniture_kit_metric o_furniture_kit_metric_ready">
+                                <div class="o_furniture_kit_metric_icon"><i class="fa fa-check" title="جاهز من التام"/></div>
+                                <div>
+                                    <span>جاهز من التام</span>
+                                    <field name="furniture_kit_ready_qty" class="o_furniture_kit_metric_number" nolabel="1" readonly="1"/>
+                                    <small>يمكن تسليمه</small>
+                                </div>
+                            </div>
+                            <div class="o_furniture_kit_metric o_furniture_kit_metric_wip">
+                                <div class="o_furniture_kit_metric_icon"><i class="fa fa-cogs" title="تحت التصنيع"/></div>
+                                <div>
+                                    <span>تحت التصنيع</span>
+                                    <field name="furniture_kit_wip_qty" class="o_furniture_kit_metric_number" nolabel="1" readonly="1"/>
+                                    <small>محجوز للطلب</small>
+                                </div>
+                            </div>
+                            <div class="o_furniture_kit_metric o_furniture_kit_metric_shortage">
+                                <div class="o_furniture_kit_metric_icon"><i class="fa fa-exclamation" title="يحتاج إنتاج"/></div>
+                                <div>
+                                    <span>يحتاج إنتاج</span>
+                                    <field name="furniture_kit_shortage_qty" class="o_furniture_kit_metric_number" nolabel="1" readonly="1"/>
+                                    <small>طلب العجز</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="o_furniture_kit_details" invisible="not furniture_kit_allocation_ids">
+                            <div class="o_furniture_kit_details_header">
+                                <div>
+                                    <h4>تفاصيل قطع الأطقم</h4>
+                                    <p>كل سطر يوضح كمية القطعة والمكان المحجوزة منه.</p>
+                                </div>
+                                <field name="furniture_shortage_mps_id"
+                                       class="o_furniture_kit_mps_link"
+                                       readonly="1"
+                                       invisible="not furniture_shortage_mps_id"/>
+                            </div>
+                            <field name="furniture_kit_display_line_ids"
+                                   class="o_furniture_kit_group_cards"
+                                   readonly="1"
+                                   nolabel="1">
+                                <kanban create="0" delete="0" edit="0" records_draggable="0">
+                                    <field name="product_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom"/>
+                                    <field name="furniture_kit_state"/>
+                                    <field name="furniture_finished_kit_qty"/>
+                                    <field name="furniture_wip_kit_qty"/>
+                                    <field name="furniture_shortage_kit_qty"/>
+                                    <field name="furniture_kit_components_html"/>
+                                    <templates>
+                                        <t t-name="card" class="o_furniture_kit_group_card">
+                                            <div class="o_furniture_kit_group_header">
+                                                <div class="o_furniture_kit_group_identity">
+                                                    <div class="o_furniture_kit_group_icon">
+                                                        <i class="fa fa-cube" title="الطقم"/>
+                                                    </div>
+                                                    <div>
+                                                        <span class="o_furniture_kit_group_label">الطقم</span>
+                                                        <field name="product_id" class="o_furniture_kit_group_name"/>
+                                                    </div>
+                                                </div>
+                                                <field name="furniture_kit_state"
+                                                       widget="badge"
+                                                       decoration-success="furniture_kit_state in ('ready', 'delivered')"
+                                                       decoration-info="furniture_kit_state == 'wip'"
+                                                       decoration-danger="furniture_kit_state == 'shortage'"/>
+                                            </div>
+
+                                            <div class="o_furniture_kit_group_metrics">
+                                                <div>
+                                                    <span>الكمية المطلوبة</span>
+                                                    <strong><field name="product_uom_qty"/> <field name="product_uom"/></strong>
+                                                </div>
+                                                <div class="is-ready">
+                                                    <span>جاهز من التام</span>
+                                                    <strong><field name="furniture_finished_kit_qty"/></strong>
+                                                </div>
+                                                <div class="is-wip">
+                                                    <span>تحت التصنيع</span>
+                                                    <strong><field name="furniture_wip_kit_qty"/></strong>
+                                                </div>
+                                                <div class="is-shortage">
+                                                    <span>العجز</span>
+                                                    <strong><field name="furniture_shortage_kit_qty"/></strong>
+                                                </div>
+                                            </div>
+
+                                            <field name="furniture_kit_components_html"
+                                                   class="o_furniture_kit_group_components"
+                                                   widget="html"/>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sale_order_remove_optional_products" model="ir.ui.view">
+        <field name="name">sale.order.remove.optional.products.furniture</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_management.sale_order_form_quote"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='optional_products']" position="replace"/>
+        </field>
+    </record>
+
+    <record id="view_furniture_sale_kit_allocation_form" model="ir.ui.view">
+        <field name="name">furniture.sale.kit.allocation.form</field>
+        <field name="model">furniture.sale.kit.allocation</field>
+        <field name="arch" type="xml">
+            <form string="حجز مكون طقم البيع">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="sale_line_id"/>
+                            <field name="kit_product_id"/>
+                            <field name="component_product_id"/>
+                            <field name="state" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="qty_per_kit"/>
+                            <field name="ordered_qty"/>
+                            <field name="required_qty"/>
+                            <field name="finished_allocated_qty"/>
+                            <field name="wip_allocated_qty"/>
+                            <field name="shortage_qty"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="stage_summary"/>
+                        <field name="expected_date"/>
+                        <field name="mps_line_id"/>
+                    </group>
+                    <field name="wip_source_ids" readonly="1">
+                        <list>
+                            <field name="source_reference"/>
+                            <field name="component_product_id"/>
+                            <field name="qty"/>
+                            <field name="stage_label"/>
+                            <field name="expected_date"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

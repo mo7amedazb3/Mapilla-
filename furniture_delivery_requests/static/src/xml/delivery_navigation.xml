@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_delivery_requests.StandaloneNavigation"
+       t-inherit="furniture_mrp.StageDashboardPage" t-inherit-mode="extension">
+        <!-- Requests now live in their own admin-only app, not the MRP toolbar. -->
+        <xpath expr="//button[hasclass('is-future-orders')]" position="replace"/>
+    </t>
+</templates>

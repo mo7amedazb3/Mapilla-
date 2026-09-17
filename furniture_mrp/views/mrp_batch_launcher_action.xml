@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        These launcher actions are declared before the production/dashboard
+        views so their XML IDs can be used by type="action" header buttons.
+        The concrete wizard views are attached later by
+        mrp_advance_material_release_view.xml once those views exist.
+    -->
+    <record id="action_furniture_mrp_advance_material_batch_wizard" model="ir.actions.act_window">
+        <field name="name">إذن خامات لأوامر متعددة</field>
+        <field name="res_model">furniture.mrp.advance.material.batch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'form_view_initial_mode': 'edit', 'auto_load_eligible_productions': True}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor')])]"/>
+    </record>
+
+    <record id="action_furniture_mrp_advance_material_batch_receipt_wizard" model="ir.actions.act_window">
+        <field name="name">استلام من المخزن</field>
+        <field name="res_model">furniture.mrp.advance.material.batch.receipt.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'form_view_initial_mode': 'edit', 'auto_load_pending_batch_receipts': True}</field>
+        <field name="groups_id" eval="[(6, 0, [ref('furniture_mrp.group_furniture_mrp_manager'), ref('furniture_mrp.group_furniture_mrp_supervisor')])]"/>
+    </record>
+</odoo>

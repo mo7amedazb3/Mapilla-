@@ -1,0 +1,328 @@
+.modal-dialog:has(.o_delivery_creation_wizard) {
+    width: Min(1180px, 96vw); max-width: Min(1180px, 96vw);
+    .modal-content { border: 1px solid #e0d8d1; border-radius: 18px; overflow: hidden; }
+    .modal-header, .modal-footer { background: #f5f3f0; border-color: #e0d8d1; padding: 14px 22px; }
+    .modal-title { color: #0c2a44; font-size: 17px; }
+    .modal-body { background: #faf9f7; }
+    .modal-footer .btn { border-radius: 9px; min-height: 40px; padding: 9px 20px; }
+}
+.o_form_view.o_delivery_creation_wizard {
+    background: #faf9f7 !important; padding: 18px !important; color: #0c2a44;
+    .mp_creation_banner {
+        display: flex; justify-content: space-between; align-items: center; gap: 20px;
+        background: #0c2a44; border-radius: 12px; padding: 20px 24px; margin-bottom: 18px;
+        color: #fff; border-bottom: 4px solid #ada696;
+        h2 { color: #fff; font-size: 23px; font-weight: 750; margin: 5px 0 8px; }
+        p { color: #e0d8d1; font-size: 12px; margin: 0; }
+        img { width: 145px; max-width: 25%; height: auto; object-fit: contain; }
+    }
+    .mp_creation_eyebrow { color: #e0d8d1; font-size: 11px; }
+    .o_furniture_line_quick_choices { gap: 14px; }
+    .o_furniture_quick_selector {
+        --quick-card-accent: #0c2a44; --quick-card-accent-dark: #0c2a44;
+        padding: 16px; background: #fff; border: 1px solid #e0d8d1;
+        border-radius: 12px; box-shadow: none;
+    }
+    .o_furniture_quick_selector__heading { margin-bottom: 12px; }
+    .o_furniture_quick_selector__heading_text strong { color: #0c2a44; font-size: 15px; }
+    .o_furniture_quick_selector__heading_text small { color: #73787b; font-weight: 400; font-size: 12px; }
+    .o_furniture_quick_selector__heading_icon { width: 34px; height: 34px; flex-basis: 34px; background: #eeeae5; color: #0c2a44; }
+    .o_furniture_quick_card {
+        min-height: 66px; padding: 11px; border-radius: 9px; border-color: #e0d8d1;
+        box-shadow: none; background: #faf9f7; color: #0c2a44;
+    }
+    .o_furniture_quick_card.is-selected { background: #0c2a44; border-color: #0c2a44; color: #fff; box-shadow: 0 4px 10px #0c2a4414; transform: none; }
+    .o_furniture_quick_card:not(:disabled):hover { border-color: #ada696; box-shadow: 0 4px 12px #0c2a4412; }
+    .o_furniture_quick_card.is-selected:hover { color: #fff; }
+    .o_furniture_quick_card__icon { background: #eeeae5; color: #0c2a44; }
+    .o_furniture_quick_card__name { font-size: 14px; }
+    .o_furniture_quick_card--more { background: #f5f3f0; }
+    .o_furniture_multi_selector__selected_count { background: #eeeae5; color: #0c2a44; }
+    .o_furniture_line_customer_strip { background: #f0ece7; border: 1px solid #e0d8d1; border-radius: 12px; padding: 16px; margin: 16px 0; }
+    .o_furniture_line_customer_field .o_form_label { color: #0c2a44; margin-bottom: 8px; }
+    .o_furniture_line_customer_field .o_input { background: #fff !important; border: 1px solid #d4ccc3 !important; border-radius: 7px; padding: 8px !important; min-height: 38px; }
+    .o_input:focus { outline: 2px solid #ada696; outline-offset: 1px; }
+    .o_furniture_batch_lines_heading { border: 1px solid #e0d8d1; border-bottom: 0; border-radius: 12px 12px 0 0; background: #fff; padding: 15px 16px; color: #0c2a44; }
+    .o_furniture_batch_lines_heading strong { color: #0c2a44; font-size: 15px; }
+    .o_furniture_batch_lines_heading span { color: #73787b; }
+    .o_furniture_batch_product_lines { border-color: #e0d8d1; border-radius: 0 0 12px 12px; overflow: auto; }
+    .o_furniture_batch_product_lines table.o_list_table {
+        min-width: 660px;
+        thead th { background: #eeeae5 !important; color: #0c2a44 !important; padding: 12px !important; }
+        tbody tr.o_data_row td { height: 52px; padding: 10px 12px !important; border-bottom: 1px solid #eeeae5; background: #fff; }
+        tbody tr.o_selected_row td { background: #f3f0eb !important; }
+        td[name='quantity'] { font-size: 16px; font-weight: 700; color: #0c2a44; }
+        .o_input { border: 1px solid #ada696 !important; background: #fff !important; border-radius: 6px; padding: 5px !important; }
+    }
+    .o_furniture_dimension_toggle { color: #0c2a44; background: #f5f3f0; border-color: #d4ccc3; border-radius: 7px; }
+    @media (max-width: 767px) {
+        padding: 10px !important;
+        .mp_creation_banner { padding: 16px; gap: 10px; h2 { font-size: 19px; } }
+        .o_furniture_quick_selector__primary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .o_furniture_quick_selector { padding: 12px; }
+        .o_furniture_quick_card { grid-template-columns: 26px minmax(0, 1fr) 18px; gap: 5px; padding: 9px; }
+        .o_furniture_quick_card__icon { width: 26px; height: 26px; }
+        .o_furniture_quick_card--more { grid-template-columns: 26px minmax(0, 1fr) auto; }
+        .o_furniture_quick_card--more .o_furniture_quick_card__chevron { display: none; }
+        .o_furniture_line_customer_strip { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+}
+
+// The brand's .btn font must not replace Odoo's icon font.
+.o_form_view.o_delivery_creation_wizard,
+.o_form_view.o_mapilla_delivery_form {
+    .o_field_many2one_selection { align-items: center; gap: 6px; }
+    .o_external_button.oi {
+        font-family: 'odoo_ui_icons' !important;
+        display: inline-flex; align-items: center; justify-content: center;
+        flex: 0 0 34px; width: 34px; height: 34px;
+        padding: 0 !important; margin: 0;
+        font-size: 17px; line-height: 1;
+        color: #0c2a44; background: #f8f6f3;
+        border: 1px solid #d4ccc3; border-radius: 7px;
+        &:hover { background: #eeeae5; border-color: #ada696; }
+        &:focus-visible { outline: 2px solid #657c8e; outline-offset: 2px; }
+    }
+}
+
+.o_delivery_creation_wizard .o_delivery_specifications_button {
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    border: 1px solid #d4ccc3 !important;
+    border-radius: 7px !important;
+    background: #f5f3f0 !important;
+    color: #0c2a44 !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+}
+
+.o_delivery_spec_editor {
+    .o_group { margin: 8px 0; }
+    .o_delivery_spec_material_tabs {
+        margin-top: 10px;
+        .nav-link { font-weight: 800; padding: 10px 22px; color: #246b67; }
+        .nav-link.active { background: #eaf7f5; border-top: 3px solid #247b74; }
+        .tab-pane { padding-top: 8px; }
+    }
+    .o_furniture_tailoring_selected_materials_heading { margin-top: 12px; }
+}
+
+// Delivery item editor: use the delivery screen's navy and neutral palette.
+.modal-dialog:has(.o_delivery_spec_editor) { max-width: 1100px !important; width: 96vw !important; }
+.modal-content:has(.o_delivery_spec_editor) {
+    border: 0; border-radius: 16px; overflow: hidden;
+    .modal-header { background: #0d2c43 !important; border: 0 !important; padding: 18px 24px; }
+    .modal-title { color: #fff !important; }
+    .modal-header button { color: #fff; }
+    .modal-footer { background: #fff; border-top: 1px solid #e5e7eb; padding: 14px 24px; }
+}
+.o_delivery_spec_editor {
+    .o_form_sheet_bg, .o_form_sheet { background: #f5f6f8 !important; }
+    .o_form_sheet { padding: 20px 24px !important; }
+    .o_furniture_tailoring_material_editor_header { border: 0; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .o_furniture_tailoring_material_editor_title { background: #0d2c43; border: 0; min-height: 48px; }
+    .o_furniture_tailoring_material_editor_title strong { color: #fff !important; font-size: 16px; }
+    .o_furniture_tailoring_material_editor_context > span { background: #f5f6f8 !important; }
+    .o_furniture_tailoring_material_editor_context strong { color: #0d2c43 !important; font-size: 18px; }
+    .o_group { margin: 0 !important; padding: 8px 12px; background: #fff; border-radius: 10px; }
+    .o_input { border: 1px solid #d5dbe1 !important; background: #fff !important; border-radius: 6px; padding: 6px 10px; }
+    .o_furniture_tailoring_material_editor_help { background: transparent; color: #64748b; padding: 8px 0; }
+    .o_delivery_spec_material_tabs {
+        .nav { gap: 8px; border: 0; background: transparent; }
+        .nav-link { border: 1px solid #d5dbe1 !important; border-radius: 8px; background: #fff; color: #334155; }
+        .nav-link.active { background: #0d2c43 !important; color: #fff !important; border-color: #0d2c43 !important; }
+        .tab-pane { background: transparent; border: 0; padding-top: 12px; }
+    }
+    .o_furniture_quick_selector { background: #fff !important; border: 1px solid #e2e6ea !important; box-shadow: none !important; }
+    .o_furniture_quick_card { background: #fff !important; color: #334155 !important; border: 1px solid #d5dbe1 !important; box-shadow: none !important; border-radius: 8px !important; min-height: 54px !important; }
+    .o_furniture_quick_card.is-selected { background: #0d2c43 !important; color: #fff !important; border-color: #0d2c43 !important; }
+    .o_furniture_quick_card__icon { display: none !important; }
+    .o_furniture_quick_card__name { color: inherit !important; font-size: 14px !important; }
+    .o_furniture_quick_selector__heading_text strong, .o_furniture_quick_selector__heading_text small { color: #334155 !important; }
+    .o_furniture_tailoring_material_editor_lines { margin-top: 14px; }
+    .o_furniture_tailoring_material_editor_lines .o_list_renderer { border: 1px solid #e2e6ea; border-radius: 8px; }
+    .o_furniture_tailoring_material_editor_lines table.o_list_table thead th { background: #edf0f4 !important; color: #0d2c43 !important; padding: 12px; }
+    .o_furniture_tailoring_material_editor_lines table.o_list_table tbody td { padding: 10px 12px; }
+    .o_furniture_touch_selection__button { color: #0d2c43 !important; border-color: #d5dbe1 !important; box-shadow: none; }
+    .o_furniture_touch_selection__button.is-selected { background: #0d2c43 !important; color: #fff !important; }
+}
+
+.o_delivery_spec_editor .o_furniture_quick_selector__heading_icon { display: none !important; }
+.o_delivery_spec_editor .o_furniture_multi_selector__selected_count { background: #edf0f4; color: #0d2c43; }
+.modal-dialog .modal-content:has(.o_delivery_spec_editor) > .modal-header { background: #0d2c43 !important; }
+.o_delivery_spec_editor .o_delivery_spec_material_tabs .nav-link.active * { color: #fff !important; }
+.o_delivery_spec_editor .o_furniture_quick_card {
+    display: flex !important; align-items: center !important; gap: 12px !important;
+    padding: 14px 18px !important; min-height: 60px !important;
+}
+.o_delivery_spec_editor .o_furniture_quick_card .o_furniture_quick_card__name {
+    flex: 1; width: auto !important; min-width: 0 !important; max-width: none !important;
+    white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
+}
+.o_delivery_spec_editor .o_furniture_quick_card__check { flex: 0 0 22px; }
+.o_delivery_spec_editor .o_notebook .nav.nav-tabs .nav-item .nav-link.active { color: #fff !important; }
+.o_delivery_spec_editor .o_furniture_tailoring_material_editor_lines tbody tr:not(.o_data_row) { display: none; }
+.modal-content:has(.o_delivery_spec_editor) > .modal-header .btn-close { filter: invert(1); }
+
+.o_delivery_spec_editor {
+    .o_delivery_equal_dimensions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin: 18px 0 12px;
+    }
+    .o_delivery_dimension_cell {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        .o_field_widget { width: 100%; min-width: 0; }
+        input { width: 100%; box-sizing: border-box; height: 38px; }
+    }
+    .o_delivery_spec_material_tabs .o_notebook_headers {
+        margin-bottom: 12px;
+    }
+    .o_delivery_spec_material_tabs .nav.nav-tabs .nav-item .nav-link {
+        border: 1px solid #d5dbe1 !important;
+        border-radius: 8px !important;
+        margin-bottom: 0 !important;
+        box-shadow: none !important;
+    }
+    .o_delivery_spec_material_tabs .nav.nav-tabs .nav-item .nav-link.active {
+        border-color: #0d2c43 !important;
+    }
+    @media (max-width: 575px) {
+        .o_delivery_equal_dimensions { grid-template-columns: 1fr; gap: 12px; }
+    }
+}
+
+.o_delivery_creation_wizard .o_furniture_batch_product_lines {
+    .o_list_renderer, table.o_list_table { direction: rtl !important; }
+    table.o_list_table th, table.o_list_table td { text-align: right !important; }
+    th[data-name="quantity"], td[name="quantity"] { text-align: center !important; }
+    td[name="fabric_summary"], td[name="takawe_summary"] {
+        white-space: pre-line !important; min-width: 175px; line-height: 1.8;
+        .o_field_widget { white-space: pre-line !important; }
+    }
+    td[name="dimension_label"] { min-width: 120px; unicode-bidi: plaintext; }
+    td[name="product_id"] { min-width: 120px; font-weight: 700; }
+    th[data-name="dimensions_expanded"], td[name="dimensions_expanded"] { min-width: 205px; }
+}
+
+.o_delivery_spec_editor .o_furniture_tailoring_material_editor_lines {
+    .o_list_renderer, table.o_list_table { direction: rtl !important; }
+    table.o_list_table th, table.o_list_table td { text-align: right !important; }
+    th[data-name="quantity"], td[name="quantity"] { text-align: center !important; }
+    td[name="quantity"] input { direction: ltr; text-align: center !important; }
+    .o_furniture_touch_selection__button { direction: ltr; }
+}
+
+.o_delivery_creation_wizard .o_furniture_batch_product_lines {
+    td[name="fabric_summary"], td[name="takawe_summary"] {
+        min-width: 195px; max-width: 270px;
+        border-inline-start: 1px solid #e3e8ee !important;
+        vertical-align: top !important;
+    }
+    th[data-name="dimensions_expanded"], td[name="dimensions_expanded"] { min-width: 140px; }
+    .o_delivery_material_summary { white-space: normal !important; padding: 5px 0; }
+    .o_delivery_material_item {
+        padding: 8px 10px; border: 1px solid #e3e8ee; border-radius: 8px;
+        background: #f7f9fb; margin-bottom: 6px;
+        strong { display: block; color: #0d2c43; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+        &:last-child { margin-bottom: 0; }
+    }
+    .o_delivery_material_meta {
+        display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;
+        span { background: #fff; border: 1px solid #e1e6eb; border-radius: 5px; padding: 1px 6px; color: #536477; font-size: 12px; }
+        bdi { unicode-bidi: isolate; }
+    }
+    .o_delivery_material_empty { color: #8b95a2; font-size: 12px; }
+    td[name="dimension_label"] { color: #536477; font-weight: 600; }
+}
+
+.o_delivery_creation_wizard .o_furniture_batch_product_lines table.o_list_table td[name="dimension_label"] {
+    vertical-align: middle !important;
+}
+.o_delivery_customer_mode {
+    .o_furniture_touch_selection { display: flex; gap: 0; width: fit-content; border: 1px solid #cdd8e3; border-radius: 9px; overflow: hidden; }
+    .o_furniture_touch_selection__button { border: 0 !important; border-radius: 0 !important; padding: 9px 20px; }
+    .o_furniture_touch_selection__button.is-selected { background: #0d2c43 !important; color: #fff !important; }
+    small { display: block; margin-top: 5px; color: #6a7888; }
+}
+.o_delivery_customer_profiles {
+    table.o_list_table { direction: rtl; }
+    td { vertical-align: middle !important; }
+    .o_delivery_material_item { padding: 5px 8px; border: 1px solid #e0e6ed; background: #f7f9fc; border-radius: 7px; margin: 3px; }
+    .o_delivery_material_item strong { display: block; font-size: 12px; }
+    .o_delivery_material_meta { font-size: 11px; color: #6a7888; display: flex; gap: 8px; }
+}
+
+.o_delivery_customer_summary .o_list_table {
+    direction: rtl;
+    th, td { text-align: right !important; vertical-align: middle !important; }
+    td { padding-top: 12px; padding-bottom: 12px; }
+    .o_delivery_material_summary { min-width: 200px; }
+    td[name="dimension_label"] .badge { direction: ltr; line-height: 1.6; }
+}
+.o_delivery_customer_summary {
+    .o_delivery_material_item {
+        background: #f6f8fb;
+        border: 1px solid #dbe3ed;
+        border-radius: 7px;
+        padding: 7px 10px;
+        margin-block: 3px;
+        strong { display: block; color: #102f46; line-height: 1.6; }
+    }
+    .o_delivery_material_meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 12px;
+        color: #62748a;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+}
+
+.o_company_standards_form .o_field_company_standard_models {
+    width: 100%;
+}
+.o_company_standard_models_grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    .o_company_standard_model { width: 100%; min-width: 0; }
+    > .text-muted { grid-column: 1 / -1; }
+}
+
+.o_delivery_creation_overview .o_delivery_draft_cushions {
+    margin-top: 12px; padding: 16px; background: #f0f4f7; border: 1px solid #dce5ed; border-radius: 12px;
+    display: flex; align-items: center; gap: 18px;
+    .o_delivery_draft_cushion_title { color: #183b53; font-size: 17px; padding-inline-end: 18px; border-inline-end: 3px solid #b69a60; }
+    .o_delivery_draft_cushion_cards { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .o_delivery_draft_cushion_card { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #dce5ed; border-radius: 12px; background: #fff; }
+    .o_delivery_draft_cushion_card > strong { flex: 1 1 100px; color: #183b53; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+    .o_delivery_draft_cushion_numbers { display: flex; gap: 5px; }
+    bdi { padding: 3px 7px; background: #f1f5f8; border-radius: 6px; font-size: 13px; font-weight: 700; color: #16384e; }
+}
+@media (max-width: 767px) {
+    .o_delivery_creation_overview .o_delivery_draft_cushions { flex-direction: column; align-items: stretch; }
+    .o_delivery_creation_overview .o_delivery_draft_cushions .o_delivery_draft_cushion_cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+.o_delivery_creation_overview .o_delivery_draft_cushions {
+    .o_delivery_draft_cushion_card { flex-wrap: nowrap; gap: 7px; }
+    .o_delivery_draft_cushion_card > strong { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .o_delivery_draft_cushion_numbers { flex: 0 0 auto; align-items: center; white-space: nowrap; }
+    .o_delivery_draft_cushion_numbers > span { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 6px; background: #f1f5f8; font-size: 13px; color: #16384e; }
+    .o_delivery_draft_cushion_numbers > span bdi { padding: 0; }
+}
+
+.o_delivery_dimension_badge {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 7px 10px; border: 1px solid #dce5ed; border-radius: 9px; background: #f2f6f9;
+    color: #23465c; font-size: 14px; line-height: 1.5; white-space: nowrap;
+    bdi { direction: ltr; unicode-bidi: isolate; font-weight: 600; }
+    small { font-size: 11px; color: #7c8c98; }
+}

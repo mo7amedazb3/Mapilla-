@@ -1,0 +1,40 @@
+/* Enterprise-like Back Button Animations */
+
+.o_back_button {
+    /* Base styling for smooth transitions */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: #495057;
+    /* Default Odoo dark gray */
+    opacity: 0.8;
+}
+
+/* Hover Effect: Slide left and pop color */
+.o_back_button:hover {
+    color: #714B67;
+    /* Odoo Enterprise Purple */
+    opacity: 1;
+    transform: translateX(-4px) scale(1.1);
+    text-shadow: 0 4px 12px rgba(113, 75, 103, 0.3);
+}
+
+/* Active/Click Effect: Scale down slightly to feel tactile */
+.o_back_button:active {
+    transform: translateX(-2px) scale(0.95);
+    opacity: 0.9;
+}
+
+/* Styled Frame for the Back Arrow Button */
+.o_back_arrow_btn {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-right: 12px !important;
+    padding: 4px 10px !important;
+}
+
+.o_back_arrow_btn:hover {
+    background-color: #ffffff;
+    border-color: #714B67;
+    box-shadow: 0 4px 10px rgba(113, 75, 103, 0.2);
+}

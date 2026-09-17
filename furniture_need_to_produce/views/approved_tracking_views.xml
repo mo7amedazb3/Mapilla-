@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_approved_tracking" model="ir.actions.client">
+        <field name="name">المعتمد — متابعة الإنتاج</field>
+        <field name="tag">furniture_approved_tracking</field>
+    </record>
+    <menuitem id="menu_approved_tracking" name="المعتمد" parent="menu_need_to_produce" action="action_approved_tracking" sequence="30" groups="furniture_mrp.group_furniture_mrp_manager"/>
+</odoo>

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_employee_advance_hr_user,employee.advance hr user,model_employee_advance,hr.group_hr_user,1,1,1,0
+access_employee_advance_account_user,employee.advance account user,model_employee_advance,account.group_account_user,1,1,1,1
+access_employee_advance_installment_hr_user,employee.advance.installment hr user,model_employee_advance_installment,hr.group_hr_user,1,0,0,0
+access_employee_advance_installment_account_user,employee.advance.installment account user,model_employee_advance_installment,account.group_account_user,1,1,1,1
+access_employee_advance_repayment_hr_user,employee.advance.repayment hr user,model_employee_advance_repayment,hr.group_hr_user,1,0,0,0
+access_employee_advance_repayment_account_user,employee.advance.repayment account user,model_employee_advance_repayment,account.group_account_user,1,1,1,1
+access_employee_advance_repayment_wizard_account_user,employee.advance.repayment.wizard account user,model_employee_advance_repayment_wizard,account.group_account_user,1,1,1,1
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_mrp_stage_start_carryover_wizard_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.stage.start.carryover.wizard.form</field>
+        <field name="model">furniture.mrp.stage.start.carryover.wizard</field>
+        <field name="arch" type="xml">
+            <form string="اختيار منتجات صالة المرحلة" class="o_furniture_stage_transfer_wizard">
+                <div class="o_furniture_transfer_hero">
+                    <div>
+                        <div class="o_furniture_transfer_eyebrow">منتجات موجودة في صالة المرحلة</div>
+                        <h2>اختار المنتجات اللي هتبدأ فعلاً في صالة <field name="stage_label" nolabel="1" readonly="1" class="oe_inline"/>.</h2>
+                    </div>
+                    <div class="o_furniture_transfer_icon">▶</div>
+                </div>
+                <group class="o_furniture_transfer_order">
+                    <field name="production_id"/>
+                    <field name="stage_code" invisible="1"/>
+                    <field name="stage_order_model" invisible="1"/>
+                    <field name="stage_order_res_id" invisible="1"/>
+                    <field name="stage_label" invisible="1"/>
+                    <field name="request_only" invisible="1"/>
+                </group>
+                <div class="o_furniture_transfer_card o_furniture_transfer_contents">
+                    <div class="o_furniture_transfer_card_title">المنتجات الموجودة في الصالة الآن</div>
+                    <div class="o_furniture_transfer_contents_hint">
+                        لازم المنتج يكون متحول للصالة قبل البدء. المنتجات المختارة فقط هتدخل في تشغيل المرحلة وتتحرك لمخزن المرحلة بعد فحص الجودة.
+                    </div>
+                    <field name="line_ids" nolabel="1"
+                           class="o_furniture_standard_transfer_lines o_furniture_wizard_list">
+                        <list create="false" delete="false" editable="bottom">
+                            <field name="selected"/>
+                            <field name="product_id" invisible="1"/>
+                            <field name="source_production_id" column_invisible="1" force_save="1"/>
+                            <field name="source_production_line_id" column_invisible="1" force_save="1"/>
+                            <field name="technical_source_production_line_ids" column_invisible="1" force_save="1"/>
+                            <field name="technical_allocation_json" column_invisible="1" force_save="1"/>
+                            <field name="product_display_label" string="الصنف" readonly="1"/>
+                            <field name="dimension_label" string="المقاس" widget="badge"
+                                   class="o_furniture_dimension_badge" readonly="1"
+                                   decoration-info="dimension_label"/>
+                            <field name="furniture_model_id" string="الموديل" readonly="1" widget="badge"
+                                   class="o_furniture_transfer_model_badge"/>
+                            <field name="qty_in_work_location" string="الكمية الموجودة في الصالة" readonly="1"/>
+                            <field name="qty_to_start" string="كمية التشغيل"/>
+                            <field name="product_uom_id" string="الوحدة" readonly="1"/>
+                            <field name="source_origin" string="أمر التشغيل الأصلي" readonly="1" optional="show"/>
+                            <button name="action_view_requested_materials" type="object"
+                                    string="الخامات المطلوبة" icon="fa-list-alt"
+                                    class="btn-link o_furniture_wizard_material_button"/>
+                        </list>
+                    </field>
+                </div>
+                <footer>
+                    <button name="action_submit_store_request" string="إرسال طلب الإذن لأمين المخزن" type="object"
+                            class="btn-primary o_furniture_transfer_confirm" invisible="not request_only"/>
+                    <button name="action_start_selected_work" string="ابدأ المختار من الصالة" type="object"
+                            class="btn-primary o_furniture_transfer_confirm" invisible="request_only"/>
+                    <button string="إلغاء" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

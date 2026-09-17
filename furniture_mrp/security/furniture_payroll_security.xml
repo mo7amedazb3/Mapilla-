@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_furniture_contract_allowance_company" model="ir.rule">
+        <field name="name">بدلات عقود المصنع: شركات المستخدم</field>
+        <field name="model_id" ref="model_furniture_mrp_contract_allowance"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="rule_simple_payroll_slip_company" model="ir.rule">
+        <field name="name">كشوف أجور المصنع: شركات المستخدم</field>
+        <field name="model_id" ref="simple_payroll_salary-2.model_simple_payroll_slip"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+// Overlay navigation: page columns never depend on the drawer's open state.
+@media screen {
+    body.o_web_client[class] {
+        --mk-sidebar-width: 0 !important;
+        --mapilla-drawer-width: 260px;
+        > .mk_apps_sidebar_panel {
+            position: fixed !important; left: 0; right: auto; bottom: 0;
+            width: var(--mapilla-drawer-width) !important; z-index: 103;
+            transform: translateX(-100%); visibility: hidden; pointer-events: none;
+            transition: transform 230ms ease, visibility 230ms;
+            border: 0; border-right: 1px solid #ada69666;
+            box-shadow: none;
+            .mk_apps_sidebar { padding: 12px 9px 0 !important; }
+            .mk_apps_sidebar_menu > li > a { justify-content: flex-start !important; padding: 7px 10px !important; }
+            .mk_apps_sidebar_name, .o_mapilla_sidebar_caption { display: block !important; }
+            .o_mapilla_sidebar_home { justify-content: flex-start !important; padding: 4px 9px 17px !important; }
+            .o_mapilla_sidebar_home > i { display: inline-block !important; }
+            .o_mapilla_sidebar_brand { display: flex !important; }
+        }
+        &:has(.mk_app_menu), &.o_fullscreen, &.editor_has_snippets_hide_backend_navbar {
+            > .mk_apps_sidebar_panel { visibility: hidden; pointer-events: none; }
+        }
+        @media (max-width: 340px) { --mapilla-drawer-width: calc(100vw - 48px); }
+        @media (prefers-reduced-motion: reduce) {
+            > .mk_apps_sidebar_panel { transition: none !important; }
+        }
+    }
+}

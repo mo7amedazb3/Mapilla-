@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_employee_form_furniture_mrp" model="ir.ui.view">
+        <field name="name">hr.employee.form.furniture.mrp</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_furniture_pay_report"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calculator"
+                        groups="furniture_mrp.group_furniture_mrp_manager,hr_contract.group_hr_contract_manager">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">كشف الأجر</span>
+                        <span class="o_stat_text">والحضور</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="furniture_mrp" string="MRP II">
+                    <group>
+                        <group string="تصنيف الموظف">
+                            <field name="furniture_mrp_factory_department"/>
+                            <field name="furniture_mrp_role" widget="radio"/>
+                        </group>
+                        <group string="الأقسام المسموحة">
+                            <field name="furniture_mrp_worker_stage_ids"
+                                   widget="many2many_tags"
+                                   invisible="furniture_mrp_role != 'worker'"/>
+                            <field name="furniture_mrp_supervisor_stage_ids"
+                                   widget="many2many_tags"
+                                   invisible="furniture_mrp_role != 'supervisor'"/>
+                            <label for="furniture_mrp_role"
+                                   string="اختار مشرف وحدد مرحلة أو أكثر لتطبيق مجموعات صلاحيات المراحل تلقائيًا."/>
+                        </group>
+                    </group>
+                    <separator string="الأجر الأسبوعي"
+                               groups="furniture_mrp.group_furniture_mrp_manager,hr_contract.group_hr_contract_manager"/>
+                    <group groups="furniture_mrp.group_furniture_mrp_manager,hr_contract.group_hr_contract_manager">
+                        <group string="طريقة الحساب">
+                            <field name="furniture_pay_currency_id" invisible="1"/>
+                            <field name="furniture_pay_basis" widget="radio"/>
+                            <field name="furniture_piece_rate"
+                                   invisible="furniture_pay_basis != 'production'"/>
+                            <field name="furniture_current_week_fixed_wage"
+                                   readonly="1"
+                                   invisible="furniture_pay_basis != 'time'"/>
+                            <field name="furniture_current_week_piece_qty"
+                                   readonly="1"
+                                   invisible="furniture_pay_basis != 'production'"/>
+                            <field name="furniture_current_week_overtime_hours"
+                                   readonly="1"/>
+                            <field name="furniture_current_week_overtime_amount"
+                                   readonly="1" widget="monetary"/>
+                            <field name="furniture_current_week_pay" readonly="1"/>
+                        </group>
+                        <group string="متابعة حضور الشهر">
+                            <field name="furniture_current_month_absence_days"
+                                   readonly="1"/>
+                            <field name="furniture_current_month_late_hours"
+                                   readonly="1"/>
+                            <button name="action_open_furniture_pay_report"
+                                    type="object"
+                                    string="فتح كشف الأجر والحضور بالتفصيل"
+                                    class="btn-primary"
+                                    icon="fa-list-alt"
+                                    groups="furniture_mrp.group_furniture_mrp_manager,hr_contract.group_hr_contract_manager"/>
+                            <div class="text-muted"
+                                 invisible="furniture_pay_basis != 'production'">
+                                الغياب والتأخير للمتابعة فقط ولا يخصمان من أجر الإنتاج.
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_contract_form_furniture_compensation" model="ir.ui.view">
+        <field name="name">hr.contract.form.furniture.compensation</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='information']/group[@name='salary_info']"
+                   position="attributes">
+                <attribute name="col">1</attribute>
+                <attribute name="class">o_furniture_contract_compensation</attribute>
+            </xpath>
+            <xpath expr="//page[@name='information']//group[@name='salary']"
+                   position="replace">
+                <group name="salary" string="الأجر الأسبوعي"
+                       groups="furniture_mrp.group_furniture_mrp_manager,hr_contract.group_hr_contract_manager">
+                    <field name="currency_id" invisible="1"/>
+                    <field name="wage" invisible="1"/>
+                    <field name="furniture_pay_basis" widget="radio"/>
+                    <field name="furniture_weekly_wage"
+                           invisible="furniture_pay_basis != 'time'"/>
+                    <field name="furniture_piece_rate"
+                           invisible="furniture_pay_basis != 'production'"/>
+                    <div class="text-muted"
+                         invisible="furniture_pay_basis != 'time'">
+                        الأجر الأسبوعي = الراتب الشهري المسجل داخليًا ÷ 4.
+                    </div>
+                    <div class="text-muted"
+                         invisible="furniture_pay_basis != 'production'">
+                        الاستحقاق الأسبوعي = القطع المكتملة في MPS × سعر القطعة.
+                    </div>
+
+                    <div class="o_furniture_contract_overtime_panel"
+                         colspan="2" dir="rtl">
+                        <span class="o_furniture_contract_overtime_icon">
+                            <i class="fa fa-clock-o" title="العمل الإضافي"/>
+                        </span>
+                        <div class="o_furniture_contract_overtime_copy">
+                            <strong>معامل ساعة العمل الإضافي</strong>
+                            <span>يُطبّق على الوقت المسجل بعد نهاية الوردية اليومية</span>
+                        </div>
+                        <div class="o_furniture_contract_overtime_value">
+                            <field name="furniture_overtime_multiplier"
+                                   nolabel="1"/>
+                            <span class="o_furniture_contract_overtime-times">×</span>
+                        </div>
+                        <span class="o_furniture_contract_overtime_hint">
+                            سعر الساعة العادية
+                        </span>
+                    </div>
+
+                    <div class="o_furniture_contract_allowance_panel"
+                         colspan="2" dir="rtl">
+                        <div class="o_furniture_contract_allowance_header">
+                            <span class="o_furniture_contract_allowance_header_icon">
+                                <i class="fa fa-gift" title="البدلات الشهرية"/>
+                            </span>
+                            <div class="o_furniture_contract_allowance_heading">
+                                <strong>البدلات الشهرية الثابتة</strong>
+                                <span>سجّل مكونات البدل مرة واحدة داخل العقد</span>
+                            </div>
+                            <span class="o_furniture_contract_allowance_tag">
+                                قيم شهرية
+                            </span>
+                        </div>
+
+                        <div class="o_furniture_contract_allowance_grid">
+                            <div class="o_furniture_contract_allowance_card is-food">
+                                <div class="o_furniture_contract_allowance_label">
+                                    <span class="o_furniture_contract_allowance_icon">
+                                        <i class="fa fa-cutlery" title="بدل الأكل"/>
+                                    </span>
+                                    <label for="furniture_food_allowance"
+                                           string="بدل الأكل"/>
+                                </div>
+                                <field name="furniture_food_allowance"
+                                       nolabel="1" widget="monetary"
+                                       class="o_furniture_contract_allowance_amount"/>
+                                <span class="o_furniture_contract_allowance_period">
+                                    يُسجّل شهريًا
+                                </span>
+                            </div>
+
+                            <div class="o_furniture_contract_allowance_card is-transport">
+                                <div class="o_furniture_contract_allowance_label">
+                                    <span class="o_furniture_contract_allowance_icon">
+                                        <i class="fa fa-bus" title="بدل المواصلات"/>
+                                    </span>
+                                    <label for="furniture_transport_allowance"
+                                           string="بدل المواصلات"/>
+                                </div>
+                                <field name="furniture_transport_allowance"
+                                       nolabel="1" widget="monetary"
+                                       class="o_furniture_contract_allowance_amount"/>
+                                <span class="o_furniture_contract_allowance_period">
+                                    يُسجّل شهريًا
+                                </span>
+                            </div>
+
+                            <div class="o_furniture_contract_allowance_card is-basic">
+                                <div class="o_furniture_contract_allowance_label">
+                                    <span class="o_furniture_contract_allowance_icon">
+                                        <i class="fa fa-star" title="البدل الأساسي"/>
+                                    </span>
+                                    <label for="furniture_basic_allowance"
+                                           string="البدل الأساسي"/>
+                                </div>
+                                <field name="furniture_basic_allowance"
+                                       nolabel="1" widget="monetary"
+                                       class="o_furniture_contract_allowance_amount"/>
+                                <span class="o_furniture_contract_allowance_period">
+                                    يُسجّل شهريًا
+                                </span>
+                            </div>
+
+                            <div class="o_furniture_contract_allowance_card is-total">
+                                <div class="o_furniture_contract_allowance_label">
+                                    <span class="o_furniture_contract_allowance_icon">
+                                        <i class="fa fa-calculator" title="إجمالي البدلات"/>
+                                    </span>
+                                    <label for="furniture_total_monthly_allowances"
+                                           string="إجمالي البدلات"/>
+                                </div>
+                                <field name="furniture_total_monthly_allowances"
+                                       nolabel="1" widget="monetary" readonly="1"
+                                       class="o_furniture_contract_allowance_amount"/>
+                                <span class="o_furniture_contract_allowance_period">
+                                    مجموع تلقائي
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="o_furniture_contract_allowance_note">
+                            <i class="fa fa-info-circle" title="معلومة"/>
+                            <span>
+                                القيم مسجلة شهريًا، ويُحتسب ربعها في كشف الأجر الأسبوعي.
+                            </span>
+                        </div>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_hr_contract_list_furniture_compensation" model="ir.ui.view">
+        <field name="name">hr.contract.list.furniture.compensation</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='wage']" position="after">
+                <field name="furniture_pay_basis" optional="show"/>
+                <field name="furniture_weekly_wage"
+                       widget="monetary" optional="show"/>
+                <field name="furniture_overtime_multiplier"
+                       string="معامل الإضافي" optional="show"/>
+                <field name="furniture_piece_rate"
+                       widget="monetary" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

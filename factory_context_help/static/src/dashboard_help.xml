@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="factory_context_help.Shortages" t-inherit="furniture_need_to_produce.PipelineView" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_ntp_workspace_intro')]" position="attributes"><attribute name="class" add="o_factory_help_card" separator=" "/></xpath>
+        <xpath expr="//div[hasclass('o_ntp_workspace_intro_copy')]/p" position="replace"/>
+        <xpath expr="//span[hasclass('o_ntp_workspace_intro_tag')]" position="replace"/>
+        <xpath expr="//div[hasclass('o_ntp_workspace_intro')]" position="inside">
+            <button type="button" class="o_factory_help_button" aria-label="شرح اختيار الموديل" aria-haspopup="dialog" title="شرح اختيار الموديل" data-help-title="نبدأ بموديل إيه؟" data-help-message="مراجعة قبل الاعتماد&#10;موديلك، أصنافه، وكل قطعة بمسارها.">!</button>
+        </xpath>
+        <xpath expr="//section[hasclass('o_ntp_bulk_toolbar')]/small" position="replace">
+            <button type="button" class="o_factory_help_button" aria-label="شرح التحديد" aria-haspopup="dialog" data-help-title="تحديد القطع" data-help-message="التحديد للصفحة الحالية.">!</button>
+        </xpath>
+    </t>
+    <t t-name="factory_context_help.ShortagesList" t-inherit="furniture_need_to_produce.ListView" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_ntp_hero')]" position="attributes"><attribute name="class" add="o_factory_help_card" separator=" "/></xpath>
+        <xpath expr="//div[hasclass('o_ntp_hero_heading')]/p" position="replace"/>
+        <xpath expr="//div[hasclass('o_ntp_hero_note')]" position="replace"/>
+        <xpath expr="//div[hasclass('o_ntp_workflow')]" position="replace"/>
+        <xpath expr="//div[hasclass('o_ntp_hero')]" position="inside">
+            <button type="button" class="o_factory_help_button" aria-label="شرح مراجعة النواقص" aria-haspopup="dialog" data-help-title="مراجعة النواقص" data-help-message="كل قطعة لها مسارها. راجع المراحل والخامات، ثم اعتمد القطعة لبدء تجهيز أوامرها.&#10;المخزون أولًا: المراحل المغطاة ببضاعة جاهزة لا يُعاد تصنيعها.&#10;راجع مسار القطعة، ثم خامات كل مرحلة، ثم اعتمد بـ Approve.&#10;مؤقتًا: ساعتان لكل عملية · يوم العمل ١٠ ساعات.">!</button>
+        </xpath>
+        <xpath expr="//div[hasclass('o_ntp_metric_models')]//small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح الموديلات" aria-haspopup="dialog" data-help-message="استخدم البحث لاختيار الموديل.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_ntp_table_heading')]/span" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح القطع" aria-haspopup="dialog" data-help-message="افتح صف القطعة لمراجعة الخامات والتفاصيل قبل الاعتماد.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.RouteLegend" t-inherit="furniture_need_to_produce.RouteField" t-inherit-mode="extension">
+        <xpath expr="//small[hasclass('o_ntp_route_legend')]" position="replace"><button t-if="hasParallel" type="button" class="o_factory_help_button" aria-label="شرح التوازي" aria-haspopup="dialog" data-help-message="+ مراحل متوازية · الأسهم تبيّن ترتيب التنفيذ.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.RouteGraph" t-inherit="furniture_need_to_produce.ProductionRouteGraph" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_ntp_graph_title')]/span" position="replace"/>
+        <xpath expr="//small[hasclass('o_ntp_graph_scroll_hint')]" position="replace">
+            <button t-if="diagram.nodes.length" type="button" class="o_factory_help_button" aria-label="شرح مسار الإنتاج" aria-haspopup="dialog" data-help-title="مسار الإنتاج" t-att-data-help-message="'المسار من اليمين إلى اليسار. اسحب الخط أفقيًا لعرض باقي المراحل.\n' + (diagram.hasParallel ? 'الفروع تعمل بالتوازي وتلتقي عند المرحلة التي تحتاجها.' : 'الأسهم توضح ترتيب التنفيذ.')">!</button>
+        </xpath>
+        <xpath expr="//div[hasclass('o_ntp_graph_footer')]/span[@t-if='diagram.hasParallel']" position="replace"/>
+        <xpath expr="//div[hasclass('o_ntp_graph_footer')]/span[@t-else]" position="replace"/>
+    </t>
+    <t t-name="factory_context_help.StageMinmax" t-inherit="furniture_stage_replenishment.StageReplenishmentDashboard" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_fsr_heading')]//p" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح Min/Max المراحل" aria-haspopup="dialog" data-help-title="Min / Max المراحل" data-help-message="اضبط حدود كل مرحلة، وراجع مسار القطع وخاماتها في النواقص قبل الموافقة.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_fsr_stage_caption')]//small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح اختيار المرحلة" aria-haspopup="dialog" data-help-message="اختر مرحلة لعرض أرصدتها وحدودها. اسحب يمينًا ويسارًا لعرض باقي المراحل على الآيباد.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_fsr_table_meta')]/p" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح رصيد المخزن وحدود Min وMax" aria-haspopup="dialog" data-help-message="رصيد المخزن هو المتاح في التبويب المختار، ولا يشمل الأوامر القادمة أو المسودات. تبويب المنتج التام يعرض نفس أرصدته وحدود Min وMax المحفوظة سابقًا. عدّل Min وMax ثم اضغط حفظ في نفس الصف. على الشاشات الصغيرة اسحب الجدول أفقيًا لباقي الخانات.">!</button></xpath>
+        <xpath expr="//td[hasclass('o_fsr_empty')]/small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح البحث" aria-haspopup="dialog" data-help-message="غيّر الموديل أو المرحلة أو الحالة أو كلمة البحث.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.FinalMinmax" t-inherit="furniture_stage_replenishment.FinalReplenishmentDashboard" t-inherit-mode="extension">
+        <xpath expr="//header//p" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح Min/Max النهائي" aria-haspopup="dialog" data-help-title="Min / Max المنتج النهائي" data-help-message="Min/Max التام يحسب أوامر الكسوة المفتوحة أولًا؛ تبدأ الكسوة بعد جاهزية التجهيز والتفصيل، ثم ينتظر التغليف اكتمال الكسوة وجاهزية الدهانات.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_ntp_final_filter_count')]/small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح التصفية" aria-haspopup="dialog" data-help-message="التصفية للعرض فقط؛ تشغيل الاحتياجات يشمل كل الأصناف.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.FactoryHeader" t-inherit="furniture_mrp.StageDashboardPage" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_furniture_stage_dashboard_page__heading')]//small[@t-if]" position="replace"><button t-if="isBatchSupervisorMode" type="button" class="o_factory_help_button" aria-label="شرح لوحة المصنع" aria-haspopup="dialog" data-help-message="تشغيل أصناف مرحلتك كدفعات مجمعة.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_furniture_stage_dashboard_page__heading')]//small[@t-elif]" position="replace"><button t-elif="isOrderWorkflowSupervisorMode" type="button" class="o_factory_help_button" aria-label="شرح لوحة المصنع" aria-haspopup="dialog" data-help-message="تشغيل أوامر مرحلتك ومتابعة خاماتها.">!</button></xpath>
+        <xpath expr="//div[hasclass('o_furniture_stage_dashboard_page__heading')]//small[@t-else]" position="replace"><button t-else="" type="button" class="o_factory_help_button" aria-label="شرح لوحة المصنع" aria-haspopup="dialog" data-help-message="قائمة مستقلة لمتابعة أوامر كل مرحلة وتفاصيل أصنافها.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.FactoryStages" t-inherit="furniture_mrp.StageDashboardPanel" t-inherit-mode="extension">
+        <xpath expr="//section[hasclass('o_furniture_stage_navigation')]//small[not(@*)]" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح مراحل المصنع" aria-haspopup="dialog" data-help-message="اختار المرحلة لعرض شغلها وإحصائياتها.">!</button></xpath>
+        <xpath expr="//section[hasclass('o_furniture_stage_dashboard')]/div[hasclass('o_furniture_stage_dashboard__heading')]//small[@t-if]" position="replace"><button t-if="isBatchSupervisorMode" type="button" class="o_factory_help_button" aria-label="شرح ملخص المرحلة" aria-haspopup="dialog" data-help-message="كل صنف ظاهر كدفعة واحدة مستقلة.">!</button></xpath>
+        <xpath expr="//section[hasclass('o_furniture_stage_dashboard')]/div[hasclass('o_furniture_stage_dashboard__heading')]//small[@t-elif]" position="replace"><button t-elif="isOrderWorkflowSupervisorMode" type="button" class="o_factory_help_button" aria-label="شرح ملخص المرحلة" aria-haspopup="dialog" data-help-message="حدد أمرًا أو أكثر، والمؤشرات هتتحسب من اختيارك فورًا.">!</button></xpath>
+        <xpath expr="//section[hasclass('o_furniture_stage_dashboard')]/div[hasclass('o_furniture_stage_dashboard__heading')]//small[@t-else]" position="replace"><button t-else="" type="button" class="o_factory_help_button" aria-label="شرح ملخص المرحلة" aria-haspopup="dialog" data-help-message="اضغط على أي مؤشر لعرض أوامر الإنتاج المكوِّنة له.">!</button></xpath>
+        <xpath expr="//section[hasclass('o_furniture_stage_dashboard__handoffs')]/header/small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح التحويلات" aria-haspopup="dialog" data-help-message="التنبيه ممكن يتقفل، لكن التحويل يفضل هنا لحد ما تقبله.">!</button></xpath>
+        <xpath expr="//section[hasclass('o_need_supervisor_history')]/p[hasclass('o_need_supervisor_notice')]" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح الأصناف المكتملة" aria-haspopup="dialog" data-help-message="أصناف اكتمل تشغيلها في هذه المرحلة، بما فيها الأوامر المنتهية. الفترة المحددة أعلى الصفحة تُطبق على تاريخ بداية الأمر المخطط.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.Models" t-inherit="furniture_mrp.FurnitureModelNavigator" t-inherit-mode="extension">
+        <xpath expr="//span[hasclass('o_furniture_model_selector__heading_text')]/small" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح موديلات الخامات" aria-haspopup="dialog" data-help-message="كل موديل له ريسيبي وخامات مستقلة.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.MPS" t-inherit="furniture_mrp.MPSDashboardPage" t-inherit-mode="extension">
+        <xpath expr="//small[contains(text(),'كل عامل يرى')]" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح تخطيط العمال" aria-haspopup="dialog" data-help-message="كل عامل يرى تكليفاته، والمشرف يرى فريقه حسب صلاحيات النظام.">!</button></xpath>
+        <xpath expr="//small[contains(text(),'ستظهر هنا تلقائيًا')]" position="replace"><button type="button" class="o_factory_help_button" aria-label="شرح التكليفات" aria-haspopup="dialog" data-help-message="ستظهر هنا تلقائيًا بعد إنشاء خطة MPS وتوزيع القطع الكاملة.">!</button></xpath>
+    </t>
+    <t t-name="factory_context_help.Attendance" t-inherit="factory_attendance_dashboard.FactoryAttendanceDashboard" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_factory_attendance_brand')]//h1" position="inside">
+            <button type="button" class="o_factory_help_button o_factory_attendance_title_help"
+                    aria-label="ملاحظات لوحة الحضور" aria-haspopup="dialog"
+                    data-help-title="ملاحظات لوحة الحضور"
+                    data-help-message="متابعة عمال المصنع ومواعيد الحضور والانصراف من جهاز البصمة.&#10;&#10;ساعة غدا واحدة مدفوعة الأجر، وأي مدة زيادة حتى بصمة الرجوع تُحسب تأخيرًا. عدم الرجوع يُحسب انصرافًا بوقت الخروج.&#10;&#10;لو مفيش نتائج مطابقة، جرّب اختيار تاريخ أو قسم أو حالة مختلفة.">!</button>
+        </xpath>
+        <xpath expr="//div[hasclass('o_factory_attendance_brand')]//p" position="replace"/>
+        <xpath expr="//div[hasclass('o_factory_lunch_policy')]/span" position="replace"/>
+        <xpath expr="//p[contains(text(),'جرّب اختيار تاريخ')]" position="replace"/>
+    </t>
+    <t t-name="factory_context_help.Overtime" t-inherit="factory_attendance_overtime.OvertimeApproval" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('o_overtime_brand')]//h1" position="inside">
+            <button type="button" class="o_factory_help_button o_factory_attendance_title_help"
+                    aria-label="ملاحظات اعتماد الإضافي" aria-haspopup="dialog"
+                    data-help-title="اعتماد الإضافي"
+                    data-help-message="كل وقت بعد نهاية الشيفت يظل بحاجة للاعتماد حتى يراجعه الأدمن.&#10;&#10;اعتماد الوقت يحتسب الإضافي الظاهر. الرفض يحفظ الانصراف ويصفر الإضافي. ويمكن تسجيل وقت يدوي ثم اعتماده.&#10;&#10;الحضور المفتوح يُغلق عند منتصف الليل، وأول بصمة بعده تُعرض كانصراف اليوم السابق للمراجعة.">!</button>
+        </xpath>
+    </t>
+</templates>

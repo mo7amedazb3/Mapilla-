@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_picking_type_kanban_furniture_locations"
+            model="ir.ui.view">
+        <field name="name">stock.picking.type.kanban.furniture.locations</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.stock_picking_type_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="js_class">furniture_stock_dashboard_kanban</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

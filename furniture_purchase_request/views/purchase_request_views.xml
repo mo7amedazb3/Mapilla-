@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_furniture_purchase_request_list" model="ir.ui.view">
+        <field name="name">furniture.purchase.request.list</field>
+        <field name="model">furniture.purchase.request</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'requested'"
+                  decoration-success="state == 'rfq_created'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="warehouse_id"/>
+                <field name="stock_location_id"/>
+                <field name="requested_by_id"/>
+                <field name="production_id" optional="show"/>
+                <field name="rfq_count" groups="purchase.group_purchase_user"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_furniture_purchase_request_form" model="ir.ui.view">
+        <field name="name">furniture.purchase.request.form</field>
+        <field name="model">furniture.purchase.request</field>
+        <field name="arch" type="xml">
+            <form string="طلب شراء خامات المخزن">
+                <header>
+                    <button name="action_submit" type="object" string="إرسال الطلب للمشتريات"
+                            class="btn-primary" invisible="state != 'draft'"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper,stock.group_stock_manager"/>
+                    <button name="action_create_rfqs" type="object" string="إنشاء عروض أسعار RFQ"
+                            class="btn-primary"
+                            invisible="state != 'requested' or not can_create_rfqs"
+                            groups="purchase.group_purchase_user"/>
+                    <button name="action_cancel" type="object" string="إلغاء"
+                            invisible="state not in ('draft', 'requested')"
+                            groups="furniture_mrp.group_furniture_mrp_storekeeper,stock.group_stock_manager,purchase.group_purchase_user"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,requested,rfq_created"/>
+                </header>
+                <sheet>
+                    <field name="can_create_rfqs" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_rfqs" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="rfq_count == 0"
+                                groups="purchase.group_purchase_user">
+                            <field name="rfq_count" widget="statinfo" string="RFQs"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="warehouse_id" readonly="1"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="stock_location_id" readonly="1"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="production_id" readonly="1"
+                                   invisible="not production_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="line_ids"
+                           readonly="state in ('rfq_created', 'cancelled') or (state == 'requested' and not can_create_rfqs)">
+                        <list editable="bottom">
+                            <control>
+                                <create string="إضافة خامة"
+                                        invisible="parent.state != 'draft'"/>
+                            </control>
+                            <field name="product_id" string="الخامة"
+                                   domain="[('purchase_ok', '=', True)]"
+                                   readonly="parent.state != 'draft' or purchase_order_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="quantity"
+                                   readonly="parent.state != 'draft' or purchase_order_id"/>
+                            <field name="product_uom_category_id" column_invisible="True"/>
+                            <field name="product_uom_id"
+                                   domain="[('category_id', '=', product_uom_category_id)]"
+                                   readonly="parent.state != 'draft' or purchase_order_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="suggested_supplier_id" readonly="1"
+                                   column_invisible="not parent.can_create_rfqs"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="supplier_id"
+                                   readonly="parent.state != 'requested' or purchase_order_id"
+                                   column_invisible="not parent.can_create_rfqs"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="purchase_order_id" readonly="1"
+                                   optional="show" groups="purchase.group_purchase_user"/>
+                        </list>
+                    </field>
+                    <field name="note" placeholder="أي ملاحظات لقسم المشتريات..."
+                           readonly="state in ('rfq_created', 'cancelled') or (state == 'requested' and not can_create_rfqs)"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_furniture_purchase_request_search" model="ir.ui.view">
+        <field name="name">furniture.purchase.request.search</field>
+        <field name="model">furniture.purchase.request</field>
+        <field name="arch" type="xml">
+            <search string="طلبات شراء خامات المخزن">
+                <field name="name"/>
+                <field name="requested_by_id"/>
+                <field name="warehouse_id"/>
+                <field name="production_id"/>
+                <filter name="requested" string="بانتظار المشتريات"
+                        domain="[('state', '=', 'requested')]"/>
+                <filter name="rfq_created" string="تم إنشاء RFQ"
+                        domain="[('state', '=', 'rfq_created')]"/>
+                <separator/>
+                <filter name="group_state" string="الحالة" context="{'group_by': 'state'}"/>
+                <filter name="group_requester" string="مقدم الطلب"
+                        context="{'group_by': 'requested_by_id'}"/>
+                <filter name="group_production" string="أمر الإنتاج"
+                        context="{'group_by': 'production_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_furniture_purchase_request" model="ir.actions.act_window">
+        <field name="name">طلبات شراء خامات المخزن</field>
+        <field name="res_model">furniture.purchase.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_furniture_purchase_request_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">أنشئ طلب خامات جديدًا</p>
+            <p>أمين المخزن يرسل الاحتياج، ثم يحدد قسم المشتريات المورد وينشئ RFQ.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_furniture_purchase_request_inventory"
+              name="طلبات شراء خامات المخزن"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="action_furniture_purchase_request"
+              sequence="26"
+              groups="furniture_mrp.group_furniture_mrp_storekeeper,stock.group_stock_manager"/>
+
+    <menuitem id="menu_furniture_purchase_request_purchase"
+              name="طلبات خامات المخزن"
+              parent="purchase.menu_purchase_root"
+              action="action_furniture_purchase_request"
+              sequence="2"
+              groups="purchase.group_purchase_user"/>
+</odoo>

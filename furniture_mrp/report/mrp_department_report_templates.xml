@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template التقديم -->
+    <template id="report_priming_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر التقديم - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>الكمية:</strong></td><td><t t-out="doc.product_qty"/></td></tr>
+                            <tr><td><strong>نوع التقديم:</strong></td><td><t t-out="doc.primer_type"/></td>
+                                <td><strong>كمية التقديم:</strong></td><td><t t-out="doc.primer_qty_liters"/></td></tr>
+                            <tr><td><strong>أوراق الصنفرة:</strong></td><td><t t-out="doc.sandpaper_sheets"/></td>
+                                <td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.labor_cost"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Template تصنيع دهانات -->
+    <template id="report_painting_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر تصنيع دهانات - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>الكمية:</strong></td><td><t t-out="doc.product_qty"/></td></tr>
+                            <tr><td><strong>نوع الدهان:</strong></td><td><t t-out="doc.paint_type"/></td>
+                                <td><strong>لون الدهان:</strong></td><td><t t-out="doc.paint_color"/></td></tr>
+                            <tr><td><strong>عدد الطبقات:</strong></td><td><t t-out="doc.num_coats"/></td>
+                                <td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.labor_cost"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Template تجميع -->
+    <template id="report_carpentry_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر تجميع - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>عدد القطع:</strong></td><td><t t-out="doc.pieces_count"/></td></tr>
+                            <tr><td><strong>نوع الخشب:</strong></td><td><t t-out="doc.wood_type"/></td>
+                                <td><strong>نوع الإطار:</strong></td><td><t t-out="doc.frame_type"/></td></tr>
+                            <tr><td><strong>الخشب (م²):</strong></td><td><t t-out="doc.wood_qty_m2"/></td>
+                                <td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.labor_cost"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_bases_template">
+        <t t-call="web.html_container"><t t-foreach="docs" t-as="doc"><t t-call="web.external_layout"><div class="page">
+            <t t-set="brand_company" t-value="doc.production_order_id.company_id"/><t t-call="furniture_mrp.report_company_brand_logo"/>
+            <h2 class="text-center">أمر القواعد - <t t-out="doc.name"/></h2>
+            <table class="table table-bordered mt-4"><tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td><td><strong>الكمية:</strong></td><td><t t-out="doc.product_qty"/></td></tr><tr><td><strong>رئيس القسم:</strong></td><td><t t-out="doc.foreman_id.name"/></td><td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.total_labor_cost"/></td></tr><tr><td><strong>الجودة:</strong></td><td><t t-out="doc.quality_check"/></td><td><strong>الحالة:</strong></td><td><t t-out="doc.state"/></td></tr></table>
+        </div></t></t></t>
+    </template>
+
+    <!-- Template كسوه -->
+    <template id="report_upholstery_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر كسوه - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>نوع القماش:</strong></td><td><t t-out="doc.fabric_type"/></td></tr>
+                            <tr><td><strong>لون القماش:</strong></td><td><t t-out="doc.fabric_color"/></td>
+                                <td><strong>كمية القماش (م):</strong></td><td><t t-out="doc.fabric_qty_m"/></td></tr>
+                            <tr><td><strong>نوع السفنجة:</strong></td><td><t t-out="doc.foam_type"/></td>
+                                <td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.labor_cost"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Template تجهيز -->
+    <template id="report_finishing_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر تجهيز - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>الرقم التسلسلي:</strong></td><td><t t-out="doc.serial_number"/></td></tr>
+                            <tr><td><strong>نوع التجهيز:</strong></td><td><t t-out="doc.finishing_type"/></td>
+                                <td><strong>التغليف:</strong></td><td><t t-out="doc.packaging_type"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Template تفصيل -->
+    <template id="report_tailoring_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <t t-set="brand_company" t-value="doc.production_order_id.company_id"/>
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <h2 class="text-center">أمر تفصيل - <t t-out="doc.name"/></h2>
+                        <table class="table table-bordered mt-4">
+                            <tr><td><strong>المنتج المخطط:</strong></td><td><t t-out="doc.product_id.display_name"/></td>
+                                <td><strong>الباترون:</strong></td><td><t t-out="doc.cutting_pattern"/></td></tr>
+                            <tr><td><strong>طريقة القطع:</strong></td><td><t t-out="doc.cutting_method"/></td>
+                                <td><strong>تكلفة العمالة:</strong></td><td><t t-out="doc.labor_cost"/></td></tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

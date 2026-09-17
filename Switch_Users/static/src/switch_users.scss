@@ -1,0 +1,41 @@
+.o_switch_users_menu {
+    min-width: 230px;
+    width: 260px;
+    max-width: 90vw;
+}
+.o_switch_users_accounts {
+    min-width: 310px;
+    width: 420px;
+    max-width: 90vw;
+    max-height: 65vh;
+    overflow-y: auto;
+    .o_switch_users_account {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        white-space: normal;
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(0, 0, 0, .05);
+        direction: rtl;
+        .o_switch_users_name { flex: 1 1 50%; font-weight: 600; }
+        .o_switch_users_details { flex: 1 1 50%; font-size: .88em; opacity: .8; }
+    }
+}
+.o_switch_users_context, .o_switch_users_heading {
+    padding: 8px 14px;
+    font-size: .86em;
+    color: #55707c;
+    background: #f1f6f8;
+}
+.o_switch_users_restore { color: #9b5c00; white-space: normal; }
+.o_switch_users_badge {
+    display: inline-block;
+    vertical-align: middle;
+    margin-inline-start: 5px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #ffc857;
+    color: #332400;
+    font-size: 10px;
+    font-weight: 700;
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="production_form_design" model="ir.ui.view">
+        <field name="name">furniture.production.mapilla.design</field>
+        <field name="model">furniture.mrp.production</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_production_form"/>
+        <field name="priority">250</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="class" add="o_mapilla_order_form" separator=" "/>
+            </xpath>
+            <xpath expr="//div[@name='furniture_stage_strip']" position="before">
+                <section class="mp_order_banner" dir="rtl">
+                    <div class="mp_order_banner_copy">
+                        <span class="mp_order_eyebrow">مصنوع بعناية · MAPILLA</span>
+                        <h1>أمر الإنتاج</h1>
+                        <div class="mp_order_reference"><field name="name" readonly="1" nolabel="1"/></div>
+                        <div class="mp_order_facts">
+                            <span><i class="fa fa-cubes" title="الأصناف"/><field name="production_line_count" readonly="1" nolabel="1"/> أصناف</span>
+                            <span><i class="fa fa-circle-o" title="الحالة"/><field name="state" readonly="1" nolabel="1"/></span>
+                        </div>
+                    </div>
+                    <div class="mp_order_brand_art">
+                        <img class="mp_order_wordmark" src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/>
+                        <img class="mp_order_illustration" src="/furniture_dashboard_presentation/static/src/img/production-studio.svg" alt=""/>
+                    </div>
+                </section>
+            </xpath>
+            <xpath expr="//div[hasclass('o_furniture_order_planning_strip')]" position="before">
+                <div class="mp_order_details_grid">
+                    <section class="mp_order_detail_panel" name="mp_order_planning_panel">
+                        <div class="mp_order_section_title"><i class="fa fa-calendar" title="التخطيط"/><span>خطة الإنتاج<small>مواعيد البدء والتسليم</small></span></div>
+                    </section>
+                    <section class="mp_order_detail_panel" name="mp_order_customer_panel">
+                        <div class="mp_order_section_title"><i class="fa fa-address-book-o" title="العملاء"/><span>بيانات العميل<small>المشتري والمستفيد من الطلب</small></span></div>
+                    </section>
+                </div>
+            </xpath>
+            <xpath expr="//section[@name='mp_order_planning_panel']" position="inside">
+                <xpath expr="//div[hasclass('o_furniture_order_planning_strip')]" position="move"/>
+            </xpath>
+            <xpath expr="//section[@name='mp_order_customer_panel']" position="inside">
+                <xpath expr="//div[hasclass('o_furniture_order_common_strip')]" position="move"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="production_creation_design" model="ir.ui.view">
+        <field name="name">furniture.production.creation.mapilla.design</field>
+        <field name="model">furniture.mrp.production.first.line.wizard</field>
+        <field name="inherit_id" ref="furniture_mrp.view_furniture_mrp_production_first_line_wizard_form"/>
+        <field name="priority">250</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="class" add="o_mapilla_creation_form" separator=" "/>
+            </xpath>
+            <xpath expr="//div[hasclass('o_furniture_transfer_hero')]" position="replace">
+                <section class="mp_creation_banner" dir="rtl">
+                    <div><span class="mp_creation_eyebrow">من التصميم إلى الإنتاج</span>
+                        <h2>جهّز تفاصيل أمر الإنتاج</h2>
+                        <p>اختار الموديل والمنتجات، وحدّد الكميات والمقاسات.</p>
+                    </div>
+                    <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png" alt="MAPILLA"/>
+                </section>
+            </xpath>
+            <xpath expr="//field[@name='furniture_order_model_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True, 'quick_limit': 4, 'always_show_more': True, 'card_title': 'الموديل', 'card_subtitle': 'اختار الموديل المطلوب تصنيعه', 'card_icon': 'fa-cube', 'card_variant': 'model', 'order_by': 'sequence, name, id'}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='selected_product_ids']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True, 'quick_names': ['كنبة كبيرة', 'كنبة صغيرة', 'فوتيه', 'شازلونج'], 'quick_limit': 4, 'always_show_more': False, 'card_title': 'المنتجات النهائية', 'card_subtitle': 'يمكن اختيار أكثر من منتج', 'card_icon': 'fa-cubes', 'card_variant': 'product', 'order_by': 'name, id'}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

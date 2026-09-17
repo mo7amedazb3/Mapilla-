@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_stage_replenishment.FinalReplenishmentDashboard">
+        <div class="o_ffr_dashboard" dir="rtl">
+            <header class="o_ffr_hero">
+                <div>
+                    <small>المتحكم الرئيسي في أوامر التعويض</small>
+                    <h1>Min / Max مخزون المنتج النهائي</h1>
+                    <p>Min/Max التام يحسب أوامر الكسوة المفتوحة أولًا؛ تبدأ الكسوة بعد جاهزية التجهيز والتفصيل، ثم ينتظر التغليف اكتمال الكسوة وجاهزية الدهانات.</p>
+                </div>
+                <div class="o_ffr_actions">
+                    <button class="btn btn-light" t-att-disabled="state.syncing" t-on-click="sync">
+                        <i t-att-class="state.syncing ? 'fa fa-refresh fa-spin' : 'fa fa-refresh'"/>
+                        تحديث الريسيبي
+                    </button>
+                    <button class="btn btn-light" t-on-click="() => this.openOrders()">
+                        <i class="fa fa-list-ul"/> المسودات
+                    </button>
+                    <button class="btn btn-warning" t-att-disabled="state.runningAll" t-on-click="() => this.run()">
+                        <i t-att-class="state.runningAll ? 'fa fa-spinner fa-spin' : 'fa fa-bolt'"/>
+                        تشغيل الاحتياجات
+                    </button>
+                </div>
+            </header>
+
+            <section class="o_ffr_summary">
+                <article><small>الأصناف</small><strong t-esc="state.summary.total_rules || 0"/></article>
+                <article><small>تم ضبطها</small><strong t-esc="state.summary.configured || 0"/></article>
+                <article class="is-danger"><small>تحتاج تصنيع</small><strong t-esc="state.summary.need_production || 0"/></article>
+                <article><small>مسودات التعويض</small><strong t-esc="state.summary.draft_orders || 0"/></article>
+            </section>
+
+            <section class="o_ffr_filters">
+                <label>
+                    <i class="fa fa-search"/>
+                    <input type="search" placeholder="ابحث بالصنف أو الموديل..." t-on-input="setSearch"/>
+                </label>
+                <select t-on-change="setStatus">
+                    <option value="all">كل الحالات</option>
+                    <option value="to_produce">تحتاج تصنيع</option>
+                    <option value="draft">مغطاة بمسودة</option>
+                    <option value="incoming">جاري في المسار</option>
+                    <option value="working">رصيد تحت التشغيل</option>
+                    <option value="ok">المستوى سليم</option>
+                    <option value="disabled">غير مُعدة</option>
+                </select>
+            </section>
+
+            <div t-if="state.loading" class="o_ffr_loading">
+                <i class="fa fa-spinner fa-spin"/> جاري تحميل المخزون...
+            </div>
+            <section t-else="" class="o_ffr_rows">
+                <article t-foreach="filteredRows" t-as="row" t-key="row.id" class="o_ffr_row">
+                    <div class="o_ffr_identity">
+                        <strong t-esc="row.product"/>
+                        <span t-esc="row.model"/>
+                        <small t-esc="row.recipe"/>
+                    </div>
+                    <div class="o_ffr_stock">
+                        <small>المخزون التام</small>
+                        <strong><t t-esc="formatQty(row.finished_qty)"/> <em t-esc="row.unit"/></strong>
+                        <span t-att-class="statusClass(row)" t-esc="statusLabel(row)"/>
+                    </div>
+                    <div class="o_ffr_limits">
+                        <label>Min
+                            <input type="number" min="0" step="0.001" t-att-value="row.minimum"
+                                   t-on-input="(event) => this.setLimit(row, 'minimum', event)"/>
+                        </label>
+                        <label>Max
+                            <input type="number" min="0" step="0.001" t-att-value="row.maximum"
+                                   t-on-input="(event) => this.setLimit(row, 'maximum', event)"/>
+                        </label>
+                        <button t-if="state.dirty[row.id]" class="btn btn-primary"
+                                t-att-disabled="state.saving[row.id]" t-on-click="() => this.save(row)">
+                            <i t-att-class="state.saving[row.id] ? 'fa fa-spinner fa-spin' : 'fa fa-save'"/> حفظ
+                        </button>
+                    </div>
+                    <div t-foreach="row.components || []" t-as="component"
+                         t-key="component.lane"
+                         t-att-class="'o_ffr_lane is-' + component.lane">
+                        <header>
+                            <i class="fa fa-cubes"/>
+                            <strong t-esc="component.label"/>
+                            <small t-if="component.owned_by_final_minmax">يتبع Min/Max التام</small>
+                            <small t-else="">Min/Max مستقل</small>
+                        </header>
+                        <span>جاهز <b t-esc="formatQty(component.wip_qty)"/></span>
+                        <span>جاري <b t-esc="formatQty(component.incoming_qty)"/></span>
+                        <span>مسودة <b t-esc="formatQty(component.draft_qty)"/></span>
+                        <span t-if="component.owned_by_final_minmax" class="is-need">
+                            المطلوب <b t-esc="formatQty(component.qty_to_produce)"/>
+                        </span>
+                        <span t-else="" class="is-independent">يُدار من شاشة مرحلته</span>
+                    </div>
+                    <div class="o_ffr_row_actions">
+                        <button class="btn btn-outline-secondary" t-on-click="() => this.openOrders(row)">
+                            الأوامر
+                        </button>
+                        <button t-if="row.can_run" class="btn btn-primary"
+                                t-att-disabled="state.running[row.id]" t-on-click="() => this.run(row)">
+                            <i t-att-class="state.running[row.id] ? 'fa fa-spinner fa-spin' : 'fa fa-industry'"/>
+                            شغّل التجميع والاحتياج
+                        </button>
+                    </div>
+                </article>
+                <div t-if="!filteredRows.length" class="o_ffr_empty">لا توجد أصناف مطابقة.</div>
+            </section>
+        </div>
+    </t>
+</templates>

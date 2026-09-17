@@ -1,0 +1,97 @@
+.o_dynamic_report_container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.o_dynamic_report_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.o_dynamic_report_header h2 {
+    color: #017e84; /* Odoo primary */
+    margin: 0;
+    font-weight: 600;
+}
+
+.o_report_table {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.o_report_table thead th {
+    background-color: #f1f1f1;
+    color: #444;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+    padding: 10px;
+}
+
+.o_report_account_row {
+    cursor: pointer;
+    background-color: #fafafa;
+}
+
+.o_report_account_row:hover {
+    background-color: #f0f0f0;
+}
+
+.o_report_account_row td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.o_report_line_row {
+    background-color: #fff;
+    font-size: 0.9em;
+}
+
+.o_report_line_row td {
+    padding: 8px 10px;
+    border-bottom: 1px dotted #eee;
+}
+
+/* Loading Animation */
+.o_dynamic_report_loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(1, 126, 132, 0.2);
+    border-top-color: #017e84;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media print {
+    .o_main_navbar, .o_control_panel, .o_dynamic_report_header button, .o_report_controls input {
+        display: none !important;
+    }
+    .o_dynamic_report_container {
+        padding: 0;
+        background-color: white;
+        overflow: visible;
+    }
+    .o_report_table {
+        box-shadow: none;
+        width: 100%;
+    }
+}

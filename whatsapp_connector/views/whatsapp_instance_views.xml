@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_instance_form" model="ir.ui.view">
+        <field name="name">whatsapp.instance.form</field>
+        <field name="model">whatsapp.instance</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Connection">
+                <header>
+                    <button name="action_init_instance" string="Connect / Initialize" type="object" class="oe_highlight" invisible="status not in ('offline', 'offsess')"/>
+                    <button name="action_refresh_status" string="Refresh Status" type="object" invisible="status in ('offline', 'offsess')"/>
+                    <button name="action_sync_history" string="Sync Chats" type="object" class="btn-secondary" invisible="status != 'ready'"/>
+                    <button name="action_logout" string="Logout / Unlink" type="object" class="btn-secondary" 
+                            confirm="Are you sure you want to logout? This will require a new QR scan."
+                            invisible="status == 'offsess'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Primary WhatsApp"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="api_settings" string="API Settings">
+                            <field name="instance_id" readonly="1" force_save="1"/>
+                            <field name="api_url"/>
+                            <field name="last_check"/>
+                            <field name="last_history_sync"/>
+                            <field name="host_phone" invisible="not host_phone"/>
+                        </group>
+                        <group name="status_group" string="Current Status">
+                            <field name="status" widget="badge" 
+                                   decoration-success="status == 'ready'" 
+                                   decoration-warning="status in ('qr', 'authenticated', 'initializing')"
+                                   decoration-danger="status == 'offline'"
+                                   decoration-info="status == 'offsess'"/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-info" role="alert" invisible="status != 'ready'">
+                        <i class="fa fa-check-circle me-1"/> WhatsApp is connected and ready to send/receive messages.
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" invisible="status != 'qr'">
+                        <i class="fa fa-qrcode me-1"/> Scan the QR code below with your WhatsApp mobile app to link the account.
+                    </div>
+
+                    <div class="alert alert-danger" role="alert" invisible="status != 'offline' or status == 'initializing'">
+                        <i class="fa fa-exclamation-triangle me-1"/> API is unreachable. Make sure the Node.js server is running on the specified URL.
+                    </div>
+
+                    <notebook>
+                        <page string="Connection QR" invisible="status != 'qr'">
+                            <div class="text-center" style="padding: 20px;">
+                                <field name="qr_code" widget="image" options="{'size': [300, 300]}" style="margin: 0 auto; display: block;"/>
+                                <p class="mt-3 text-muted">Waiting for scan...</p>
+                            </div>
+                        </page>
+                        <page string="Logged Out" invisible="status != 'offsess'">
+                            <div class="text-center" style="padding: 50px;">
+                                <i class="fa fa-unlink fa-4x text-muted mb-3"/>
+                                <h3>Account Unlinked</h3>
+                                <p>Click "Refresh Status" to generate a new QR code.</p>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_instance_tree" model="ir.ui.view">
+        <field name="name">whatsapp.instance.tree</field>
+        <field name="model">whatsapp.instance</field>
+        <field name="arch" type="xml">
+            <list string="WhatsApp Connections">
+                <field name="name"/>
+                <field name="host_phone"/>
+                <field name="status" widget="badge" 
+                       decoration-success="status == 'ready'" 
+                       decoration-warning="status in ('qr', 'authenticated', 'initializing')"
+                       decoration-danger="status == 'offline'"/>
+                <field name="last_check"/>
+            </list>
+        </field>
+    </record>
+
+    <menuitem id="menu_whatsapp_connector_root" name="WA Connector" sequence="35" web_icon="whatsapp_connector,static/description/icon.png"/>
+
+    <record id="action_whatsapp_instance" model="ir.actions.act_window">
+        <field name="name">WhatsApp Connections</field>
+        <field name="res_model">whatsapp.instance</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Manage your WhatsApp connection here.
+            </p>
+            <p>
+                Ensure the Node.js API is running on the server.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_whatsapp_instance" 
+              name="Connections" 
+              parent="menu_whatsapp_connector_root"
+              action="action_whatsapp_instance" 
+              sequence="5"/>
+</odoo>

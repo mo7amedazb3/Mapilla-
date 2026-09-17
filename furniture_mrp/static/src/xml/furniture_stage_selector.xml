@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="furniture_mrp.FurnitureStageSelector">
+        <section class="o_furniture_model_selector o_furniture_stage_selector">
+            <button t-if="isBatchReleaseLine"
+                    type="button"
+                    class="o_furniture_batch_order_choice"
+                    t-att-class="{'is-selected': isOrderIncluded, 'is-unavailable': !isOrderSelectable}"
+                    t-att-disabled="!isOrderSelectable"
+                    t-att-aria-checked="isOrderIncluded ? 'true' : 'false'"
+                    role="checkbox"
+                    t-on-click.stop="() => this.toggleOrder()">
+                <span class="o_furniture_batch_order_choice__icon" aria-hidden="true">
+                    <i t-att-class="!isOrderSelectable ? 'fa fa-lock' : (isOrderIncluded ? 'fa fa-check' : 'fa fa-plus')"/>
+                </span>
+                <span class="o_furniture_batch_order_choice__copy">
+                    <strong t-if="!isOrderSelectable">الأمر غير متاح للصرف</strong>
+                    <strong t-elif="isOrderIncluded">الأمر داخل إذن الصرف</strong>
+                    <strong t-else="">إضافة الأمر إلى إذن الصرف</strong>
+                    <small t-if="!isOrderSelectable">لا توجد مراحل متاحة لهذا الأمر حاليًا</small>
+                    <small t-elif="isOrderIncluded">اختار المراحل المطلوبة من المربعات بالأسفل</small>
+                    <small t-else="">اضغط هنا أولًا، ثم اختار مراحل الصرف</small>
+                </span>
+                <span class="o_furniture_batch_order_choice__state">
+                    <t t-if="!isOrderSelectable">غير متاح</t>
+                    <t t-elif="isOrderIncluded">محدد</t>
+                    <t t-else="">اختيار</t>
+                </span>
+            </button>
+
+            <div class="o_furniture_model_selector__heading">
+                <span class="o_furniture_model_selector__heading_icon" aria-hidden="true">
+                    <i class="fa fa-th-large"/>
+                </span>
+                <span class="o_furniture_model_selector__heading_text">
+                    <t t-if="isBatchReleaseLine">
+                        <strong>حدد مراحل الصرف لهذا الأمر</strong>
+                        <small aria-live="polite">
+                            <t t-if="isOrderIncluded">
+                                <t t-esc="selectedCount"/> مرحلة مختارة · حدد المراحل المطلوبة
+                            </t>
+                            <t t-else="">
+                                اختار الأمر أولًا لتفعيل مراحله
+                            </t>
+                        </small>
+                    </t>
+                    <t t-else="">
+                        <strong>حدد مراحل تصنيع الصنف</strong>
+                        <small aria-live="polite">
+                            <t t-esc="selectedCount"/> مرحلة مختارة · اضغط على أي مربع لتحديده أو إلغائه
+                        </small>
+                    </t>
+                </span>
+                <button t-if="isBatchReleaseLine"
+                        type="button"
+                        class="o_furniture_batch_select_all"
+                        t-att-class="{'is-complete': allAvailableStagesSelected}"
+                        t-att-disabled="!isOrderSelectable || allAvailableStagesSelected"
+                        title="تحديد كل المراحل المتاحة لهذا الأمر"
+                        t-on-click.stop="() => this.selectAllAvailableStages()">
+                    <i t-att-class="allAvailableStagesSelected ? 'fa fa-check-circle' : 'fa fa-check-square-o'"
+                       aria-hidden="true"/>
+                    <span t-if="allAvailableStagesSelected">تم تحديد الكل</span>
+                    <span t-else="">تحديد الكل</span>
+                </button>
+            </div>
+
+            <div class="o_furniture_model_selector__cards o_furniture_stage_selector__cards"
+                 role="group" aria-label="مراحل تصنيع الصنف">
+                <button t-foreach="stages" t-as="stage" t-key="stage.field"
+                        type="button"
+                        class="o_furniture_model_card o_furniture_stage_card"
+                        t-att-class="{
+                            'is-selected': isSelected(stage),
+                            'is-disabled': isDisabled(stage),
+                        }"
+                        t-att-disabled="isDisabled(stage)"
+                        t-att-title="stageReason(stage)"
+                        t-att-aria-checked="isSelected(stage) ? 'true' : 'false'"
+                        role="checkbox"
+                        t-on-click.stop="() => this.toggleStage(stage)">
+                    <span class="o_furniture_model_card__icon" aria-hidden="true">
+                        <i t-att-class="stage.icon"/>
+                    </span>
+                    <span class="o_furniture_stage_card__copy">
+                        <span class="o_furniture_model_card__name" t-esc="stage.label"/>
+                        <small t-if="stageReason(stage)"
+                               class="o_furniture_stage_card__reason"
+                               t-esc="stageReason(stage)"/>
+                    </span>
+                    <span class="o_furniture_model_card__check" aria-hidden="true">
+                        <i class="fa fa-check"/>
+                    </span>
+                </button>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="furniture_mrp.FurnitureBatchMaterialCheckSelector">
+        <button type="button"
+                class="o_furniture_batch_order_choice o_furniture_material_check_order_choice"
+                t-att-class="{'is-selected': isSelected}"
+                t-att-aria-checked="isSelected ? 'true' : 'false'"
+                role="checkbox"
+                t-on-click.stop="() => this.toggleSelection()">
+            <span class="o_furniture_batch_order_choice__icon" aria-hidden="true">
+                <i t-att-class="isSelected ? 'fa fa-check' : 'fa fa-search'"/>
+            </span>
+            <span class="o_furniture_batch_order_choice__copy">
+                <strong t-if="isSelected">الأمر محدد للفحص والحجز</strong>
+                <strong t-else="">اختيار الأمر لفحص المواد</strong>
+                <small t-if="isSelected">سيتم حجز المتاح وتحديث طلبات شراء العجز</small>
+                <small t-else="">اضغط هنا لإضافة الأمر إلى العملية المجمعة</small>
+            </span>
+            <span class="o_furniture_batch_order_choice__state">
+                <t t-if="isSelected">محدد</t>
+                <t t-else="">اختيار</t>
+            </span>
+        </button>
+    </t>
+
+    <t t-name="furniture_mrp.FurnitureBatchMaterialCheckSelectAll">
+        <button type="button"
+                class="o_furniture_material_check_batch_select_all"
+                t-att-class="{'is-selected': allSelected, 'is-busy': selectAllState.busy}"
+                t-att-disabled="isDisabled"
+                t-att-aria-checked="allSelected ? 'true' : 'false'"
+                role="checkbox"
+                t-on-click.stop="() => this.toggleAll()">
+            <i t-att-class="allSelected ? 'fa fa-check-square' : 'fa fa-square-o'"
+               aria-hidden="true"/>
+            <span t-if="allSelected">إلغاء تحديد كل الأوامر</span>
+            <span t-else="">تحديد كل الأوامر</span>
+        </button>
+    </t>
+
+</templates>

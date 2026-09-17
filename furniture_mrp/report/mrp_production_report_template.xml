@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_production_order_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="brand_company" t-value="o.company_id"/>
+                    <div class="page" dir="rtl" style="font-family: 'Cairo', Arial, sans-serif;">
+                        <t t-call="furniture_mrp.report_company_brand_logo"/>
+                        <!-- رأس التقرير -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 8px;">
+                                    🏭 أمر التشغيل الأسبوعي
+                                </h2>
+                                <h3 style="color: #3498db;">
+                                    <t t-esc="o.name"/>
+                                </h3>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div class="badge fs-5 p-2"
+                                     style="background-color: #3498db; color: white;">
+                                    <t t-esc="dict(o.fields_get(['state'])['state']['selection'])[o.state]"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- معلومات التشغيل الأسبوعي -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <table class="table table-bordered" style="border-color: #bdc3c7;">
+                                    <thead style="background-color: #2c3e50; color: white;">
+                                        <tr>
+                                            <th colspan="4" class="text-center">📦 معلومات التشغيل الأسبوعي</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">المنتج المخطط</td>
+                                            <td><t t-esc="o.product_id.display_name"/></td>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">الكمية</td>
+                                            <td>
+                                                <t t-esc="o.product_qty"/>
+                                                <t t-esc="o.product_uom_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">المسؤول</td>
+                                            <td><t t-esc="o.responsible_id.name"/></td>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">الأولوية</td>
+                                            <td>
+                                                <t t-if="o.priority == '0'">عادي</t>
+                                                <t t-if="o.priority == '1'">مهم ⭐</t>
+                                                <t t-if="o.priority == '2'">عاجل 🔥</t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">تاريخ البدء المخطط</td>
+                                            <td><t t-esc="o.date_planned_start" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td style="background-color: #ecf0f1; font-weight: bold;">تاريخ الانتهاء المخطط</td>
+                                            <td><t t-esc="o.date_planned_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- حالة الأقسام -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 style="color: #2c3e50; border-right: 4px solid #3498db; padding-right: 10px;">
+                                    🔄 رحلة الإنتاج عبر الأقسام
+                                </h4>
+                                <table class="table table-bordered text-center">
+                                    <thead style="background-color: #34495e; color: white;">
+                                        <tr>
+                                            <th>القسم</th>
+                                            <th>رقم الأمر</th>
+                                            <th>الحالة</th>
+                                            <th>تاريخ الانتهاء</th>
+                                            <th>فحص الجودة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-if="o.priming_order_id">
+                                            <td style="font-weight: bold;">🎨 التقديم</td>
+                                            <td><t t-esc="o.priming_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.priming_order_id.fields_get(['state'])['state']['selection'])[o.priming_order_id.state]"/></td>
+                                            <td><t t-esc="o.priming_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.priming_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.priming_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.painting_order_id">
+                                            <td style="font-weight: bold;">🖌️ تصنيع دهانات</td>
+                                            <td><t t-esc="o.painting_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.painting_order_id.fields_get(['state'])['state']['selection'])[o.painting_order_id.state]"/></td>
+                                            <td><t t-esc="o.painting_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.painting_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.painting_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.carpentry_order_id">
+                                            <td style="font-weight: bold;">🪵 تجميع</td>
+                                            <td><t t-esc="o.carpentry_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.carpentry_order_id.fields_get(['state'])['state']['selection'])[o.carpentry_order_id.state]"/></td>
+                                            <td><t t-esc="o.carpentry_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.carpentry_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.carpentry_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.bases_order_id">
+                                            <td style="font-weight: bold;">🧱 القواعد</td><td><t t-esc="o.bases_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.bases_order_id.fields_get(['state'])['state']['selection'])[o.bases_order_id.state]"/></td>
+                                            <td><t t-esc="o.bases_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.bases_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.bases_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.finishing_order_id">
+                                            <td style="font-weight: bold;">🔧 تجهيز</td>
+                                            <td><t t-esc="o.finishing_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.finishing_order_id.fields_get(['state'])['state']['selection'])[o.finishing_order_id.state]"/></td>
+                                            <td><t t-esc="o.finishing_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.finishing_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.finishing_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.tailoring_order_id">
+                                            <td style="font-weight: bold;">✂️ تفصيل</td>
+                                            <td><t t-esc="o.tailoring_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.tailoring_order_id.fields_get(['state'])['state']['selection'])[o.tailoring_order_id.state]"/></td>
+                                            <td><t t-esc="o.tailoring_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.tailoring_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.tailoring_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.upholstery_order_id">
+                                            <td style="font-weight: bold;">🛋️ كسوه</td>
+                                            <td><t t-esc="o.upholstery_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.upholstery_order_id.fields_get(['state'])['state']['selection'])[o.upholstery_order_id.state]"/></td>
+                                            <td><t t-esc="o.upholstery_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.upholstery_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.upholstery_order_id.quality_check]"/></td>
+                                        </tr>
+                                        <tr t-if="o.packaging_order_id">
+                                            <td style="font-weight: bold;">📦 التغليف</td>
+                                            <td><t t-esc="o.packaging_order_id.name"/></td>
+                                            <td><t t-esc="dict(o.packaging_order_id.fields_get(['state'])['state']['selection'])[o.packaging_order_id.state]"/></td>
+                                            <td><t t-esc="o.packaging_order_id.date_finish" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy'}"/></td>
+                                            <td><t t-esc="dict(o.packaging_order_id.fields_get(['quality_check'])['quality_check']['selection'])[o.packaging_order_id.quality_check]"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- نسبة التقدم -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <strong>نسبة إنجاز الأمر: </strong>
+                                <span style="font-size: 1.5em; color: #27ae60; font-weight: bold;">
+                                    <t t-esc="o.progress"/>%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- الملاحظات -->
+                        <div t-if="o.notes" class="row">
+                            <div class="col-12">
+                                <h5>📝 ملاحظات:</h5>
+                                <div style="border: 1px solid #bdc3c7; padding: 10px; border-radius: 4px;">
+                                    <t t-out="o.notes"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- التوقيعات -->
+                        <div class="row mt-5">
+                            <div class="col-4 text-center">
+                                <div style="border-top: 2px solid #2c3e50; margin-top: 40px; padding-top: 10px;">
+                                    مدير الإنتاج
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top: 2px solid #2c3e50; margin-top: 40px; padding-top: 10px;">
+                                    مسؤول الجودة
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top: 2px solid #2c3e50; margin-top: 40px; padding-top: 10px;">
+                                    المستلم
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

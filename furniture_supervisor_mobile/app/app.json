@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Mapilla Supervisors",
+    "slug": "mapilla-supervisors",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "mapilla-supervisors",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mapilla.supervisors"
+    },
+    "android": {
+      "package": "com.mapilla.supervisors",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0c2a44"
+      },
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "allowBackup": false
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/icon.png",
+      "name": "Mapilla | المشرفين"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "baseUrl": "/furniture_supervisor_mobile/static/app"
+    }
+  }
+}

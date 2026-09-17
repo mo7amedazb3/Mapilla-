@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════════
+         MPS - جدول الإنتاج الرئيسي
+    ══════════════════════════════════════════════════════ -->
+
+    <!-- ─── Form View ─────────────────────────────────────────────────────── -->
+    <record id="view_furniture_mrp_mps_form" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.form</field>
+        <field name="model">furniture.mrp.mps</field>
+        <field name="arch" type="xml">
+            <form string="جدول الإنتاج الرئيسي (MPS)">
+                <header>
+                    <button name="action_confirm"
+                            string="تأكيد"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_generate_production"
+                            string="🏭 توليد تشغيل أسبوعي"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_initialize_capacity"
+                            string="⚙️ تهيئة طاقة الأقسام"
+                            type="object"
+                            invisible="state == 'done' or state == 'cancelled'"/>
+                    <button name="action_mark_done"
+                            string="إغلاق الجدول"
+                            type="object"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_reset_to_draft"
+                            string="إعادة للمسودة"
+                            type="object"
+                            invisible="state not in ['cancelled', 'confirmed']"/>
+                    <button name="action_cancel"
+                            string="إلغاء"
+                            type="object"
+                            invisible="state in ['done', 'cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,done"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_productions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-industry"
+                                invisible="production_count == 0">
+                            <field name="production_count" widget="statinfo"
+                                   string="أوامر التشغيل الأسبوعية"/>
+                        </button>
+                        <button name="action_view_lines"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-th-list"
+                                invisible="line_count == 0">
+                            <field name="line_count" widget="statinfo"
+                                   string="أصناف الخطة"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="معلومات المنتج">
+                            <field name="product_id" string="المنتج الرئيسي (اختياري)"
+                                   domain="[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False)]"
+                                   options="{'no_create': True}"/>
+                            <field name="product_uom_id" readonly="1"/>
+                            <field name="responsible_id"/>
+                            <field name="priority" widget="priority"/>
+                        </group>
+                        <group string="الفترة الزمنية">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group string="📦 الكميات والمخزون">
+                        <group>
+                            <field name="forecast_qty"/>
+                            <field name="demand_qty"/>
+                        </group>
+                        <group>
+                            <field name="line_total_qty" readonly="1"
+                                   invisible="line_count == 0"/>
+                            <field name="stock_on_hand" readonly="1"
+                                   decoration-danger="stock_on_hand &lt; demand_qty"
+                                   decoration-success="stock_on_hand &gt;= demand_qty"/>
+                            <field name="expected_stock" readonly="1"
+                                   decoration-danger="expected_stock &lt; 0"
+                                   decoration-warning="expected_stock &gt;= 0 and expected_stock &lt; demand_qty"
+                                   decoration-success="expected_stock &gt;= demand_qty"/>
+                            <field name="produced_qty" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- الأصناف / السطور -->
+                        <page string="🧾 الأصناف" name="lines">
+                            <field name="line_ids">
+                                <list string="ملخص أصناف الخطة" create="1" edit="1" delete="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" string="المنتج النهائي"
+                                           domain="[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False)]"
+                                           options="{'no_create_edit': True}"/>
+                                    <field name="furniture_order_model_id" string="الموديل" optional="show" required="1"/>
+                                    <field name="bom_id"
+                                           domain="[('furniture_product_id', '=', product_id), ('furniture_model_id', '=', furniture_order_model_id), ('type', '=', 'normal')]"
+                                           options="{'no_create_edit': True}" optional="hide"/>
+                                    <field name="product_qty"/>
+                                    <field name="product_uom_id" readonly="1" optional="hide"/>
+                                    <field name="dimension_label" widget="badge"
+                                           class="o_furniture_dimension_badge"
+                                           decoration-info="dimension_label"/>
+                                    <field name="width_cm" optional="hide"/>
+                                    <field name="depth_cm" optional="hide"/>
+                                    <field name="height_cm" optional="hide"/>
+                                    <field name="dimension_factor" readonly="1" optional="show"/>
+                                    <field name="stage_count" readonly="1" optional="hide"/>
+                                    <field name="stage_summary" readonly="1"/>
+                                    <field name="production_order_id" readonly="1"/>
+                                </list>
+                                <form string="تفاصيل صنف الخطة الأسبوعية" class="o_furniture_mps_line_form">
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <label for="product_id" string="المنتج النهائي"/>
+                                            <h1>
+                                                <field name="product_id" nolabel="1"
+                                                       domain="[('furniture_has_active_normal_recipe', '=', True), ('furniture_dimension_source_product_id', '=', False)]"
+                                                       options="{'no_create_edit': True}"/>
+                                            </h1>
+                                            <field name="furniture_classification_label" widget="badge"
+                                                   class="o_furniture_classification_badge"
+                                                   invisible="not furniture_classification_label"/>
+                                        </div>
+                                        <group>
+                                            <group string="تعريف المنتج">
+                                                <field name="mps_id" readonly="1" invisible="not mps_id"/>
+                                                <field name="furniture_order_model_id" string="الموديل" required="1"/>
+                                                <field name="bom_id"
+                                                       domain="[('furniture_product_id', '=', product_id), ('furniture_model_id', '=', furniture_order_model_id), ('type', '=', 'normal')]"
+                                                       options="{'no_create_edit': True}"/>
+                                                <field name="product_qty"/>
+                                                <field name="product_uom_id" readonly="1"/>
+                                                <field name="production_order_id" readonly="1"/>
+                                                <field name="production_state" readonly="1"/>
+                                            </group>
+                                            <group string="المقاسات">
+                                                <field name="bom_width_cm" readonly="1"/>
+                                                <field name="bom_depth_cm" readonly="1"/>
+                                                <field name="bom_height_cm" readonly="1"/>
+                                                <separator string="المقاس الفعلي"/>
+                                                <field name="width_cm"/>
+                                                <field name="depth_cm"/>
+                                                <field name="height_cm"/>
+                                                <field name="dimension_factor" readonly="1"/>
+                                                <field name="dimension_label" readonly="1" widget="badge"
+                                                       class="o_furniture_dimension_badge"/>
+                                            </group>
+                                        </group>
+                                        <group string="مراحل التصنيع">
+                                            <field name="stage_count" readonly="1"/>
+                                            <field name="stage_summary" readonly="1"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+
+                        <!-- طاقة الأقسام -->
+                        <page string="🏭 طاقة الأقسام" name="capacity">
+                            <field name="capacity_line_ids" domain="[('department', '!=', 'sewing')]">
+                                <list editable="bottom">
+                                    <field name="department"/>
+                                    <field name="planned_orders"/>
+                                    <field name="actual_orders" readonly="1"/>
+                                    <field name="capacity_pct" readonly="1"
+                                           widget="progressbar"
+                                           options="{'max_value': 100, 'editable': false}"/>
+                                    <field name="capacity_status" readonly="1"
+                                           decoration-success="capacity_status == 'ok'"
+                                           decoration-warning="capacity_status == 'warning'"
+                                           decoration-danger="capacity_status == 'overload'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- أوامر التشغيل الأسبوعية -->
+                        <page string="📋 أوامر التشغيل الأسبوعية" name="productions">
+                            <field name="production_order_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="product_qty"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-warning="state in ['priming','painting','carpentry','bases','finishing','tailoring','upholstery','packaging']"
+                                           decoration-success="state == 'done'"
+                                           decoration-danger="state == 'cancelled'"/>
+                                    <field name="date_planned_start"/>
+                                    <field name="progress" widget="progressbar"
+                                           options="{'max_value': 100, 'editable': false}"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- الملاحظات -->
+                        <page string="ملاحظات" name="notes">
+                            <field name="notes" placeholder="أضف ملاحظاتك هنا..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── List View ─────────────────────────────────────────────────────── -->
+    <record id="view_furniture_mrp_mps_list" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.list</field>
+        <field name="model">furniture.mrp.mps</field>
+        <field name="arch" type="xml">
+            <list string="جداول الإنتاج الرئيسية (MPS)"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'confirmed'">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="forecast_qty"/>
+                <field name="demand_qty"/>
+                <field name="stock_on_hand"/>
+                <field name="expected_stock"/>
+                <field name="produced_qty"/>
+                <field name="production_count"/>
+                <field name="priority" widget="priority" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="responsible_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ─── Search View ───────────────────────────────────────────────────── -->
+    <record id="view_furniture_mrp_mps_search" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.search</field>
+        <field name="model">furniture.mrp.mps</field>
+        <field name="arch" type="xml">
+            <search string="جدول الإنتاج الرئيسي">
+                <field name="name" string="المرجع"/>
+                <field name="product_id" string="المنتج"/>
+                <field name="responsible_id" string="المسؤول"/>
+
+                <filter string="مسودة" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="مؤكد" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="منتهي" name="done" domain="[('state','=','done')]"/>
+                <filter string="ملغي" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <group expand="0" string="تجميع حسب">
+                    <filter string="المنتج" name="group_product"
+                            context="{'group_by': 'product_id'}"/>
+                    <filter string="الحالة" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="الأسبوع" name="group_week"
+                            context="{'group_by': 'date_from:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Kanban View ───────────────────────────────────────────────────── -->
+    <record id="view_furniture_mrp_mps_kanban" model="ir.ui.view">
+        <field name="name">furniture.mrp.mps.kanban</field>
+        <field name="model">furniture.mrp.mps</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="forecast_qty"/>
+                <field name="produced_qty"/>
+                <field name="expected_stock"/>
+                <field name="state"/>
+                <field name="priority"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill oe_kanban_color_#{record.color.raw_value}">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div><b>المنتج: </b><field name="product_id"/></div>
+                                    <div><b>من: </b><field name="date_from"/> <b> إلى: </b><field name="date_to"/></div>
+                                    <div><b>المخطط: </b><field name="forecast_qty"/> | <b>المنتج: </b><field name="produced_qty"/></div>
+                                    <div t-attf-class="text-#{record.expected_stock.raw_value &lt; 0 ? 'danger' : 'success'}">
+                                        <b>المتوقع: </b><field name="expected_stock"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ─── Action ────────────────────────────────────────────────────────── -->
+    <record id="action_furniture_mrp_mps" model="ir.actions.act_window">
+                <field name="name">جدول الإنتاج الرئيسي (MPS)</field>
+        <field name="res_model">furniture.mrp.mps</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_furniture_mrp_mps_search"/>
+        <field name="context">{'search_default_confirmed': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ أول جدول إنتاج رئيسي (MPS)
+            </p>
+            <p>
+                يساعدك جدول الإنتاج الرئيسي على تخطيط الإنتاج الأسبوعي،
+                متابعة المخزون، وإدارة طاقة الأقسام الأربعة.
+            </p>
+        </field>
+    </record>
+
+</odoo>

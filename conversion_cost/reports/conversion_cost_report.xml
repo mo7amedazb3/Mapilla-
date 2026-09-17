@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_conversion_cost" model="ir.actions.report">
+        <field name="name">Conversion Cost Report</field>
+        <field name="model">conversion.cost.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">conversion_cost.report_conversion_cost_template</field>
+        <field name="report_file">conversion_cost.report_conversion_cost_template</field>
+        <field name="print_report_name">'Conversion_Cost_%s_to_%s' % (object.date_from, object.date_to)</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+</odoo>

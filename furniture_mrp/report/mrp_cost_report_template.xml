@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_furniture_mrp_cost_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="currency" t-value="o.company_id.currency_id"/>
+                    <t t-set="product_rows" t-value="o.get_cost_report_product_rows()"/>
+                    <t t-set="brand_company" t-value="o.company_id"/>
+                    <div class="page" dir="rtl" style="font-family:'DejaVu Sans',Arial,sans-serif; color:#18313b; font-size:10px;">
+                        <style>
+                            .cost-cover { background:#123f49; color:#fff; padding:18px 22px; border-radius:10px; margin-bottom:12px; }
+                            .cost-cover h1 { color:#fff !important; margin:0 0 4px 0; font-size:25px; font-weight:700; }
+                            .cost-cover .subtitle { color:#ccebed; font-size:11px; }
+                            .cost-meta { width:100%; table-layout:fixed; margin-top:12px; color:#fff; }
+                            .cost-meta td { width:25%; box-sizing:border-box; padding:3px 8px; border-left:1px solid rgba(255,255,255,.18); vertical-align:top; word-wrap:break-word; }
+                            .section-title { font-size:14px; font-weight:700; color:#123f49; border-right:5px solid #e79b25; padding:4px 9px; margin:14px 0 7px; }
+                            .summary-table { width:100%; border-collapse:separate; border-spacing:7px 0; margin:0 -7px 10px; }
+                            .summary-card { border:1px solid #cfe1e3; background:#f4faf9; padding:10px; border-radius:7px; width:20%; }
+                            .summary-card .label { color:#60767d; font-size:9px; margin-bottom:3px; }
+                            .summary-card .value { color:#123f49; font-size:17px; font-weight:700; }
+                            .summary-card.total { background:#e7f5ef; border-color:#8cc9b1; }
+                            .summary-card.unit { background:#fff5df; border-color:#e9c777; }
+                            table.report-grid { width:100%; border-collapse:collapse; margin-bottom:10px; }
+                            table.report-grid thead th { background:#195966; color:#fff; padding:7px 4px; border:1px solid #174d58; font-size:9px; text-align:center; }
+                            table.report-grid tbody td { padding:7px 4px; border:1px solid #d7e2e4; text-align:center; vertical-align:middle; }
+                            table.report-grid tbody tr:nth-child(even) { background:#f5f8f8; }
+                            .stage-name { font-weight:700; color:#155563; }
+                            .money { direction:ltr; white-space:nowrap; font-weight:600; }
+                            .unit-cost { direction:ltr; white-space:nowrap; font-size:13px; font-weight:700; color:#14784d; }
+                            .tag { display:inline-block; background:#e7f1f3; color:#155563; border:1px solid #bdd4d8; border-radius:9px; padding:1px 7px; }
+                            .notice { background:#fff8e8; border:1px solid #efd597; border-right:5px solid #e79b25; padding:7px 10px; margin:8px 0 12px; line-height:1.7; }
+                            .notice-main { color:#26464e; font-weight:700; }
+                            .notice-sub { color:#6d6251; font-size:9px; }
+                            .empty-box { background:#f5f7f7; color:#64777d; border:1px dashed #aebfc2; padding:14px; text-align:center; }
+                            .signatures { width:100%; margin-top:25px; page-break-inside:avoid; }
+                            .signatures td { width:33.33%; text-align:center; padding:30px 20px 0; }
+                            .signature-line { border-top:1px solid #71858a; padding-top:5px; }
+                        </style>
+
+                        <div class="cost-cover">
+                            <table style="width:100%; table-layout:fixed; color:#fff;">
+                                <tr>
+                                    <td style="width:70%; vertical-align:top;">
+                                        <h1>تقرير التكاليف الفعلية الشامل</h1>
+                                        <div class="subtitle">تكلفة معتمدة لحظة بلحظة حسب قبول الجودة في مراحل الإنتاج</div>
+                                    </td>
+                                    <td style="width:30%; text-align:left; vertical-align:top;">
+                                        <t t-call="furniture_mrp.report_company_brand_logo_left"/>
+                                        <div style="font-size:18px; font-weight:700;"><t t-esc="o.name"/></div>
+                                        <div class="subtitle"><t t-esc="o.company_id.name"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="cost-meta">
+                                <tr>
+                                    <td><strong>مدير الإنتاج:</strong> <t t-esc="o.responsible_id.name or '-'"/></td>
+                                    <td><strong>الحالة:</strong>
+                                        <t t-if="o.state == 'draft'">مسودة</t>
+                                        <t t-elif="o.state == 'confirmed'">مؤكد</t>
+                                        <t t-elif="o.state == 'in_production'">جاري التصنيع</t>
+                                        <t t-elif="o.state == 'done'">منتهي</t>
+                                        <t t-else=""><t t-esc="o.state"/></t>
+                                    </td>
+                                    <td><strong>التقدم:</strong> <t t-esc="o.progress"/>%</td>
+                                    <td><strong>العملة:</strong> <t t-esc="currency.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><strong>الأصناف:</strong> <span style="white-space:pre-line;"><t t-esc="o.header_product_summary or '-'"/></span></td>
+                                    <td><strong>بداية فعلية:</strong> <span t-if="o.date_start" t-field="o.date_start" t-options="{'widget':'datetime'}"/><span t-else="">-</span></td>
+                                    <td><strong>نهاية فعلية:</strong> <span t-if="o.date_finish" t-field="o.date_finish" t-options="{'widget':'datetime'}"/><span t-else="">-</span></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section-title">الملخص التنفيذي حتى هذه اللحظة</div>
+                        <table class="summary-table">
+                            <tr>
+                                <td class="summary-card">
+                                    <div class="label">الخامات المعتمدة</div>
+                                    <div class="value"><t t-esc="'{:,.2f}'.format(o.material_cost or 0.0)"/></div>
+                                </td>
+                                <td class="summary-card">
+                                    <div class="label">العمالة المعتمدة</div>
+                                    <div class="value"><t t-esc="'{:,.2f}'.format(o.labor_cost or 0.0)"/></div>
+                                </td>
+                                <td class="summary-card">
+                                    <div class="label">Overhead</div>
+                                    <div class="value"><t t-esc="'{:,.2f}'.format(o.overhead_cost or 0.0)"/></div>
+                                </td>
+                                <td class="summary-card total">
+                                    <div class="label">إجمالي التكلفة الفعلية</div>
+                                    <div class="value"><t t-esc="'{:,.2f}'.format(o.total_cost or 0.0)"/></div>
+                                </td>
+                                <td class="summary-card unit">
+                                    <div class="label">متوسط تكلفة الوحدة الحالية</div>
+                                    <div class="value"><t t-esc="'{:,.2f}'.format(o.cost_per_unit or 0.0)"/></div>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="notice">
+                            <div class="notice-main">
+                                الكمية المعتمدة بالتكلفة حتى الآن:
+                                <span t-esc="'{:,.3f}'.format(o.actual_costed_quantity or 0.0)"/>
+                            </div>
+                            <div class="notice-sub">يشمل التقرير التكاليف التي تم تثبيتها عند قبول الجودة فقط، وتتحدث أرقامه تلقائيًا مع تقدم التشغيل.</div>
+                        </div>
+
+                        <!-- تم حذف جدول تكلفة المراحل والعمالة فقط حسب المطلوب. -->
+                        <div class="section-title">تكلفة دفعات المنتجات الحالية</div>
+                        <table class="report-grid" t-if="product_rows">
+                            <thead>
+                                <tr>
+                                    <th>الصنف</th>
+                                    <th>الموديل</th>
+                                    <th>المشتري / المستفيد</th>
+                                    <th>المقاس</th>
+                                    <th>الكمية المخططة</th>
+                                    <th>الكمية المعتمدة</th>
+                                    <th>تقدم المراحل</th>
+                                    <th>خامات تراكمية</th>
+                                    <th>عمالة تراكمية</th>
+                                    <th>إجمالي الدفعة</th>
+                                    <th>تكلفة القطعة الواحدة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="product_rows" t-as="row">
+                                    <td class="stage-name"><t t-esc="row['product'].display_name"/></td>
+                                    <td><span class="tag" t-if="row['model']"><t t-esc="row['model'].name"/></span><span t-else="">-</span></td>
+                                    <td>
+                                        <div t-if="row['buyer']"><strong>المشتري:</strong> <t t-esc="row['buyer'].name"/></div>
+                                        <div t-if="row['beneficiary']"><strong>المستفيد:</strong> <t t-esc="row['beneficiary'].name"/></div>
+                                        <span t-if="not row['buyer'] and not row['beneficiary']">-</span>
+                                    </td>
+                                    <td><span class="tag" t-if="row['dimension']"><t t-esc="row['dimension']"/></span><span t-else="">-</span></td>
+                                    <td><t t-esc="'{:,.3f}'.format(row['planned_quantity'])"/></td>
+                                    <td><t t-esc="'{:,.3f}'.format(row['quantity'])"/></td>
+                                    <td><t t-esc="row['completed_count']"/> / <t t-esc="row['stage_count']"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['material_cost'])"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['labor_cost'])"/></td>
+                                    <td class="money"><t t-esc="'{:,.2f}'.format(row['total_cost'])"/></td>
+                                    <td class="unit-cost"><t t-esc="'{:,.2f}'.format(row['unit_cost'])"/> جنيه</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="empty-box" t-else="">لا توجد تكاليف معتمدة للأصناف حتى الآن.</div>
+
+                        <table class="signatures">
+                            <tr>
+                                <td><div class="signature-line">إعداد التقرير</div></td>
+                                <td><div class="signature-line">مدير الإنتاج</div></td>
+                                <td><div class="signature-line">الإدارة المالية</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

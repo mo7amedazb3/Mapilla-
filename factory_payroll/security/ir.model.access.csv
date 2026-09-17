@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_factory_payroll_slip_manager,factory payroll slip manager,simple_payroll_salary-2.model_simple_payroll_slip,hr.group_hr_manager,1,1,1,1
+access_factory_payroll_batch_wizard_manager,factory payroll batch wizard manager,model_factory_payroll_batch_wizard,hr.group_hr_manager,1,1,1,1

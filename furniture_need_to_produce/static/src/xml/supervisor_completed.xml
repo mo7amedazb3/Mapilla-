@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="furniture_mrp.StageDashboardPanel" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='isBatchSupervisorMode']" position="before">
+            <t t-if="stageDashboard.supervisorMode">
+                <div class="o_need_supervisor_sections" role="tablist" aria-label="مخطط الإنتاج والمكتمل">
+                    <button type="button" role="tab" class="o_need_supervisor_tab is-planned"
+                            t-att-class="{'is-active': needSupervisor.section === 'planned'}"
+                            t-att-aria-selected="needSupervisor.section === 'planned' ? 'true' : 'false'"
+                            t-on-click="() => this.selectNeedSupervisorSection('planned')">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"/>
+                        <span><small>أوامر الإنتاج</small><strong t-esc="formatNumber(needPlannedOrderCount)"/></span>
+                    </button>
+                    <button type="button" role="tab" class="o_need_supervisor_tab is-completed"
+                            t-att-class="{'is-active': needSupervisor.section === 'completed'}"
+                            t-att-aria-selected="needSupervisor.section === 'completed' ? 'true' : 'false'"
+                            t-on-click="() => this.selectNeedSupervisorSection('completed')">
+                        <i class="fa fa-check-circle" aria-hidden="true"/>
+                        <span><small>مكتمل</small><strong t-esc="formatNumber(needSupervisor.completedQuantity)"/></span>
+                    </button>
+                </div>
+                <p t-if="needSupervisor.loading" role="status" class="o_need_supervisor_notice">جاري تحميل سجل المرحلة…</p>
+                <p t-if="needSupervisor.error" role="alert" class="o_need_supervisor_notice is-error" t-esc="needSupervisor.error"/>
+                <section t-if="needSupervisor.section === 'completed'" class="o_need_supervisor_history" aria-label="الأصناف المكتملة">
+                    <p class="o_need_supervisor_notice">أصناف اكتمل تشغيلها في هذه المرحلة، بما فيها الأوامر المنتهية. الفترة المحددة أعلى الصفحة تُطبق على تاريخ بداية الأمر المخطط.</p>
+                    <div t-if="needSupervisor.completed.length" class="o_need_supervisor_rows">
+                        <t t-foreach="needSupervisor.completed" t-as="row" t-key="row.key"><t t-call="furniture_need_to_produce.SupervisorReadonlyCard"/></t>
+                    </div>
+                    <p t-elif="!needSupervisor.loading and !needSupervisor.error" class="o_need_supervisor_empty">لا توجد أصناف مكتملة لهذه المرحلة خلال الفترة المحددة.</p>
+                </section>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-if='isBatchSupervisorMode']" position="attributes">
+            <attribute name="t-if">isBatchSupervisorMode and needSupervisor.section === 'planned'</attribute>
+        </xpath>
+        <xpath expr="//t[@t-elif='isOrderWorkflowSupervisorMode']" position="attributes">
+            <attribute name="t-elif">isOrderWorkflowSupervisorMode and needSupervisor.section === 'planned'</attribute>
+        </xpath>
+        <xpath expr="//t[t[@t-call='furniture_mrp.StageDashboardOrderSupervisor']]/following-sibling::t[1]" position="attributes">
+            <attribute name="t-else"/>
+            <attribute name="t-elif">!stageDashboard.supervisorMode</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_furniture_stage_dashboard__metrics')][hasclass('is-supervisor-batch')]" position="attributes">
+            <attribute name="t-if">false</attribute>
+        </xpath>
+        <xpath expr="//section[hasclass('is-supervisor-batch')]//span[hasclass('o_furniture_stage_dashboard__details_total')]/t" position="attributes">
+            <attribute name="t-esc">formatNumber(needPlannedQuantity)</attribute>
+        </xpath>
+        <xpath expr="//div[@t-if='supervisorProductBatches.length']/following-sibling::div[1]" position="after">
+            <details t-if="needSupervisor.waiting.length" t-key="selectedStageCode" class="o_need_supervisor_upcoming">
+                <summary>
+                    <i class="fa fa-chevron-down" aria-hidden="true"/>
+                    <span>أوامر إنتاج قادمة (<t t-esc="formatNumber(needSupervisor.waiting.length)"/>)</span>
+                    <span class="o_need_supervisor_upcoming__line" aria-hidden="true"/>
+                </summary>
+                <div class="o_need_supervisor_rows is-waiting">
+                    <t t-foreach="needSupervisor.waiting" t-as="row" t-key="row.key"><t t-call="furniture_need_to_produce.SupervisorReadonlyCard"/></t>
+                </div>
+            </details>
+        </xpath>
+        <xpath expr="//div[@t-if='supervisorProductBatches.length']/following-sibling::div[1]" position="attributes">
+            <attribute name="t-else"/>
+            <attribute name="t-elif">!needSupervisor.waiting.length and !needSupervisor.loading</attribute>
+        </xpath>
+    </t>
+
+    <t t-name="furniture_need_to_produce.SupervisorReadonlyCard">
+        <article t-att-class="'o_need_supervisor_row is-' + row.status + (row.modelStart ? ' is-model-start' : '')">
+            <i t-att-class="row.status === 'completed' ? 'fa fa-check-circle' : 'fa fa-hourglass-half'" aria-hidden="true"/>
+            <div class="o_need_supervisor_row__identity">
+                <small t-if="row.model_name" t-esc="row.model_name"/>
+                <strong t-esc="row.product_name"/>
+                <span t-if="row.dimension_label" t-esc="row.dimension_label"/>
+                <p t-esc="row.message"/>
+                <time t-if="row.finished_at" t-esc="formatDateTime(row.finished_at)"/>
+            </div>
+            <span class="o_need_supervisor_row__quantity"><strong t-esc="formatNumber(row.quantity)"/><small t-esc="row.uom_name"/></span>
+        </article>
+    </t>
+</templates>

@@ -1,0 +1,182 @@
+// Screen-only identity. No JS, no layout/scroll overrides, no report selectors.
+// Use locally bundled, licensed Odoo fonts. The PDF's subset display fonts are
+// not a complete webfont and must not be extracted or falsely called Aftika.
+@font-face {
+    font-family: "Mapilla Arabic";
+    src: url('/web/static/fonts/google/Tajawal/Tajawal-Regular.ttf') format('truetype');
+    font-weight: 400; font-style: normal; font-display: swap;
+    unicode-range: U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF;
+}
+@font-face {
+    font-family: "Mapilla Arabic";
+    src: url('/web/static/fonts/google/Tajawal/Tajawal-Medium.ttf') format('truetype');
+    font-weight: 500 600; font-style: normal; font-display: swap;
+    unicode-range: U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF;
+}
+@font-face {
+    font-family: "Mapilla Arabic";
+    src: url('/web/static/fonts/google/Tajawal/Tajawal-Bold.ttf') format('truetype');
+    font-weight: 700 900; font-style: normal; font-display: swap;
+    unicode-range: U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF;
+}
+
+@media screen {
+    body.o_web_client {
+        --mapilla-font: "Mapilla Arabic", "Lato", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+        --mapilla-action: #0c2a44;
+        --mapilla-action-hover: #173c59;
+        --mapilla-action-text: #fff;
+        --mapilla-focus: #657c8e;
+        --mapilla-hero: linear-gradient(115deg, #0c2a44, #18364e 62%, #3d5569);
+        --mapilla-inset: #f8f6f3;
+        --mapilla-selected: #e8eef3;
+        --mapilla-on-hero: #e0d8d1;
+        --mapilla-radius: 12px;
+        --mapilla-page: #f7f5f2;
+        font-family: var(--mapilla-font);
+        background: var(--mapilla-page);
+
+        // Font icons intentionally excluded. No wildcard font assignment.
+        h1, h2, h3, h4, h5, h6, .btn, .form-control, .form-select,
+        .o_input, .o_form_label, .o_main_navbar, .o_menu_sections,
+        .mk_apps_sidebar_panel, .o_factory_attendance_dashboard {
+            font-family: var(--mapilla-font) !important;
+        }
+
+        // Some Odoo icon controls carry .btn on the icon itself. Preserve their
+        // glyph fonts after the shared typography rule, including product links.
+        .oi, .oi::before, .oi::after {
+            font-family: 'odoo_ui_icons' !important;
+        }
+        .fa, .fa::before, .fa::after {
+            font-family: FontAwesome !important;
+        }
+
+        .o_main_navbar, .mk_apps_sidebar_panel, .mk_app_menu.dropdown-menu {
+            background-color: var(--mapilla-oxford) !important;
+        }
+        .mk_apps_sidebar_panel .mk_apps_sidebar_menu > li.active > a {
+            background: var(--mapilla-timberwolf) !important;
+            color: #0c2a44 !important;
+            box-shadow: inset 3px 0 #ada696;
+            font-weight: 700;
+        }
+        .mk_apps_sidebar_panel .mk_apps_sidebar_menu > li:not(.active) > a:hover {
+            background: #ffffff15 !important;
+            color: white !important;
+        }
+        .o_mapilla_sidebar_brand img { width: 112px; max-width: 100%; height: auto; }
+        .o_main_navbar .o_menu_sections > button,
+        .o_main_navbar .o_menu_sections > .dropdown > button {
+            color: #fff;
+        }
+        .o_control_panel { background: var(--mapilla-surface); border-color: var(--mapilla-border); }
+
+        // Explicit variants, not all buttons: danger/success/warning still
+        // communicate their meaning, while primary actions always use Mapilla.
+        .btn.btn-primary, .o_action .btn.btn-primary, .o_dialog .btn.btn-primary,
+        .o_form_view .oe_highlight:not(.btn-danger):not(.btn-success):not(.btn-warning) {
+            background: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+            color: var(--mapilla-action-text) !important;
+            box-shadow: 0 3px 9px rgba(12, 42, 68, .16);
+        }
+        .btn.btn-primary:not(:disabled):hover, .btn.btn-primary:not(:disabled):focus-visible,
+        .o_action .btn.btn-primary:not(:disabled):hover {
+            background: var(--mapilla-action-hover) !important;
+            border-color: var(--mapilla-action-hover) !important;
+        }
+        .btn.btn-secondary, .btn.btn-light, .btn.btn-outline-secondary {
+            background: var(--mapilla-surface) !important;
+            border-color: var(--mapilla-border-strong) !important;
+            color: var(--mapilla-heading) !important;
+            box-shadow: 0 1px 3px rgba(12, 42, 68, .04);
+        }
+        .btn.btn-secondary:not(:disabled):hover,
+        .btn.btn-light:not(:disabled):hover, .btn.btn-outline-secondary:not(:disabled):hover {
+            background: var(--mapilla-surface-soft) !important;
+        }
+        .btn.btn-outline-primary {
+            border-color: var(--mapilla-action) !important;
+            background: transparent !important; color: var(--mapilla-action) !important;
+        }
+        .btn.btn-outline-primary:not(:disabled):hover {
+            background: var(--mapilla-action) !important; color: var(--mapilla-action-text) !important;
+        }
+        .btn-link:not(.text-danger):not(.text-success), .text-primary {
+            color: var(--mapilla-heading) !important;
+        }
+        .bg-primary:not(.o_tag):not(.badge), .nav-pills .nav-link.active {
+            background-color: var(--mapilla-action) !important; color: var(--mapilla-action-text) !important;
+        }
+        .btn { font-weight: 600; }
+        button:focus-visible, a:focus-visible {
+            outline: 2px solid var(--mapilla-focus); outline-offset: 3px;
+        }
+        input[type='checkbox'], input[type='radio'] { accent-color: var(--mapilla-action); }
+        .form-check-input:checked {
+            background-color: var(--mapilla-action) !important;
+            border-color: var(--mapilla-action) !important;
+        }
+        .form-control:focus, .form-select:focus, .o_input:focus {
+            border-color: var(--mapilla-focus) !important;
+            box-shadow: 0 0 0 3px rgba(12, 42, 68, .12) !important;
+        }
+
+        .o_form_view .o_form_sheet_bg, .o_kanban_renderer, .o_base_settings {
+            background-color: var(--mapilla-page);
+        }
+        .o_form_view .o_form_sheet, .o_form_view .o_notebook_content,
+        .o_list_renderer, .o_list_view {
+            border-color: var(--mapilla-border); background-color: var(--mapilla-surface);
+        }
+        .o_form_view .o_horizontal_separator { color: var(--mapilla-heading) !important; }
+        .o_notebook .nav-link.active {
+            color: var(--mapilla-heading) !important;
+            border-bottom-color: var(--mapilla-action) !important;
+        }
+        .o_list_table thead th {
+            background: var(--mapilla-surface-soft) !important;
+            color: var(--mapilla-heading) !important;
+            text-transform: none; letter-spacing: normal;
+        }
+        .o_list_table .o_group_header { background-color: var(--mapilla-surface-soft); }
+        .o_list_table .o_data_row.o_selected_row > td {
+            background-color: var(--mapilla-selected);
+        }
+        .o_searchview_facet { border-color: var(--mapilla-border) !important; }
+        .o_searchview_facet_label {
+            background: var(--mapilla-action) !important; color: var(--mapilla-action-text) !important;
+        }
+        .o_statusbar_status .o_arrow_button_current {
+            background-color: var(--mapilla-action) !important; color: var(--mapilla-action-text) !important;
+        }
+        .o_statusbar_status .o_arrow_button_current::after {
+            border-left-color: var(--mapilla-action) !important;
+        }
+        .o_statusbar_status .o_arrow_button_current::before {
+            border-left-color: var(--mapilla-border-strong) !important;
+        }
+
+        .o_dialog .modal-content {
+            border: 1px solid var(--mapilla-border) !important;
+            border-radius: 16px !important;
+            background: var(--mapilla-surface);
+            box-shadow: 0 24px 70px rgba(12, 42, 68, .22);
+        }
+        .o_dialog .modal-header, .o_dialog .modal-footer {
+            background: var(--mapilla-surface-soft) !important;
+            border-color: var(--mapilla-border) !important;
+            color: var(--mapilla-heading);
+        }
+        .o_dialog .modal-title { color: var(--mapilla-heading); font-weight: 700; }
+        .dropdown-item:hover, .dropdown-item:focus { background-color: var(--mapilla-hover); }
+        .o-mail-DiscussSidebar { background: var(--mapilla-surface-soft) !important; }
+        .o-mail-DiscussSidebar .o-active { background: var(--mapilla-selected) !important; }
+        .o-mail-Composer { border-color: var(--mapilla-border); }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn, .o_kanban_record { transition: none !important; }
+        }
+    }
+}

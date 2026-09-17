@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_mrp.FutureOrderSystray">
+        <t t-if="state.canManage">
+            <Dropdown position="'bottom-end'"
+                      beforeOpen.bind="refresh"
+                      menuClass="'o_furniture_future_order_menu p-0'"
+                      state="dropdown">
+                <button type="button"
+                        class="o_furniture_future_order_bell"
+                        t-att-class="{'has-alerts': state.dueSoonCount &gt; 0}"
+                        t-att-title="state.dueSoonCount ? `${state.dueSoonCount} طلبات تسليم تحتاج قرار خلال 15 يوم` : 'طلبات التسليم القادمة'"
+                        aria-label="طلبات التسليم القادمة">
+                    <i class="fa fa-bell o_furniture_future_order_bell_icon"
+                       aria-hidden="true"/>
+                    <span t-if="state.dueSoonCount"
+                          class="o_furniture_future_order_badge"
+                          t-esc="state.dueSoonCount &gt; 99 ? '99+' : state.dueSoonCount"/>
+                </button>
+                <t t-set-slot="content">
+                    <section class="o_furniture_future_order_dropdown" dir="rtl">
+                        <header>
+                            <span>
+                                <strong>طلبات خلال 15 يوم</strong>
+                                <small>الطلبات التي لم يُتخذ فيها قرار</small>
+                            </span>
+                            <span class="o_furniture_future_order_dropdown_count"
+                                  t-esc="state.dueSoonCount"/>
+                        </header>
+                        <div t-if="state.loading" class="o_furniture_future_order_empty">
+                            <i class="fa fa-spinner fa-spin"/> جاري التحميل...
+                        </div>
+                        <div t-elif="state.error" class="o_furniture_future_order_empty is-error">
+                            تعذر تحديث الطلبات
+                            <button type="button" t-on-click.stop="refresh">إعادة المحاولة</button>
+                        </div>
+                        <div t-elif="!state.orders.length" class="o_furniture_future_order_empty is-success">
+                            <i class="fa fa-check-circle"/>
+                            مفيش طلبات خلال 15 يوم محتاجة قرار
+                        </div>
+                        <div t-else="" class="o_furniture_future_order_list">
+                            <button t-foreach="state.orders"
+                                    t-as="order"
+                                    t-key="order.id"
+                                    type="button"
+                                    class="o_furniture_future_order_item"
+                                    t-on-click="() => this.openOrder(order.id)">
+                                <span class="o_furniture_future_order_item_main">
+                                    <strong t-esc="order.name"/>
+                                    <em t-esc="order.delivery_label"/>
+                                </span>
+                                <span class="o_furniture_future_order_item_customer">
+                                    <i class="fa fa-user"/>
+                                    <t t-esc="order.buyer"/> ← <t t-esc="order.consumer"/>
+                                </span>
+                                <small t-esc="order.products"/>
+                                <span class="o_furniture_future_order_item_stock"
+                                      t-att-class="`is-${order.availability_state}`"
+                                      t-esc="order.availability_label"/>
+                            </button>
+                        </div>
+                        <footer>
+                            <button type="button" class="btn btn-primary"
+                                    t-on-click="openPendingOrders">
+                                عرض كل الطلبات المعلقة
+                            </button>
+                            <button type="button" class="btn btn-outline-primary"
+                                    t-on-click="createOrder">
+                                <i class="fa fa-plus"/> طلب جديد
+                            </button>
+                        </footer>
+                    </section>
+                </t>
+            </Dropdown>
+
+
+        </t>
+    </t>
+</templates>

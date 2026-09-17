@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.ProductionRouteGraph">
+        <div t-if="standaloneStage" class="o_ntp_standalone_stage" dir="rtl">
+            <strong t-esc="standaloneStage.label"/>
+            <span><i class="fa fa-clock-o" aria-hidden="true"/> <t t-esc="format(standaloneStage.estimated_hours)"/> ساعة</span>
+            <button type="button" class="btn btn-outline-secondary" t-att-disabled="!!ui.opening"
+                    t-on-click="(event) => this.openStage(standaloneStage, event)" t-on-keydown.stop="() => {}" t-on-keyup.stop="() => {}">
+                <t t-esc="canEdit(standaloneStage) ? 'تعديل BoM' : 'عرض BoM'"/>
+            </button>
+        </div>
+        <div t-else="" class="o_ntp_graph" dir="rtl">
+            <div t-att-id="graphId + '-content'" class="o_ntp_graph_content" role="region" aria-label="مسار إنتاج القطعة">
+            <t>
+            <t t-set="diagram" t-value="layout"/>
+            <div class="o_ntp_graph_heading">
+                <div class="o_ntp_graph_title"><i class="fa fa-sitemap" aria-hidden="true"/> خط إنتاج القطعة <span>من اليمين إلى اليسار</span></div>
+                <div class="o_ntp_graph_legend" aria-label="أنواع مراحل المسار">
+                    <span><i class="o_ntp_graph_dot o_ntp_graph_dot_stage"/> تصنيع مطلوب</span>
+                    <span><i class="o_ntp_graph_dot o_ntp_graph_dot_incoming"/> ينتظر أمرًا قائمًا</span>
+                    <span t-if="diagram.hasCompletion" title="القواعد والتجهيز يعملان بالتوازي؛ لا يخرج التجهيز للكسوة حتى اكتمال القواعد"><i class="o_ntp_graph_completion_key"/> شرط اكتمال، مش تحويل</span>
+                </div>
+            </div>
+            <div t-if="diagram.nodes.length" t-ref="graphViewport" class="o_ntp_graph_scroll" tabindex="0" role="region" aria-label="مخطط مترابط لمراحل القطعة. مرر أفقيًا لعرض بقية المسار." t-on-click.stop="() => {}">
+                <div class="o_ntp_graph_canvas" t-att-style="'width:' + diagram.width + 'px;height:' + diagram.height + 'px'">
+                    <svg class="o_ntp_graph_edges" t-att-width="diagram.width" t-att-height="diagram.height" t-att-viewBox="'0 0 ' + diagram.width + ' ' + diagram.height" aria-hidden="true" focusable="false">
+                        <defs>
+                            <marker t-att-id="graphId + '-completion'" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path class="o_ntp_graph_arrow_stage" d="M 0 0 L 8 4 L 0 8 Z"/></marker>
+                            <marker t-att-id="graphId + '-stage'" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path class="o_ntp_graph_arrow_stage" d="M 0 0 L 8 4 L 0 8 Z"/></marker>
+                            <marker t-att-id="graphId + '-stock'" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path class="o_ntp_graph_arrow_stock" d="M 0 0 L 8 4 L 0 8 Z"/></marker>
+                            <marker t-att-id="graphId + '-incoming'" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path class="o_ntp_graph_arrow_incoming" d="M 0 0 L 8 4 L 0 8 Z"/></marker>
+                        </defs>
+                        <path t-foreach="diagram.edges" t-as="edge" t-key="edge.key" t-att-d="edge.path" t-att-class="'o_ntp_graph_edge o_ntp_graph_edge_' + edge.kind"/>
+                    </svg>
+                    <article t-foreach="diagram.nodes" t-as="node" t-key="node.id"
+                             t-att-class="'o_ntp_graph_node o_ntp_graph_node_' + node.kind + ' o_ntp_graph_stage_' + (node.stage_code || 'source') + (node.parallel ? ' is-parallel' : '') + (node.withdrawn ? ' is-withdrawn' : '')"
+                             t-att-style="node.style" t-att-aria-label="nodeDescription(node)" t-att-title="nodeDescription(node)">
+                        <div t-if="node.kind !== 'stage' or node.withdrawn" class="o_ntp_graph_node_top">
+                            <span class="o_ntp_graph_node_icon"><i t-att-class="'fa ' + icon(node)" aria-hidden="true"/></span>
+                            <span t-if="node.kind !== 'incoming' or node.withdrawn" class="o_ntp_graph_node_kind">
+                                <t t-if="node.withdrawn">تم السحب للمرحلة التالية</t>
+                                <t t-elif="node.kind === 'history'">محجوز — لم يُسحب بعد</t>
+                                <t t-elif="node.kind === 'stock'">جاهز للاستخدام</t>
+                            </span>
+                            <span t-if="node.customized" class="o_ntp_graph_customized" title="خامات مخصصة لهذه القطعة" aria-label="خامات مخصصة"><i class="fa fa-star" aria-hidden="true"/></span>
+                        </div>
+                        <span t-if="node.kind === 'stage' and !node.withdrawn" class="o_ntp_graph_step_icon" aria-hidden="true"><i t-att-class="'fa ' + icon(node)"/></span>
+                        <span t-if="node.kind === 'stage' and !node.withdrawn and node.customized" class="o_ntp_graph_customized o_ntp_graph_customized_stage" title="خامات مخصصة لهذه القطعة" aria-label="خامات مخصصة"><i class="fa fa-star" aria-hidden="true"/></span>
+                        <span t-if="node.withdrawn" class="o_ntp_graph_withdrawn_check" role="img" aria-label="تم السحب للمرحلة التالية"><i class="fa fa-check" aria-hidden="true"/></span>
+                        <strong class="o_ntp_graph_node_label" t-att-title="node.label" t-esc="node.displayLabel"/>
+                        <div class="o_ntp_graph_node_meta">
+                            <span t-if="node.kind === 'history' or node.withdrawn">كمية الدفعة <b t-esc="format(node.quantity)"/></span>
+                            <span t-elif="node.kind === 'stage'"><i class="fa fa-clock-o" aria-hidden="true"/> <b t-esc="format(node.estimated_hours)"/> ساعة</span>
+                            <span t-elif="node.kind === 'stock'"><i class="fa fa-check" aria-hidden="true"/> الكمية <b t-esc="format(node.quantity)"/></span>
+                            <span t-else="">مدة الانتظار غير محددة</span>
+                        </div>
+                        <small t-if="node.kind === 'stage' and ['tailoring', 'painting'].includes(node.stage_code)" class="o_ntp_graph_branch_label">مسار منفصل</small>
+                        <div t-if="node.kind === 'history' or node.withdrawn" class="o_ntp_graph_source_note" t-att-title="node.production_name"><span t-esc="node.production_name || 'مرحلة سابقة في المسار'"/></div>
+                        <button t-elif="node.kind === 'stage' and node.stage_id" type="button" t-att-class="'o_ntp_graph_bom ' + (canEdit(node) ? 'o_ntp_graph_bom_edit' : '')" t-att-disabled="!!ui.opening" t-att-aria-label="(canEdit(node) ? 'تعديل BoM — ' : 'عرض BoM — ') + node.label" t-att-title="(canEdit(node) ? 'تعديل BoM — ' : 'عرض BoM — ') + node.label" t-on-click="(event) => this.openStage(node, event)" t-on-keydown.stop="() => {}" t-on-keyup.stop="() => {}">
+                            <i t-if="ui.opening === node.id" class="fa fa-spinner fa-spin" aria-hidden="true"/>
+                        </button>
+                        <div t-elif="node.kind === 'stock'" class="o_ntp_graph_source_note">لا يحتاج إلى تصنيع جديد</div>
+                        <div t-elif="node.kind === 'incoming'" class="o_ntp_graph_source_note" t-att-title="node.production_name || 'أمر إنتاج جارٍ'">
+                            <i class="fa fa-link" aria-hidden="true"/> <span t-esc="node.production_name || 'مرتبط بأمر إنتاج جارٍ'"/>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <small t-if="diagram.nodes.length" class="o_ntp_graph_scroll_hint"><i class="fa fa-arrows-h" aria-hidden="true"/> اسحب الخط أفقيًا لعرض باقي المراحل</small>
+            <div t-else="" class="o_ntp_graph_empty"><i class="fa fa-sitemap" aria-hidden="true"/><t t-if="graph.nodes &amp;&amp; graph.nodes.length">لا توجد مراحل متبقية للعرض.</t><t t-else="">لم يُنشأ مسار هذه القطعة بعد.</t></div>
+            <div class="o_ntp_graph_footer" t-if="diagram.nodes.length">
+                <span t-if="diagram.hasParallel"><i class="fa fa-code-fork" aria-hidden="true"/> الفروع تعمل بالتوازي وتلتقي عند المرحلة التي تحتاجها.</span>
+                <span t-else=""><i class="fa fa-long-arrow-left" aria-hidden="true"/> الأسهم توضح ترتيب التنفيذ.</span>
+                <span class="o_ntp_graph_wait" t-if="graph.unknown_wait"><i class="fa fa-hourglass-half" aria-hidden="true"/> وقت المسار لا يشمل انتظار الأوامر الجارية.</span>
+            </div>
+            <div t-if="diagram.invalid" class="o_ntp_graph_warning" role="status"><i class="fa fa-exclamation-triangle" aria-hidden="true"/> بعض روابط المسار غير مكتملة. حدّث الخطة قبل الاعتماد.</div>
+            <div t-if="graph.history_incomplete" class="o_ntp_graph_warning" role="status">تعذّر تتبّع جزء من تاريخ التحويلات؛ المعروض هو الروابط المثبتة فقط.</div>
+            </t>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+native-bundles/
+native-bundles-ios/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/local.properties
+ios/Pods/
+ios/build/
+*.p12
+*.jks
+*.keystore
+!android/app/debug.keystore

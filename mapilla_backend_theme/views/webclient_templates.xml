@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="mapilla_web_layout"
+              inherit_id="web.layout"
+              name="Mapilla Web Layout"
+              priority="100">
+        <xpath expr="//title" position="replace">
+            <title t-esc="title or 'MAPILLA ERP'"/>
+        </xpath>
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <link type="image/png"
+                  rel="shortcut icon"
+                  href="/mapilla_backend_theme/static/src/img/favicon_64.png"/>
+        </xpath>
+    </template>
+
+    <template id="mapilla_webclient_bootstrap"
+              inherit_id="web.webclient_bootstrap"
+              name="Mapilla Webclient Metadata"
+              priority="100">
+        <xpath expr="//meta[@name='theme-color']" position="replace">
+            <meta name="theme-color" content="#0C2A44"/>
+        </xpath>
+        <xpath expr="//link[@rel='apple-touch-icon']" position="replace">
+            <link rel="apple-touch-icon"
+                  href="/mapilla_backend_theme/static/src/img/favicon_192.png"/>
+        </xpath>
+    </template>
+
+    <template id="mapilla_login_layout"
+              inherit_id="web.login_layout"
+              name="Mapilla Login Layout"
+              priority="100">
+        <xpath expr="//t[@t-set='body_classname']" position="attributes">
+            <attribute name="t-value">'mapilla_login_page'</attribute>
+        </xpath>
+        <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' container ') and contains(concat(' ', normalize-space(@class), ' '), ' py-5 ')]" position="replace">
+            <div class="mapilla_login_shell">
+                <section class="mapilla_login_visual" aria-hidden="true">
+                    <div class="mapilla_login_visual_content">
+                        <img class="mapilla_login_visual_logo"
+                             src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_light.png"
+                             alt=""/>
+                        <p class="mapilla_login_tagline">Crafting spaces that inspire</p>
+                        <p class="mapilla_login_subline">Factory operations, inventory, production and finance — connected in one workspace.</p>
+                    </div>
+                </section>
+                <section class="mapilla_login_panel">
+                    <div t-attf-class="mapilla_login_card {{login_card_classes}} o_database_list">
+                        <div class="mapilla_login_logo">
+                            <img src="/mapilla_backend_theme/static/src/img/mapilla_wordmark_dark.png"
+                                 alt="Mapilla"/>
+                        </div>
+                        <div class="mapilla_login_intro">
+                            <strong>Factory Management System</strong>
+                            <span>Sign in to continue to Mapilla ERP</span>
+                        </div>
+                        <t t-out="0"/>
+                        <div class="mapilla_login_footer" t-if="not disable_footer">
+                            <t t-if="not disable_database_manager">
+                                <a href="/web/database/manager">Manage databases</a>
+                                <span class="mx-2">•</span>
+                            </t>
+                            <span>Mapilla internal operations</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </xpath>
+    </template>
+</odoo>

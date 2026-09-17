@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="simple_payroll_salary-2.menu_simple_payroll_root" model="ir.ui.menu">
+        <field name="name">مرتبات المصنع</field>
+    </record>
+    <record id="simple_payroll_salary-2.menu_simple_payroll_slips" model="ir.ui.menu">
+        <field name="name">مسيرات الرواتب</field>
+    </record>
+    <record id="simple_payroll_salary-2.menu_simple_payroll_summary" model="ir.ui.menu">
+        <field name="name">تقارير الرواتب</field>
+    </record>
+
+    <record id="view_simple_payroll_slip_form_factory" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.form.factory</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_form"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_confirm']" position="before">
+                <button name="action_recompute_factory_payroll"
+                        type="object"
+                        string="تحديث حساب المرتب"
+                        class="btn-secondary"
+                        invisible="state != 'draft'"/>
+            </xpath>
+
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_from']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_to']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='attendance_hours']" position="after">
+                <field name="factory_attendance_days" readonly="1"/>
+                <field name="factory_paid_leave_days" readonly="1" invisible="factory_paid_leave_days == 0"/>
+                <field name="factory_paid_leave_hours" readonly="1" invisible="factory_paid_leave_hours == 0"/>
+                <field name="factory_overtime_hours" readonly="1" invisible="factory_overtime_hours == 0"/>
+                <field name="factory_biometric_attendance_count" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='attendance_deduction']" position="after">
+                <field name="factory_other_deduction_amount"
+                       widget="monetary"
+                       readonly="state != 'draft'"
+                       class="fw-bold text-danger"/>
+            </xpath>
+
+            <xpath expr="//div[hasclass('payroll-card', 'commission')]//h5" position="replace">
+                <h5 class="card-title text-muted fw-bold mb-3">حوافز ومكافآت</h5>
+            </xpath>
+            <xpath expr="//div[hasclass('payroll-card', 'commission')]//field[@name='commission_amount']" position="replace">
+                <field name="factory_bonus_amount"
+                       widget="monetary"
+                       readonly="state != 'draft'"
+                       options="{'currency_field': 'company_currency_id'}"/>
+            </xpath>
+
+            <xpath expr="//div[hasclass('payroll-card', 'net-salary')]" position="after">
+                <div class="col-md-3">
+                    <div class="card text-center payroll-card hover-animate">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-muted fw-bold mb-3">قسط السلفة المستحق</h5>
+                            <div class="payroll-stat-value text-danger">
+                                <field name="due_advance_installments" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                            </div>
+                            <small class="text-muted">للمراجعة؛ السداد يُسجل من شاشة السلف</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center payroll-card net-salary hover-animate">
+                        <div class="card-body py-4">
+                            <h5 class="card-title text-success fw-bold mb-3">صافي تقديري بعد القسط</h5>
+                            <div class="payroll-stat-value net">
+                                <field name="factory_net_after_due_advance" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//sheet" position="inside">
+                <div class="alert alert-light border mt-4" role="status">
+                    <strong>مصدر الحضور:</strong> جهاز البصمة وسجلات الحضور المعتمدة.
+                    <span class="ms-3"><strong>آخر تحديث:</strong> <field name="factory_last_calculated_at" readonly="1"/></span>
+                    <field name="factory_last_calculated_by_id" readonly="1" class="ms-2"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_list_factory" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.list.factory</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_list"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='attendance_hours']" position="after">
+                <field name="factory_paid_leave_days" optional="hide"/>
+                <field name="factory_overtime_hours" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='commission_amount']" position="attributes">
+                <attribute name="string">الحوافز</attribute>
+            </xpath>
+            <xpath expr="//field[@name='commission_amount']" position="after">
+                <field name="factory_other_deduction_amount" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='net_salary']" position="after">
+                <field name="factory_net_after_due_advance" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_payroll_slip_search_factory" model="ir.ui.view">
+        <field name="name">simple.payroll.slip.search.factory</field>
+        <field name="model">simple.payroll.slip</field>
+        <field name="inherit_id" ref="simple_payroll_salary-2.view_simple_payroll_slip_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="الشهر" name="group_factory_month" context="{'group_by': 'date_from:month'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

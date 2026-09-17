@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="furniture_need_to_produce.ListView" t-inherit="web.ListView" t-inherit-mode="primary">
+        <xpath expr="//t[@t-component='props.Renderer']" position="before">
+            <section class="o_ntp_intro" dir="rtl" aria-label="ملخص احتياجات الإنتاج">
+                <div class="o_ntp_hero">
+                    <div class="o_ntp_hero_heading">
+                        <span class="o_ntp_eyebrow"><i class="fa fa-cubes" aria-hidden="true"/> تخطيط تشغيل المصنع</span>
+                        <h1><span lang="ar" dir="rtl">النواقص</span><span class="o_ntp_hero_arabic">احتياجات الإنتاج</span></h1>
+                        <p>كل قطعة لها مسارها. راجع المراحل والخامات، ثم اعتمد القطعة لبدء تجهيز أوامرها.</p>
+                    </div>
+                    <div class="o_ntp_hero_note">
+                        <i class="fa fa-check-circle" aria-hidden="true"/>
+                        <div><strong>المخزون أولًا</strong><span>المراحل المغطاة ببضاعة جاهزة لا يُعاد تصنيعها.</span></div>
+                    </div>
+                </div>
+                <div class="o_ntp_workflow" aria-label="خطوات الاعتماد">
+                    <span><b>١</b> راجع مسار القطعة</span>
+                    <i class="fa fa-angle-left" aria-hidden="true"/>
+                    <span><b>٢</b> راجع خامات كل مرحلة</span>
+                    <i class="fa fa-angle-left" aria-hidden="true"/>
+                    <span><b>٣</b> اعتمد بـ <strong lang="en" dir="ltr">Approve</strong></span>
+                    <small><i class="fa fa-clock-o" aria-hidden="true"/> مؤقتًا: ساعتان لكل عملية · يوم العمل ١٠ ساعات</small>
+                </div>
+                <t t-set="summary" t-value="ntpSummary"/>
+                <div class="o_ntp_summary">
+                    <div class="o_ntp_metric o_ntp_metric_total">
+                        <span class="o_ntp_metric_icon"><i class="fa fa-cubes" aria-hidden="true"/></span>
+                        <div><span>نتائج البحث</span><strong><t t-esc="summary.total"/><t t-if="summary.limited">+</t></strong><small>قطعة حسب الفلاتر الحالية</small></div>
+                    </div>
+                    <div class="o_ntp_metric o_ntp_metric_draft">
+                        <span class="o_ntp_metric_icon"><i class="fa fa-list-alt" aria-hidden="true"/></span>
+                        <div><span>بانتظار الاعتماد</span><strong t-esc="summary.draft"/><small>من <t t-esc="summary.loaded"/> صف معروض</small></div>
+                    </div>
+                    <div class="o_ntp_metric o_ntp_metric_models">
+                        <span class="o_ntp_metric_icon"><i class="fa fa-tags" aria-hidden="true"/></span>
+                        <div><span>موديلات معروضة</span><strong t-esc="summary.models"/><small>استخدم البحث لاختيار الموديل</small></div>
+                    </div>
+                </div>
+                <div class="o_ntp_table_heading">
+                    <h2>القطع وخطوط الإنتاج</h2>
+                    <span><i class="fa fa-info-circle" aria-hidden="true"/> افتح صف القطعة لمراجعة الخامات والتفاصيل قبل الاعتماد</span>
+                </div>
+            </section>
+        </xpath>
+    </t>
+
+    <t t-name="furniture_need_to_produce.RouteField">
+        <div class="o_ntp_route" dir="rtl" t-att-title="value">
+            <div class="o_ntp_route_tokens" t-if="tokens.length">
+                <t t-foreach="tokens" t-as="token" t-key="token.key">
+                    <span t-if="token.type === 'arrow'" class="o_ntp_route_arrow" aria-label="ثم">←</span>
+                    <span t-elif="token.type === 'parallel'" class="o_ntp_route_parallel" title="فرعان يعملان بالتوازي" aria-label="بالتوازي">+</span>
+                    <span t-elif="token.type === 'group'" class="o_ntp_route_group" t-esc="token.text"/>
+                    <span t-else="" t-att-class="'o_ntp_route_stage o_ntp_route_' + token.type">
+                        <i t-if="token.type === 'waiting'" class="fa fa-hourglass-half" aria-hidden="true"/>
+                        <i t-if="token.type === 'stock'" class="fa fa-check-circle" aria-hidden="true"/>
+                        <t t-esc="token.text"/>
+                    </span>
+                </t>
+            </div>
+            <span t-else="" class="o_ntp_route_empty">المسار غير متاح</span>
+            <small t-if="hasParallel" class="o_ntp_route_legend">+ مراحل متوازية · الأسهم تبيّن ترتيب التنفيذ</small>
+        </div>
+    </t>
+
+    <t t-name="furniture_need_to_produce.ProductField">
+        <div class="o_ntp_product" dir="rtl">
+            <strong t-esc="productName"/>
+            <small class="o_ntp_product_reference" t-esc="pieceName"/>
+        </div>
+    </t>
+
+    <t t-name="furniture_need_to_produce.TimeField">
+        <div class="o_ntp_time" dir="rtl" title="وقت العمل التقديري للمسار، وليس موعد التسليم">
+            <span><i class="fa fa-clock-o" aria-hidden="true"/> <strong t-esc="hours"/> ساعة</span>
+            <small><t t-esc="days"/> يوم عمل</small>
+        </div>
+    </t>
+</templates>

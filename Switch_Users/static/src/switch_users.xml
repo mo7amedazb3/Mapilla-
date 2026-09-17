@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="Switch_Users.UserMenu" t-inherit="web.UserMenu" t-inherit-mode="extension">
+        <xpath expr="//t[@t-foreach='getElements()']" position="before">
+            <SwitchUsersMenu t-if="switchUsersEnabled"/>
+            <div t-if="switchUsersEnabled" role="separator" class="dropdown-divider"/>
+        </xpath>
+        <xpath expr="//img[contains(@class,'o_user_avatar')]" position="after">
+            <span t-if="switchUsersActive" class="o_switch_users_badge" title="حساب اختبار — يمكنك الرجوع للأدمن من Switch account">TEST</span>
+        </xpath>
+    </t>
+
+    <t t-name="Switch_Users.Menu">
+        <Dropdown beforeOpen.bind="loadAccounts" menuClass="'o_switch_users_menu'" position="'left-start'">
+            <button class="dropdown-item o_switch_users_toggle d-flex align-items-center gap-2" data-menu="switch_account">
+                <i class="fa fa-exchange"/>
+                <span class="flex-grow-1">Switch account</span>
+            </button>
+            <t t-set-slot="content">
+                <div class="o_switch_users_context"><i class="fa fa-database me-1"/><t t-esc="state.db"/></div>
+                <t t-if="state.switched">
+                    <DropdownItem onSelected="() => this.switchAccount(null, true)" attrs="{'data-menu': 'switch_users_restore'}" class="'o_switch_users_restore'">
+                        <i class="fa fa-undo me-2"/>الرجوع للأدمن — <t t-esc="state.origin_name"/>
+                    </DropdownItem>
+                    <div class="dropdown-divider"/>
+                </t>
+                <t t-foreach="state.direct_accounts" t-as="account" t-key="account.user_id">
+                    <DropdownItem onSelected="() => this.switchAccount(account.user_id)" attrs="{'data-menu': 'switch_users_direct', 'data-switch-uid': account.user_id}" class="{'o_switch_users_account': true, 'active': account.current}">
+                        <i class="fa fa-user-circle-o me-2"/>
+                        <span class="o_switch_users_name"><t t-esc="account.name"/></span>
+                        <i t-if="account.current" class="fa fa-check"/>
+                    </DropdownItem>
+                </t>
+                <div t-if="state.direct_accounts.length" role="separator" class="dropdown-divider"/>
+                <Dropdown menuClass="'o_switch_users_accounts'" position="'left-start'">
+                    <button class="dropdown-item d-flex align-items-center gap-2" data-menu="switch_users_supervisors">
+                        <i class="fa fa-user-secret"/><span class="flex-grow-1">المشرفين</span>
+                        <span class="badge rounded-pill text-bg-light"><t t-esc="state.supervisors.length"/></span>
+                    </button>
+                    <t t-set-slot="content">
+                        <div class="o_switch_users_heading">المشرف — المرحلة</div>
+                        <t t-foreach="state.supervisors" t-as="account" t-key="account.id">
+                            <DropdownItem onSelected="() => this.switchAccount(account.user_id)" attrs="{'data-switch-uid': account.user_id}" class="{'o_switch_users_account': true, 'active': account.current}">
+                                <span class="o_switch_users_name"><t t-esc="account.name"/></span>
+                                <span class="o_switch_users_details"><t t-esc="account.details"/></span>
+                                <i t-if="account.current" class="fa fa-check"/>
+                            </DropdownItem>
+                        </t>
+                        <div t-if="!state.supervisors.length" class="p-3 text-muted">لا توجد حسابات مشرفين مرتبطة بموظفين.</div>
+                    </t>
+                </Dropdown>
+                <Dropdown menuClass="'o_switch_users_accounts'" position="'left-start'">
+                    <button class="dropdown-item d-flex align-items-center gap-2" data-menu="switch_users_workers">
+                        <i class="fa fa-users"/><span class="flex-grow-1">العمال</span>
+                        <span class="badge rounded-pill text-bg-light"><t t-esc="state.workers.length"/></span>
+                    </button>
+                    <t t-set-slot="content">
+                        <div class="o_switch_users_heading">العامل — القسم</div>
+                        <t t-foreach="state.workers" t-as="account" t-key="account.id">
+                            <DropdownItem onSelected="() => this.switchAccount(account.user_id)" attrs="{'data-switch-uid': account.user_id}" class="{'o_switch_users_account': true, 'active': account.current}">
+                                <span class="o_switch_users_name"><t t-esc="account.name"/></span>
+                                <span class="o_switch_users_details"><t t-esc="account.details"/></span>
+                                <i t-if="account.current" class="fa fa-check"/>
+                            </DropdownItem>
+                        </t>
+                        <div t-if="!state.workers.length" class="p-3 text-muted">لا توجد حسابات عمال مرتبطة بموظفين.</div>
+                    </t>
+                </Dropdown>
+            </t>
+        </Dropdown>
+    </t>
+</templates>

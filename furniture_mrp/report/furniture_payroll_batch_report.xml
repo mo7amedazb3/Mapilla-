@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_furniture_payroll_batch" model="report.paperformat">
+        <field name="name">تقرير أجور العمال المجمع A3</field>
+        <field name="default" eval="False"/>
+        <field name="format">A3</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">7</field>
+        <field name="margin_bottom">7</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_report_furniture_payroll_batch" model="ir.actions.report">
+        <field name="name">تقرير أجور العمال المجمع</field>
+        <field name="model">furniture.mrp.payroll.batch.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">furniture_mrp.report_furniture_payroll_batch</field>
+        <field name="report_file">furniture_mrp.report_furniture_payroll_batch</field>
+        <field name="paperformat_id" ref="paperformat_furniture_payroll_batch"/>
+        <field name="print_report_name">'تقرير أجور العمال - %s - %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <template id="report_furniture_payroll_batch">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="furniture_mrp.furniture_payroll_bare_layout">
+                    <t t-set="slips" t-value="o.slip_ids"/>
+                    <t t-set="currency" t-value="o.company_id.currency_id"/>
+                    <div class="page o_furniture_payroll_batch_page" dir="rtl">
+                        <style>
+                            .o_furniture_payroll_batch_page {
+                                color: #17324d;
+                                font-family: DejaVu Sans, Arial, sans-serif;
+                                font-size: 8.5px;
+                            }
+                            .o_furniture_payroll_batch_header {
+                                background: #123b57;
+                                border-radius: 7px;
+                                color: #fff;
+                                margin-bottom: 9px;
+                                padding: 9px 14px;
+                            }
+                            .o_furniture_payroll_batch_header table,
+                            .o_furniture_payroll_batch_header td {
+                                border: 0;
+                                color: #fff;
+                            }
+                            .o_furniture_payroll_batch_table {
+                                border: 1px solid #cfdce3;
+                                border-collapse: collapse;
+                                table-layout: fixed;
+                                width: 100%;
+                            }
+                            .o_furniture_payroll_batch_table thead {
+                                display: table-header-group;
+                            }
+                            .o_furniture_payroll_batch_table tfoot {
+                                display: table-row-group;
+                            }
+                            .o_furniture_payroll_batch_table tr {
+                                page-break-inside: avoid;
+                            }
+                            .o_furniture_payroll_batch_table th {
+                                background: #174c68;
+                                border: 1px solid #396b83;
+                                color: #fff;
+                                font-size: 8px;
+                                font-weight: 700;
+                                line-height: 1.35;
+                                padding: 6px 3px;
+                                text-align: center;
+                                vertical-align: middle;
+                            }
+                            .o_furniture_payroll_batch_table td {
+                                border: 1px solid #d9e3e8;
+                                line-height: 1.35;
+                                padding: 5px 4px;
+                                text-align: center;
+                                vertical-align: middle;
+                            }
+                            .o_furniture_payroll_batch_table tbody tr:nth-child(even) td {
+                                background: #f7fafb;
+                            }
+                            .o_furniture_payroll_batch_table .employee-cell {
+                                text-align: right;
+                                white-space: normal;
+                                word-break: break-word;
+                            }
+                            .o_furniture_payroll_batch_table .employee-name {
+                                color: #17324d;
+                                font-size: 9px;
+                                font-weight: 800;
+                            }
+                            .o_furniture_payroll_batch_table .employee-meta {
+                                color: #758995;
+                                font-size: 7px;
+                                margin-top: 2px;
+                            }
+                            .o_furniture_payroll_batch_table .num {
+                                direction: ltr;
+                                font-variant-numeric: tabular-nums;
+                                text-align: center;
+                                white-space: nowrap;
+                            }
+                            .o_furniture_payroll_batch_table .earning {
+                                color: #16764b;
+                                font-weight: 700;
+                            }
+                            .o_furniture_payroll_batch_table .deduction {
+                                color: #bd342f;
+                                font-weight: 700;
+                            }
+                            .o_furniture_payroll_batch_table .metric {
+                                color: #6f828d;
+                                display: block;
+                                font-size: 7px;
+                                font-weight: 400;
+                                margin-bottom: 1px;
+                            }
+                            .o_furniture_payroll_batch_table .net {
+                                background: #eaf7ef;
+                                color: #12683f;
+                                font-size: 9px;
+                                font-weight: 800;
+                            }
+                            .o_furniture_payroll_batch_table .totals-label,
+                            .o_furniture_payroll_batch_table tfoot td {
+                                background: #e8f0f4;
+                                border-color: #bdcdd6;
+                                font-size: 8.5px;
+                                font-weight: 800;
+                            }
+                            .o_furniture_payroll_batch_table tfoot .net {
+                                background: #167a52;
+                                color: #fff;
+                                font-size: 9.5px;
+                            }
+                        </style>
+
+                        <div class="o_furniture_payroll_batch_header">
+                            <table style="width:100%; table-layout:fixed;">
+                                <tr>
+                                    <td style="width:72%; text-align:right; vertical-align:middle;">
+                                        <div style="color:#bcd2df; font-size:8px; margin-bottom:1px;">
+                                            السجل الأسبوعي المجمع
+                                        </div>
+                                        <div style="font-size:20px; font-weight:800; line-height:1.2;">
+                                            تقرير أجور العمال
+                                        </div>
+                                        <div style="font-size:9px; margin-top:5px;">
+                                            <span style="color:#bcd2df; margin-left:5px;">الفترة</span>
+                                            <span dir="ltr" style="direction:ltr; font-weight:700;">
+                                                <span t-field="o.date_from"/> — <span t-field="o.date_to"/>
+                                            </span>
+                                            <span style="color:#7095aa; margin:0 8px;">|</span>
+                                            <span style="color:#bcd2df; margin-left:4px;">عدد العمال</span>
+                                            <strong t-out="len(slips)"/>
+                                            <span style="color:#7095aa; margin:0 8px;">|</span>
+                                            <span style="color:#bcd2df; margin-left:4px;">العملة</span>
+                                            <strong t-out="currency.name"/>
+                                        </div>
+                                    </td>
+                                    <td style="width:28%; text-align:left; vertical-align:middle;">
+                                        <img t-if="o.company_id.logo"
+                                             t-att-src="image_data_uri(o.company_id.logo)"
+                                             style="max-height:40px; max-width:130px; background:#fff; padding:4px; border-radius:5px;"/>
+                                        <div t-else="" style="font-size:11px; font-weight:700;">
+                                            <span t-field="o.company_id.name"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table class="o_furniture_payroll_batch_table">
+                            <colgroup>
+                                <col style="width:2%;"/>
+                                <col style="width:13%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:5%;"/>
+                                <col style="width:7%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:6%;"/>
+                                <col style="width:8%;"/>
+                                <col style="width:9%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>العامل والقسم</th>
+                                    <th>طريقة الأجر</th>
+                                    <th>الحضور<br/>فعلي / مطلوب</th>
+                                    <th>أجر الفترة</th>
+                                    <th>البدلات</th>
+                                    <th>الإضافي<br/>ساعات / قيمة</th>
+                                    <th>الحوافز</th>
+                                    <th>إجمالي الاستحقاقات</th>
+                                    <th>الغياب<br/>أيام / خصم</th>
+                                    <th>التأخير<br/>ساعات / خصم</th>
+                                    <th>خصومات أخرى</th>
+                                    <th>إجمالي الخصومات</th>
+                                    <th>صافي المستحق</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="slips" t-as="slip"
+                                    class="o_furniture_payroll_batch_employee_row">
+                                    <td class="num" t-out="slip_index + 1"/>
+                                    <td class="employee-cell">
+                                        <div class="employee-name" dir="auto"
+                                             t-out="slip.employee_id.name"/>
+                                        <div class="employee-meta" dir="auto">
+                                            <span t-out="slip.furniture_department_id.name or 'بدون قسم'"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span t-field="slip.furniture_pay_basis"/>
+                                        <span class="metric" style="margin-top:2px;">
+                                            <span t-field="slip.state"/>
+                                        </span>
+                                    </td>
+                                    <td class="num">
+                                        <t t-out="'{:.0f}'.format(slip.factory_attendance_days or 0.0)"/>
+                                        /
+                                        <t t-out="'{:.0f}'.format(slip.expected_working_days or 0.0)"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(slip.base_wage or 0.0)"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(slip.contract_allowances or 0.0)"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(slip.factory_overtime_hours or 0.0)"/> ساعة
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(slip.furniture_overtime_amount or 0.0)"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(slip.factory_bonus_amount or 0.0)"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(slip.furniture_total_earnings or 0.0)"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(slip.absence_days or 0.0)"/> يوم
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(slip.absence_deduction or 0.0)"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(slip.delay_hours or 0.0)"/> ساعة
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(slip.delay_deduction or 0.0)"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <t t-out="'{:,.2f}'.format(slip.factory_other_deduction_amount or 0.0)"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <t t-out="'{:,.2f}'.format(slip.furniture_total_deductions or 0.0)"/>
+                                    </td>
+                                    <td class="num net">
+                                        <t t-out="'{:,.2f}'.format(slip.net_salary or 0.0)"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not slips">
+                                    <td colspan="14" style="padding:18px; color:#758995; text-align:center;">
+                                        لا توجد كشوف أجر ضمن هذا التقرير.
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot t-if="slips">
+                                <tr>
+                                    <td colspan="4" class="totals-label" style="text-align:right; padding-right:8px;">
+                                        إجمالي <span t-out="len(slips)"/> عامل
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('base_wage')))"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('contract_allowances')))"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(sum(slips.mapped('factory_overtime_hours')))"/> ساعة
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('furniture_overtime_amount')))"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('factory_bonus_amount')))"/>
+                                    </td>
+                                    <td class="num earning">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('furniture_total_earnings')))"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(sum(slips.mapped('absence_days')))"/> يوم
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('absence_deduction')))"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <span class="metric">
+                                            <t t-out="'{:.2f}'.format(sum(slips.mapped('delay_hours')))"/> ساعة
+                                        </span>
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('delay_deduction')))"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('factory_other_deduction_amount')))"/>
+                                    </td>
+                                    <td class="num deduction">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('furniture_total_deductions')))"/>
+                                    </td>
+                                    <td class="num net">
+                                        <t t-out="'{:,.2f}'.format(sum(slips.mapped('net_salary')))"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <table style="width:100%; margin-top:15px; border:0; page-break-inside:avoid; color:#526b79;">
+                            <tr>
+                                <td style="width:50%; border:0; text-align:center; padding-top:12px;">
+                                    إعداد ومراجعة<br/>____________________________
+                                </td>
+                                <td style="width:50%; border:0; text-align:center; padding-top:12px;">
+                                    اعتماد المسؤول<br/>____________________________
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

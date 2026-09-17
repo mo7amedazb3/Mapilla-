@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Late ir.asset entries run after installed module manifests, including
+         MuK and optional factory addons. No business-module dependency needed. -->
+    <record id="brand_primary_variables" model="ir.asset">
+        <field name="name">Mapilla — final screen palette</field>
+        <field name="bundle">web._assets_primary_variables</field>
+        <field name="directive">append</field>
+        <field name="path">mapilla_backend_theme/static/src/scss/brand_variables.scss</field>
+        <field name="sequence">1000</field>
+    </record>
+    <record id="brand_backend_identity" model="ir.asset">
+        <field name="name">Mapilla — native and custom workspace identity</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="directive">append</field>
+        <field name="path">mapilla_backend_theme/static/src/scss/brand_identity.scss</field>
+        <field name="sequence">1000</field>
+    </record>
+    <record id="brand_custom_identity" model="ir.asset">
+        <field name="name">Mapilla — factory workspace adapters</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="directive">append</field>
+        <field name="path">mapilla_backend_theme/static/src/scss/brand_workspaces.scss</field>
+        <field name="sequence">1001</field>
+    </record>
+    <record id="brand_dark_identity" model="ir.asset">
+        <field name="name">Mapilla — accessible dark palette</field>
+        <field name="bundle">web.assets_web_dark</field>
+        <field name="directive">append</field>
+        <field name="path">mapilla_backend_theme/static/src/scss/brand_dark.scss</field>
+        <field name="sequence">1001</field>
+    </record>
+    <record id="brand_navigation_identity" model="ir.asset">
+        <field name="name">Mapilla — workspace, navigation and motion</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="directive">append</field>
+        <field name="path">mapilla_backend_theme/static/src/scss/brand_navigation.scss</field>
+        <field name="sequence">1002</field>
+    </record>
+</odoo>
