@@ -1,0 +1,3 @@
+[submodule "odoo18"]
+	path = odoo18
+	url = https://github.com/odoo/odoo.git

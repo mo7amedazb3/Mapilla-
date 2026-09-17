@@ -1,0 +1,12 @@
+{
+  "odooUrl": "http://127.0.0.1:8069",
+  "port": 3000,
+  "stateDir": "/var/lib/whatsapp-bridge",
+  "token": "REPLACE_WITH_PRIVATE_DATABASE_CALLBACK_TOKEN",
+  "instances": [
+    {
+      "id": "4d16524e-799d-4959-968b-be2b0a631852",
+      "database": "yasser3"
+    }
+  ]
+}

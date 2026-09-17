@@ -1,31 +1,121 @@
-# Mapilla — Custom Odoo Addons and Supervisors App
+# Mapilla — نفس نسخة السيرفر
 
-Source snapshot of the factory's custom Odoo 18 addons, including the independent
-React Native supervisors app. See [ADDONS.md](ADDONS.md) for the 43 included modules.
+هذا الريبو مربوط مباشرة بمجلد **`/opt/odoo` على السيرفر الحالي**. ملفات
+`Custom_addons/` و`whatsapp-bridge/` هي الملفات التي تستخدمها الخدمات الفعلية؛
+ليست نسخة تصدير منفصلة. يحتفظ الريبو بتاريخ الرفع الأول، ونُقلت مساراته تحت
+`Custom_addons/` حتى يطابق تنظيم السيرفر.
 
-## Layout
+## أين أعدّل؟
 
-Each top-level module directory is an Odoo addon. Install Odoo 18 and the required
-Python/system dependencies separately, add this repository to `addons_path`, and
-install or upgrade only the modules needed by the target database. Existing
-module manifests define their dependencies and licenses; those licenses remain
-in effect for each module and its assets.
+- `Custom_addons/`: موديولات المصنع الـ43، ومنها الثيم وتطبيق المشرفين.
+- `odoo18/`: كود Odoo 18 كـGit submodule مثبت على **نفس commit الموجود بالسيرفر**.
+- `whatsapp-bridge/`: كود خدمة واتساب الفعلية وملف اعتمادياتها المثبت.
+- `server/`: أمثلة إعدادات الخدمات الحالية بدون كلمات سر، واعتماديات Python الحالية.
+- `repository_backups/initial/`: نسخة مشفرة من قاعدة المصنع الحالية والمرفقات المرتبطة بها.
+- `ops/`: أدوات أخذ النسخة الاحتياطية وفكها والتحقق منها.
 
-The supervisors app source, Android/iOS projects and build instructions are in
-[furniture_supervisor_mobile/README.md](furniture_supervisor_mobile/README.md).
-The standalone app is separate from the normal ERP interface. Do not re-enable
-its retired ERP root menu or redirect the main ERP entry to the mobile app.
+الموقع الحالي: https://mapilla.net/odoo?db=yasser3
 
-## Local and private files
+تطبيق المشرفين منفصل: https://mapilla.net/supervisor-app?db=yasser3
 
-This repository intentionally excludes production database dumps, filestores,
-server configuration, credential files, signing keys, operational CSV exports,
-logs, installed dependencies, caches and native build outputs. The generated
-web app assets are included so the Odoo addon can serve its independent web UI.
-Android APK/iOS IPA files belong in release artifacts, not the source tree.
+**لا تفعّل قائمة التطبيق القديمة ولا تحوّل مدخل ERP لواجهة الموبايل.**
 
-Keep database/filestore backups and signing keys in a separate private backup.
-This source repository is not a complete data backup of the running factory.
+## حفظ تعديل من السيرفر إلى GitHub
 
-The export was prepared separately from the running system; preparing it did
-not modify the live addon files or the production database.
+```bash
+cd /opt/odoo
+git status
+git diff -- Custom_addons/اسم_الموديول
+git add Custom_addons/اسم_الموديول
+git commit -m "Describe the actual change"
+git push origin main
+```
+
+التغييرات على السيرفر تظهر مباشرة في `git status`، لكنها لا تُرفع تلقائيًا؛
+الرفع يحصل بعد `commit` و`push`. بيانات المستخدمين لا تدخل في هذه العمليات.
+
+## تنزيل تعديل GitHub إلى السيرفر
+
+```bash
+cd /opt/odoo
+git status --short
+# يجب مراجعة/حفظ التعديلات المحلية أولًا؛ لا تستخدم reset --hard.
+git pull --ff-only origin main
+```
+
+لا يُعاد تشغيل الموقع أو تحديث قاعدة البيانات تلقائيًا عند الرفع على GitHub.
+تغييرات Python تحتاج إعادة تشغيل الخدمات المعنية. تغييرات حقول الموديلات أو
+XML والصلاحيات تحتاج تحديث الموديول المحدد أيضًا، بعد نسخة احتياطية وفي موعد
+مناسب للتشغيل. لا تُجرِ تحديثًا عامًا لكل الموديولات (`-u all`).
+
+خدمات Odoo الحالية هي `odoo18` و`odoo18-zkteco`؛ الأخيرة تستخدم الكود نفسه
+لدخول أجهزة البصمة. خدمة واتساب اسمها `whatsapp-bridge`. يجب التحقق من التغيير
+قبل إعادة تشغيل الخدمات التي تعتمد عليه، وعدم إيقافها لمجرد عمل `git push`.
+
+## تنزيل المشروع كاملًا على جهاز آخر
+
+```bash
+git clone --recurse-submodules git@github.com:mo7amedazb3/Mapilla-.git
+```
+
+لنسخة مستنسخة بالفعل:
+
+```bash
+git submodule update --init --recursive
+```
+
+التنزيل يشمل كود Odoo عند الإصدار المثبت، وليس أحدث نسخة متغيرة من فرع 18.0.
+تعديل داخل `odoo18/` له تاريخ Git مستقل: أي تعديل على Odoo نفسه يحتاج حفظه في
+fork تملكه وتحديث مرجع الـsubmodule، أو نقله إلى موديول مخصص. الموديولات المخصصة
+وخدمة واتساب تتبع هذا الريبو مباشرة.
+
+## قاعدة البيانات والمرفقات
+
+PostgreSQL يحتفظ بالبيانات الحية على السيرفر. GitHub يحفظ **لقطة مشفرة قابلة
+للاسترجاع**؛ لا يشغّل قاعدة البيانات ولا يزامن كل حركة مبيعات/مخزون تلقائيًا.
+اللقطة تشمل قاعدة `yasser3` كاملة وملفات المرفقات التي تشير إليها نفس لقطة
+PostgreSQL. النسخة غير مُجهّلة، لذلك يلزم الحفاظ على مفتاحها خارج GitHub.
+
+فحص اللقطة الأولية وجد **22 ملف SVG لصور جهات اتصال مفقودين أصلًا من السيرفر**.
+اللقطة تحفظ قاعدة البيانات كما هي، وكل ملفات المرفقات الـ560 الموجودة، وتسجّل
+مسارات الملفات المفقودة داخل التقرير المشفر. لم تُحذف أو تُعدّل سجلات المصدر.
+
+مفتاح النسخة على السيرفر في `/root/.config/mapilla/repository-backup.key`،
+ويجب حفظ نسخة منه في مكان خاص آخر. فقدان المفتاح يمنع استرجاع النسخة المشفرة.
+لم يُرفع المفتاح ولا إعداد كلمات السر إلى GitHub.
+
+فك النسخة باستخدام Python 3.12+ وGnuPG:
+
+```bash
+python3 ops/decrypt_backup.py \
+  --key-file /مسار/خاص/repository-backup.key \
+  --output /مسار/خاص/mapilla-restored
+```
+
+الأداة تتحقق من سلامة الأجزاء والتشفير ومحتوى الأرشيف، وترفض الكتابة فوق مجلد
+موجود. الناتج: `database.dump` و`filestore/` و`manifest.json`. لا تغيّر أي قاعدة
+بيانات بنفسها. خطوات التشغيل والاسترجاع على سيرفر آخر في [server/README.md](server/README.md).
+
+لأخذ لقطة أحدث من السيرفر الحالي (اختر مجلدًا جديدًا لكل لقطة):
+
+```bash
+/opt/odoo/odoo18-venv/bin/python3 /opt/odoo/ops/backup.py \
+  --config /etc/odoo18.conf --database yasser3 \
+  --filestore /opt/odoo/.local/share/Odoo/filestore/yasser3 \
+  --key-file /root/.config/mapilla/repository-backup.key \
+  --output /opt/odoo/repository_backups/اسم_لقطة_جديدة
+```
+
+راجع حجم النسخ وسياسة الاحتفاظ قبل إضافة لقطات أخرى لتاريخ Git. النسخة الأولية
+مقسمة إلى أجزاء أصغر من حد ملفات GitHub، ومشفرة بـAES-256 مع تحقق سلامة GnuPG.
+الأداة ترفض افتراضيًا أخذ نسخة إذا وجدت مرفقًا مفقودًا. بعد مراجعة الحالة يمكن
+استخدام `--allow-missing-files` لتوثيق الملفات الناقصة أصلًا داخل النسخة المشفرة.
+
+جلسات الربط الفعلية لواتساب، الشهادات، مفاتيح توقيع التطبيقات، وقواعد الاختبار
+الأخرى ليست ضمن لقطة المصنع. عند نقل التشغيل يلزم ربط واتساب وإعداد النطاق
+وHTTPS بشكل مستقل. النسخة لا تغيّر التشغيل الحالي أو أي بيانات حية.
+
+## التراخيص
+
+تراخيص كل موديول وملف تظل سارية كما هي. راجع [ADDONS.md](ADDONS.md)
+و`__manifest__.py` داخل كل موديول وملف ترخيص Odoo داخل الـsubmodule.

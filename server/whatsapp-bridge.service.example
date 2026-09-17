@@ -1,0 +1,28 @@
+[Unit]
+Description=Mapilla WhatsApp bridge for Odoo
+After=network-online.target odoo18.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=whatsapp-bridge
+Group=whatsapp-bridge
+WorkingDirectory=/opt/odoo/whatsapp-bridge
+ExecStart=/usr/bin/node /opt/odoo/whatsapp-bridge/server.js
+Environment=NODE_ENV=production
+Environment=PUPPETEER_CACHE_DIR=/var/lib/whatsapp-bridge/browser-cache
+Environment=WA_CONFIG=/etc/whatsapp-bridge.json
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/whatsapp-bridge
+MemoryMax=2G
+TasksMax=256
+
+[Install]
+WantedBy=multi-user.target

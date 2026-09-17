@@ -1,0 +1,22 @@
+[options]
+admin_passwd = REPLACE_ON_SERVER
+db_host = localhost
+db_port = 5432
+db_user = odoo
+db_password = REPLACE_ON_SERVER
+addons_path = /opt/odoo/odoo18/addons,/opt/odoo/Custom_addons
+logfile = /var/log/odoo/odoo18.log
+log_level = info
+xmlrpc_port = 8069
+workers = 4
+gevent_port = 8072
+proxy_mode = True
+http_interface = 127.0.0.1
+limit_memory_hard = 2684354560
+limit_memory_soft = 2147483648
+limit_request = 8192
+limit_time_cpu = 600
+limit_time_real = 1200
+max_cron_threads = 1
+server_wide_modules = base,web,furniture_supervisor_mobile
+

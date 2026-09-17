@@ -1,0 +1,8 @@
+{
+  "name": "mapilla-whatsapp-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local WhatsApp transport for the existing Odoo connector",
+  "scripts": {"start": "node server.js", "postinstall": "node patch-send-result.js", "test": "node --test test.js send-confirmation.test.js send-receipts.test.js voice-media.test.js media-download.test.js call-log.test.js"},
+  "dependencies": {"whatsapp-web.js": "1.34.7"}
+}

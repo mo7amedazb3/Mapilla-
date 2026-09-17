@@ -1,0 +1,24 @@
+[Unit]
+Description=Odoo 18 ZKTeco PUSH ingress (yasser3 only)
+Documentation=https://www.zkteco.com/en/PUSHSDK
+After=network.target postgresql.service odoo18.service
+Wants=network.target
+PartOf=odoo18.service
+
+[Service]
+Type=simple
+User=odoo
+Group=odoo
+Environment="ZK_ATTENDANCE_DB=yasser3"
+Environment="ZK_PUSH_GATEWAY_TOKEN=8e3b1f76c0a94d52b7f41d09e2ca683fa6c7185bd0349f11ce782a6540d39b87"
+ExecStart=/opt/odoo/odoo18-venv/bin/python3 /opt/odoo/odoo18/odoo-bin -c /etc/odoo18.conf -d yasser3 --db-filter=^yasser3$ --no-database-list --http-interface=127.0.0.1 --http-port=8073 --gevent-port=8074 --workers=1 --max-cron-threads=1 --logfile=/var/log/odoo/odoo18-zkteco.log
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/opt/odoo/.local /var/log/odoo
+
+[Install]
+WantedBy=multi-user.target
