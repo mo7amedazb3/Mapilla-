@@ -1,0 +1,22 @@
+{
+  "checkpoint": "checkpoint-20260917-163322",
+  "source_commit": "fc4b9bf2dbf29d0c803e448abd8740b66668e868",
+  "odoo_commit": "f4c76be062bec47b68ee42505d7d42fed31ac0f2",
+  "created_at": "2026-09-17T16:33:35.051572+00:00",
+  "restore_verification": "passed",
+  "tables": 893,
+  "installed_modules": 124,
+  "verified_attachment_files": 560,
+  "preexisting_missing_svg_avatar_files": 22,
+  "scope": [
+    "tracked live source",
+    "factory PostgreSQL database",
+    "available referenced filestore attachments"
+  ],
+  "exclusions": [
+    "private server configuration",
+    "WhatsApp linked-device state",
+    "application signing keys",
+    "other databases"
+  ]
+}
