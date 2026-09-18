@@ -506,23 +506,18 @@
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_id"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="product_id"] {
-    width: 50% !important;
+    width: 55% !important;
 }
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="actual_qty"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="actual_qty"] {
-    width: 20% !important;
+    width: 30% !important;
 }
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="inventory_status"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="inventory_status"] {
     width: 15% !important;
     text-align: center !important;
-}
-
-.o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_uom_id"],
-.o_mapilla_weekly_lines table.is-supervisor-inventory td[name="product_uom_id"] {
-    width: 15% !important;
 }
 
 .o_mapilla_weekly_lines table.o_list_table thead th,
@@ -623,7 +618,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+    direction: rtl;
 }
 
 .o_mapilla_actual_input .fa-check-circle { color: #2d7a5b; }
