@@ -589,6 +589,25 @@
     text-align: center !important;
 }
 
+.o_mapilla_inventory_uom {
+    width: 112px;
+    max-width: 100%;
+    min-height: 34px;
+    padding: 4px 9px;
+    border: 1px solid #c7d2db;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--permit-navy);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.o_mapilla_inventory_uom:focus {
+    border-color: #7392aa;
+    outline: 2px solid rgb(115 146 170 / 18%);
+}
+
 .o_mapilla_weekly_lines td[name="actual_qty"] input {
     width: 112px !important;
     min-width: 0 !important;

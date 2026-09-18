@@ -140,10 +140,12 @@ export class MaterialPeriod extends Component {
         try {
             const saved = await this.orm.call(
                 "furniture.assembly.weekly.material.report", "save_actual_inventory",
-                [[this.recordId], this.state.stage, line.id, quantity]
+                [[this.recordId], this.state.stage, line.id, quantity, line.uom_id]
             );
             line.counted = saved.counted;
             line.actual_qty = saved.actual_qty;
+            line.uom_id = saved.uom_id;
+            line.uom_name = saved.uom_name;
             line.status = saved.status;
             input.value = saved.actual_qty;
             this.notification.add(`تم حفظ جرد ${line.name}.`, { type: "success" });
@@ -152,6 +154,28 @@ export class MaterialPeriod extends Component {
             this.notification.add(error.data?.message || "تعذر حفظ الجرد الفعلي.", { type: "danger" });
         } finally {
             input.disabled = false;
+            this.state.savingLineId = null;
+        }
+    }
+
+    async changeUom(line, event) {
+        const previousUomId = line.uom_id;
+        const uomId = Number(event.target.value);
+        this.state.savingLineId = line.id;
+        try {
+            const saved = await this.orm.call(
+                "furniture.assembly.weekly.material.report", "set_actual_inventory_uom",
+                [[this.recordId], this.state.stage, line.id, uomId]
+            );
+            line.counted = saved.counted;
+            line.actual_qty = saved.actual_qty;
+            line.uom_id = saved.uom_id;
+            line.uom_name = saved.uom_name;
+            line.status = saved.status;
+        } catch (error) {
+            event.target.value = previousUomId;
+            this.notification.add(error.data?.message || "تعذر تغيير وحدة القياس.", { type: "danger" });
+        } finally {
             this.state.savingLineId = null;
         }
     }

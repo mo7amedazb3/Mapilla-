@@ -517,6 +517,21 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         )
         current.action_stage_dashboard_finish_product_batch(token, 'carpentry')
 
+        recipe_uom = self.env.ref('furniture_mrp.furniture_uom_box')
+        recipe_bom = self.env['mrp.bom'].create({
+            'product_tmpl_id': self.product.product_tmpl_id.id,
+            'product_qty': 1,
+            'company_id': self.env.company.id,
+        })
+        self.env['furniture.mrp.bom.stage.line'].create({
+            'bom_id': recipe_bom.id,
+            'stage': 'carpentry',
+            'product_id': self.nail.id,
+            'product_uom_code': 'box',
+            'product_uom_id': recipe_uom.id,
+            'product_qty': 2,
+        })
+
         Report = self.env['furniture.assembly.weekly.material.report']
         current_week_start, _current_week_end = Report._week_dates()
         Report.search([
@@ -565,36 +580,63 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         )
         self.assertEqual(
             set(supervisor_nail),
-            {'id', 'name', 'uom_name', 'counted', 'actual_qty', 'status'},
+            {
+                'id', 'name', 'uom_id', 'uom_name', 'uom_options',
+                'counted', 'actual_qty', 'status',
+            },
         )
-        self.assertEqual(supervisor_nail['uom_name'], self.nail.uom_id.display_name)
+        self.assertEqual(supervisor_nail['uom_id'], recipe_uom.id)
+        self.assertEqual(supervisor_nail['uom_name'], recipe_uom.display_name)
+        self.assertIn(recipe_uom.id, {
+            option['id'] for option in supervisor_nail['uom_options']
+        })
+        self.assertIn(self.nail.uom_id.id, {
+            option['id'] for option in supervisor_nail['uom_options']
+        })
         self.assertEqual(supervisor_nail['status'], 'pending')
         saved = report.with_user(self.supervisor).save_actual_inventory(
-            'carpentry', self.nail.id, 1,
+            'carpentry', self.nail.id, 1, recipe_uom.id,
         )
         self.assertTrue(saved['counted'])
         self.assertEqual(saved['actual_qty'], 1)
+        self.assertEqual(saved['uom_id'], recipe_uom.id)
         self.assertEqual(saved['status'], 'shortage')
         self.assertNotIn('variance_qty', saved)
-        nail_line.invalidate_recordset(['counted', 'actual_qty', 'variance_qty'])
+        nail_line.invalidate_recordset([
+            'counted', 'actual_qty', 'actual_uom_id', 'variance_qty',
+        ])
         self.assertTrue(nail_line.counted)
         self.assertEqual(nail_line.actual_qty, 1)
+        self.assertEqual(nail_line.actual_uom_id, recipe_uom)
         self.assertEqual(nail_line.variance_qty, -3)
+
+        selected = report.with_user(
+            self.supervisor
+        ).set_actual_inventory_uom(
+            'carpentry', self.nail.id, self.nail.uom_id.id,
+        )
+        self.assertEqual(selected['uom_id'], self.nail.uom_id.id)
+        self.assertEqual(selected['actual_qty'], 1)
+        with self.assertRaises(AccessError):
+            report.with_user(self.supervisor).set_actual_inventory_uom(
+                'carpentry', self.nail.id,
+                self.env.ref('uom.product_uom_hour').id,
+            )
 
         self.assertEqual(
             report.with_user(self.supervisor).save_actual_inventory(
-                'carpentry', self.nail.id, 5,
+                'carpentry', self.nail.id, 5, self.nail.uom_id.id,
             )['status'],
             'surplus',
         )
         self.assertEqual(
             report.with_user(self.supervisor).save_actual_inventory(
-                'carpentry', self.nail.id, 4,
+                'carpentry', self.nail.id, 4, self.nail.uom_id.id,
             )['status'],
             'balanced',
         )
         report.with_user(self.supervisor).save_actual_inventory(
-            'carpentry', self.nail.id, 1,
+            'carpentry', self.nail.id, 1, self.nail.uom_id.id,
         )
 
         admin_data = report.get_period_materials(

@@ -159,6 +159,106 @@ class AssemblyWeeklyMaterialReport(models.Model):
             return 'surplus'
         return 'balanced'
 
+    def _recipe_uoms_by_stage_product(self, stage_product_keys):
+        """Return active recipe units, preserving their configured order."""
+        if not stage_product_keys:
+            return {}
+        stage_codes = list({key[0] for key in stage_product_keys})
+        product_ids = list({key[1] for key in stage_product_keys})
+        recipe_lines = self.env['furniture.mrp.bom.stage.line'].sudo().search([
+            ('product_id', 'in', product_ids),
+            '|', ('stage', 'in', stage_codes),
+                 ('stage_id.stage', 'in', stage_codes),
+        ], order='sequence, id')
+        uoms_by_key = defaultdict(lambda: self.env['uom.uom'].sudo())
+        for recipe_line in recipe_lines:
+            bom = recipe_line.bom_id or recipe_line.stage_id.bom_id
+            stage_code = recipe_line.stage or recipe_line.stage_id.stage
+            key = (stage_code, recipe_line.product_id.id)
+            if (
+                key not in stage_product_keys
+                or not bom.active
+                or (bom.company_id and bom.company_id != self.company_id)
+                or not recipe_line.product_uom_id.active
+            ):
+                continue
+            uoms_by_key[key] |= recipe_line.product_uom_id
+        return uoms_by_key
+
+    @api.model
+    def _inventory_uom_choices(self, product, recipe_uoms):
+        Uom = self.env['uom.uom'].sudo()
+        furniture_uoms = Uom.browse(list(Uom._furniture_mrp_uom_ids())).filtered(
+            lambda uom: uom.active and (
+                uom.category_id == product.uom_id.category_id
+                or product.uom_id._is_furniture_mrp_uom_pair(uom)
+            )
+        )
+        choices = recipe_uoms.filtered('active')
+        choices |= product.uom_id
+        choices |= furniture_uoms.sorted(lambda uom: uom.display_name)
+        return choices
+
+    @api.model
+    def _quantity_for_inventory_uom(self, product, quantity, uom):
+        return product.uom_id._compute_quantity(quantity, uom, round=False)
+
+    def _supervisor_inventory_lines(self, stage_code, product_id):
+        self.ensure_one()
+        profile = self._inventory_access_profile(self.company_id)
+        self.check_access('read')
+        if not profile['is_supervisor']:
+            raise AccessError(_('إدخال الجرد من هذه الشاشة متاح لمشرف المرحلة فقط.'))
+        if stage_code not in profile['allowed_stage_codes']:
+            raise AccessError(_('غير مسموح لك بتسجيل جرد هذه المرحلة.'))
+        try:
+            product_id = int(product_id)
+        except (TypeError, ValueError):
+            raise ValidationError(_('الخامة المختارة غير صحيحة.'))
+        policy = self.env[
+            'furniture.assembly.supervisor.material'
+        ].sudo().search([
+            ('company_id', '=', self.company_id.id),
+            ('supervisor_id', '=', self.env.user.id),
+            ('stage_code', '=', stage_code),
+            ('product_ids', 'in', product_id),
+        ], limit=1)
+        if not policy:
+            raise AccessError(_('هذه الخامة غير مسموحة لك في المرحلة المختارة.'))
+
+        own_line = self.sudo().line_ids.filtered(lambda line: (
+            line.supervisor_id.id == self.env.user.id
+            and line.stage_code == stage_code
+            and line.product_id.id == product_id
+        ))[:1]
+        if not own_line:
+            self.sudo().action_refresh()
+            own_line = self.sudo().line_ids.filtered(lambda line: (
+                line.supervisor_id.id == self.env.user.id
+                and line.stage_code == stage_code
+                and line.product_id.id == product_id
+            ))[:1]
+        if not own_line:
+            raise ValidationError(_('سطر الخامة غير موجود في تقرير الأسبوع الحالي.'))
+        stage_lines = self.sudo().line_ids.filtered(lambda line: (
+            line.stage_code == stage_code and line.product_id.id == product_id
+        ))
+        return own_line, stage_lines
+
+    def _validated_inventory_uom(self, stage_code, line, uom_id):
+        try:
+            uom_id = int(uom_id)
+        except (TypeError, ValueError):
+            raise ValidationError(_('اختر وحدة قياس صحيحة.'))
+        recipe_uoms = self._recipe_uoms_by_stage_product({
+            (stage_code, line.product_id.id),
+        }).get((stage_code, line.product_id.id), self.env['uom.uom'])
+        choices = self._inventory_uom_choices(line.product_id, recipe_uoms)
+        uom = choices.filtered(lambda choice: choice.id == uom_id)[:1]
+        if not uom:
+            raise AccessError(_('وحدة القياس المختارة غير مسموحة لهذه الخامة.'))
+        return uom
+
     @api.model
     def _week_dates(self, target_date=None):
         target_date = fields.Date.to_date(target_date or fields.Date.context_today(self))
@@ -414,10 +514,15 @@ class AssemblyWeeklyMaterialReport(models.Model):
         products = self.env['product.product'].browse(
             list({value['product_id'] for value in values.values()})
         )
+        products_by_id = {product.id: product for product in products}
         names = {product.id: product.display_name for product in products}
-        uom_names = {
-            product.id: product.uom_id.display_name for product in products
+        stage_product_keys = {
+            (value['stage_code'], value['product_id'])
+            for value in values.values()
         }
+        recipe_uoms_by_key = self._recipe_uoms_by_stage_product(
+            stage_product_keys,
+        )
         allowed_stage_codes = profile['allowed_stage_codes']
         stages = {code: {} for code in allowed_stage_codes}
         saved_lines = defaultdict(lambda: self.env[
@@ -441,7 +546,6 @@ class AssemblyWeeklyMaterialReport(models.Model):
             row = {
                 'id': product_id,
                 'name': names[product_id],
-                'uom_name': uom_names[product_id],
             }
             candidate_lines = saved_lines[(stage_code, product_id)]
             if profile['is_supervisor']:
@@ -449,17 +553,44 @@ class AssemblyWeeklyMaterialReport(models.Model):
                     lambda line: line.supervisor_id.id == self.env.user.id
                 )
             inventory_line = candidate_lines[:1]
+            product = products_by_id[product_id]
+            recipe_uoms = recipe_uoms_by_key.get(
+                (stage_code, product_id), self.env['uom.uom']
+            )
+            selected_uom = (
+                inventory_line.actual_uom_id
+                if inventory_line and inventory_line.actual_uom_id.active
+                else recipe_uoms[:1] or product.uom_id
+            )
+            uom_choices = self._inventory_uom_choices(product, recipe_uoms)
+            uom_choices |= selected_uom
+            row.update({
+                'uom_id': selected_uom.id,
+                'uom_name': selected_uom.display_name,
+                'uom_options': [
+                    {'id': uom.id, 'name': uom.display_name}
+                    for uom in uom_choices
+                ],
+            })
             if profile['is_admin']:
                 row.update({
-                    'recipe_qty': value['recipe_used_qty'],
-                    'manual_qty': value['received_qty'],
+                    'recipe_qty': self._quantity_for_inventory_uom(
+                        product, value['recipe_used_qty'], selected_uom,
+                    ),
+                    'manual_qty': self._quantity_for_inventory_uom(
+                        product, value['received_qty'], selected_uom,
+                    ),
                     'counted': bool(inventory_line and inventory_line.counted),
                     'actual_qty': (
-                        inventory_line.actual_qty
+                        self._quantity_for_inventory_uom(
+                            product, inventory_line.actual_qty, selected_uom,
+                        )
                         if inventory_line and inventory_line.counted else False
                     ),
                     'variance_qty': (
-                        inventory_line.variance_qty
+                        self._quantity_for_inventory_uom(
+                            product, inventory_line.variance_qty, selected_uom,
+                        )
                         if inventory_line and inventory_line.counted else False
                     ),
                 })
@@ -467,7 +598,9 @@ class AssemblyWeeklyMaterialReport(models.Model):
                 row.update({
                     'counted': bool(inventory_line and inventory_line.counted),
                     'actual_qty': (
-                        inventory_line.actual_qty
+                        self._quantity_for_inventory_uom(
+                            product, inventory_line.actual_qty, selected_uom,
+                        )
                         if inventory_line and inventory_line.counted else False
                     ),
                     'status': self._inventory_status(
@@ -489,60 +622,66 @@ class AssemblyWeeklyMaterialReport(models.Model):
             ],
         }
 
-    def save_actual_inventory(self, stage_code, product_id, actual_qty):
+    def save_actual_inventory(
+        self, stage_code, product_id, actual_qty, uom_id=False,
+    ):
         """Save one hall count after checking the caller's exact stage policy."""
-        self.ensure_one()
-        profile = self._inventory_access_profile(self.company_id)
-        self.check_access('read')
-        if not profile['is_supervisor']:
-            raise AccessError(_('إدخال الجرد من هذه الشاشة متاح لمشرف المرحلة فقط.'))
-        if stage_code not in profile['allowed_stage_codes']:
-            raise AccessError(_('غير مسموح لك بتسجيل جرد هذه المرحلة.'))
         try:
-            product_id = int(product_id)
             quantity = float(actual_qty)
         except (TypeError, ValueError):
             raise ValidationError(_('أدخل كمية جرد صحيحة.'))
-        if product_id <= 0 or not math.isfinite(quantity) or quantity < 0:
+        if not math.isfinite(quantity) or quantity < 0:
             raise ValidationError(_('الجرد الفعلي يجب أن يكون رقمًا موجبًا أو صفرًا.'))
-
-        policy = self.env[
-            'furniture.assembly.supervisor.material'
-        ].sudo().search([
-            ('company_id', '=', self.company_id.id),
-            ('supervisor_id', '=', self.env.user.id),
-            ('stage_code', '=', stage_code),
-            ('product_ids', 'in', product_id),
-        ], limit=1)
-        if not policy:
-            raise AccessError(_('هذه الخامة غير مسموحة لك في المرحلة المختارة.'))
-
-        own_line = self.sudo().line_ids.filtered(lambda line: (
-            line.supervisor_id.id == self.env.user.id
-            and line.stage_code == stage_code
-            and line.product_id.id == product_id
-        ))[:1]
-        if not own_line:
-            self.sudo().action_refresh()
-            own_line = self.sudo().line_ids.filtered(lambda line: (
-                line.supervisor_id.id == self.env.user.id
-                and line.stage_code == stage_code
-                and line.product_id.id == product_id
-            ))[:1]
-        if not own_line:
-            raise ValidationError(_('سطر الخامة غير موجود في تقرير الأسبوع الحالي.'))
-
+        own_line, stage_lines = self._supervisor_inventory_lines(
+            stage_code, product_id,
+        )
+        uom = self._validated_inventory_uom(
+            stage_code, own_line, uom_id or own_line.actual_uom_id.id
+            or own_line.product_uom_id.id,
+        )
+        product_quantity = uom._compute_quantity(
+            quantity, own_line.product_uom_id, round=False,
+        )
         # The physical stock belongs to the stage hall. If two supervisors are
         # configured for the same material, keep their report rows identical.
-        stage_lines = self.sudo().line_ids.filtered(lambda line: (
-            line.stage_code == stage_code and line.product_id.id == product_id
-        ))
-        stage_lines.write({'counted': True, 'actual_qty': quantity})
-        own_line.invalidate_recordset(['counted', 'actual_qty', 'variance_qty'])
+        stage_lines.write({
+            'counted': True,
+            'actual_qty': product_quantity,
+            'actual_uom_id': uom.id,
+        })
+        own_line.invalidate_recordset([
+            'counted', 'actual_qty', 'actual_uom_id', 'variance_qty',
+        ])
         return {
             'counted': True,
-            'actual_qty': own_line.actual_qty,
+            'actual_qty': self._quantity_for_inventory_uom(
+                own_line.product_id, own_line.actual_qty, uom,
+            ),
+            'uom_id': uom.id,
+            'uom_name': uom.display_name,
             'status': self._inventory_status(True, own_line.variance_qty),
+        }
+
+    def set_actual_inventory_uom(self, stage_code, product_id, uom_id):
+        """Persist a permitted display/input unit without changing the count."""
+        own_line, stage_lines = self._supervisor_inventory_lines(
+            stage_code, product_id,
+        )
+        uom = self._validated_inventory_uom(stage_code, own_line, uom_id)
+        stage_lines.write({'actual_uom_id': uom.id})
+        own_line.invalidate_recordset(['actual_uom_id'])
+        return {
+            'counted': own_line.counted,
+            'actual_qty': (
+                self._quantity_for_inventory_uom(
+                    own_line.product_id, own_line.actual_qty, uom,
+                ) if own_line.counted else False
+            ),
+            'uom_id': uom.id,
+            'uom_name': uom.display_name,
+            'status': self._inventory_status(
+                own_line.counted, own_line.variance_qty,
+            ),
         }
 
     def action_refresh(self):
@@ -660,6 +799,9 @@ class AssemblyWeeklyMaterialReportLine(models.Model):
     )
     counted = fields.Boolean('تم الجرد')
     actual_qty = fields.Float('الجرد الفعلي', digits=(16, 3))
+    actual_uom_id = fields.Many2one(
+        'uom.uom', string='وحدة الجرد', readonly=True, ondelete='restrict',
+    )
     variance_qty = fields.Float(
         'الفرق', compute='_compute_balances', store=True,
         readonly=True, digits=(16, 3),
@@ -695,7 +837,7 @@ class AssemblyWeeklyMaterialReportLine(models.Model):
 
     def write(self, vals):
         self.env['furniture.assembly.weekly.material.report']._check_admin()
-        editable = {'counted', 'actual_qty', 'note'}
+        editable = {'counted', 'actual_qty', 'actual_uom_id', 'note'}
         automatic = {
             'supervisor_id', 'stage_code', 'product_id', 'product_uom_id',
             'opening_qty', 'received_qty', 'recipe_used_qty',
