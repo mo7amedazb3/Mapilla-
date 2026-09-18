@@ -24,7 +24,7 @@
                 </div>
                 <div class="o_mapilla_permit_lines o_mapilla_weekly_lines">
                     <table t-att-class="'o_list_table table mb-0 ' + (isSupervisor ? 'is-supervisor-inventory' : 'is-admin-inventory')" aria-label="جرد خامات المرحلة">
-                        <thead><tr><th scope="col" data-name="product_id">اسم الخامة</th><t t-if="!isSupervisor"><th scope="col" data-name="recipe_used_qty">المسحوب من الريسيبي</th><th scope="col" data-name="received_qty">المسحوب يدوي</th></t><th scope="col" data-name="actual_qty">الجرد الفعلي</th><th t-if="!isSupervisor" scope="col" data-name="variance_qty">الفرق</th></tr></thead>
+                        <thead><tr><th scope="col" data-name="product_id">اسم الخامة</th><t t-if="!isSupervisor"><th scope="col" data-name="recipe_used_qty">المسحوب من الريسيبي</th><th scope="col" data-name="received_qty">المسحوب يدوي</th></t><th scope="col" data-name="actual_qty">الجرد الفعلي</th><th t-if="isSupervisor" scope="col" data-name="inventory_status">الحالة</th><th t-else="" scope="col" data-name="variance_qty">الفرق</th></tr></thead>
                         <tbody>
                             <tr t-foreach="lines" t-as="line" t-key="line.id">
                                 <td name="product_id" t-esc="line.name"/>
@@ -37,9 +37,10 @@
                                     </div>
                                     <t t-else="" t-esc="line.counted ? number(line.actual_qty) : '—'"/>
                                 </td>
-                                <td t-if="!isSupervisor" name="variance_qty" t-att-class="line.counted ? (line.variance_qty &lt; 0 ? 'is-negative' : (line.variance_qty &gt; 0 ? 'is-positive' : 'is-zero')) : ''" t-esc="line.counted ? number(line.variance_qty) : '—'"/>
+                                <td t-if="isSupervisor" name="inventory_status"><span t-att-class="'o_mapilla_inventory_status is-' + line.status" t-esc="statusLabel(line.status)"/></td>
+                                <td t-else="" name="variance_qty" t-att-class="line.counted ? (line.variance_qty &lt; 0 ? 'is-negative' : (line.variance_qty &gt; 0 ? 'is-positive' : 'is-zero')) : ''" t-esc="line.counted ? number(line.variance_qty) : '—'"/>
                             </tr>
-                            <tr t-if="!lines.length"><td t-att-colspan="isSupervisor ? 2 : 5" class="o_mapilla_period_empty">لا توجد خامات مسجلة لهذه المرحلة.</td></tr>
+                            <tr t-if="!lines.length"><td t-att-colspan="isSupervisor ? 3 : 5" class="o_mapilla_period_empty">لا توجد خامات مسجلة لهذه المرحلة.</td></tr>
                         </tbody>
                         <tfoot t-if="lines.length &amp;&amp; !isSupervisor"><tr><td>الإجمالي</td><td t-esc="total('recipe_qty')"/><td t-esc="total('manual_qty')"/><td t-esc="totalCounted('actual_qty')"/><td t-esc="totalCounted('variance_qty')"/></tr></tfoot>
                     </table>

@@ -501,12 +501,18 @@
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_id"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="product_id"] {
-    width: 60% !important;
+    width: 50% !important;
 }
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="actual_qty"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="actual_qty"] {
-    width: 40% !important;
+    width: 30% !important;
+}
+
+.o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="inventory_status"],
+.o_mapilla_weekly_lines table.is-supervisor-inventory td[name="inventory_status"] {
+    width: 20% !important;
+    text-align: center !important;
 }
 
 .o_mapilla_weekly_lines table.o_list_table thead th,
@@ -533,7 +539,8 @@
 .o_mapilla_weekly_lines th[data-name="recipe_used_qty"] > div,
 .o_mapilla_weekly_lines th[data-name="received_qty"] > div,
 .o_mapilla_weekly_lines th[data-name="actual_qty"] > div,
-.o_mapilla_weekly_lines th[data-name="variance_qty"] > div {
+.o_mapilla_weekly_lines th[data-name="variance_qty"] > div,
+.o_mapilla_weekly_lines th[data-name="inventory_status"] > div {
     justify-content: center !important;
 }
 
@@ -585,6 +592,23 @@
 .o_mapilla_weekly_lines td[name="variance_qty"].is-negative { color: #b23b3b !important; }
 .o_mapilla_weekly_lines td[name="variance_qty"].is-positive { color: #9a681c !important; }
 .o_mapilla_weekly_lines td[name="variance_qty"].is-zero { color: #2d7a5b !important; }
+
+.o_mapilla_inventory_status {
+    display: inline-flex;
+    min-width: 66px;
+    min-height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.o_mapilla_inventory_status.is-shortage { color: #a32e2e; background: #fbe9e9; }
+.o_mapilla_inventory_status.is-surplus { color: #8a611e; background: #fff2d8; }
+.o_mapilla_inventory_status.is-balanced { color: #256347; background: #e5f4ec; }
+.o_mapilla_inventory_status.is-pending { color: var(--permit-muted); background: #eef1f3; }
 
 /* Compact weekly layout: one summary strip and one stage-tab workspace. */
 .o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero {

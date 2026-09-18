@@ -91,6 +91,15 @@ export class MaterialPeriod extends Component {
         return Boolean(this.state.result?.is_supervisor);
     }
 
+    statusLabel(status) {
+        return {
+            shortage: "عجز",
+            surplus: "فائض",
+            balanced: "مطابق",
+            pending: "—",
+        }[status] || "—";
+    }
+
     number(value) {
         return formatFloat(value, { digits: [16, 3] });
     }
@@ -135,7 +144,7 @@ export class MaterialPeriod extends Component {
             );
             line.counted = saved.counted;
             line.actual_qty = saved.actual_qty;
-            line.variance_qty = saved.variance_qty;
+            line.status = saved.status;
             input.value = saved.actual_qty;
             this.notification.add(`تم حفظ جرد ${line.name}.`, { type: "success" });
         } catch (error) {

@@ -565,18 +565,36 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         )
         self.assertEqual(
             set(supervisor_nail),
-            {'id', 'name', 'counted', 'actual_qty'},
+            {'id', 'name', 'counted', 'actual_qty', 'status'},
         )
+        self.assertEqual(supervisor_nail['status'], 'pending')
         saved = report.with_user(self.supervisor).save_actual_inventory(
             'carpentry', self.nail.id, 1,
         )
         self.assertTrue(saved['counted'])
         self.assertEqual(saved['actual_qty'], 1)
-        self.assertEqual(saved['variance_qty'], 1)
+        self.assertEqual(saved['status'], 'shortage')
+        self.assertNotIn('variance_qty', saved)
         nail_line.invalidate_recordset(['counted', 'actual_qty', 'variance_qty'])
         self.assertTrue(nail_line.counted)
         self.assertEqual(nail_line.actual_qty, 1)
-        self.assertEqual(nail_line.variance_qty, 1)
+        self.assertEqual(nail_line.variance_qty, -3)
+
+        self.assertEqual(
+            report.with_user(self.supervisor).save_actual_inventory(
+                'carpentry', self.nail.id, 5,
+            )['status'],
+            'surplus',
+        )
+        self.assertEqual(
+            report.with_user(self.supervisor).save_actual_inventory(
+                'carpentry', self.nail.id, 4,
+            )['status'],
+            'balanced',
+        )
+        report.with_user(self.supervisor).save_actual_inventory(
+            'carpentry', self.nail.id, 1,
+        )
 
         admin_data = report.get_period_materials(
             fields.Date.to_string(report.week_start),
@@ -588,9 +606,19 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
             for row in stage['lines'] if row['id'] == self.nail.id
         )
         self.assertEqual(admin_nail['actual_qty'], 1)
-        self.assertEqual(admin_nail['variance_qty'], 1)
+        self.assertEqual(admin_nail['variance_qty'], -3)
         self.assertIn('recipe_qty', admin_nail)
         self.assertIn('manual_qty', admin_nail)
+
+        action = self.env.ref(
+            'furniture_assembly_requisitions.'
+            'action_assembly_weekly_material_report_direct'
+        ).with_user(self.supervisor).run()
+        self.assertEqual(action['res_id'], report.id)
+        with self.assertRaises(AccessError):
+            report.with_user(self.supervisor).write({
+                'generated_at': fields.Datetime.now(),
+            })
 
         other_supervisor = self._create_supervisor_user(('painting',))
         with self.assertRaises(AccessError):
@@ -614,7 +642,7 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
                 'actual_qty': report_line.theoretical_qty,
             })
         nail_line.write({'actual_qty': 1})
-        self.assertEqual(nail_line.variance_qty, 1)
+        self.assertEqual(nail_line.variance_qty, -3)
         self.assertNotIn('state', Report._fields)
 
         next_report = Report.create({

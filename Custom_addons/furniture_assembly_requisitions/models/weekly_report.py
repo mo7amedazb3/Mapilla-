@@ -147,6 +147,19 @@ class AssemblyWeeklyMaterialReport(models.Model):
         }
 
     @api.model
+    def _inventory_status(self, counted, variance_qty):
+        if not counted:
+            return 'pending'
+        comparison = float_compare(
+            variance_qty, 0.0, precision_digits=3,
+        )
+        if comparison < 0:
+            return 'shortage'
+        if comparison > 0:
+            return 'surplus'
+        return 'balanced'
+
+    @api.model
     def _week_dates(self, target_date=None):
         target_date = fields.Date.to_date(target_date or fields.Date.context_today(self))
         friday = target_date - timedelta(days=(target_date.weekday() - 4) % 7)
@@ -453,6 +466,10 @@ class AssemblyWeeklyMaterialReport(models.Model):
                         inventory_line.actual_qty
                         if inventory_line and inventory_line.counted else False
                     ),
+                    'status': self._inventory_status(
+                        bool(inventory_line and inventory_line.counted),
+                        inventory_line.variance_qty if inventory_line else 0.0,
+                    ),
                 })
             stages[stage_code][product_id] = row
         return {
@@ -521,7 +538,7 @@ class AssemblyWeeklyMaterialReport(models.Model):
         return {
             'counted': True,
             'actual_qty': own_line.actual_qty,
-            'variance_qty': own_line.variance_qty,
+            'status': self._inventory_status(True, own_line.variance_qty),
         }
 
     def action_refresh(self):
@@ -662,7 +679,8 @@ class AssemblyWeeklyMaterialReportLine(models.Model):
                 - line.recipe_used_qty - line.other_out_qty
             )
             line.variance_qty = (
-                line.actual_qty - line.theoretical_qty if line.counted else 0.0
+                line.actual_qty - line.recipe_used_qty - line.received_qty
+                if line.counted else 0.0
             )
 
     @api.constrains('actual_qty')
