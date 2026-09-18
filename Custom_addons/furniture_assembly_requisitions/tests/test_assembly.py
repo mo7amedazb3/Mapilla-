@@ -565,8 +565,9 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         )
         self.assertEqual(
             set(supervisor_nail),
-            {'id', 'name', 'counted', 'actual_qty', 'status'},
+            {'id', 'name', 'uom_name', 'counted', 'actual_qty', 'status'},
         )
+        self.assertEqual(supervisor_nail['uom_name'], self.nail.uom_id.display_name)
         self.assertEqual(supervisor_nail['status'], 'pending')
         saved = report.with_user(self.supervisor).save_actual_inventory(
             'carpentry', self.nail.id, 1,
@@ -609,6 +610,7 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         self.assertEqual(admin_nail['variance_qty'], -3)
         self.assertIn('recipe_qty', admin_nail)
         self.assertIn('manual_qty', admin_nail)
+        self.assertEqual(admin_nail['uom_name'], self.nail.uom_id.display_name)
 
         action = self.env.ref(
             'furniture_assembly_requisitions.'

@@ -415,6 +415,9 @@ class AssemblyWeeklyMaterialReport(models.Model):
             list({value['product_id'] for value in values.values()})
         )
         names = {product.id: product.display_name for product in products}
+        uom_names = {
+            product.id: product.uom_id.display_name for product in products
+        }
         allowed_stage_codes = profile['allowed_stage_codes']
         stages = {code: {} for code in allowed_stage_codes}
         saved_lines = defaultdict(lambda: self.env[
@@ -438,6 +441,7 @@ class AssemblyWeeklyMaterialReport(models.Model):
             row = {
                 'id': product_id,
                 'name': names[product_id],
+                'uom_name': uom_names[product_id],
             }
             candidate_lines = saved_lines[(stage_code, product_id)]
             if profile['is_supervisor']:

@@ -491,12 +491,17 @@
 
 .o_mapilla_weekly_lines table.is-admin-inventory th[data-name="product_id"],
 .o_mapilla_weekly_lines table.is-admin-inventory td[name="product_id"] {
-    width: 32% !important;
+    width: 28% !important;
 }
 
 .o_mapilla_weekly_lines table.is-admin-inventory th[data-name]:not([data-name="product_id"]),
 .o_mapilla_weekly_lines table.is-admin-inventory td[name]:not([name="product_id"]) {
-    width: 17% !important;
+    width: 15% !important;
+}
+
+.o_mapilla_weekly_lines table.is-admin-inventory th[data-name="product_uom_id"],
+.o_mapilla_weekly_lines table.is-admin-inventory td[name="product_uom_id"] {
+    width: 12% !important;
 }
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_id"],
@@ -506,13 +511,18 @@
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="actual_qty"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="actual_qty"] {
-    width: 30% !important;
+    width: 20% !important;
 }
 
 .o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="inventory_status"],
 .o_mapilla_weekly_lines table.is-supervisor-inventory td[name="inventory_status"] {
-    width: 20% !important;
+    width: 15% !important;
     text-align: center !important;
+}
+
+.o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_uom_id"],
+.o_mapilla_weekly_lines table.is-supervisor-inventory td[name="product_uom_id"] {
+    width: 15% !important;
 }
 
 .o_mapilla_weekly_lines table.o_list_table thead th,
@@ -540,7 +550,8 @@
 .o_mapilla_weekly_lines th[data-name="received_qty"] > div,
 .o_mapilla_weekly_lines th[data-name="actual_qty"] > div,
 .o_mapilla_weekly_lines th[data-name="variance_qty"] > div,
-.o_mapilla_weekly_lines th[data-name="inventory_status"] > div {
+.o_mapilla_weekly_lines th[data-name="inventory_status"] > div,
+.o_mapilla_weekly_lines th[data-name="product_uom_id"] > div {
     justify-content: center !important;
 }
 
@@ -571,8 +582,17 @@
     text-align: center !important;
 }
 
+.o_mapilla_weekly_lines td[name="product_uom_id"] {
+    color: var(--permit-muted);
+    font-size: 13px;
+    font-weight: 750;
+    text-align: center !important;
+}
+
 .o_mapilla_weekly_lines td[name="actual_qty"] input {
-    min-width: 84px;
+    width: 112px !important;
+    min-width: 0 !important;
+    max-width: 100%;
     border: 1px solid #c7d2db;
     border-radius: 8px;
     background: #fff;
