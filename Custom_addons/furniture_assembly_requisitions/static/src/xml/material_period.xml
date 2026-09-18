@@ -2,15 +2,16 @@
 <templates xml:space="preserve">
     <t t-name="furniture_assembly_requisitions.MaterialPeriod">
         <div class="o_mapilla_material_period" dir="rtl">
-            <div class="o_mapilla_period_filters">
+            <div t-if="!state.result || state.result.is_admin" class="o_mapilla_period_filters">
                 <div class="o_mapilla_period_heading"><i class="fa fa-calendar" aria-hidden="true"/><div><strong>استهلاك الخامات خلال فترة</strong><small>اختار البداية والنهاية، ويتم التحديث تلقائيًا</small></div></div>
                 <label><span>من تاريخ</span><input type="date" aria-label="من تاريخ" t-model="state.from" t-on-change="(event) => this.onPeriodChanged('from', event)" t-att-disabled="state.loading"/></label>
                 <label><span>إلى تاريخ</span><input type="date" aria-label="إلى تاريخ" t-model="state.to" t-on-change="(event) => this.onPeriodChanged('to', event)" t-att-disabled="state.loading"/></label>
                 <button type="button" class="btn btn-outline-secondary" t-on-click="resetPeriod" t-att-disabled="state.loading || !recordId">أسبوع التقرير</button>
             </div>
             <div class="o_mapilla_period_caption" role="status" aria-live="polite">
-                <t t-if="state.loading">جارٍ حساب الاستهلاك…</t>
-                <t t-elif="state.result">الفترة المعروضة: <bdi t-esc="date(state.result.date_from)"/> إلى <bdi t-esc="date(state.result.date_to)"/> — شاملة يوم البداية ويوم النهاية</t>
+                <t t-if="state.loading">جارٍ تحميل بيانات الجرد…</t>
+                <t t-elif="state.result &amp;&amp; state.result.is_supervisor">أدخل العدد الفعلي لكل خامة؛ يتم الحفظ عند الخروج من الخانة.</t>
+                <t t-elif="state.result">الفترة المعروضة: <bdi t-esc="date(state.result.date_from)"/> إلى <bdi t-esc="date(state.result.date_to)"/> — شاملة يوم البداية ويوم النهاية<t t-if="!state.result.inventory_period"> — الجرد والفرق يظهران في أسبوع التقرير فقط</t></t>
                 <t t-else="">احفظ التقرير لعرض الاستهلاك.</t>
             </div>
             <div t-if="state.result" class="o_mapilla_stage_notebook o_mapilla_period_workspace" t-att-aria-busy="state.loading ? 'true' : 'false'">
@@ -22,13 +23,25 @@
                     </ul>
                 </div>
                 <div class="o_mapilla_permit_lines o_mapilla_weekly_lines">
-                    <table class="o_list_table table mb-0" aria-label="استهلاك خامات المرحلة">
-                        <thead><tr><th scope="col" data-name="product_id">اسم الخامة</th><th scope="col" data-name="recipe_used_qty">المسحوب من الريسيبي</th><th scope="col" data-name="received_qty">المسحوب يدوي</th></tr></thead>
+                    <table t-att-class="'o_list_table table mb-0 ' + (isSupervisor ? 'is-supervisor-inventory' : 'is-admin-inventory')" aria-label="جرد خامات المرحلة">
+                        <thead><tr><th scope="col" data-name="product_id">اسم الخامة</th><t t-if="!isSupervisor"><th scope="col" data-name="recipe_used_qty">المسحوب من الريسيبي</th><th scope="col" data-name="received_qty">المسحوب يدوي</th></t><th scope="col" data-name="actual_qty">الجرد الفعلي</th><th t-if="!isSupervisor" scope="col" data-name="variance_qty">الفرق</th></tr></thead>
                         <tbody>
-                            <tr t-foreach="lines" t-as="line" t-key="line.id"><td name="product_id" t-esc="line.name"/><td name="recipe_used_qty" t-esc="number(line.recipe_qty)"/><td name="received_qty" t-esc="number(line.manual_qty)"/></tr>
-                            <tr t-if="!lines.length"><td colspan="3" class="o_mapilla_period_empty">لا توجد خامات مسجلة لهذه المرحلة.</td></tr>
+                            <tr t-foreach="lines" t-as="line" t-key="line.id">
+                                <td name="product_id" t-esc="line.name"/>
+                                <t t-if="!isSupervisor"><td name="recipe_used_qty" t-esc="number(line.recipe_qty)"/><td name="received_qty" t-esc="number(line.manual_qty)"/></t>
+                                <td name="actual_qty">
+                                    <div t-if="isSupervisor" class="o_mapilla_actual_input">
+                                        <input type="text" inputmode="decimal" min="0" aria-label="الجرد الفعلي" t-att-value="line.counted ? line.actual_qty : ''" t-att-disabled="state.loading || state.savingLineId === line.id" t-on-change="(event) => this.saveActual(line, event)"/>
+                                        <i t-if="state.savingLineId === line.id" class="fa fa-spinner fa-spin" aria-label="جارٍ الحفظ"/>
+                                        <i t-elif="line.counted" class="fa fa-check-circle" aria-label="تم الحفظ"/>
+                                    </div>
+                                    <t t-else="" t-esc="line.counted ? number(line.actual_qty) : '—'"/>
+                                </td>
+                                <td t-if="!isSupervisor" name="variance_qty" t-att-class="line.counted ? (line.variance_qty &lt; 0 ? 'is-negative' : (line.variance_qty &gt; 0 ? 'is-positive' : 'is-zero')) : ''" t-esc="line.counted ? number(line.variance_qty) : '—'"/>
+                            </tr>
+                            <tr t-if="!lines.length"><td t-att-colspan="isSupervisor ? 2 : 5" class="o_mapilla_period_empty">لا توجد خامات مسجلة لهذه المرحلة.</td></tr>
                         </tbody>
-                        <tfoot t-if="lines.length"><tr><td>الإجمالي</td><td t-esc="total('recipe_qty')"/><td t-esc="total('manual_qty')"/></tr></tfoot>
+                        <tfoot t-if="lines.length &amp;&amp; !isSupervisor"><tr><td>الإجمالي</td><td t-esc="total('recipe_qty')"/><td t-esc="total('manual_qty')"/><td t-esc="totalCounted('actual_qty')"/><td t-esc="totalCounted('variance_qty')"/></tr></tfoot>
                     </table>
                 </div>
             </div>

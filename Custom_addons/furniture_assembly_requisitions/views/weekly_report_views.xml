@@ -62,5 +62,5 @@
               parent="assembly_request_root"
               action="action_assembly_weekly_material_report_direct"
               sequence="30"
-              groups="base.group_system"/>
+              groups="base.group_system,furniture_mrp.group_furniture_mrp_supervisor"/>
 </odoo>

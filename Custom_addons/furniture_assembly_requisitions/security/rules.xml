@@ -55,4 +55,16 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('base.group_system'))]"/>
     </record>
+    <record id="assembly_weekly_report_supervisor_company" model="ir.rule">
+        <field name="name">متابعة الجرد: شركة المشرف</field>
+        <field name="model_id" ref="model_furniture_assembly_weekly_material_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+    </record>
+    <record id="assembly_weekly_report_line_supervisor_own" model="ir.rule">
+        <field name="name">سطور الجرد: خامات المشرف فقط</field>
+        <field name="model_id" ref="model_furniture_assembly_weekly_material_report_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids), ('supervisor_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('furniture_mrp.group_furniture_mrp_supervisor'))]"/>
+    </record>
 </odoo>

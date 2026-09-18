@@ -489,6 +489,26 @@
     width: 25% !important;
 }
 
+.o_mapilla_weekly_lines table.is-admin-inventory th[data-name="product_id"],
+.o_mapilla_weekly_lines table.is-admin-inventory td[name="product_id"] {
+    width: 32% !important;
+}
+
+.o_mapilla_weekly_lines table.is-admin-inventory th[data-name]:not([data-name="product_id"]),
+.o_mapilla_weekly_lines table.is-admin-inventory td[name]:not([name="product_id"]) {
+    width: 17% !important;
+}
+
+.o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="product_id"],
+.o_mapilla_weekly_lines table.is-supervisor-inventory td[name="product_id"] {
+    width: 60% !important;
+}
+
+.o_mapilla_weekly_lines table.is-supervisor-inventory th[data-name="actual_qty"],
+.o_mapilla_weekly_lines table.is-supervisor-inventory td[name="actual_qty"] {
+    width: 40% !important;
+}
+
 .o_mapilla_weekly_lines table.o_list_table thead th,
 .o_mapilla_weekly_lines table.o_list_table thead th .o_column_title,
 .o_mapilla_weekly_lines table.o_list_table thead th .text-truncate {
@@ -511,7 +531,9 @@
 }
 
 .o_mapilla_weekly_lines th[data-name="recipe_used_qty"] > div,
-.o_mapilla_weekly_lines th[data-name="received_qty"] > div {
+.o_mapilla_weekly_lines th[data-name="received_qty"] > div,
+.o_mapilla_weekly_lines th[data-name="actual_qty"] > div,
+.o_mapilla_weekly_lines th[data-name="variance_qty"] > div {
     justify-content: center !important;
 }
 
@@ -531,7 +553,9 @@
 }
 
 .o_mapilla_weekly_lines td[name="recipe_used_qty"],
-.o_mapilla_weekly_lines td[name="received_qty"] {
+.o_mapilla_weekly_lines td[name="received_qty"],
+.o_mapilla_weekly_lines td[name="actual_qty"],
+.o_mapilla_weekly_lines td[name="variance_qty"] {
     direction: ltr;
     color: var(--permit-navy) !important;
     font-size: 15px;
@@ -548,6 +572,19 @@
     font-weight: 800;
     text-align: center;
 }
+
+.o_mapilla_actual_input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.o_mapilla_actual_input .fa-check-circle { color: #2d7a5b; }
+.o_mapilla_actual_input .fa-spinner { color: var(--permit-muted); }
+.o_mapilla_weekly_lines td[name="variance_qty"].is-negative { color: #b23b3b !important; }
+.o_mapilla_weekly_lines td[name="variance_qty"].is-positive { color: #9a681c !important; }
+.o_mapilla_weekly_lines td[name="variance_qty"].is-zero { color: #2d7a5b !important; }
 
 /* Compact weekly layout: one summary strip and one stage-tab workspace. */
 .o_mapilla_weekly_inventory_form .o_mapilla_weekly_hero {

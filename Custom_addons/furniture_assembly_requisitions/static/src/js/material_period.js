@@ -16,6 +16,7 @@ export class MaterialPeriod extends Component {
         this.requestId = 0;
         this.state = useState({
             from: "", to: "", result: null, loading: false, stage: "carpentry",
+            savingLineId: null,
         });
         onWillStart(() => this.loadRecord(this.props.record));
         onWillUpdateProps((props) => {
@@ -54,6 +55,9 @@ export class MaterialPeriod extends Component {
             );
             if (requestId === this.requestId) {
                 this.state.result = result;
+                if (!result.stages.some((stage) => stage.code === this.state.stage)) {
+                    this.state.stage = result.stages[0]?.code || "";
+                }
             }
         } catch (error) {
             if (requestId === this.requestId) {
@@ -83,12 +87,64 @@ export class MaterialPeriod extends Component {
         return this.state.result?.stages.find(stage => stage.code === this.state.stage)?.lines || [];
     }
 
+    get isSupervisor() {
+        return Boolean(this.state.result?.is_supervisor);
+    }
+
     number(value) {
         return formatFloat(value, { digits: [16, 3] });
     }
 
     total(field) {
-        return this.number(this.lines.reduce((sum, line) => sum + line[field], 0));
+        return this.number(this.lines.reduce((sum, line) => sum + (Number(line[field]) || 0), 0));
+    }
+
+    totalCounted(field) {
+        return this.number(this.lines.reduce(
+            (sum, line) => sum + (line.counted ? (Number(line[field]) || 0) : 0),
+            0
+        ));
+    }
+
+    normalizeNumber(value) {
+        const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+        const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+        return String(value)
+            .trim()
+            .replace(/[٠-٩]/g, (digit) => arabicDigits.indexOf(digit))
+            .replace(/[۰-۹]/g, (digit) => persianDigits.indexOf(digit))
+            .replace(/٬/g, "")
+            .replace(/[٫,]/g, ".");
+    }
+
+    async saveActual(line, event) {
+        const input = event.target;
+        const normalized = this.normalizeNumber(input.value);
+        const quantity = Number(normalized);
+        if (normalized === "" || !Number.isFinite(quantity) || quantity < 0) {
+            this.notification.add("أدخل رقمًا صحيحًا موجبًا أو صفرًا.", { type: "warning" });
+            input.value = line.counted ? line.actual_qty : "";
+            return;
+        }
+        this.state.savingLineId = line.id;
+        input.disabled = true;
+        try {
+            const saved = await this.orm.call(
+                "furniture.assembly.weekly.material.report", "save_actual_inventory",
+                [[this.recordId], this.state.stage, line.id, quantity]
+            );
+            line.counted = saved.counted;
+            line.actual_qty = saved.actual_qty;
+            line.variance_qty = saved.variance_qty;
+            input.value = saved.actual_qty;
+            this.notification.add(`تم حفظ جرد ${line.name}.`, { type: "success" });
+        } catch (error) {
+            input.value = line.counted ? line.actual_qty : "";
+            this.notification.add(error.data?.message || "تعذر حفظ الجرد الفعلي.", { type: "danger" });
+        } finally {
+            input.disabled = false;
+            this.state.savingLineId = null;
+        }
     }
 
     date(value) {

@@ -518,6 +518,11 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         current.action_stage_dashboard_finish_product_batch(token, 'carpentry')
 
         Report = self.env['furniture.assembly.weekly.material.report']
+        current_week_start, _current_week_end = Report._week_dates()
+        Report.search([
+            ('company_id', '=', self.env.company.id),
+            ('week_start', '=', current_week_start),
+        ]).unlink()
         report = Report.create({'company_id': self.env.company.id})
         stage_fields = {
             'priming': 'priming_line_ids',
@@ -544,6 +549,65 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         self.assertEqual(nail_line.recipe_used_qty, 2)
         self.assertEqual(nail_line.theoretical_qty, 0)
 
+        supervisor_data = report.with_user(self.supervisor).get_period_materials(
+            fields.Date.to_string(report.week_start),
+            fields.Date.to_string(report.week_end),
+        )
+        self.assertTrue(supervisor_data['is_supervisor'])
+        self.assertFalse(supervisor_data['is_admin'])
+        self.assertEqual(
+            [stage['code'] for stage in supervisor_data['stages']],
+            ['carpentry'],
+        )
+        supervisor_nail = next(
+            row for row in supervisor_data['stages'][0]['lines']
+            if row['id'] == self.nail.id
+        )
+        self.assertEqual(
+            set(supervisor_nail),
+            {'id', 'name', 'counted', 'actual_qty'},
+        )
+        saved = report.with_user(self.supervisor).save_actual_inventory(
+            'carpentry', self.nail.id, 1,
+        )
+        self.assertTrue(saved['counted'])
+        self.assertEqual(saved['actual_qty'], 1)
+        self.assertEqual(saved['variance_qty'], 1)
+        nail_line.invalidate_recordset(['counted', 'actual_qty', 'variance_qty'])
+        self.assertTrue(nail_line.counted)
+        self.assertEqual(nail_line.actual_qty, 1)
+        self.assertEqual(nail_line.variance_qty, 1)
+
+        admin_data = report.get_period_materials(
+            fields.Date.to_string(report.week_start),
+            fields.Date.to_string(report.week_end),
+        )
+        admin_nail = next(
+            row
+            for stage in admin_data['stages'] if stage['code'] == 'carpentry'
+            for row in stage['lines'] if row['id'] == self.nail.id
+        )
+        self.assertEqual(admin_nail['actual_qty'], 1)
+        self.assertEqual(admin_nail['variance_qty'], 1)
+        self.assertIn('recipe_qty', admin_nail)
+        self.assertIn('manual_qty', admin_nail)
+
+        other_supervisor = self._create_supervisor_user(('painting',))
+        with self.assertRaises(AccessError):
+            report.with_user(other_supervisor).save_actual_inventory(
+                'carpentry', self.nail.id, 1,
+            )
+        with self.assertRaises(ValidationError):
+            report.with_user(self.supervisor).save_actual_inventory(
+                'carpentry', self.nail.id, -1,
+            )
+        visible_lines = self.env[
+            'furniture.assembly.weekly.material.report.line'
+        ].with_user(self.supervisor).search([('report_id', '=', report.id)])
+        self.assertEqual(set(visible_lines.mapped('supervisor_id').ids), {
+            self.supervisor.id,
+        })
+
         for report_line in report.line_ids:
             report_line.write({
                 'counted': True,
@@ -561,5 +625,9 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
             lambda item: item.product_id == self.nail
         ).ensure_one()
         self.assertEqual(next_nail_line.opening_qty, 1)
-        with self.assertRaises(AccessError):
-            Report.with_user(self.supervisor).search([])
+        self.assertIn(
+            report,
+            Report.with_user(self.supervisor).search([
+                ('company_id', '=', self.env.company.id),
+            ]),
+        )

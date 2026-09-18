@@ -1,3 +1,4 @@
+import math
 from collections import defaultdict
 from datetime import datetime, time, timedelta
 
@@ -14,7 +15,12 @@ from odoo.addons.furniture_mrp.models.mrp_stage_product_batch import (
     PRODUCT_BATCH_STAGE_CODES,
 )
 
-from .requisition import SHARED_HALL_STAGES, STAGE_HALL_XMLIDS, STAGE_LABELS
+from .requisition import (
+    SHARED_HALL_STAGES,
+    STAGE_GROUPS,
+    STAGE_HALL_XMLIDS,
+    STAGE_LABELS,
+)
 
 
 ADMIN_GROUP = 'base.group_system'
@@ -107,6 +113,38 @@ class AssemblyWeeklyMaterialReport(models.Model):
     def _check_admin(self):
         if not self.env.is_superuser() and not self.env.user.has_group(ADMIN_GROUP):
             raise AccessError(_('متابعة الاستهلاك متاحة لمسؤولي النظام فقط.'))
+
+    @api.model
+    def _inventory_access_profile(self, company):
+        """Return the server-enforced inventory scope for the current user."""
+        user = self.env.user
+        is_admin = self.env.is_superuser() or user.has_group(ADMIN_GROUP)
+        is_supervisor = user.has_group(
+            'furniture_mrp.group_furniture_mrp_supervisor'
+        )
+        if not is_admin and not is_supervisor:
+            raise AccessError(_(
+                'متابعة الجرد متاحة لمسؤولي النظام ومشرفي المراحل فقط.'
+            ))
+
+        allowed_stage_codes = list(SHARED_HALL_STAGES)
+        if not is_admin:
+            policies = self.env[
+                'furniture.assembly.supervisor.material'
+            ].sudo().search([
+                ('company_id', '=', company.id),
+                ('supervisor_id', '=', user.id),
+            ])
+            policy_stage_codes = set(policies.mapped('stage_code'))
+            allowed_stage_codes = [
+                code for code in SHARED_HALL_STAGES
+                if code in policy_stage_codes and user.has_group(STAGE_GROUPS[code])
+            ]
+        return {
+            'is_admin': is_admin,
+            'is_supervisor': is_supervisor and not is_admin,
+            'allowed_stage_codes': allowed_stage_codes,
+        }
 
     @api.model
     def _week_dates(self, target_date=None):
@@ -340,7 +378,7 @@ class AssemblyWeeklyMaterialReport(models.Model):
     def get_period_materials(self, date_from, date_to):
         """Read an inclusive date range without changing a weekly inventory."""
         self.ensure_one()
-        self._check_admin()
+        profile = self._inventory_access_profile(self.company_id)
         self.check_access('read')
         try:
             start = fields.Date.to_date(date_from)
@@ -349,6 +387,9 @@ class AssemblyWeeklyMaterialReport(models.Model):
             raise ValidationError(_('أدخل تاريخ بداية ونهاية صحيحين.'))
         if not start or not end or start > end or end.year >= 9999:
             raise ValidationError(_('تاريخ البداية يجب أن يكون قبل تاريخ النهاية أو مساويًا له.'))
+        inventory_period = start == self.week_start and end == self.week_end
+        if profile['is_supervisor'] and not inventory_period:
+            raise AccessError(_('المشرف يسجل جرد أسبوع التقرير الحالي فقط.'))
         # new() is deliberately in-memory: querying overlapping ranges must not
         # overwrite weekly snapshots, counted quantities, or the next opening.
         preview = self.new({
@@ -361,24 +402,126 @@ class AssemblyWeeklyMaterialReport(models.Model):
             list({value['product_id'] for value in values.values()})
         )
         names = {product.id: product.display_name for product in products}
-        stages = {code: {} for code in SHARED_HALL_STAGES}
-        for value in values.values():
+        allowed_stage_codes = profile['allowed_stage_codes']
+        stages = {code: {} for code in allowed_stage_codes}
+        saved_lines = defaultdict(lambda: self.env[
+            'furniture.assembly.weekly.material.report.line'
+        ].sudo())
+        if inventory_period:
+            for line in self.sudo().line_ids.sorted(
+                key=lambda item: (not item.counted, item.id)
+            ):
+                saved_lines[(line.stage_code, line.product_id.id)] |= line
+
+        for (supervisor_id, _stage_code, _product_id), value in values.items():
+            stage_code = value['stage_code']
+            product_id = value['product_id']
+            if stage_code not in stages:
+                continue
+            if profile['is_supervisor'] and supervisor_id != self.env.user.id:
+                continue
             # The source values repeat hall totals for each allowed supervisor;
             # one material row per stage prevents double-counting those totals.
-            stages[value['stage_code']][value['product_id']] = {
-                'id': value['product_id'],
-                'name': names[value['product_id']],
-                'recipe_qty': value['recipe_used_qty'],
-                'manual_qty': value['received_qty'],
+            row = {
+                'id': product_id,
+                'name': names[product_id],
             }
+            candidate_lines = saved_lines[(stage_code, product_id)]
+            if profile['is_supervisor']:
+                candidate_lines = candidate_lines.filtered(
+                    lambda line: line.supervisor_id.id == self.env.user.id
+                )
+            inventory_line = candidate_lines[:1]
+            if profile['is_admin']:
+                row.update({
+                    'recipe_qty': value['recipe_used_qty'],
+                    'manual_qty': value['received_qty'],
+                    'counted': bool(inventory_line and inventory_line.counted),
+                    'actual_qty': (
+                        inventory_line.actual_qty
+                        if inventory_line and inventory_line.counted else False
+                    ),
+                    'variance_qty': (
+                        inventory_line.variance_qty
+                        if inventory_line and inventory_line.counted else False
+                    ),
+                })
+            else:
+                row.update({
+                    'counted': bool(inventory_line and inventory_line.counted),
+                    'actual_qty': (
+                        inventory_line.actual_qty
+                        if inventory_line and inventory_line.counted else False
+                    ),
+                })
+            stages[stage_code][product_id] = row
         return {
             'date_from': fields.Date.to_string(start),
             'date_to': fields.Date.to_string(end),
+            'is_admin': profile['is_admin'],
+            'is_supervisor': profile['is_supervisor'],
+            'inventory_period': inventory_period,
             'stages': [
                 {'code': code, 'name': STAGE_LABELS[code],
                  'lines': sorted(stages[code].values(), key=lambda row: row['name'])}
-                for code in SHARED_HALL_STAGES
+                for code in allowed_stage_codes
             ],
+        }
+
+    def save_actual_inventory(self, stage_code, product_id, actual_qty):
+        """Save one hall count after checking the caller's exact stage policy."""
+        self.ensure_one()
+        profile = self._inventory_access_profile(self.company_id)
+        self.check_access('read')
+        if not profile['is_supervisor']:
+            raise AccessError(_('إدخال الجرد من هذه الشاشة متاح لمشرف المرحلة فقط.'))
+        if stage_code not in profile['allowed_stage_codes']:
+            raise AccessError(_('غير مسموح لك بتسجيل جرد هذه المرحلة.'))
+        try:
+            product_id = int(product_id)
+            quantity = float(actual_qty)
+        except (TypeError, ValueError):
+            raise ValidationError(_('أدخل كمية جرد صحيحة.'))
+        if product_id <= 0 or not math.isfinite(quantity) or quantity < 0:
+            raise ValidationError(_('الجرد الفعلي يجب أن يكون رقمًا موجبًا أو صفرًا.'))
+
+        policy = self.env[
+            'furniture.assembly.supervisor.material'
+        ].sudo().search([
+            ('company_id', '=', self.company_id.id),
+            ('supervisor_id', '=', self.env.user.id),
+            ('stage_code', '=', stage_code),
+            ('product_ids', 'in', product_id),
+        ], limit=1)
+        if not policy:
+            raise AccessError(_('هذه الخامة غير مسموحة لك في المرحلة المختارة.'))
+
+        own_line = self.sudo().line_ids.filtered(lambda line: (
+            line.supervisor_id.id == self.env.user.id
+            and line.stage_code == stage_code
+            and line.product_id.id == product_id
+        ))[:1]
+        if not own_line:
+            self.sudo().action_refresh()
+            own_line = self.sudo().line_ids.filtered(lambda line: (
+                line.supervisor_id.id == self.env.user.id
+                and line.stage_code == stage_code
+                and line.product_id.id == product_id
+            ))[:1]
+        if not own_line:
+            raise ValidationError(_('سطر الخامة غير موجود في تقرير الأسبوع الحالي.'))
+
+        # The physical stock belongs to the stage hall. If two supervisors are
+        # configured for the same material, keep their report rows identical.
+        stage_lines = self.sudo().line_ids.filtered(lambda line: (
+            line.stage_code == stage_code and line.product_id.id == product_id
+        ))
+        stage_lines.write({'counted': True, 'actual_qty': quantity})
+        own_line.invalidate_recordset(['counted', 'actual_qty', 'variance_qty'])
+        return {
+            'counted': True,
+            'actual_qty': own_line.actual_qty,
+            'variance_qty': own_line.variance_qty,
         }
 
     def action_refresh(self):
@@ -436,7 +579,7 @@ class AssemblyWeeklyMaterialReport(models.Model):
     @api.model
     def action_open_current_report(self):
         """Open the current company's weekly report directly from the menu."""
-        self._check_admin()
+        self._inventory_access_profile(self.env.company)
         report = self._generate_for_company(self.env.company)
         return {
             'type': 'ir.actions.act_window',
