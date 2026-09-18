@@ -138,15 +138,23 @@ export class MaterialPeriod extends Component {
         this.state.savingLineId = line.id;
         input.disabled = true;
         try {
+            const method = this.isSupervisor
+                ? "save_actual_inventory"
+                : "save_admin_actual_inventory";
             const saved = await this.orm.call(
-                "furniture.assembly.weekly.material.report", "save_actual_inventory",
+                "furniture.assembly.weekly.material.report", method,
                 [[this.recordId], this.state.stage, line.id, quantity, line.uom_id]
             );
             line.counted = saved.counted;
             line.actual_qty = saved.actual_qty;
             line.uom_id = saved.uom_id;
             line.uom_name = saved.uom_name;
-            line.status = saved.status;
+            if ("status" in saved) {
+                line.status = saved.status;
+            }
+            if ("variance_qty" in saved) {
+                line.variance_qty = saved.variance_qty;
+            }
             input.value = saved.actual_qty;
             this.notification.add(`تم حفظ جرد ${line.name}.`, { type: "success" });
         } catch (error) {

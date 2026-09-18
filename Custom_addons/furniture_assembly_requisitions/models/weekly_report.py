@@ -662,6 +662,55 @@ class AssemblyWeeklyMaterialReport(models.Model):
             'status': self._inventory_status(True, own_line.variance_qty),
         }
 
+    def save_admin_actual_inventory(
+        self, stage_code, product_id, actual_qty, uom_id=False,
+    ):
+        """Let an administrator correct a weekly physical count."""
+        self.ensure_one()
+        self._check_admin()
+        self.check_access('read')
+        try:
+            product_id = int(product_id)
+            quantity = float(actual_qty)
+        except (TypeError, ValueError):
+            raise ValidationError(_('أدخل كمية جرد صحيحة.'))
+        if product_id <= 0 or not math.isfinite(quantity) or quantity < 0:
+            raise ValidationError(_('الجرد الفعلي يجب أن يكون رقمًا موجبًا أو صفرًا.'))
+
+        stage_lines = self.sudo().line_ids.filtered(lambda line: (
+            line.stage_code == stage_code and line.product_id.id == product_id
+        ))
+        inventory_line = stage_lines[:1]
+        if not inventory_line:
+            raise ValidationError(_('سطر الخامة غير موجود في تقرير الأسبوع الحالي.'))
+        uom = self._validated_inventory_uom(
+            stage_code, inventory_line,
+            uom_id or inventory_line.actual_uom_id.id
+            or inventory_line.product_uom_id.id,
+        )
+        product_quantity = uom._compute_quantity(
+            quantity, inventory_line.product_uom_id, round=False,
+        )
+        stage_lines.write({
+            'counted': True,
+            'actual_qty': product_quantity,
+            'actual_uom_id': uom.id,
+        })
+        inventory_line.invalidate_recordset([
+            'counted', 'actual_qty', 'actual_uom_id', 'variance_qty',
+        ])
+        return {
+            'counted': True,
+            'actual_qty': self._quantity_for_inventory_uom(
+                inventory_line.product_id, inventory_line.actual_qty, uom,
+            ),
+            'variance_qty': self._quantity_for_inventory_uom(
+                inventory_line.product_id, inventory_line.variance_qty, uom,
+            ),
+            'uom_id': uom.id,
+            'uom_name': uom.display_name,
+        }
+
     def set_actual_inventory_uom(self, stage_code, product_id, uom_id):
         """Persist a permitted display/input unit without changing the count."""
         own_line, stage_lines = self._supervisor_inventory_lines(

@@ -654,6 +654,19 @@ class TestAssemblyRequisitions(TestFurnitureMrpStageDashboard):
         self.assertIn('manual_qty', admin_nail)
         self.assertEqual(admin_nail['uom_name'], self.nail.uom_id.display_name)
 
+        admin_saved = report.save_admin_actual_inventory(
+            'carpentry', self.nail.id, 4, self.nail.uom_id.id,
+        )
+        self.assertEqual(admin_saved['actual_qty'], 4)
+        self.assertEqual(admin_saved['variance_qty'], 0)
+        report.save_admin_actual_inventory(
+            'carpentry', self.nail.id, 1, self.nail.uom_id.id,
+        )
+        with self.assertRaises(AccessError):
+            report.with_user(self.supervisor).save_admin_actual_inventory(
+                'carpentry', self.nail.id, 4, self.nail.uom_id.id,
+            )
+
         action = self.env.ref(
             'furniture_assembly_requisitions.'
             'action_assembly_weekly_material_report_direct'
